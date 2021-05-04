@@ -67,11 +67,11 @@
 
 					<template #cell(selected)="{ rowSelected }">
 						<template v-if="rowSelected">
-							<span aria-hidden="true">&check;</span>
+							<b-icon icon="check-square-fill"></b-icon>
 							<span class="sr-only">Selected</span>
 						</template>
 						<template v-else>
-							<span aria-hidden="true">&nbsp;</span>
+							<b-icon icon="dash-square"></b-icon>
 							<span class="sr-only">Not selected</span>
 						</template>
 					</template>
