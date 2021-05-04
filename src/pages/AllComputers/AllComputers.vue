@@ -8,7 +8,7 @@
 					<b-form-group
 						label="Filter"
 						label-for="filter-input"
-						label-cols-sm="3"
+						label-cols-sm="9"
 						label-align-sm="right"
 						label-size="sm"
 						class="mb-0"
@@ -28,17 +28,21 @@
 					</b-form-group>
 				</b-col>
 			</b-row>
-
-			<b-checkbox
-				:disabled="visibleFields.length == 1 && field.visible"
-				v-for="field in fields" 
-				:key="field.key" 
-				v-model="field.visible" 
-				inline
-			>
-				{{ field.key }}
-			</b-checkbox>
-
+			<br><br>
+			<b-row>
+				<b-col>
+					<b-checkbox
+						:disabled="visibleFields.length == 1 && field.visible"
+						v-for="field in fields" 
+						:key="field.key" 
+						v-model="field.visible" 
+						inline
+					>
+						{{ field.key }}
+					</b-checkbox>
+				</b-col>
+			</b-row>
+			<br><br>
 			<div class="overflow-auto">
 				<b-table striped hover responsive selectable
 					id="all-computers"
@@ -134,6 +138,8 @@ export default {
 			totalRows: 1,
 			filter: null,
 			selectMode: 'multi',
+			sortDesc: null,
+			sortBy: null,
 		};
 	},
 	created() {
