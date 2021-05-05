@@ -3,6 +3,16 @@
 		<div class="AllComputers-page">
 			<h1 class="page-title">All computers</h1>
 
+			<download-excel
+				class="btn btn-default"
+				:data="json_data"
+				:fields="json_fields"
+				type="csv"
+				name="export.xls"
+			>
+				Export CSV
+			</download-excel>
+
 			<b-row>
 				<b-col>
 					<b-form-group
@@ -140,6 +150,16 @@ export default {
 			selectMode: 'multi',
 			sortDesc: null,
 			sortBy: null,
+			json_fields: [],
+			json_data: [],
+			json_meta: [
+				[
+					{
+						key: "charset",
+						value: "utf-8",
+					},
+				],
+			],
 		};
 	},
 	created() {
@@ -157,6 +177,7 @@ export default {
 					sortable: true,
 					visible: true,
 				}
+				this.json_fields[data] = data
 				var index = this.fields.findIndex(x => x.key==data);
 				index === -1 ? this.fields.push(array) : null
 			})
@@ -170,6 +191,7 @@ export default {
 	mounted() {
 		// Set the initial number of items
 		this.totalRows = this.computers.table.length
+		this.json_data = this.computers.table
     },
 	methods: {
 		onFiltered(filteredItems) {
