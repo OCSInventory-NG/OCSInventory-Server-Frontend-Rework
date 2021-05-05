@@ -16,11 +16,7 @@ import Widget from './components/Widget/Widget';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
-//import SmartTable from 'vuejs-smart-table';
-
-import DataTable from 'laravel-vue-datatable';
-
-Vue.use(DataTable);
+import JsonExcel from "vue-json-excel";
 
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons)
@@ -33,7 +29,8 @@ Vue.component('apexchart', VueApexCharts);
 Vue.mixin(layoutMixin);
 Vue.use(Toasted, {duration: 10000});
 Vue.use(VueAxios, axios);
-//Vue.use(SmartTable);
+
+Vue.component('downloadExcel', JsonExcel);
 
 Vue.config.productionTip = false;
 
