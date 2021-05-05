@@ -3,6 +3,7 @@
 		<div class="AllComputers-page">
 			<h1 class="page-title">All computers</h1>
 
+			<!-- Export button -->
 			<download-excel
 				class="btn btn-default"
 				:data="json_data"
@@ -13,6 +14,7 @@
 				Export CSV
 			</download-excel>
 
+			<!-- Search bar -->
 			<b-row>
 				<b-col>
 					<b-form-group
@@ -39,6 +41,8 @@
 				</b-col>
 			</b-row>
 			<br><br>
+
+			<!-- Show/Hide columns -->
 			<b-row>
 				<b-col>
 					<b-checkbox
@@ -53,6 +57,8 @@
 				</b-col>
 			</b-row>
 			<br><br>
+
+			<!-- Datatable -->
 			<div class="overflow-auto">
 				<b-table striped hover responsive selectable
 					id="all-computers"
@@ -88,6 +94,7 @@
 				</b-table>
 			</div>
 
+			<!-- Pagination -->
 			<b-row>
 				<b-col sm="3" md="3" class="my-1">
 					<b-form-group
@@ -133,9 +140,12 @@ export default {
 	name: 'AllComputers',
 	data() {
 		return {
+			// Pagination parameters
 			perPage: 5,
 			currentPage: 1,
 			pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
+			totalRows: 1,
+			// Datatable datas
 			fields: [
 				{ 
 					key: "selected", 
@@ -145,11 +155,14 @@ export default {
 				}
 			],
 			computers,
-			totalRows: 1,
+			// Search parameter
 			filter: null,
+			// Select row parameter
 			selectMode: 'multi',
+			// Sort datatable parameters
 			sortDesc: null,
 			sortBy: null,
+			// Export parameters
 			json_fields: [],
 			json_data: [],
 			json_meta: [
@@ -177,13 +190,16 @@ export default {
 					sortable: true,
 					visible: true,
 				}
+				// Initialize CSV export header
 				this.json_fields[data] = data
+				// Initialize datatable header
 				var index = this.fields.findIndex(x => x.key==data);
 				index === -1 ? this.fields.push(array) : null
 			})
 		})
 	},
 	computed: {
+		// Initialize visible fields
 		visibleFields() {
 			return this.fields.filter(field => field.visible)
 		}
@@ -191,14 +207,16 @@ export default {
 	mounted() {
 		// Set the initial number of items
 		this.totalRows = this.computers.table.length
+		// Initialize data to export
 		this.json_data = this.computers.table
     },
 	methods: {
+		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
-			// Trigger pagination to update the number of buttons/pages due to filtering
 			this.totalRows = filteredItems.length
 			this.currentPage = 1
 		},
+		// Trigger selection rows
 		selectAllRows() {
 			if(this.$refs.selectableTable.selectedRows[0] === true) {
 				this.$refs.selectableTable.clearSelected()
