@@ -6,6 +6,7 @@ import VueTouch from 'vue-touch';
 import Trend from 'vuetrend';
 import Toasted from 'vue-toasted';
 import VueApexCharts from 'vue-apexcharts';
+import VueComp from '@vue/composition-api';
 
 import store from './store';
 import router from './Routes';
@@ -17,6 +18,12 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 
 import JsonExcel from "vue-json-excel";
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+
+Vue.use(VueApexCharts)
 
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons)
@@ -31,6 +38,7 @@ Vue.use(Toasted, {duration: 10000});
 Vue.use(VueAxios, axios);
 
 Vue.component('downloadExcel', JsonExcel);
+Vue.use(VueComp);
 
 Vue.config.productionTip = false;
 
