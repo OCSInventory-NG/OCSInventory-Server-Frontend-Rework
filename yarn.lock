@@ -1425,10 +1425,10 @@
     "normalize-path" "^3.0.0"
     "picomatch" "^2.0.4"
 
-"apexcharts@^3.22.2", "apexcharts@^3.6.6":
-  "integrity" "sha512-zdYHs3k3tgmCn1BpYLj7rhGEndBYF33Pq1+g0ora37xAr+3act5CJrpdXM2jx2boVUyXgavoSp6sa8WpK7RkSA=="
-  "resolved" "https://registry.npmjs.org/apexcharts/-/apexcharts-3.26.0.tgz"
-  "version" "3.26.0"
+"apexcharts@^3.26.0", "apexcharts@^3.26.1":
+  "integrity" "sha512-Z/pfGTsL4YUm1tHd6a0d0G2hX4XUmhEI0b/5BxVK69dEB/XXvVMX9hKCkcIx+kPyVqVFCuo91ZjCdqjMcmSVBA=="
+  "resolved" "https://registry.npmjs.org/apexcharts/-/apexcharts-3.26.1.tgz"
+  "version" "3.26.1"
   dependencies:
     "svg.draggable.js" "^2.2.2"
     "svg.easing.js" "^2.0.0"
@@ -4233,6 +4233,11 @@
   "integrity" "sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ=="
   "resolved" "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.6.tgz"
   "version" "4.2.6"
+
+"gridstack@^4.2.2":
+  "integrity" "sha512-pVU1+eexa/gs4YFuJHjGDvObq6mcmie8aGULCu1F/u39lFlpAmZrzf8kJ+3tWbdBYdBUoxT/gydwDDeiA+C2Ug=="
+  "resolved" "https://registry.npmjs.org/gridstack/-/gridstack-4.2.2.tgz"
+  "version" "4.2.2"
 
 "gzip-size@^5.0.0":
   "integrity" "sha512-FNHi6mmoHvs1mxZAds4PpdCS6QG8B4C1krxJsMutgxl5t3+GlRTzzI3NEkifXx2pVsOvJdOGSmIgDhQ55FwdPA=="
@@ -8885,10 +8890,10 @@
   "resolved" "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz"
   "version" "1.1.2"
 
-"vue-apexcharts@^1.6.0":
-  "integrity" "sha512-sT6tuVTLBwfH3TA7azecDNS/W70bmz14ZJI7aE7QIqcG9I6OywyH7x3hcOeY1v1DxttI8Svc5RuYj4Dd+A5F4g=="
-  "resolved" "https://registry.npmjs.org/vue-apexcharts/-/vue-apexcharts-1.6.0.tgz"
-  "version" "1.6.0"
+"vue-apexcharts@^1.6.1":
+  "integrity" "sha512-ILn3/55IvZQUgsc7+jKDjPfHfGUlcUQi/lDrLjRe5g7gfjj99o8otXoHwMeib3CBHYdQXNG9foe1vzv7RdUzXA=="
+  "resolved" "https://registry.npmjs.org/vue-apexcharts/-/vue-apexcharts-1.6.1.tgz"
+  "version" "1.6.1"
 
 "vue-axios@^3.2.4":
   "integrity" "sha512-8Dgws6dwt+1LoKEU4HDzIPfaRgWHl0xLDLW6kxrAk/z3GAJ2thkajcXC4qZgmqj0cZRx/Z/dzooKi5HWtUQwxA=="

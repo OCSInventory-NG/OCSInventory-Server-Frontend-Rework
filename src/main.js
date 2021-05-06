@@ -22,6 +22,9 @@ import JsonExcel from "vue-json-excel";
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+
+Vue.use(VueApexCharts)
+
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons)
 
