@@ -6,11 +6,11 @@ export default {
             appConfig: config.app,
         }
     },
-  methods: {
-    decodeHtml(html) {
-      let txt = document.createElement("textarea");
-      txt.innerHTML = html;
-      return txt.value;
-    }
-  }
+	methods: {
+		decodeHtml(html) {
+			let txt = document.createElement("textarea");
+			txt.innerHTML = html;
+			return txt.value;
+		}
+	}
 };

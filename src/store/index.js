@@ -6,7 +6,7 @@ import layout from './layout';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  modules: {
-    layout,
-  },
+	modules: {
+		layout,
+	},
 });

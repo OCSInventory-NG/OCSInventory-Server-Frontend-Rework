@@ -741,6 +741,122 @@
   dependencies:
     "@hapi/hoek" "^8.3.0"
 
+"@interactjs/actions@^1.10.2", "@interactjs/actions@1.10.11":
+  "integrity" "sha512-P39zeefr4hkmKx+5nZ+mrH1s0l2YJ3gIHrthXmE81n6MlMa42m0WtHcTms4C5JTTNBP2EEDY+KGgGxSnmJKvUw=="
+  "resolved" "https://registry.npmjs.org/@interactjs/actions/-/actions-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/auto-scroll@1.10.11":
+  "integrity" "sha512-feHNjhi0EMNLV2nQcEgjYPz2mI54aeSW2RiaoNtFLyBvtXKp0b4DmluwDv6DvuXmUpDwD5g/Hk1gGM2rgl7iqQ=="
+  "resolved" "https://registry.npmjs.org/@interactjs/auto-scroll/-/auto-scroll-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/auto-start@^1.10.2", "@interactjs/auto-start@1.10.11":
+  "integrity" "sha512-cIg5CcalCPtC6AiGq6j/0hKUtL2MweEpvw12FuB19sz2Q9Dye0J4GliHKhOYvtumNinnvfVAZ4FZMqZEuX7YZA=="
+  "resolved" "https://registry.npmjs.org/@interactjs/auto-start/-/auto-start-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/core@1.10.11":
+  "integrity" "sha512-aJ50ccVeszpJt7wPH7Yfqm7f1aG1SA94qd90P0NaESh5/QUXn4CESO6igobo4DFHQ5z+1Rfdl8aphP4JxlH4gw=="
+  "resolved" "https://registry.npmjs.org/@interactjs/core/-/core-1.10.11.tgz"
+  "version" "1.10.11"
+
+"@interactjs/dev-tools@^1.10.2", "@interactjs/dev-tools@1.10.11":
+  "integrity" "sha512-BP2FNfMbF7zLuOAUGMkDhCo1e1B0fnqyb9ih/Y8yAIJuoLrZxP/9htbsS1vZOIVZ4UgtrId4cYOwfcAZBMQtmw=="
+  "resolved" "https://registry.npmjs.org/@interactjs/dev-tools/-/dev-tools-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/inertia@1.10.11":
+  "integrity" "sha512-h+sknCzRqBSyHy4ctPNsq56mxkAMMdwHWD6en7rDEw899gdGKYaXVDVdv1jMfiwNRw0eRFBNoCiol8r3a/a3Jw=="
+  "resolved" "https://registry.npmjs.org/@interactjs/inertia/-/inertia-1.10.11.tgz"
+  "version" "1.10.11"
+  dependencies:
+    "@interactjs/offset" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/interact@1.10.11":
+  "integrity" "sha512-0iZJ9l547JuBA/lKxK4ARGYVmMqRSsAdA8gXL1zWe51qEIQq8PyWmMipoi8JbDaL7exC2THKwkXu5uq5ndT+iA=="
+  "resolved" "https://registry.npmjs.org/@interactjs/interact/-/interact-1.10.11.tgz"
+  "version" "1.10.11"
+  dependencies:
+    "@interactjs/core" "1.10.11"
+    "@interactjs/types" "1.10.11"
+    "@interactjs/utils" "1.10.11"
+
+"@interactjs/interactjs@^1.10.2":
+  "integrity" "sha512-cGOxf6rp3Y8/sk88LhIT0XDn4gCiCzAnUG5Kkj9SAqiUO6BK/9+Wbp1IBkNaPgl/8uG8gNHh/dXBrlBBNcqJAg=="
+  "resolved" "https://registry.npmjs.org/@interactjs/interactjs/-/interactjs-1.10.11.tgz"
+  "version" "1.10.11"
+  dependencies:
+    "@interactjs/actions" "1.10.11"
+    "@interactjs/auto-scroll" "1.10.11"
+    "@interactjs/auto-start" "1.10.11"
+    "@interactjs/core" "1.10.11"
+    "@interactjs/dev-tools" "1.10.11"
+    "@interactjs/inertia" "1.10.11"
+    "@interactjs/interact" "1.10.11"
+    "@interactjs/modifiers" "1.10.11"
+    "@interactjs/offset" "1.10.11"
+    "@interactjs/pointer-events" "1.10.11"
+    "@interactjs/reflow" "1.10.11"
+    "@interactjs/utils" "1.10.11"
+
+"@interactjs/modifiers@^1.10.2", "@interactjs/modifiers@1.10.11":
+  "integrity" "sha512-ltqX1RSqeAIikixlQBlyEUdclT5+rbfIGi3sIdLLYaIZQnltYkWqL9MHKx/w5b+hV+Mc0p5MLUFWJbTdkSCZ9g=="
+  "resolved" "https://registry.npmjs.org/@interactjs/modifiers/-/modifiers-1.10.11.tgz"
+  "version" "1.10.11"
+  dependencies:
+    "@interactjs/snappers" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/offset@1.10.11":
+  "integrity" "sha512-mBT7eIfy5ivofECiv+VwtEwwIMLV54fT9ujSMWJPduxdSYIHepUWgEf/3zjJknFh6jQc7pqz9dtjvVvyzRCLlQ=="
+  "resolved" "https://registry.npmjs.org/@interactjs/offset/-/offset-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/pointer-events@1.10.11":
+  "integrity" "sha512-yBT8JJVMZ+MgBay5l1WAHnL8ch/mZsRfaFahti+QFYeQyRloDtsWmEMDSYI/Onyy9+hS3gN/ge77ArGciZZ0Ow=="
+  "resolved" "https://registry.npmjs.org/@interactjs/pointer-events/-/pointer-events-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/reflow@1.10.11":
+  "integrity" "sha512-NSCtcCkjImOYSbxzzv2kFqR9t49J8KlhEr9UoePc7GyLbNXsiv3WQ3n0ehZd7CgZXQDiVXnP2UnmIOv5Zd4HQg=="
+  "resolved" "https://registry.npmjs.org/@interactjs/reflow/-/reflow-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/snappers@1.10.11":
+  "integrity" "sha512-yYtOMUZ7aFUZ1IYheq9Tj5hZ4J1r5dnaXhLF44WsI/awQ5L0DjZf07GPWof0B+7rZHEVudxyQNbPfFmb+1K94Q=="
+  "resolved" "https://registry.npmjs.org/@interactjs/snappers/-/snappers-1.10.11.tgz"
+  "version" "1.10.11"
+  optionalDependencies:
+    "@interactjs/interact" "1.10.11"
+
+"@interactjs/types@1.10.11":
+  "integrity" "sha512-YRsVFWjL8Gkkvlx3qnjeaxW4fnibSJ9791g8BA7Pv5ANByI64WmtR1vU7A2rXcrOn8XvyCEfY0ss1s8NhZP+MA=="
+  "resolved" "https://registry.npmjs.org/@interactjs/types/-/types-1.10.11.tgz"
+  "version" "1.10.11"
+
+"@interactjs/utils@1.10.11":
+  "integrity" "sha512-410ZoxKF+r1roeSelL+WHXfdryUMg5iykC1XwQ3l6XqNw43IMACzyvTH6k6Pwxj7w7x42nce0Qdn1GQ3Y8xyCw=="
+  "resolved" "https://registry.npmjs.org/@interactjs/utils/-/utils-1.10.11.tgz"
+  "version" "1.10.11"
+
 "@intervolga/optimize-cssnano-plugin@^1.0.5":
   "integrity" "sha512-zN69TnSr0viRSU6cEDIcuPcP67QcpQ6uHACg58FiN9PDrU6SLyGW3MR4tiISbYxy1kDWAVPwD+XwQTWE5cigAA=="
   "resolved" "https://registry.npmjs.org/@intervolga/optimize-cssnano-plugin/-/optimize-cssnano-plugin-1.0.6.tgz"
@@ -781,6 +897,13 @@
     "error-stack-parser" "^2.0.2"
     "string-width" "^2.0.0"
     "strip-ansi" "^5"
+
+"@types/chart.js@^2.7.55":
+  "integrity" "sha512-d45JiRQwEOlZiKwukjqmqpbqbYzUX2yrXdH9qVn6kXpPDsTYCo6YbfFOlnUaJ8S/DhJwbBJiLsMjKpW5oP8B2A=="
+  "resolved" "https://registry.npmjs.org/@types/chart.js/-/chart.js-2.9.32.tgz"
+  "version" "2.9.32"
+  dependencies:
+    "moment" "^2.10.2"
 
 "@types/glob@^7.1.1":
   "integrity" "sha512-SEYeGAIQIQX8NN6LDKprLjbrd5dARM5EXsd8GI/A5l0apYI1fGMWgPHSe4ZKL4eozlAyI+doUE9XbYS4xCkQ1w=="
@@ -1707,6 +1830,11 @@
   "resolved" "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz"
   "version" "1.5.1"
 
+"batch-processor@1.0.0":
+  "integrity" "sha1-dclcMrdI4IUNEMKxaPa9vpiRrOg="
+  "resolved" "https://registry.npmjs.org/batch-processor/-/batch-processor-1.0.0.tgz"
+  "version" "1.0.0"
+
 "batch@0.6.1":
   "integrity" "sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY="
   "resolved" "https://registry.npmjs.org/batch/-/batch-0.6.1.tgz"
@@ -2201,6 +2329,11 @@
   "integrity" "sha1-tUc7M9yXxCTl2Y3IfVXU2KKci/I="
   "resolved" "https://registry.npmjs.org/chardet/-/chardet-0.4.2.tgz"
   "version" "0.4.2"
+
+"chart.js@^3.2.1", "chart.js@>= 2.5":
+  "integrity" "sha512-XsNDf3854RGZkLCt+5vWAXGAtUdKP2nhfikLGZqud6G4CvRE2ts64TIxTTfspOin2kEZvPgomE29E6oU02dYjQ=="
+  "resolved" "https://registry.npmjs.org/chart.js/-/chart.js-3.2.1.tgz"
+  "version" "3.2.1"
 
 "check-types@^8.0.3":
   "integrity" "sha512-YpeKZngUmG65rLudJ4taU7VLkOCTMhNl/u4ctNC56LQS/zJTyNH0Lrtwm1tfTsbLlwvlfsA2d1c8vCf/Kh2KwQ=="
@@ -3254,6 +3387,13 @@
   "integrity" "sha512-agtrL5vLSOIK89sE/YSzAgqCw76eZ60gf3J7Tid5RfLbSp5H4nWL28/dIV+H+ZhNNi1JNiaF62jffwYsAyXc0g=="
   "resolved" "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.3.705.tgz"
   "version" "1.3.705"
+
+"element-resize-detector@^1.2.1":
+  "integrity" "sha512-+LOXRkCJc4I5WhEJxIDjhmE3raF8jtOMBDqSCgZTMz2TX3oXAX5pE2+MDeopJlGdXzP7KzPbBJaUGfNaP9HG4A=="
+  "resolved" "https://registry.npmjs.org/element-resize-detector/-/element-resize-detector-1.2.2.tgz"
+  "version" "1.2.2"
+  dependencies:
+    "batch-processor" "1.0.0"
 
 "elliptic@^6.5.3":
   "integrity" "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ=="
@@ -5761,6 +5901,11 @@
   "version" "0.5.5"
   dependencies:
     "minimist" "^1.2.5"
+
+"moment@^2.10.2":
+  "integrity" "sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ=="
+  "resolved" "https://registry.npmjs.org/moment/-/moment-2.29.1.tgz"
+  "version" "2.29.1"
 
 "move-concurrently@^1.0.1":
   "integrity" "sha1-viwAX9oy4LKa8fBdfEszIUxwH5I="
@@ -8900,6 +9045,13 @@
   "resolved" "https://registry.npmjs.org/vue-axios/-/vue-axios-3.2.4.tgz"
   "version" "3.2.4"
 
+"vue-chartjs@^3.5.1":
+  "integrity" "sha512-foocQbJ7FtveICxb4EV5QuVpo6d8CmZFmAopBppDIGKY+esJV8IJgwmEW0RexQhxqXaL/E1xNURsgFFYyKzS/g=="
+  "resolved" "https://registry.npmjs.org/vue-chartjs/-/vue-chartjs-3.5.1.tgz"
+  "version" "3.5.1"
+  dependencies:
+    "@types/chart.js" "^2.7.55"
+
 "vue-echarts@^4.1.0":
   "integrity" "sha512-am2vsAjEYGz3JqqMaSqIR35HIxr/TjxYPoKWTorgi10rzwl7+f+uBvpj7AkCJ6HVL8zR3exYpyo881aG+24Rfg=="
   "resolved" "https://registry.npmjs.org/vue-echarts/-/vue-echarts-4.1.0.tgz"
@@ -8924,6 +9076,18 @@
   "integrity" "sha512-leT4kdJVQyeZNY1kmnS1xiUlQ9z1B/kdBFCILIjYYQDqZgLqCLa0UhjSSeRX6c3mUe6U5qYeM8LrEqkHJ1B4LA=="
   "resolved" "https://registry.npmjs.org/vue-functional-data-merge/-/vue-functional-data-merge-3.1.0.tgz"
   "version" "3.1.0"
+
+"vue-grid-layout@^2.3.12":
+  "integrity" "sha512-x9l4KxfH0MeB4xImanrnnTihksq8LYk3f40hm1sdiTHF2bYM+Xhae6eQsvFWEFwbYq7RVNvB80qwis1vInB+WQ=="
+  "resolved" "https://registry.npmjs.org/vue-grid-layout/-/vue-grid-layout-2.3.12.tgz"
+  "version" "2.3.12"
+  dependencies:
+    "@interactjs/actions" "^1.10.2"
+    "@interactjs/auto-start" "^1.10.2"
+    "@interactjs/dev-tools" "^1.10.2"
+    "@interactjs/interactjs" "^1.10.2"
+    "@interactjs/modifiers" "^1.10.2"
+    "element-resize-detector" "^1.2.1"
 
 "vue-hot-reload-api@^2.3.0":
   "integrity" "sha512-BXq3jwIagosjgNVae6tkHzzIk6a8MHFtzAdwhnV5VlvPTFxDCvIttgSiHWjdGoTJvXtmRu5HacExfdarRcFhog=="
