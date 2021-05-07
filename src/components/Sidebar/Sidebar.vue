@@ -134,38 +134,38 @@ import isScreen from '@/core/screenHelper';
 import NavLink from './NavLink/NavLink';
 
 export default {
-  name: 'Sidebar',
-  components: { NavLink },
-  methods: {
-    ...mapActions('layout', ['changeSidebarActive', 'switchSidebar']),
-    setActiveByRoute() {
-      const paths = this.$route.fullPath.split('/');
-      paths.pop();
-      this.changeSidebarActive(paths.join('/'));
-    },
-    sidebarMouseEnter() {
-      if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
-        this.switchSidebar(false);
-        this.setActiveByRoute();
-      }
-    },
-    sidebarMouseLeave() {
-      if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
-        this.switchSidebar(true);
-        this.changeSidebarActive(null);
-      }
-    },
-  },
-  created() {
-    this.setActiveByRoute();
-  },
-  computed: {
-    ...mapState('layout', {
-      sidebarStatic: state => state.sidebarStatic,
-      sidebarOpened: state => !state.sidebarClose,
-      activeItem: state => state.sidebarActiveElement,
-    }),
-  },
+	name: 'Sidebar',
+	components: { NavLink },
+	methods: {
+		...mapActions('layout', ['changeSidebarActive', 'switchSidebar']),
+		setActiveByRoute() {
+			const paths = this.$route.fullPath.split('/');
+			paths.pop();
+			this.changeSidebarActive(paths.join('/'));
+		},
+		sidebarMouseEnter() {
+			if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
+				this.switchSidebar(false);
+				this.setActiveByRoute();
+			}
+		},
+		sidebarMouseLeave() {
+			if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
+				this.switchSidebar(true);
+				this.changeSidebarActive(null);
+			}
+		},
+	},
+	created() {
+		this.setActiveByRoute();
+	},
+	computed: {
+		...mapState('layout', {
+			sidebarStatic: state => state.sidebarStatic,
+			sidebarOpened: state => !state.sidebarClose,
+			activeItem: state => state.sidebarActiveElement,
+		}),
+	},
 };
 </script>
 
