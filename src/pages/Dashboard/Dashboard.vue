@@ -2,13 +2,14 @@
 	<grid-layout
 		:layout.sync="layout"
 		:col-num="12"
-		:row-height="30"
+		:row-height="100"
 		:is-draggable="true"
 		:is-resizable="true"
 		:is-mirrored="false"
 		:vertical-compact="true"
 		:margin="[10, 10]"
 		:use-css-transforms="true"
+		@layout-ready="layoutReadyEvent"
     >
         <grid-item 
 			v-for="item in layout"
@@ -19,42 +20,37 @@
 			:i="item.i"
 			:key="item.i"
 		>
-			<apexchart height="100%" type="bar" :options="options" :series="series"></apexchart>
+			<template v-if="layoutLoaded">
+				<Chart/>
+			</template>
         </grid-item>
     </grid-layout>
 </template>
 
 <script>
 import VueGridLayout from 'vue-grid-layout';
+import Chart from '@/components/Charts/Chart';
 
 export default {
 	name: "Dashboard",
 	components: {
 		GridLayout: VueGridLayout.GridLayout,
-		GridItem: VueGridLayout.GridItem
+		GridItem: VueGridLayout.GridItem,
+		Chart
     },
 	data() {
 		return {
-			options: {
-				chart: {
-					id: 'vuechart-example',
-					type: 'bar',
-					redrawOnParentResize: true,
-					height: '100%'
-				},
-				xaxis: {
-					categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
-				}
-			},
-			series: [{
-				name: '0',
-				data: [30, 40, 45, 50, 49, 60, 70, 91]
-			}],
 			layout: [
-				{"x":0,"y":0,"w":3,"h":8,"i":"0"},
+				{"x":0,"y":0,"w":3,"h":3,"i":"0"},
 			],
+			layoutLoaded: false,
 		}	
 	},
+	methods: {
+		layoutReadyEvent: function(newLayout){
+			this.layoutLoaded = true
+		}
+	}
 }
 </script>
 
@@ -66,6 +62,19 @@ export default {
     display: grid;
     grid-template-rows: 64px auto auto;
     padding: 5px;
+	background-color: white;
 }
+
+.vue-grid-item.vue-grid-placeholder {
+    background: grey;
+    opacity: 0.2;
+    transition-duration: 100ms;
+    z-index: 2;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}  
 </style>
  
