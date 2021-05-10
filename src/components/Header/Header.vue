@@ -25,8 +25,6 @@
 				</template>
 				<b-dropdown-item-button @click="account"><i class='fi flaticon-person px-3 mr-3' />My Account</b-dropdown-item-button>
 				<b-dropdown-divider />
-				<b-dropdown-item-button @click="debug"><i class='fi flaticon-calendar-9 px-3 mr-3' />DEBUG</b-dropdown-item-button>
-				<b-dropdown-divider />
 				<b-dropdown-item-button @click="logout">
 					<i class="fi flaticon-power-1 px-3 mr-3" />Log Out
 				</b-dropdown-item-button>
