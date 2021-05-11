@@ -51,7 +51,7 @@ export default {
 			const email = this.$refs.email.value;
 			const password = this.$refs.password.value;
 
-			/*const loginOptions = { 
+			const loginOptions = { 
 				"username": email,
 				"password": password
 			}
@@ -68,12 +68,12 @@ export default {
 				})
 				.catch(e => {
 					console.log(e)
-				})*/
+				})
 
-			if (email.length !== 0 && password.length !== 0) {
+			/*if (email.length !== 0 && password.length !== 0) {
 				window.localStorage.setItem('authenticated', true);
 				this.$router.push('/app/dashboard');
-			}
+			}*/
 		},
 	},
 	created() {
