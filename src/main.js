@@ -24,6 +24,10 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import VueI18n from 'vue-i18n';
 import i18n from './i18n'
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUserSecret, faUsersCog } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
 Vue.use(VueI18n);
 
 
@@ -43,6 +47,10 @@ Vue.use(VueAxios, axios);
 
 Vue.component('downloadExcel', JsonExcel);
 Vue.use(VueComp);
+
+library.add({ faUserSecret, faUsersCog});
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.config.productionTip = false;
 

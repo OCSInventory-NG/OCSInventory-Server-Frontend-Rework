@@ -1,4 +1,12 @@
 {
-  "username": "Username",
-  "password": "Password"
+	"username": "Username",
+	"password": "Password",
+
+	"myaccount": "My account",
+	"logout": "Logout",
+
+	"dashboard": "Dashboard",
+	"usermanagement": "User Management",
+	"users": "Users",
+	"groups": "Groups"
 }

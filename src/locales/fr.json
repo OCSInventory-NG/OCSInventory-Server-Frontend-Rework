@@ -1,4 +1,12 @@
 {
     "username": "Identifiant",
-    "password": "Mot de passe"
-  }
+    "password": "Mot de passe",
+
+    "myaccount": "Mon compte",
+    "logout": "Déconnexion",
+
+    "dashboard": "Tableau de bord",
+    "usermanagement": "Gestion des utilisateurs",
+    "users": "Utilisateurs",
+    "groups": "Groupes"
+}
