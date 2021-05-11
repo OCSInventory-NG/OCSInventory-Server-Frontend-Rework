@@ -9,8 +9,9 @@ import MyAccount from '@/pages/MyAccount/MyAccount';
 
 // Main
 import Dashboard from '@/pages/Dashboard/Dashboard';
-// All computers
-import AllComputers from '@/pages/AllComputers/AllComputers';
+// User management
+import Users from '@/pages/UserManagement/Users';
+import Groups from '@/pages/UserManagement/Groups';
 
 Vue.use(Router);
 
@@ -42,9 +43,20 @@ export default new Router({
 					component: Dashboard,
 				},
 				{
-					path: 'all_computers',
-					name: 'AllComputers',
-					component: AllComputers,
+					path: 'user_management',
+					name: 'UserManagement',
+					children: [
+						{
+							path: 'users',
+							name: 'Users',
+							component: Users,
+						},
+						{
+							path: 'groups',
+							name: 'Groups',
+							component: Groups,
+						}
+					]
 				},
 			],
 		},

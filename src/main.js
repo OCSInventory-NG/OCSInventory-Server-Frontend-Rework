@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import VueTouch from 'vue-touch';
 import Trend from 'vuetrend';
 import Toasted from 'vue-toasted';
@@ -19,8 +19,16 @@ import VueAxios from 'vue-axios';
 
 import JsonExcel from "vue-json-excel";
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import VueI18n from 'vue-i18n';
+import i18n from './i18n'
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faUserSecret, faUsersCog } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+Vue.use(VueI18n);
 
 
 Vue.use(VueApexCharts)
@@ -40,12 +48,17 @@ Vue.use(VueAxios, axios);
 Vue.component('downloadExcel', JsonExcel);
 Vue.use(VueComp);
 
+library.add({ faUserSecret, faUsersCog});
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
-	el: '#app',
-	store,
-	router,
-	render: h => h(App),
+    el: '#app',
+    store,
+    router,
+    i18n,
+    render: h => h(App)
 });

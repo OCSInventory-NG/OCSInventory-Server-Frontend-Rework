@@ -11,7 +11,7 @@
 			<ul class="nav">
 				<NavLink
 					:activeItem="activeItem"
-					header="Dashboard"
+					:header="$t('dashboard')"
 					link="/app/dashboard"
 					iconName="flaticon-home"
 					index="dashboard"
@@ -19,11 +19,14 @@
 				/>
 				<NavLink
 					:activeItem="activeItem"
-					header="All computers"
-					link="/app/all_computers"
-					iconName="flaticon-network"
-					index="all_computers"
-					isHeader
+					:header="$t('usermanagement')"
+					link="/app/user_management"
+					iconName="users-cog"
+					index="user_management"
+					:childrenLinks="[
+						{ header: $t('users'), link: '/app/user_management/users' },
+						{ header: $t('groups'), link: '/app/user_management/groups' },
+					]"
 				/>
 			</ul>
 		</nav>
