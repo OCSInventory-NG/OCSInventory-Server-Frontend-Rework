@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import VueTouch from 'vue-touch';
 import Trend from 'vuetrend';
 import Toasted from 'vue-toasted';
@@ -19,8 +19,11 @@ import VueAxios from 'vue-axios';
 
 import JsonExcel from "vue-json-excel";
 
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import VueI18n from 'vue-i18n';
+
+Vue.use(VueI18n);
 
 
 Vue.use(VueApexCharts)
