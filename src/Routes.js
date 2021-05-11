@@ -9,9 +9,10 @@ import MyAccount from '@/pages/MyAccount/MyAccount';
 
 // Main
 import Dashboard from '@/pages/Dashboard/Dashboard';
+
 // User management
-import Users from '@/pages/UserManagement/Users';
-import Groups from '@/pages/UserManagement/Groups';
+import Users from '@/pages/UserManagement/Users/Users';
+import Groups from '@/pages/UserManagement/Groups/Groups';
 
 Vue.use(Router);
 
@@ -43,20 +44,14 @@ export default new Router({
 					component: Dashboard,
 				},
 				{
-					path: 'user_management',
-					name: 'UserManagement',
-					children: [
-						{
-							path: 'users',
-							name: 'Users',
-							component: Users,
-						},
-						{
-							path: 'groups',
-							name: 'Groups',
-							component: Groups,
-						}
-					]
+					path: 'users',
+					name: 'Users',
+					component: Users,
+				},
+				{
+					path: 'groups',
+					name: 'Groups',
+					component: Groups,
 				},
 			],
 		},

@@ -58,27 +58,25 @@ export default {
 
 			const header = {
 				"Access-Control-Allow-Origin" : "*",
-      			"Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+				"Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS",
 				"Content-Type": "application/json;charset=utf-8",
 			}
 
 			Axios.post("http://172.18.26.12:8000/api-auth/token", loginOptions, { header })
 				.then(response => {
-					console.log(response.data)
+					this.errorMessage = null
+					localStorage.setItem('token_authentication', response.data.token)
+					localStorage.setItem('authenticated', true)
+					this.$router.push('/app/dashboard')
 				})
 				.catch(e => {
-					console.log(e)
+					this.errorMessage = e
 				})
-
-			/*if (email.length !== 0 && password.length !== 0) {
-				window.localStorage.setItem('authenticated', true);
-				this.$router.push('/app/dashboard');
-			}*/
 		},
 	},
 	created() {
-		if (window.localStorage.getItem('authenticated') === 'true') {
-			this.$router.push('/app/main/analytics');
+		if (localStorage.getItem('authenticated') === 'true' && localStorage.getItem('token_authentication') !== null) {
+			this.$router.push('/app/dashboard');
 		}
 	},
 };

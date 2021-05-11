@@ -13,19 +13,18 @@
 					:activeItem="activeItem"
 					:header="$t('dashboard')"
 					link="/app/dashboard"
-					iconName="flaticon-home"
+					iconName="home"
 					index="dashboard"
 					isHeader
 				/>
 				<NavLink
 					:activeItem="activeItem"
 					:header="$t('usermanagement')"
-					link="/app/user_management"
 					iconName="users-cog"
 					index="user_management"
 					:childrenLinks="[
-						{ header: $t('users'), link: '/app/user_management/users' },
-						{ header: $t('groups'), link: '/app/user_management/groups' },
+						{ header: $t('users'), link: '/app/users' },
+						{ header: $t('groups'), link: '/app/groups' },
 					]"
 				/>
 			</ul>

@@ -25,32 +25,27 @@ import VueI18n from 'vue-i18n';
 import i18n from './i18n'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserSecret, faUsersCog } from '@fortawesome/free-solid-svg-icons';
+import { faUserSecret, faUsersCog, faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueI18n);
-
-
 Vue.use(VueApexCharts)
-
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons)
-
 Vue.use(VueTouch);
 Vue.use(Trend);
-Vue.component('Widget', Widget);
-
-Vue.component('apexchart', VueApexCharts);
-Vue.mixin(layoutMixin);
 Vue.use(Toasted, { duration: 10000 });
 Vue.use(VueAxios, axios);
-
-Vue.component('downloadExcel', JsonExcel);
 Vue.use(VueComp);
 
-library.add({ faUserSecret, faUsersCog});
-
+Vue.component('Widget', Widget);
+Vue.component('apexchart', VueApexCharts);
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('downloadExcel', JsonExcel);
+
+Vue.mixin(layoutMixin);
+
+library.add({ faUserSecret, faUsersCog, faHome });
 
 Vue.config.productionTip = false;
 

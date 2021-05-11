@@ -66,14 +66,12 @@ export default {
 			}
 		},
 		logout() {
-			window.localStorage.setItem('authenticated', false);
+			localStorage.setItem('authenticated', false);
+			localStorage.removeItem('token_authentication');
 			this.$router.push('/login');
 		},
 		account() {
 			this.$router.push('/app/my_account');
-		},
-		debug() {
-			this.$router.push('/app/debug');
 		},
 	}
 };
