@@ -20,6 +20,7 @@
 				<NavLink
 					:activeItem="activeItem"
 					:header="$t('usermanagement')"
+					link="/app/user_management"
 					iconName="users-cog"
 					index="user_management"
 					:childrenLinks="[
