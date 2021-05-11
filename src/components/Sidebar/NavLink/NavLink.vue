@@ -12,7 +12,7 @@
     <div @click="() => togglePanelCollapse(link)">
       <router-link :to="link" event="" class="d-flex sidebar-link">
         <span class="icon">
-          <i :class="fullIconName"></i>
+          <font-awesome-icon :icon="['fas', iconName]"/>
         </span>
         {{header}} <sup v-if="label" :class="'text-' + labelColor" class="ml-1 headerLabel">{{label}}</sup>
         <div :class="{caretWrapper: true, carretActive: isActive}">
