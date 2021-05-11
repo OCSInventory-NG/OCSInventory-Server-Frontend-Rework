@@ -22,6 +22,7 @@ import JsonExcel from "vue-json-excel";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import VueI18n from 'vue-i18n';
+import i18n from './i18n'
 
 Vue.use(VueI18n);
 
@@ -47,8 +48,9 @@ Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
-	el: '#app',
-	store,
-	router,
-	render: h => h(App),
+    el: '#app',
+    store,
+    router,
+    i18n,
+    render: h => h(App)
 });

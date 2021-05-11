@@ -9,11 +9,16 @@
 					<b-alert class="alert-sm" variant="danger" :show="!!errorMessage">
 						{{errorMessage}}
 					</b-alert>
-					<div class="form-group">
-						<input class="form-control no-border" ref="email" required type="text" name="email" placeholder="Username" />
+					<div class="form-group locale-changer">
+						<b-form-select v-model="$root.$i18n.locale">
+							<b-form-select-option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="i">{{ lang }}</b-form-select-option>
+						</b-form-select>
 					</div>
 					<div class="form-group">
-						<input class="form-control no-border" ref="password" required type="password" name="password" placeholder="Password" />
+						<input class="form-control no-border" ref="email" required type="text" name="email" :placeholder="$t('username')" />
+					</div>
+					<div class="form-group">
+						<input class="form-control no-border" ref="password" required type="password" name="password" :placeholder="$t('password')" />
 					</div>
 					<b-button type="submit" size="sm" class="auth-btn mb-3 login-button" variant="inverse">Login</b-button>
 				</form>
@@ -35,6 +40,10 @@ export default {
 	data() {
 		return {
 			errorMessage: null,
+			langs: {
+				'fr': "Français",
+				'en': "English"
+			},
 		};
 	},
 	methods: {
@@ -42,7 +51,7 @@ export default {
 			const email = this.$refs.email.value;
 			const password = this.$refs.password.value;
 
-			const loginOptions = { 
+			/*const loginOptions = { 
 				"username": email,
 				"password": password
 			}
@@ -59,12 +68,12 @@ export default {
 				})
 				.catch(e => {
 					console.log(e)
-				})
+				})*/
 
-			/*if (email.length !== 0 && password.length !== 0) {
+			if (email.length !== 0 && password.length !== 0) {
 				window.localStorage.setItem('authenticated', true);
 				this.$router.push('/app/dashboard');
-			}*/
+			}
 		},
 	},
 	created() {
