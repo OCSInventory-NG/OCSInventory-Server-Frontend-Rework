@@ -21,7 +21,7 @@
     "rules": {
     	"indent": ["error", "tab"],
         "max-len": ["error", { "code": 128 }],
-        "no-tabs": ["error"],
+        "no-tabs": 0,
         "vue/html-indent": ["error", "tab"]        
     }
 }
