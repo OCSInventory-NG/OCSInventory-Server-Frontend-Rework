@@ -13,7 +13,6 @@
         "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 2019,
         "sourceType": "module"
     },
     "plugins": [
@@ -21,14 +20,8 @@
     ],
     "rules": {
     	"indent": ["error", "tab"],
-	"max-len": ["error", { "code": 128 }],
-	"no-tabs": ["error", { "allowIndentationTabs": true }],
-	"vue/html-indent": ["error", "tab", {
-        	"attribute": 1,
-                "baseIndent": 1,
-                "closeBracket": 0,
-                "alignAttributesVertically": true,
-                "ignores": []
-	}]        
+        "max-len": ["error", { "code": 128 }],
+        "no-tabs": ["error"],
+        "vue/html-indent": ["error", "tab"]        
     }
 }
