@@ -1,26 +1,70 @@
 <template>
 	<div class="auth-page">
 		<b-container>
-			<div class="logo" align="center">
-				<img src="../../assets/img/illu_communaute.png" class="ocs-logo"/>
+			<div 
+				class="logo" 
+				align="center"
+			>
+				<img 
+					src="../../assets/img/illu_communaute.png" 
+					class="ocs-logo"
+				>
 			</div>
-			<Widget class="widget-auth mx-auto" title="" customHeader>
-				<form class="mt" @submit.prevent="login">
-					<b-alert class="alert-sm" variant="danger" :show="!!errorMessage">
-						{{errorMessage}}
+			<Widget 
+				class="widget-auth mx-auto" 
+				title="" 
+				custom-header
+			>
+				<form 
+					class="mt" 
+					@submit.prevent="login"
+				>
+					<b-alert 
+						:show="!!errorMessage" 
+						class="alert-sm" 
+						variant="danger"
+					>
+						{{ errorMessage }}
 					</b-alert>
-					<div class="form-group locale-changer">
+					<div class="form-group locale-changer login-form-group">
 						<b-form-select v-model="$root.$i18n.locale">
-							<b-form-select-option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="i">{{ lang }}</b-form-select-option>
+							<b-form-select-option 
+								v-for="(lang, i) in langs" 
+								:key="`Lang${i}`" 
+								:value="i"
+							>
+								{{ lang }}
+							</b-form-select-option>
 						</b-form-select>
 					</div>
-					<div class="form-group">
-						<input class="form-control no-border" ref="email" required type="text" name="email" :placeholder="$t('username')" />
+					<div class="form-group login-form-group">
+						<input 
+							ref="email" 
+							:placeholder="$t('username')" 
+							class="form-control no-border" 
+							required 
+							type="text" 
+							name="email"
+						>
 					</div>
-					<div class="form-group">
-						<input class="form-control no-border" ref="password" required type="password" name="password" :placeholder="$t('password')" />
+					<div class="form-group login-form-group">
+						<input 
+							ref="password" 
+							:placeholder="$t('password')" 
+							class="form-control no-border" 
+							required 
+							type="password" 
+							name="password"
+						>
 					</div>
-					<b-button type="submit" size="sm" class="auth-btn mb-3 login-button" variant="inverse">Login</b-button>
+					<b-button 
+						type="submit" 
+						size="sm" 
+						class="auth-btn mb-3" 
+						variant="inverse"
+					>
+						Login
+					</b-button>
 				</form>
 			</Widget>
 		</b-container>
@@ -45,6 +89,11 @@ export default {
 				'en': "English"
 			},
 		};
+	},
+	created() {
+		if (localStorage.getItem('authenticated') === 'true' && localStorage.getItem('token_authentication') !== null) {
+			this.$router.push('/app/dashboard');
+		}
 	},
 	methods: {
 		login() {
@@ -74,27 +123,5 @@ export default {
 				})
 		},
 	},
-	created() {
-		if (localStorage.getItem('authenticated') === 'true' && localStorage.getItem('token_authentication') !== null) {
-			this.$router.push('/app/dashboard');
-		}
-	},
 };
 </script>
-
-<style lang="scss">
-.login-button {
-	background-color:#20222e!important;
-	color: white!important;
-}
-
-.login-button:hover {
-	background-color:#961b7e!important;
-	color: white!important;
-	border-color: #961b7e!important;
-}
-
-.logo {
-	margin-bottom: 20px;
-}
-</style>

@@ -2,16 +2,15 @@
 	<b-navbar class="header d-print-none app-header">
 		<b-nav>
 			<b-nav-item>
-				<a class="d-md-down-none px-2" href="#" @click="toggleSidebarMethod" id="barsTooltip">
-					<i class='fi flaticon-menu' />
-				</a>
-				<a class="fs-lg d-lg-none" href="#" @click="switchSidebarMethod">
-					<i class='fi flaticon-menu' />
-				</a>
-			</b-nav-item>
-			<b-nav-item class="d-md-down-none">
-				<a href="#" class="px-2">
-					<i class='fi flaticon-flip' />
+				<a 
+					id="barsTooltip" 
+					class="d-md-down-none px-2" 
+					href="#" 
+					@click="toggleSidebarMethod"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'bars']" 
+						size="2x"/>
 				</a>
 			</b-nav-item>
 		</b-nav>
@@ -19,14 +18,29 @@
 			OCS Inventory
 		</a>
 		<b-nav class="ml-auto">
-			<b-nav-item-dropdown id="v-step-2" class="settingsDropdown d-sm-down-none" no-caret right>
+			<b-nav-item-dropdown 
+				id="v-step-2" 
+				class="settingsDropdown d-sm-down-none" 
+				no-caret 
+				right
+			>
 				<template slot="button-content">
-					<i class='fi flaticon-settings-10 px-2' />
+					<font-awesome-icon 
+						:icon="['fas', 'cog']" 
+						size="2x"/>
 				</template>
-				<b-dropdown-item-button @click="account"><i class='fi flaticon-person px-3 mr-3' />My Account</b-dropdown-item-button>
+				<b-dropdown-item-button @click="account">
+					<font-awesome-icon 
+						:icon="['fas', 'user']"
+						class="mr-3"
+					/>My Account
+				</b-dropdown-item-button>
 				<b-dropdown-divider />
 				<b-dropdown-item-button @click="logout">
-					<i class="fi flaticon-power-1 px-3 mr-3" />Log Out
+					<font-awesome-icon 
+						:icon="['fas', 'power-off']"
+						class="mr-3"
+					/>Log Out
 				</b-dropdown-item-button>
 			</b-nav-item-dropdown>
 		</b-nav>
@@ -76,5 +90,3 @@ export default {
 	}
 };
 </script>
-
-<style src="./Header.scss" lang="scss"></style>

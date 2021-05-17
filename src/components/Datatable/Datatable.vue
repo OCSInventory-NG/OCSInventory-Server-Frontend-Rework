@@ -1,19 +1,21 @@
 <template>
-	<div id="AllComputers">
+	<div id="Datatable">
 
 		<div class="header-table">
 			<h4>Computers</h4>
 			<!-- Search bar -->
 			<b-input-group class="mb-1 input-filter">
-				<b-input-group-prepend is-text class="icon-btn">
-					<b-icon icon="search"></b-icon>
+				<b-input-group-prepend 
+					is-text 
+					class="icon-btn">
+					<b-icon icon="search"/>
 				</b-input-group-prepend>
 				<b-form-input 
-					type="search" 
-					placeholder="Search" 
-					id="filter-input"
-					v-model="filter"
-				></b-form-input>
+					id="filter-input" 
+					v-model="filter" 
+					type="search"
+					placeholder="Search"
+				/>
 			</b-input-group>
 
 			<b-button-toolbar>
@@ -24,8 +26,12 @@
 						type="csv"
 						name="export.xls"
 					>
-						<b-button title="Export CSV" class="export-btn">
-							<b-icon icon="download" aria-hidden="true"></b-icon>
+						<b-button 
+							title="Export CSV" 
+							class="export-btn">
+							<b-icon 
+								icon="download" 
+								aria-hidden="true"/>
 						</b-button>
 					</download-excel>
 				</b-button-group>
@@ -51,10 +57,10 @@
 
 		<!-- Datatable -->
 		<div class="overflow-auto">
-			<b-table striped hover responsive selectable
-				id="all-computers"
-				ref="selectableTable"
-				:select-mode="selectMode"
+			<b-table 
+				id="all-computers" 
+				ref="selectableTable" 
+				:select-mode="selectMode" 
 				:items="computers.table"
 				:fields="visibleFields"
 				:sort-by.sync="sortBy"
@@ -62,22 +68,28 @@
 				:per-page="perPage"
 				:current-page="currentPage"
 				:filter="filter"
-				@filtered="onFiltered"
-				primary-key="ID"  
+				striped
+				hover
+				responsive
+				selectable
+				primary-key="ID"
+				@filtered="onFiltered"  
 			>
 				<template v-slot:head(selected)="">
 					<b-form-group>
-						<input type="checkbox" @click="selectAllRows"/>
+						<input 
+							type="checkbox" 
+							@click="selectAllRows">
 					</b-form-group>
 				</template>
 
 				<template #cell(selected)="{ rowSelected }">
 					<template v-if="rowSelected">
-						<b-icon icon="check-square-fill"></b-icon>
+						<b-icon icon="check-square-fill"/>
 						<span class="sr-only">Selected</span>
 					</template>
 					<template v-else>
-						<b-icon icon="dash-square"></b-icon>
+						<b-icon icon="dash-square"/>
 						<span class="sr-only">Not selected</span>
 					</template>
 				</template>
@@ -85,8 +97,16 @@
 				<template v-slot:cell(actions)="">
 					<b-button-toolbar>
 						<b-button-group class="mr-1">
-							<b-button @click="edit(item)" variant="primary"><b-icon icon="pencil-square" aria-hidden="true"></b-icon></b-button >
-							<b-button @click="deleteItem(item)" variant="danger"><b-icon icon="x" aria-hidden="true"></b-icon></b-button >
+							<b-button 
+								variant="primary" 
+								@click="edit(item)"><b-icon 
+									icon="pencil-square" 
+									aria-hidden="true"/></b-button >
+							<b-button 
+								variant="danger" 
+								@click="deleteItem(item)"><b-icon 
+									icon="x" 
+									aria-hidden="true"/></b-button >
 						</b-button-group>
 					</b-button-toolbar>
 				</template>
@@ -95,7 +115,10 @@
 
 		<!-- Pagination -->
 		<b-row class="pagination-align">
-			<b-col sm="3" md="3" class="my-1">
+			<b-col 
+				sm="3" 
+				md="3" 
+				class="my-1">
 				<b-form-group
 					label="Per page"
 					label-for="per-page-select"
@@ -111,19 +134,22 @@
 						v-model="perPage"
 						:options="pageOptions"
 						size="sm"
-					></b-form-select>
+					/>
 				</b-form-group>
 			</b-col>
 
-			<b-col sm="3" md="3" class="my-1">
+			<b-col 
+				sm="3" 
+				md="3" 
+				class="my-1">
 				<b-pagination
-				v-model="currentPage"
-				:total-rows="totalRows"
-				:per-page="perPage"
-				align="fill"
-				size="sm"
-				class="my-0"
-				></b-pagination>
+					v-model="currentPage"
+					:total-rows="totalRows"
+					:per-page="perPage"
+					align="fill"
+					size="sm"
+					class="my-0"
+				/>
 			</b-col>
 		</b-row>
 
@@ -173,6 +199,12 @@ export default {
 			],
 		};
 	},
+	computed: {
+		// Initialize visible fields
+		visibleFields() {
+			return this.fields.filter(field => field.visible)
+		}
+	},
 	created() {
 		/*axios.get(`http://172.18.26.12/ocsapi/v1/computers?&start=0&limit=20`)
 		.then(response => {
@@ -204,18 +236,12 @@ export default {
 		}
 		this.fields.push(actions)
 	},
-	computed: {
-		// Initialize visible fields
-		visibleFields() {
-			return this.fields.filter(field => field.visible)
-		}
-    },
 	mounted() {
 		// Set the initial number of items
 		this.totalRows = this.computers.table.length
 		// Initialize data to export
 		this.json_data = this.computers.table
-    },
+	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
@@ -233,69 +259,3 @@ export default {
 	}
 };
 </script>
-
-<style lang="scss">
-#AllComputers {
-	-webkit-box-shadow: 0 0 4px #b6b5b5;
-    box-shadow: 0 0 4px #b6b5b5;
-    font-size: 10pt;
-    display: grid;
-    grid-template-rows: 64px auto auto;
-    padding: 4px;
-}
-
-.header-table {
-	width: 100%;
-    padding: 10px 20px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    position: relative;
-}
-
-.input-filter {
-	margin-left: 30%;
-	margin-right: 30%;
-}
-
-.export-btn,
-.icon-btn
-.input-group-text {
-	color: #fff!important;
-    background-color: #20222e!important;
-    border-color: #20222e!important;
-}
-
-.export-btn:focus,
-.export-btn:hover {
-	color: #fff!important;
-    background-color: #961b7e!important;
-    border-color: #961b7e!important;
-}
-
-thead {
-    color: rgba(0,0,0,.5);
-    font-size: 10pt;
-    font-weight: lighter;
-}
-
-.form-group {
-	margin-bottom: 0!important;
-}
-
-.pagination-align {
-	justify-content: flex-end;
-}
-
-.page-item.active
-.page-link {
-    background-color: #961b7e!important;
-    border-color: #961b7e!important;
-}
-</style>

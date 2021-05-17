@@ -1,16 +1,16 @@
 <template>
 	<div v-if="!excluded">
-		<b-breadcrumb :items="tree"></b-breadcrumb>
+		<b-breadcrumb :items="tree"/>
 	</div>
 </template>
 
 <script>
 export default {
-    name: 'BreadcrumbHistory',
-    props: {
+	name: 'BreadcrumbHistory',
+	props: {
 		exclude: {type: Array, default: () => []}
-    },
-    computed: {
+	},
+	computed: {
 		excluded() {
 			return this.exclude.indexOf(this.$route.path.split('/').pop()) > -1;
 		},
@@ -26,6 +26,6 @@ export default {
 					)
 				);
 		}
-    }
+	}
 }
 </script>

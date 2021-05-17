@@ -3,8 +3,12 @@
 		<Sidebar />
 		<div class="wrap">
 			<Header />
-			<v-touch class="content" @swipe="handleSwipe" :swipe-options="{direction: 'horizontal'}">
-				<breadcrumb-history></breadcrumb-history>
+			<v-touch 
+				:swipe-options="{direction: 'horizontal'}"
+				class="content"
+				@swipe="handleSwipe"
+			>
+				<breadcrumb-history/>
 				<transition name="router-animation">
 					<router-view />
 				</transition>
@@ -24,24 +28,9 @@ import Sidebar from '@/components/Sidebar/Sidebar';
 import Header from '@/components/Header/Header';
 import BreadcrumbHistory from '@/components/BreadcrumbHistory/BreadcrumbHistory';
 
-import './Layout.scss';
-
 export default {
 	name: 'Layout',
 	components: { Sidebar, Header, BreadcrumbHistory },
-	methods: {
-		...mapActions(
-			['switchSidebar', 'handleSwipe', 'changeSidebarActive', 'toggleSidebar'],
-		),
-		handleWindowResize() {
-			const width = window.innerWidth;
-
-			if (width <= 768 && this.sidebarStatic) {
-				this.toggleSidebar();
-				this.changeSidebarActive(null);
-			}
-		},
-	},
 	computed: {
 		...mapState(["sidebarClose", "sidebarStatic"]),
 	},
@@ -62,8 +51,19 @@ export default {
 	},
 	beforeDestroy() {
 		window.removeEventListener('resize', this.handleWindowResize);
-	}
+	},
+	methods: {
+		...mapActions(
+			['switchSidebar', 'handleSwipe', 'changeSidebarActive', 'toggleSidebar']
+		),
+		handleWindowResize() {
+			const width = window.innerWidth;
+
+			if (width <= 768 && this.sidebarStatic) {
+				this.toggleSidebar();
+				this.changeSidebarActive(null);
+			}
+		},
+	},
 };
 </script>
-
-<style src="./Layout.scss" lang="scss" />

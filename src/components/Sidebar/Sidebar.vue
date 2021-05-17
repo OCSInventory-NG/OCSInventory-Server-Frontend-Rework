@@ -6,27 +6,30 @@
 			@mouseleave="sidebarMouseLeave"
 		>
 			<header class="logo">
-				<router-link to="/app/dashboard"><span class="primary-word">OCS</span> <span class="secondary-word"> Inventory</span></router-link>
+				<router-link to="/app/dashboard">
+					<span class="primary-word">OCS</span>
+					<span class="secondary-word"> Inventory</span>
+				</router-link>
 			</header>
 			<ul class="nav">
 				<NavLink
-					:activeItem="activeItem"
+					:active-item="activeItem"
 					:header="$t('dashboard')"
 					link="/app/dashboard"
-					iconName="home"
+					icon-name="home"
 					index="dashboard"
-					isHeader
+					is-header
 				/>
 				<NavLink
-					:activeItem="activeItem"
+					:active-item="activeItem"
 					:header="$t('usermanagement')"
-					link="/app/user_management"
-					iconName="users-cog"
-					index="user_management"
-					:childrenLinks="[
+					:children-links="[
 						{ header: $t('users'), link: '/app/users' },
 						{ header: $t('groups'), link: '/app/groups' },
 					]"
+					link="/app/user_management"
+					icon-name="users-cog"
+					index="user_management"
 				/>
 			</ul>
 		</nav>
@@ -41,6 +44,16 @@ import NavLink from './NavLink/NavLink';
 export default {
 	name: 'Sidebar',
 	components: { NavLink },
+	computed: {
+		...mapState('layout', {
+			sidebarStatic: state => state.sidebarStatic,
+			sidebarOpened: state => !state.sidebarClose,
+			activeItem: state => state.sidebarActiveElement,
+		}),
+	},
+	created() {
+		this.setActiveByRoute();
+	},
 	methods: {
 		...mapActions('layout', ['changeSidebarActive', 'switchSidebar']),
 		setActiveByRoute() {
@@ -61,18 +74,5 @@ export default {
 			}
 		},
 	},
-	created() {
-		this.setActiveByRoute();
-	},
-	computed: {
-		...mapState('layout', {
-			sidebarStatic: state => state.sidebarStatic,
-			sidebarOpened: state => !state.sidebarClose,
-			activeItem: state => state.sidebarActiveElement,
-		}),
-	},
 };
 </script>
-
-<!-- Sidebar styles should be scoped -->
-<style src="./Sidebar.scss" lang="scss" scoped/>

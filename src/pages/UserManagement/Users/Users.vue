@@ -1,5 +1,5 @@
 <template>
-    <Datatable></Datatable>
+	<Datatable/>
 </template>
 
 <script>
@@ -7,14 +7,14 @@
 import Datatable from '@/components/Datatable/Datatable';
 
 export default {
-    name: "Users",
-    components: {
-        Datatable
-    },
-    data() {
-        //rowData: []
-    },
-    /*beforeCreate() {
+	name: "Users",
+	components: {
+		Datatable
+	},
+	data() {
+		//rowData: []
+	},
+	/*beforeCreate() {
         console.log("ok")
         const header = {
             'Authorization' : 'Token ' + localStorage.getItem('token_authentication')
