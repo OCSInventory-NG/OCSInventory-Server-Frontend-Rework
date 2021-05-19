@@ -25,7 +25,16 @@ import VueI18n from 'vue-i18n';
 import i18n from './i18n'
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserSecret, faUsersCog, faHome } from '@fortawesome/free-solid-svg-icons';
+import { 
+	faUserSecret, 
+	faUsersCog, 
+	faHome, 
+	faBars, 
+	faCog, 
+	faPowerOff, 
+	faUser, 
+	faAngleRight
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueI18n);
@@ -45,15 +54,24 @@ Vue.component('downloadExcel', JsonExcel);
 
 Vue.mixin(layoutMixin);
 
-library.add({ faUserSecret, faUsersCog, faHome });
+library.add({ 
+	faUserSecret, 
+	faUsersCog, 
+	faHome, 
+	faBars, 
+	faCog, 
+	faPowerOff, 
+	faUser, 
+	faAngleRight 
+});
 
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
-    el: '#app',
-    store,
-    router,
-    i18n,
-    render: h => h(App)
+	el: '#app',
+	store,
+	router,
+	i18n,
+	render: h => h(App)
 });

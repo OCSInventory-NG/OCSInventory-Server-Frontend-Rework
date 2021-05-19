@@ -12,10 +12,12 @@
 		<h5 
 			v-if="title && typeof title === 'string' && !customHeader" 
 			class="title">{{ title }}</h5>
+		<!-- eslint-disable vue/no-v-html -->
 		<header 
 			v-if="title && customHeader" 
 			class="title" 
 			v-html="title"/>
+		<!--eslint-enable-->
 		<div 
 			v-if="!customControls && mainControls"
 			class="widgetControls widget-controls"
@@ -122,11 +124,13 @@
 				</b-tooltip>
 			</a>
 		</div>
+		<!-- eslint-disable vue/no-v-html -->
 		<div 
 			v-if="customControls" 
 			ref="customControlsRef" 
 			class="widgetControls widget-controls" 
 			v-html="customControls"/>
+		<!--eslint-enable-->
 		<div 
 			ref="widgetBodyRef" 
 			:class="`widgetBody widget-body ${bodyClass}`"
@@ -163,7 +167,7 @@ export default {
 		title: { type: String, default: '' },
 		customControls: { type: Object, default: null },
 		bodyClass: { type: String, default: '' },
-		options: { type: Array, default: () => ({}) },
+		options: { type: Function, default: () => ({}) },
 		fetchingData: {type: Boolean, default: false},
 		showLoader: {type: Boolean, default: true},
 		collapsed: {type: Boolean, default: false},
@@ -179,8 +183,7 @@ export default {
 			return Math.floor(Math.random() * 100);
 		},
 		mainControls() {
-			return !!(this.close || this.fullscreen || this.collapse
-				|| this.refresh || this.settings || this.settingsInverse);
+			return !!(this.close || this.fullscreen || this.collapse || this.refresh || this.settings || this.settingsInverse);
 		},
 	},
 	mounted() {
@@ -239,5 +242,3 @@ export default {
 	}
 };
 </script>
-
-<style src="./Widget.scss" lang="scss" />

@@ -1,0 +1,100 @@
+/**
+ *===========================================
+ * DATATABLE
+ *===========================================
+ */
+
+// Page
+#Datatable {
+    -webkit-box-shadow: 0 0 4px #b6b5b5;
+    box-shadow: 0 0 4px #b6b5b5;
+    font-size: 10pt;
+    display: grid;
+    grid-template-rows: 64px auto auto;
+    padding: 4px;
+}
+
+// Table
+.header-table {
+    width: 100%;
+    padding: 10px 20px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: relative;
+}
+
+table > thead > tr > th {
+    border-top: none !important;
+    border-bottom-width: 1px !important;
+    text-transform: uppercase;
+}
+
+
+thead {
+    color: rgba(0,0,0,.5);
+    font-size: 10pt;
+    font-weight: lighter;
+}
+
+// Search bar
+.input-filter {
+    margin-left: 30%;
+    margin-right: 30%;
+}
+
+.form-group {
+    margin-bottom: 0!important;
+}
+
+// Export button
+.export-btn,
+.icon-btn
+.input-group-text {
+    color: #fff!important;
+    background-color: #20222e!important;
+    border-color: #20222e!important;
+}
+
+.export-btn:focus,
+.export-btn:hover {
+    color: #fff!important;
+    background-color: #961b7e!important;
+    border-color: #961b7e!important;
+}
+
+// Pagination
+.pagination {
+    font-weight: $font-weight-normal;
+
+    > .page-item {
+        display: inline; // Remove list-style and block-level defaults
+
+        > .page-link,
+        > span {
+            border-radius: $border-radius;
+            margin: 0 2px;
+        }
+
+        > .page-link {
+            text-decoration: none;
+            border: none;
+        }
+    }
+}
+
+.pagination-align {
+    justify-content: flex-end;
+}
+
+.page-item.active
+.page-link {
+    background-color: #961b7e!important;
+    border-color: #961b7e!important;
+}

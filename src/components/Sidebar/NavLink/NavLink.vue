@@ -59,13 +59,13 @@
 		>
 			<ul class="sub-menu">
 				<NavLink 
-					v-for="link in childrenLinks"
+					v-for="childLink in childrenLinks"
 					:active-item="activeItem"
-					:header="link.header"
-					:index="link.index"
-					:link="link.link"
-					:children-links="link.childrenLinks"
-					:key="link.link"
+					:header="childLink.header"
+					:index="childLink.index"
+					:link="childLink.link"
+					:children-links="childLink.childrenLinks"
+					:key="childLink.link"
 				/>
 			</ul>
 		</b-collapse>

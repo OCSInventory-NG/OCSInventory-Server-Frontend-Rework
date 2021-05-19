@@ -1,0 +1,62 @@
+/**
+ *===========================================
+ * LOGIN PAGE
+ *===========================================
+ */
+
+// Page
+.auth-page {
+    padding-top: 10vh;
+    height: 100vh;
+}
+
+.widget-auth {
+    max-width: 360px;
+    padding: 30px !important;
+
+    .widget-auth-info {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 0;
+        text-align: center;
+    }
+
+    // Login button
+    .auth-btn {
+        width: 100%;
+        background-color:#20222e!important;
+        color: white!important;
+        margin-top: 20px;
+    }
+
+    .auth-btn:hover {
+        background-color:#961b7e!important;
+        color: white!important;
+        border-color: #961b7e!important;
+    }
+
+    // Logo
+    .logo {
+        margin-bottom: 20px;
+    }
+
+    // Form input
+    .login-form-group {
+        margin-top: 10px;
+    }
+}
+
+// Footer
+.auth-footer {
+    margin-bottom: 25px;
+    font-size: 13px;
+    color: #636c72;
+    text-align: center;
+
+    @media (min-height: 600px) {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+}

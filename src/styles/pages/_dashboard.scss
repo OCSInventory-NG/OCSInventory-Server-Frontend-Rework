@@ -1,0 +1,27 @@
+/**
+ *===========================================
+ * DASHBOARD
+ *===========================================
+ */
+
+.vue-grid-item {
+	-webkit-box-shadow: 0 0 4px #b6b5b5;
+	box-shadow: 0 0 4px #b6b5b5;
+	font-size: 10pt;
+	display: grid;
+	grid-template-rows: 64px auto auto;
+	padding: 5px;
+	background-color: white;
+}
+
+.vue-grid-item.vue-grid-placeholder {
+	background: grey;
+	opacity: 0.2;
+	transition-duration: 100ms;
+	z-index: 2;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}

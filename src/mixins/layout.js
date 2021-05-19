@@ -1,11 +1,11 @@
 import config from '../config';
 
 export default {
-    data: () => {
-        return {
-            appConfig: config.app,
-        }
-    },
+	data: () => {
+		return {
+			appConfig: config.app,
+		}
+	},
 	methods: {
 		decodeHtml(html) {
 			let txt = document.createElement("textarea");
