@@ -97,10 +97,6 @@
 
 	.widget-body.p-0 {
 		margin: $widget-padding-vertical (-$widget-padding-horizontal) (-$widget-padding-vertical);
-
-		+ footer {
-			margin-top: $widget-padding-vertical;
-		}
 	}
 
 
@@ -116,6 +112,10 @@
 		margin: $spacer/2 (-$widget-padding-horizontal) (-$widget-padding-vertical);
 		padding: 10px 20px;
 	}
+}
+
+.widget .widget-body.p-0 + footer {
+	margin-top: $widget-padding-vertical;
 }
 
 .widgetControls + .widgetBody {
@@ -167,10 +167,6 @@
 		transition: transform 0.15s ease;
     }
 
-    &:hover > img {
-      	transform: scale(1.1, 1.1);
-    }
-
     .title {
 		position: absolute;
 		top: 0;
@@ -184,33 +180,6 @@
 		right: 0;
 		margin: 20px;
     }
-}
-
-.widget-footer-bottom {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-}
-
-.widget-sm {
-	height: 230px;
-}
-
-.widget-md {
-	height: 373px;
-}
-
-.widget-padding-md {
-	padding: $widget-padding-vertical $widget-padding-horizontal;
-}
-
-.widget-padding-lg {
-	padding: $widget-padding-vertical*2 $widget-padding-horizontal*2;
-}
-
-.widget-body-container {
-	position: relative;
-	height: 100%;
 }
 
 .widget-top-overflow,
@@ -246,6 +215,37 @@
 			bottom: 0;
 		}
 	}
+}
+
+.widget-image > img:hover > img {
+	transform: scale(1.1, 1.1);
+}
+
+.widget-footer-bottom {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+}
+
+.widget-sm {
+	height: 230px;
+}
+
+.widget-md {
+	height: 373px;
+}
+
+.widget-padding-md {
+	padding: $widget-padding-vertical $widget-padding-horizontal;
+}
+
+.widget-padding-lg {
+	padding: $widget-padding-vertical*2 $widget-padding-horizontal*2;
+}
+
+.widget-body-container {
+	position: relative;
+	height: 100%;
 }
 
 .widget-icon {
