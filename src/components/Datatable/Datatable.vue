@@ -216,8 +216,6 @@ export default {
 		}
 	},
 	created() {
-		var temp = {}
-
 		this.rowdata.forEach(details => {
 			Object.keys(details).forEach( data => {
 				var array = {
