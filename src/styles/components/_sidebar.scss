@@ -82,6 +82,7 @@
 
 .sidebarClose .logo {
     width: $sidebar-width-closed;
+    margin-left: 8px;
     .secondary-word {
         opacity: 0;
     }
@@ -102,8 +103,4 @@
 .sidebarStatic .labelName {
     transition: none;
     opacity: 1;
-}
-
-.sidebarClose .logo {
-    margin-left: 8px;
 }

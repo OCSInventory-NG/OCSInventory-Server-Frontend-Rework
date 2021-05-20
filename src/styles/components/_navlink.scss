@@ -62,10 +62,6 @@ a.router-link-active .icon {
     padding: 6px;
 }
 
-a.router-link-active .icon svg {
-    color: var(--sidebar-icon-active);
-}
-
 .headerLink > a {
     align-items: center;
     position: relative;
@@ -175,4 +171,8 @@ a.router-link-active .icon svg {
 
 .carretActive svg {
     transform: rotate(90deg);
+}
+
+a.router-link-active .icon svg {
+    color: var(--sidebar-icon-active);
 }
