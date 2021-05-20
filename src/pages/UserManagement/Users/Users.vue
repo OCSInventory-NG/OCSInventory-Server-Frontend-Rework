@@ -1,9 +1,24 @@
 <template>
-	<Datatable/>
+	<div>
+		<b-alert 
+			:show="!!errorMsg" 
+			class="alert-sm" 
+			variant="danger"
+		>
+			{{ errorMsg }}
+		</b-alert>
+
+		<div v-if="errorMsg === null">
+			<Datatable 
+				:rowdata="rowdata" 
+				title="Users" 
+			/>
+		</div>
+	</div>
 </template>
 
 <script>
-//import Axios from 'axios'
+import Axios from 'axios'
 import Datatable from '@/components/Datatable/Datatable';
 
 export default {
@@ -12,22 +27,26 @@ export default {
 		Datatable
 	},
 	data() {
-		//rowData: []
+		return {
+			errorMsg: null,
+			rowdata: []
+		}
 	},
-	/*beforeCreate() {
-        console.log("ok")
-        const header = {
-            'Authorization' : 'Token ' + localStorage.getItem('token_authentication')
-        }
+	created() {
+		const header = {
+			"Content-Type": "application/json;charset=utf-8",
+			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+		}
 
-        Axios.get("http://172.18.26.12:8000/users/", { header })
-            .then(response => {
-                console.log(response)
-            })
-            .catch(e => {
-                console.log(e)
-            })
-
-    }*/
+		Axios.get("http://172.18.26.12:8000/users/", { headers: header })
+			.then(response => {
+				console.log(response.data)
+				this.rowdata = response.data
+				this.errorMsg = null
+			})
+			.catch(e => {
+				this.errorMsg = e
+			})
+	}
 }
 </script>
