@@ -8,7 +8,9 @@
 			class="sidebar-link"
 		>
 			<span class="icon">
-				<font-awesome-icon :icon="['fas', iconName]"/>
+				<font-awesome-icon 
+					:icon="['fas', iconName]"
+					style="font-size: 1.2em;"/>
 			</span>
 			{{ header }} 
 			<sup 
@@ -38,7 +40,9 @@
 				class="d-flex sidebar-link"
 			>
 				<span class="icon">
-					<font-awesome-icon :icon="['fas', iconName]"/>
+					<font-awesome-icon 
+						:icon="['fas', iconName]"
+						style="font-size: 1.2em;"/>
 				</span>
 				{{ header }} 
 				<sup 
