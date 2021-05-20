@@ -4,6 +4,41 @@
  *===========================================
  */
 
+.collapse,
+.collapsing {
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
+
+    a {
+        line-height: 20px !important;
+
+        &.router-link-active {
+            font-weight: $font-weight-semi-bold;
+            color: var(--sidebar-color);
+        }
+    }
+
+    ul {
+        background: var(--sidebar-action-bg);
+        padding: $spacer;
+
+        li {
+            list-style: none;
+        }
+
+        a {
+            padding: 10px 20px 10px 26px;
+            font-size: $font-size-mini;
+
+            &:hover {
+                background-color: var(--sidebar-item-hover-bg-color);
+            }
+        }
+    }
+}
+
 .headerLink {
     width: 100%;
     overflow-x: hidden;
@@ -18,10 +53,6 @@
         color: var(--sidebar-color-item);
         text-decoration: none;
         cursor: pointer;
-    }
-  
-    &:last-child > a {
-        border-bottom: 1px solid $sidebar-item-border-color;
     }
   
     > a,
@@ -42,6 +73,10 @@
         > i {
             margin-right: 7px;
         }
+    }
+  
+    &:last-child > a {
+        border-bottom: 1px solid $sidebar-item-border-color;
     }
   
     .icon {
@@ -94,11 +129,10 @@
 
     svg {
         @include transition(transform 0.3s ease-in-out);
+        font-size: $font-size-larger;
     }
 }
-.caretWrapper svg {
-    font-size: $font-size-larger;
-}
+
 .carretActive svg {
     transform: rotate(90deg);
 }
@@ -114,41 +148,6 @@ a.router-link-active {
 
         i {
             color: var(--sidebar-icon-active);
-        }
-    }
-}
-
-.collapse,
-.collapsing {
-    border: none;
-    box-shadow: none;
-    margin: 0;
-    border-radius: 0;
-
-    a {
-        line-height: 20px !important;
-
-        &.router-link-active {
-            font-weight: $font-weight-semi-bold;
-            color: var(--sidebar-color);
-        }
-    }
-
-    ul {
-        background: var(--sidebar-action-bg);
-        padding: $spacer;
-
-        li {
-            list-style: none;
-        }
-
-        a {
-            padding: 10px 20px 10px 26px;
-            font-size: $font-size-mini;
-
-            &:hover {
-                background-color: var(--sidebar-item-hover-bg-color);
-            }
         }
     }
 }
