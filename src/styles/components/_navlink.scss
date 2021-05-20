@@ -4,6 +4,38 @@
  *===========================================
  */
 
+.headerLink {
+    width: 100%;
+    overflow-x: hidden;
+  
+    @media (min-width: map_get($grid-breakpoints, lg))
+    and (min-height: $screen-lg-height), (max-width: map_get($grid-breakpoints, md) - 1px) {
+        font-size: 13px;
+    }
+  
+    a {
+        display: block;
+        color: var(--sidebar-color-item);
+        text-decoration: none;
+        cursor: pointer;
+    }
+}
+
+a.router-link-active {
+    color: var(--sidebar-item-active);
+    font-size: $font-size-larger;
+    font-weight: $font-weight-semi-bold;
+
+    .icon {
+        border-radius: 50%;
+        background-color: var(--sidebar-item-active-bg);
+
+        i {
+            color: var(--sidebar-icon-active);
+        }
+    }
+}
+
 .collapse,
 .collapsing {
     border: none;
@@ -40,21 +72,6 @@
 }
 
 .headerLink {
-    width: 100%;
-    overflow-x: hidden;
-  
-    @media (min-width: map_get($grid-breakpoints, lg))
-    and (min-height: $screen-lg-height), (max-width: map_get($grid-breakpoints, md) - 1px) {
-        font-size: 13px;
-    }
-  
-    a {
-        display: block;
-        color: var(--sidebar-color-item);
-        text-decoration: none;
-        cursor: pointer;
-    }
-  
     > a,
     > div a {
         align-items: center;
@@ -135,19 +152,4 @@
 
 .carretActive svg {
     transform: rotate(90deg);
-}
-
-a.router-link-active {
-    color: var(--sidebar-item-active);
-    font-size: $font-size-larger;
-    font-weight: $font-weight-semi-bold;
-
-    .icon {
-        border-radius: 50%;
-        background-color: var(--sidebar-item-active-bg);
-
-        i {
-            color: var(--sidebar-icon-active);
-        }
-    }
 }
