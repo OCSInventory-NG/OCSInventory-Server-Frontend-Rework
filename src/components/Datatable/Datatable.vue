@@ -1,5 +1,8 @@
 <template>
-	<div id="Datatable">
+	<div 
+		:id="id" 
+		class="datatable-custom"
+	>
 		<div class="header-table">
 			<h4>{{ title }}</h4>
 			<!-- Search bar -->
@@ -167,6 +170,7 @@ export default {
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
+		id: { type: String, default: '' }
 	},
 	data() {
 		return {
