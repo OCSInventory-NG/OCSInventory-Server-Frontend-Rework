@@ -84,6 +84,11 @@ a.router-link-active .icon i {
     list-style: none;
 }
 
+.collapse a,
+.collapsing a {
+    line-height: 20px !important;
+}
+
 .collapse ul a,
 .collapsing ul a {
     padding: 10px 20px 10px 26px;
@@ -119,11 +124,6 @@ a.router-link-active .icon i {
     box-shadow: none;
     margin: 0;
     border-radius: 0;
-}
-
-.collapse a,
-.collapsing a {
-    line-height: 20px !important;
 }
 
 .collapse a.router-link-active,
