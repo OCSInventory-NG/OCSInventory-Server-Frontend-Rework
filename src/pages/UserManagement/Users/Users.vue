@@ -1,38 +1,53 @@
 <template>
-	<div>
-		<b-alert 
-			:show="!!errorMsg" 
-			class="alert-sm" 
-			variant="danger"
-		>
-			{{ errorMsg }}
-		</b-alert>
+	<div id="Users">
+		<section v-if="errored">
+			<b-alert 
+				:show="!!errorMsg" 
+				class="alert-sm" 
+				variant="danger"
+			>
+				{{ errorMsg }}
+			</b-alert>
+		</section>
 
-		<div v-if="errorMsg === null">
-			<Datatable 
-				:rowdata="rowdata" 
-				title="Users" 
-			/>
-		</div>
+		<section v-else>
+			<div v-if="loading">
+				<Loader/>
+			</div>
+
+			<div
+				v-else
+			>
+				<Datatable
+					id="usersdatatable"
+					:rowdata="rowdata"
+					title="Users"
+				/>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
 import Datatable from '@/components/Datatable/Datatable';
+import Loader from '@/components/Loader/Loader';
 
 export default {
 	name: "Users",
 	components: {
-		Datatable
+		Datatable,
+		Loader
 	},
 	data() {
 		return {
 			errorMsg: null,
-			rowdata: []
+			rowdata: [],
+			loading: true,
+			errored: false,
 		}
 	},
-	created() {
+	mounted() {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8",
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -40,13 +55,15 @@ export default {
 
 		Axios.get("http://172.18.26.12:8000/users/", { headers: header })
 			.then(response => {
-				console.log(response.data)
 				this.rowdata = response.data
 				this.errorMsg = null
+				this.errored = false
 			})
 			.catch(e => {
 				this.errorMsg = e
+				this.errored = true
 			})
+			.finally(() => this.loading = false)
 	}
 }
 </script>
