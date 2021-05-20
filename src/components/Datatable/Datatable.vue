@@ -197,7 +197,7 @@ export default {
 			sortDesc: null,
 			sortBy: null,
 			// Export parameters
-			json_fields: [],
+			json_fields: {},
 			json_data: [],
 			json_meta: [
 				[
@@ -216,6 +216,8 @@ export default {
 		}
 	},
 	created() {
+		var temp = {}
+
 		this.rowdata.forEach(details => {
 			Object.keys(details).forEach( data => {
 				var array = {
@@ -224,7 +226,9 @@ export default {
 					visible: true,
 				}
 				// Initialize CSV export header
+				
 				this.json_fields[data] = data
+				
 				// Initialize datatable header
 				var index = this.fields.findIndex(x => x.key==data);
 				index === -1 ? this.fields.push(array) : null
