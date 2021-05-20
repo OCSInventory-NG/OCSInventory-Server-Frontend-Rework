@@ -1,8 +1,7 @@
 <template>
 	<div id="Datatable">
-
 		<div class="header-table">
-			<h4>Computers</h4>
+			<h4>{{ title }}</h4>
 			<!-- Search bar -->
 			<b-input-group class="mb-1 input-filter">
 				<b-input-group-prepend 
@@ -37,7 +36,10 @@
 				</b-button-group>
 			</b-button-toolbar>
 		</div>
-		
+
+		<div align="center">
+			<p>{{ totalRows }} Result(s)</p>
+		</div>
 
 		<!-- Show/Hide columns -->
 		<!--<b-row>
@@ -58,10 +60,10 @@
 		<!-- Datatable -->
 		<div class="overflow-auto">
 			<b-table 
-				id="all-computers" 
+				id="data-list" 
 				ref="selectableTable" 
 				:select-mode="selectMode" 
-				:items="computers.table"
+				:items="rowdata"
 				:fields="visibleFields"
 				:sort-by.sync="sortBy"
 				:sort-desc.sync="sortDesc"
@@ -162,6 +164,10 @@ import computers from './computers-test';
 
 export default {
 	name: 'Datatable',
+	props: {
+		title: { type: String, default: '' },
+		rowdata: { type: Array, default: null },
+	},
 	data() {
 		return {
 			// Pagination parameters
@@ -206,15 +212,8 @@ export default {
 		}
 	},
 	created() {
-		/*axios.get(`http://172.18.26.12/ocsapi/v1/computers?&start=0&limit=20`)
-		.then(response => {
-			this.posts = response.data;
-		})
-		.catch(e => {
-			this.errors.push(e);
-		})*/
-		computers.table.forEach(computer => {
-			Object.keys(computer).forEach( data => {
+		this.rowdata.forEach(details => {
+			Object.keys(details).forEach( data => {
 				var array = {
 					key: data,
 					sortable: true,
@@ -238,9 +237,9 @@ export default {
 	},
 	mounted() {
 		// Set the initial number of items
-		this.totalRows = this.computers.table.length
+		this.totalRows = this.rowdata.length
 		// Initialize data to export
-		this.json_data = this.computers.table
+		this.json_data = this.rowdata
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
