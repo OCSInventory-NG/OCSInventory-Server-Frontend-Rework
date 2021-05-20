@@ -162,9 +162,6 @@
 </template>
 
 <script>
-//import axios from 'axios';
-import computers from './computers-test';
-
 export default {
 	name: 'Datatable',
 	props: {
@@ -188,7 +185,6 @@ export default {
 					visible: true,
 				}
 			],
-			computers,
 			// Search parameter
 			filter: null,
 			// Select row parameter
