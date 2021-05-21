@@ -1,8 +1,9 @@
 <template>
 	<div class="data-loader">
-		<i 
-			:style="{fontSize: size + 'px'}" 
-			class="la la-spinner la-spin"
+		<b-icon
+			icon="three-dots"
+			animation="cylon"
+			font-scale="4"
 		/>
 	</div>
 </template>
