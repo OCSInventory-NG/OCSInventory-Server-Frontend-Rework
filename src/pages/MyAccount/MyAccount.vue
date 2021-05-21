@@ -8,7 +8,7 @@
 					class="alert-sm" 
 					variant="success"
 				>
-					{{ succesMsg }}
+					{{ $t('success_saved') }}
 				</b-alert>
 			</section>
 
@@ -41,13 +41,12 @@
 						<b-row>
 							<b-col>
 								<b-form-group
-									label="Username :" 
+									:label="$t('username')" 
 									label-for="username"
 								>
 									<b-form-input
 										id="username"
 										v-model="row.username"
-										placeholder="Username"
 										required
 										disabled
 									>{{ row.username }}</b-form-input>
@@ -55,7 +54,7 @@
 							</b-col>
 							<b-col>
 								<b-form-group
-									label="Password :" 
+									:label="$t('password')" 
 									label-for="password"
 								>
 									<b-form-input
@@ -70,13 +69,12 @@
 						<b-row>
 							<b-col>
 								<b-form-group
-									label="Email :" 
+									:label="$t('email')" 
 									label-for="email"
 								>
 									<b-form-input
 										id="email"
 										v-model="row.email"
-										placeholder="Email"
 										required
 									>{{ row.email }}</b-form-input>
 								</b-form-group>
@@ -85,26 +83,24 @@
 						<b-row>
 							<b-col>
 								<b-form-group 
-									label="Firstname :" 
+									:label="$t('firstname')" 
 									label-for="first_name"
 								>
 									<b-form-input
 										id="first_name"
 										v-model="row.first_name"
-										placeholder="Firstname"
 										required
 									>{{ row.first_name }}</b-form-input>
 								</b-form-group>
 							</b-col>
 							<b-col>
 								<b-form-group
-									label="Lastname :" 
+									:label="$t('lastname')" 
 									label-for="last_name"
 								>
 									<b-form-input
 										id="last_name"
 										v-model="row.last_name"
-										placeholder="Lastname"
 										required
 									>{{ row.last_name }}</b-form-input>
 								</b-form-group>
@@ -120,7 +116,7 @@
 									type="submit"
 									variant="success"
 								>
-									Save
+									{{ $t('save') }}
 								</b-button>
 							</b-col>
 							<b-col align-self="end"/>
@@ -197,7 +193,7 @@ export default {
 
 				Axios.patch("http://172.18.26.12:8000/myaccount/"+details.id+"/", jsonReturn, { headers: header })
 					.then(() => {
-						this.succesMsg = "My new account configuration saved !"
+						this.succesMsg = "success"
 						this.successed = true
 						this.errorMsg = null
 						this.errored = false

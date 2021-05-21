@@ -1,6 +1,11 @@
 {
 	"username": "Username",
 	"password": "Password",
+	"email": "Email",
+	"firstname": "Firstname",
+	"lastname": "Lastname",
+
+	"save": "Save",
 
 	"myaccount": "My account",
 	"logout": "Logout",
@@ -8,5 +13,7 @@
 	"dashboard": "Dashboard",
 	"usermanagement": "User Management",
 	"users": "Users",
-	"groups": "Groups"
+	"groups": "Groups",
+
+	"success_saved": "Configuration saved with success !"
 }

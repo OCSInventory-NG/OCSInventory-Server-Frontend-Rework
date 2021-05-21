@@ -1,6 +1,11 @@
 {
     "username": "Identifiant",
     "password": "Mot de passe",
+	"email": "Email",
+	"firstname": "Prénom",
+	"lastname": "Nom",
+
+	"save": "Sauvegarder",
 
     "myaccount": "Mon compte",
     "logout": "Déconnexion",
@@ -8,5 +13,7 @@
     "dashboard": "Tableau de bord",
     "usermanagement": "Gestion des utilisateurs",
     "users": "Utilisateurs",
-    "groups": "Groupes"
+    "groups": "Groupes",
+
+	"success_saved": "Configuration sauvegardée avec succès !"
 }
