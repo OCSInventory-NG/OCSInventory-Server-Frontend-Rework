@@ -10,9 +10,6 @@
 
 <script>
 export default {
-	name: 'Loader',
-	props: {
-		size: {type: Number, default: 21}
-	}
+	name: 'Loader'
 }
 </script>
