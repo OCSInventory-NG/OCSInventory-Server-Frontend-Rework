@@ -41,7 +41,7 @@
 		</div>
 
 		<div align="center">
-			<p>{{ totalRows }} Result(s)</p>
+			<p>{{ totalRows }} {{ $t('result') }}</p>
 		</div>
 
 		<!-- Show/Hide columns -->
