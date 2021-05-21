@@ -14,9 +14,9 @@
 				</b-input-group-prepend>
 				<b-form-input 
 					id="filter-input" 
-					v-model="filter" 
+					v-model="filter"
+					:placeholder="$t('search')"
 					type="search"
-					placeholder="Search"
 				/>
 			</b-input-group>
 
