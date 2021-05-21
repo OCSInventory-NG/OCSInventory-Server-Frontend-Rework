@@ -2,8 +2,8 @@
 	"username": "Username",
 	"password": "Password",
 	"email": "Email",
-	"firstname": "Firstname",
-	"lastname": "Lastname",
+	"first_name": "Firstname",
+	"last_name": "Lastname",
 
 	"save": "Save",
 
@@ -15,5 +15,10 @@
 	"users": "Users",
 	"groups": "Groups",
 
-	"success_saved": "Configuration saved with success !"
+	"success_saved": "Configuration saved with success !",
+
+	"actions": "Actions",
+	"is_staff": "Console access",
+	"user_permissions": "Permissions"
+
 }

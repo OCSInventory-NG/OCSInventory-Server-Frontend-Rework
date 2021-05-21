@@ -83,7 +83,7 @@
 						<b-row>
 							<b-col>
 								<b-form-group 
-									:label="$t('firstname')" 
+									:label="$t('first_name')" 
 									label-for="first_name"
 								>
 									<b-form-input
@@ -95,7 +95,7 @@
 							</b-col>
 							<b-col>
 								<b-form-group
-									:label="$t('lastname')" 
+									:label="$t('last_name')" 
 									label-for="last_name"
 								>
 									<b-form-input

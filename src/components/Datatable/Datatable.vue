@@ -77,7 +77,7 @@
 				hover
 				responsive
 				selectable
-				primary-key="ID"
+				primary-key="id"
 				@filtered="onFiltered"  
 			>
 				<template v-slot:head(selected)="">
@@ -162,6 +162,8 @@
 </template>
 
 <script>
+import i18n from '../../i18n'
+
 export default {
 	name: 'Datatable',
 	props: {
@@ -216,6 +218,7 @@ export default {
 			Object.keys(details).forEach( data => {
 				var array = {
 					key: data,
+					label: i18n.t(data),
 					sortable: true,
 					visible: true,
 				}
@@ -228,10 +231,9 @@ export default {
 				index === -1 ? this.fields.push(array) : null
 			})
 		})
-
 		var actions = {
 			key: "actions", 
-			label: "Actions", 
+			label: i18n.t('actions'), 
 			sortable: false ,
 			visible: true,
 		}

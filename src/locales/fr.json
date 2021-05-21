@@ -2,8 +2,8 @@
     "username": "Identifiant",
     "password": "Mot de passe",
 	"email": "Email",
-	"firstname": "Prénom",
-	"lastname": "Nom",
+	"first_name": "Prénom",
+	"last_name": "Nom",
 
 	"save": "Sauvegarder",
 
@@ -15,5 +15,9 @@
     "users": "Utilisateurs",
     "groups": "Groupes",
 
-	"success_saved": "Configuration sauvegardée avec succès !"
+	"success_saved": "Configuration sauvegardée avec succès !",
+
+	"actions": "Actions",
+	"is_staff": "Accès console",
+	"user_permissions": "Permissions"
 }
