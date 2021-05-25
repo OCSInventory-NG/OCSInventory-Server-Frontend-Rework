@@ -23,7 +23,7 @@
 				<Datatable
 					id="usersdatatable"
 					:rowdata="rowdata"
-					title="Users"
+					title="users"
 				/>
 			</div>
 		</section>

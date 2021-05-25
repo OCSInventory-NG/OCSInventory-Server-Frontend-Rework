@@ -18,10 +18,12 @@
 			<div
 				v-else
 			>
+				<AddGroupModal />
+
 				<Datatable
 					id="groupsdatatable"
 					:rowdata="rowdata"
-					title="Groups"
+					title="groups"
 				/>
 			</div>
 		</section>
@@ -32,12 +34,14 @@
 import Axios from 'axios'
 import Datatable from '@/components/Datatable/Datatable';
 import Loader from '@/components/Loader/Loader';
+import AddGroupModal from '@/components/Modals/AddGroupModal';
 
 export default {
 	name: "Groups",
 	components: {
 		Datatable,
-		Loader
+		Loader,
+		AddGroupModal
 	},
 	data() {
 		return {
