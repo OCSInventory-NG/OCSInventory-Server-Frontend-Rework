@@ -1,5 +1,5 @@
 <template>
-	<div id="AddUserModal">
+	<div id="AddGroupModal">
 		<section v-if="successed">
 			<b-alert 
 				:show="!!succesMsg" 
@@ -21,8 +21,8 @@
 		</section>
 
 		<b-button 
-			v-b-modal.add-user
-			:title="$t('adduser')"
+			v-b-modal.add-group
+			:title="$t('addgroup')"
 			variant="success"
 			class="add-button"
 		>
@@ -31,8 +31,8 @@
 		</b-button>
 
 		<b-modal 
-			id="add-user" 
-			:title="$t('adduser')"
+			id="add-group" 
+			:title="$t('addgroup')"
 			hide-footer
 		>
 			<b-form
@@ -40,109 +40,21 @@
 			>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('user_informations') }}</h4>
+						<h4>{{ $t('group_informations') }}</h4>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('username')" 
-							label-for="username"
+							:label="$t('name')" 
+							label-for="name"
 						>
 							<b-form-input
-								id="username"
-								v-model="row.username"
+								id="name"
+								v-model="row.name"
 								required
 							/>
 						</b-form-group>
-					</b-col>
-					<b-col>
-						<b-form-group
-							:label="$t('password')" 
-							label-for="password"
-						>
-							<b-form-input
-								id="password"
-								v-model="row.password"
-								type="password"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('email')" 
-							label-for="email"
-						>
-							<b-form-input
-								id="email"
-								v-model="row.email"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group 
-							:label="$t('first_name')" 
-							label-for="first_name"
-						>
-							<b-form-input
-								id="first_name"
-								v-model="row.first_name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-					<b-col>
-						<b-form-group
-							:label="$t('last_name')" 
-							label-for="last_name"
-						>
-							<b-form-input
-								id="last_name"
-								v-model="row.last_name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-checkbox
-							id="is_staff"
-							v-model="row.is_staff"
-							name="is_staff"
-							value="true"
-							unchecked-value="false"
-						>
-							{{ $t('is_staff') }}
-						</b-form-checkbox>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<h4>{{ $t('groups') }}</h4>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col
-						v-for="group in groups"
-						:key="group.id"
-						cols="4"
-					>
-						<b-form-checkbox
-							:id="group.code"
-							v-model="row.groups"
-							:name="group.code"
-							:value="group.id"
-							unchecked
-						>
-							{{ group.name }}
-						</b-form-checkbox>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -158,7 +70,7 @@
 					>
 						<b-form-checkbox
 							:id="permission.code"
-							v-model="row.user_permissions"
+							v-model="row.permissions"
 							:name="permission.code"
 							:value="permission.id"
 							unchecked
@@ -196,16 +108,9 @@ export default {
 	data() {
 		return {
 			row: {
-				username: null,
-				password: null,
-				email: null,
-				first_name: null,
-				last_name: null,
-				is_staff: false,
-				groups: [],
-				user_permissions: []
+				name: null,
+				permissions: []
 			},
-			groups: [],
 			permissions: [],
 			errorMsg: null,
 			succesMsg: null,
@@ -218,17 +123,6 @@ export default {
 			"Content-Type": "application/json;charset=utf-8",
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
-
-		Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
-			.then(response => {
-				response.data.forEach(groupDetails => {
-					this.groups.push({
-						id: groupDetails.id,
-						code: "group_"+groupDetails.id,
-						name: groupDetails.name
-					})
-				})
-			})
 
 		Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
 			.then(response => {
@@ -250,18 +144,20 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			Axios.post("http://172.18.26.12:8000/users/", this.row, { headers: header })
+			Axios.post("http://172.18.26.12:8000/groups/", this.row, { headers: header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
+					this.$bvModal.hide('add-group')
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
+					this.$bvModal.hide('add-group')
 				})
 		}
 	}

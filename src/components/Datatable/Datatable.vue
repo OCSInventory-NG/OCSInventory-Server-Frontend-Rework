@@ -4,7 +4,7 @@
 		class="datatable-custom"
 	>
 		<div class="header-table">
-			<h4>{{ title }}</h4>
+			<h4>{{ $t(title) }}</h4>
 			<!-- Search bar -->
 			<b-input-group class="mb-1 input-filter">
 				<b-input-group-prepend 
