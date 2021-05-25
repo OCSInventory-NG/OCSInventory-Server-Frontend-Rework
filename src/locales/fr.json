@@ -4,6 +4,7 @@
 	"email": "Email",
 	"first_name": "Prénom",
 	"last_name": "Nom",
+	"name": "Nom",
 
 	"save": "Sauvegarder",
 	"add": "Ajouter",
@@ -23,5 +24,8 @@
 	"actions": "Actions",
 	"is_staff": "Accès console",
 	"user_permissions": "Permissions",
-	"adduser": "Ajouter un nouvel utilisateur"
+	"adduser": "Ajouter un nouvel utilisateur",
+	"addgroup": "Ajouter un nouveau groupe",
+	"user_informations": "Informations de l'utilisateur",
+	"group_informations": "Informations du groupe"
 }

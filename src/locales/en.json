@@ -4,6 +4,7 @@
 	"email": "Email",
 	"first_name": "Firstname",
 	"last_name": "Lastname",
+	"name": "Name",
 
 	"save": "Save",
 	"add": "Add",
@@ -24,7 +25,9 @@
 	"is_staff": "Console access",
 	"user_permissions": "Permissions",
 	"adduser": "Add a new user",
+	"addgroup": "Add a new group",
 	"user_informations": "User informations",
+	"group_informations": "Group informations",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
