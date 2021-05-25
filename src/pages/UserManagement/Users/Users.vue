@@ -18,6 +18,8 @@
 			<div
 				v-else
 			>
+				<AddUserModal />
+
 				<Datatable
 					id="usersdatatable"
 					:rowdata="rowdata"
@@ -32,12 +34,14 @@
 import Axios from 'axios'
 import Datatable from '@/components/Datatable/Datatable';
 import Loader from '@/components/Loader/Loader';
+import AddUserModal from '@/components/Modals/AddUserModal';
 
 export default {
 	name: "Users",
 	components: {
 		Datatable,
-		Loader
+		Loader,
+		AddUserModal
 	},
 	data() {
 		return {

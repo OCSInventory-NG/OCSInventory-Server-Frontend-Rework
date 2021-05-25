@@ -6,6 +6,7 @@
 	"last_name": "Nom",
 
 	"save": "Sauvegarder",
+	"add": "Ajouter",
 	"search": "Rechercher",
 	"result": "Résultat(s)",
 
@@ -21,5 +22,6 @@
 
 	"actions": "Actions",
 	"is_staff": "Accès console",
-	"user_permissions": "Permissions"
+	"user_permissions": "Permissions",
+	"adduser": "Ajouter un nouvel utilisateur"
 }
