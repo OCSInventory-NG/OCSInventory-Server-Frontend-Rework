@@ -11,6 +11,9 @@
 	"search": "Search",
 	"result": "Result(s)",
 
+	"yes": "Yes",
+	"no": "No",
+
 	"myaccount": "My account",
 	"logout": "Logout",
 
@@ -24,8 +27,12 @@
 	"actions": "Actions",
 	"is_staff": "Console access",
 	"user_permissions": "Permissions",
+	"permissions": "Permissions",
 	"adduser": "Add a new user",
 	"addgroup": "Add a new group",
+	"editgroup": "Edit group",
+	"deleteitem": "Delete item",
+	"delete_msg": "Do you want to delete",
 	"user_informations": "User informations",
 	"group_informations": "Group informations",
 
