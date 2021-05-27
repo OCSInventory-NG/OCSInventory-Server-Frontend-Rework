@@ -26,14 +26,12 @@
 
 <script>
 import Axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable';
 import Loader from '@/components/Loader/Loader';
 import AddUserModal from '@/components/Modals/AddItem/AddUserModal';
 
 export default {
 	name: "Users",
 	components: {
-		Datatable,
 		Loader,
 		AddUserModal
 	},

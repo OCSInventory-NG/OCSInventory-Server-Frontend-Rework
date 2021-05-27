@@ -24,7 +24,7 @@
 					<b-col>
 						<p>{{ $t("delete_msg") }} {{ name }} ?</p>
 						<b-form-input 
-							v-model="id" 
+							v-model="text" 
 							hidden
 						>{{ id }}</b-form-input>
 					</b-col>
