@@ -1,39 +1,21 @@
 <template>
-	<div id="AddUserModal">
-		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
-				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
-		</section>
-
-		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
-				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
-		</section>
-
+	<div id="EditUserModal">
 		<b-button 
-			v-b-modal.add-user
-			:title="$t('adduser')"
-			variant="success"
-			class="add-button"
+			v-b-modal="idModal"
+			:title="$t('editgroup')"
+			variant="primary"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'plus']"/>
-		</b-button>
+			<b-icon 
+				icon="pencil-square" 
+				aria-hidden="true"
+			/>
+		</b-button >
 
 		<b-modal 
-			id="add-user" 
-			:title="$t('adduser')"
+			:id="idModal" 
+			:title="$t('editgroup')"
 			hide-footer
+			modal-class="custom-modal"
 		>
 			<b-form
 				@submit="onSubmit"
@@ -53,7 +35,9 @@
 								id="username"
 								v-model="row.username"
 								required
-							/>
+							>
+								{{ row.username }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
 					<b-col>
@@ -80,7 +64,9 @@
 								id="email"
 								v-model="row.email"
 								required
-							/>
+							>
+								{{ row.email }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -94,7 +80,9 @@
 								id="first_name"
 								v-model="row.first_name"
 								required
-							/>
+							>
+								{{ row.first_name }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
 					<b-col>
@@ -106,7 +94,9 @@
 								id="last_name"
 								v-model="row.last_name"
 								required
-							/>
+							>
+								{{ row.last_name }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -177,7 +167,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('add') }}
+							{{ $t('save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end"/>
@@ -189,10 +179,18 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../i18n'
+import i18n from '../../../i18n'
+
+const header = {
+	"Content-Type": "application/json;charset=utf-8",
+	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+}
 
 export default {
-	name: 'AddUserModal',
+	name: 'EditUserModal',
+	props: {
+		id: { type: Number, default: null }
+	},
 	data() {
 		return {
 			row: {
@@ -205,63 +203,78 @@ export default {
 				groups: [],
 				user_permissions: []
 			},
-			groups: [],
 			permissions: [],
+			groups: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			idModal: 'edit-user'+this.id
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
-
-		Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
-			.then(response => {
-				response.data.forEach(groupDetails => {
-					this.groups.push({
-						id: groupDetails.id,
-						code: "group_"+groupDetails.id,
-						name: groupDetails.name
-					})
-				})
-			})
-
-		Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
-			.then(response => {
-				response.data.forEach(permissionDetails => {
-					this.permissions.push({
-						id: permissionDetails.id,
-						code: "permission_"+permissionDetails.id,
-						name: i18n.t(permissionDetails.codename)
-					})
-				})
-			})
+		this.getUser()
+		this.getPermissions()
+		this.getGroups()		
 	},
 	methods: {
-		onSubmit(event) {
-			event.preventDefault()
-			
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
-			Axios.post("http://172.18.26.12:8000/users/", this.row, { headers: header })
-				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
+		// Get user
+		getUser() {
+			Axios.get("http://172.18.26.12:8000/users/"+this.id+"/", { headers: header })
+				.then(response => {
+					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
+				})
+		},
+		// Get all permissions
+		getPermissions() {
+			Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
+				.then(response => {
+					response.data.forEach(permissionDetails => {
+						this.permissions.push({
+							id: permissionDetails.id,
+							code: "permission_"+this.id+"_"+permissionDetails.id,
+							name: i18n.t(permissionDetails.codename)
+						})
+					})
+				})
+		},
+		// Get groups
+		getGroups() {
+			Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
+				.then(response => {
+					response.data.forEach(groupDetails => {
+						this.groups.push({
+							id: groupDetails.id,
+							code: "group_"+groupDetails.id,
+							name: groupDetails.name
+						})
+					})
+				})
+		},
+		// Submit group creation and call getGroups to reload datatable datas
+		onSubmit(event) {
+			event.preventDefault()
+			Axios.put("http://172.18.26.12:8000/users/"+this.row.id+"/", this.row, { headers: header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+					this.$bvModal.hide('edit-user'+this.row.id)
+					this.$emit('reloadDatatable')
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
 					this.succesMsg = null
 					this.successed = false
+					this.$bvModal.hide('edit-user'+this.row.id)
 				})
 		}
 	}

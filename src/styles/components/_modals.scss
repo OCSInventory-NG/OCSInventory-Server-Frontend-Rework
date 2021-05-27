@@ -14,21 +14,21 @@
     margin-bottom: 10px;
 }
 
-#add-user, #add-group {    
+.custom-modal {    
     .modal-body > form > .row {
-        padding: 5px;
+        padding: 5px!important;
     }
 
     .form-control {
         border-top: none!important;
         border-left: none!important;
         border-right: none!important;
-        border-bottom: 1px solid #ced4da;
+        border-bottom: 1px solid #ced4da!important;
         border-radius: 0!important;
         box-shadow: none!important;
     }
 
     h4 {
-        margin-top: 10px;
+        margin-top: 10px!important;
     }
 }

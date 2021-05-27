@@ -109,7 +109,7 @@
 							/>
 							<delete-item-modal
 								:id="row.item.id"
-								:name="row.item.name"
+								:name="row.item.name || row.item.username"
 								:parameter="title"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -165,12 +165,14 @@
 <script>
 import i18n from '../../i18n'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
+import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 
 export default {
 	name: 'Datatable',
 	components: {
 		EditGroupModal,
+		EditUserModal,
 		DeleteItemModal
 	},
 	props: {
