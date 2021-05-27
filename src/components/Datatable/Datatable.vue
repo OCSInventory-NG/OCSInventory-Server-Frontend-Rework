@@ -99,19 +99,20 @@
 					</template>
 				</template>
 
-				<template v-slot:cell(actions)="">
+				<template #cell(actions)="row">
 					<b-button-toolbar>
 						<b-button-group class="mr-1">
-							<b-button 
-								variant="primary" 
-								@click="edit(item)"><b-icon 
-									icon="pencil-square" 
-									aria-hidden="true"/></b-button >
-							<b-button 
-								variant="danger" 
-								@click="deleteItem(item)"><b-icon 
-									icon="x" 
-									aria-hidden="true"/></b-button >
+							<component 
+								:is="editcomponent"
+								v-bind="{ id: row.item.id }"
+								@reloadDatatable="reloadDatatable"
+							/>
+							<delete-item-modal
+								:id="row.item.id"
+								:name="row.item.name"
+								:parameter="title"
+								@reloadDatatable="reloadDatatable"
+							/>
 						</b-button-group>
 					</b-button-toolbar>
 				</template>
@@ -163,13 +164,20 @@
 
 <script>
 import i18n from '../../i18n'
+import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 
 export default {
 	name: 'Datatable',
+	components: {
+		EditGroupModal,
+		DeleteItemModal
+	},
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
-		id: { type: String, default: '' }
+		id: { type: String, default: '' },
+		editcomponent: { type: String, default: '' }
 	},
 	data() {
 		return {
@@ -259,6 +267,9 @@ export default {
 				this.$refs.selectableTable.selectAllRows()
 			}
 		},
+		reloadDatatable() {
+			this.$emit('reloadDatatable')
+		}
 	}
 };
 </script>
