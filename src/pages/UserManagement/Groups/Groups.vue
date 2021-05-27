@@ -19,12 +19,6 @@
 				v-else
 			>
 				<AddGroupModal />
-
-				<Datatable
-					id="groupsdatatable"
-					:rowdata="rowdata"
-					title="groups"
-				/>
 			</div>
 		</section>
 	</div>
@@ -32,21 +26,18 @@
 
 <script>
 import Axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable';
 import Loader from '@/components/Loader/Loader';
-import AddGroupModal from '@/components/Modals/AddGroupModal';
+import AddGroupModal from '@/components/Modals/AddItem/AddGroupModal';
 
 export default {
 	name: "Groups",
 	components: {
-		Datatable,
 		Loader,
 		AddGroupModal
 	},
 	data() {
 		return {
 			errorMsg: null,
-			rowdata: [],
 			loading: true,
 			errored: false,
 		}
@@ -58,8 +49,7 @@ export default {
 		}
 
 		Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
-			.then(response => {
-				this.rowdata = response.data
+			.then(() => {
 				this.errorMsg = null
 				this.errored = false
 			})

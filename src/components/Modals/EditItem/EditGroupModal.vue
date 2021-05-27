@@ -1,39 +1,21 @@
 <template>
-	<div id="AddGroupModal">
-		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
-				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
-		</section>
-
-		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
-				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
-		</section>
-
+	<div id="EditGroupModal">
 		<b-button 
-			v-b-modal.add-group
-			:title="$t('addgroup')"
-			variant="success"
-			class="add-button"
+			v-b-modal="idModal"
+			:title="$t('editgroup')"
+			variant="primary"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'plus']"/>
-		</b-button>
+			<b-icon 
+				icon="pencil-square" 
+				aria-hidden="true"
+			/>
+		</b-button >
 
 		<b-modal 
-			id="add-group" 
-			:title="$t('addgroup')"
+			:id="idModal" 
+			:title="$t('editgroup')"
 			hide-footer
+			modal-class="custom-modal"
 		>
 			<b-form
 				@submit="onSubmit"
@@ -53,13 +35,15 @@
 								id="name"
 								v-model="row.name"
 								required
-							/>
+							>
+								{{ row.name }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('user_permissions') }}</h4>
+						<h4>{{ $t('permissions') }}</h4>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -89,7 +73,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('add') }}
+							{{ $t('save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end"/>
@@ -101,10 +85,18 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../i18n'
+import i18n from '../../../i18n'
+
+const header = {
+	"Content-Type": "application/json;charset=utf-8",
+	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+}
 
 export default {
-	name: 'AddUserModal',
+	name: 'EditGroupModal',
+	props: {
+		id: { type: Number, default: null }
+	},
 	data() {
 		return {
 			row: {
@@ -116,48 +108,58 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			idModal: 'edit-group'+this.id
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
-
-		Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
-			.then(response => {
-				response.data.forEach(permissionDetails => {
-					this.permissions.push({
-						id: permissionDetails.id,
-						code: "permission_"+permissionDetails.id,
-						name: i18n.t(permissionDetails.codename)
-					})
-				})
-			})
+		this.getPermissions()
+		this.getGroup()		
 	},
 	methods: {
+		// Get all permissions
+		getPermissions() {
+			Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
+				.then(response => {
+					response.data.forEach(permissionDetails => {
+						this.permissions.push({
+							id: permissionDetails.id,
+							code: "permission_"+this.id+"_"+permissionDetails.id,
+							name: i18n.t(permissionDetails.codename)
+						})
+					})
+				})
+		},
+		// Get groups
+		getGroup() {
+			Axios.get("http://172.18.26.12:8000/groups/"+this.id+"/", { headers: header })
+				.then(response => {
+					this.row = response.data
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+		},
+		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
-			Axios.post("http://172.18.26.12:8000/groups/", this.row, { headers: header })
+			Axios.put("http://172.18.26.12:8000/groups/"+this.row.id+"/", this.row, { headers: header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('add-group')
+					this.$bvModal.hide('edit-group'+this.row.id)
+					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('add-group')
+					this.$bvModal.hide('edit-group'+this.row.id)
 				})
 		}
 	}
