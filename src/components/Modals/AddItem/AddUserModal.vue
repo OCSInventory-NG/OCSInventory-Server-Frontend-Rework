@@ -237,7 +237,9 @@ export default {
 			},
 			rowdata: [],
 			groups: [],
+			groupsLabel: [],
 			permissions: [],
+			permissionsLabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -251,9 +253,9 @@ export default {
 		}
 	},
 	mounted() {
-		this.getUsers()
 		this.getPermissions()
 		this.getGroups()
+		this.getUsers()
 	},
 	methods: {
 		// Get all users
@@ -261,6 +263,8 @@ export default {
 			Axios.get("http://172.18.26.12:8000/users/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
+					this.permissionsTreatment()
+					this.groupsTreatment()
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -269,6 +273,24 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
+		},
+		permissionsTreatment() {
+			var tmpPermissions = []
+			this.rowdata.forEach(rowDetails => {
+				rowDetails.user_permissions.forEach(permissionsDetails => {
+					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
+				})
+				rowDetails.user_permissions = tmpPermissions.join(", ")
+			})
+		},
+		groupsTreatment() {
+			var tmpGroups = []
+			this.rowdata.forEach(rowDetails => {
+				rowDetails.groups.forEach(groupsDetails => {
+					tmpGroups.push(this.groupsLabel[groupsDetails])
+				})
+				rowDetails.groups = tmpGroups.join(", ")
+			})
 		},
 		// Get all permissions
 		getPermissions() {
@@ -280,6 +302,7 @@ export default {
 							code: "permission_"+permissionDetails.id,
 							name: i18n.t(permissionDetails.codename)
 						})
+						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
 					})
 				})
 		},
@@ -293,6 +316,7 @@ export default {
 							code: "group_"+groupDetails.id,
 							name: groupDetails.name
 						})
+						this.groupsLabel[groupDetails.id] = groupDetails.name
 					})
 				})
 		},

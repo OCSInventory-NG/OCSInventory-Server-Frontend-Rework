@@ -73,7 +73,8 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'delete-item'+this.id
+			idModal: 'delete-item'+this.id,
+			text: null,
 		}
 	},
 	methods: {

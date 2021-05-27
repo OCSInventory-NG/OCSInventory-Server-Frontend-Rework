@@ -143,6 +143,7 @@ export default {
 			},
 			rowdata: [],
 			permissions: [],
+			permissionsLabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -170,6 +171,7 @@ export default {
 							code: "permission_"+permissionDetails.id,
 							name: i18n.t(permissionDetails.codename)
 						})
+						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
 					})
 				})
 		},
@@ -178,6 +180,7 @@ export default {
 			Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
+					this.permissionsTreatment()
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -186,6 +189,15 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
+		},
+		permissionsTreatment() {
+			var tmpPermissions = []
+			this.rowdata.forEach(rowDetails => {
+				rowDetails.permissions.forEach(permissionsDetails => {
+					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
+				})
+				rowDetails.permissions = tmpPermissions.join(", ")
+			})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
