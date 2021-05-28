@@ -254,8 +254,6 @@ export default {
 	},
 	mounted() {
 		this.getPermissions()
-		this.getGroups()
-		this.getUsers()
 	},
 	methods: {
 		// Get all users
@@ -263,8 +261,6 @@ export default {
 			Axios.get("http://172.18.26.12:8000/users/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
-					this.permissionsTreatment()
-					this.groupsTreatment()
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -272,20 +268,19 @@ export default {
 					this.errorMsg = e
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
+				.finally(() => {
+					this.permissionsGroupsTreatment()
+					this.loading = false
+				})
 		},
-		permissionsTreatment() {
+		permissionsGroupsTreatment() {
 			var tmpPermissions = []
+			var tmpGroups = []
 			this.rowdata.forEach(rowDetails => {
 				rowDetails.user_permissions.forEach(permissionsDetails => {
 					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
 				})
 				rowDetails.user_permissions = tmpPermissions.join(", ")
-			})
-		},
-		groupsTreatment() {
-			var tmpGroups = []
-			this.rowdata.forEach(rowDetails => {
 				rowDetails.groups.forEach(groupsDetails => {
 					tmpGroups.push(this.groupsLabel[groupsDetails])
 				})
@@ -305,6 +300,7 @@ export default {
 						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
 					})
 				})
+				.finally(() => this.getGroups())
 		},
 		// Get groups
 		getGroups() {
@@ -319,6 +315,7 @@ export default {
 						this.groupsLabel[groupDetails.id] = groupDetails.name
 					})
 				})
+				.finally(() => this.getUsers())
 		},
 		onSubmit(event) {
 			event.preventDefault()

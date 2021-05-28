@@ -158,7 +158,6 @@ export default {
 	},
 	mounted() {
 		this.getPermissions()
-		this.getGroups()		
 	},
 	methods: {
 		// Get all permissions
@@ -174,6 +173,7 @@ export default {
 						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
 					})
 				})
+				.finally(() => this.getGroups())
 		},
 		// Get groups
 		getGroups() {
