@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import i18n from '../../i18n'
+
 export default {
 	name: 'BreadcrumbHistory',
 	props: {
@@ -15,15 +17,13 @@ export default {
 			return this.exclude.indexOf(this.$route.path.split('/').pop()) > -1;
 		},
 		tree() {
-			return ['OCS Inventory']
-				.concat(this.$route.path
-					.split('/')
-					.slice(1)
-					.map(route => route
-						.split('_')
-						.map(word => word[0].toUpperCase() + word.slice(1))
-						.join(' ')
-					)
+			return this.$route.path
+				.split('/')
+				.slice(1)
+				.map(route => route
+					.split('_')
+					.map(word => i18n.t(word))
+					.join(' ')
 				);
 		}
 	}
