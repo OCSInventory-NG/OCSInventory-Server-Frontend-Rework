@@ -6,7 +6,7 @@
 			@mouseleave="sidebarMouseLeave"
 		>
 			<header class="logo">
-				<router-link to="/app/dashboard">
+				<router-link to="/ocsreports/dashboard">
 					<span class="primary-word">OCS</span>
 					<span class="secondary-word"> Inventory</span>
 				</router-link>
@@ -15,7 +15,7 @@
 				<NavLink
 					:active-item="activeItem"
 					:header="$t('dashboard')"
-					link="/app/dashboard"
+					link="/ocsreports/dashboard"
 					icon-name="home"
 					index="dashboard"
 					is-header
@@ -24,10 +24,10 @@
 					:active-item="activeItem"
 					:header="$t('usermanagement')"
 					:children-links="[
-						{ header: $t('users'), link: '/app/users' },
-						{ header: $t('groups'), link: '/app/groups' },
+						{ header: $t('users'), link: '/ocsreports/users' },
+						{ header: $t('groups'), link: '/ocsreports/groups' },
 					]"
-					link="/app/user_management"
+					link="/ocsreports/user_management"
 					icon-name="users-cog"
 					index="user_management"
 				/>

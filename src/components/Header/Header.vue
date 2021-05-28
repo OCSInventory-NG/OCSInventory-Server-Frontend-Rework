@@ -85,7 +85,7 @@ export default {
 			this.$router.push('/login');
 		},
 		account() {
-			this.$router.push('/app/my_account');
+			this.$router.push('/ocsreports/my_account');
 		},
 	}
 };

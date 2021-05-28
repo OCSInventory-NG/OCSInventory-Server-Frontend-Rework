@@ -92,7 +92,7 @@ export default {
 	},
 	created() {
 		if (localStorage.getItem('authenticated') === 'true' && localStorage.getItem('token_authentication') !== null) {
-			this.$router.push('/app/dashboard');
+			this.$router.push('/ocsreports/dashboard');
 		}
 	},
 	methods: {
@@ -116,7 +116,7 @@ export default {
 					this.errorMessage = null
 					localStorage.setItem('token_authentication', response.data.token)
 					localStorage.setItem('authenticated', true)
-					this.$router.push('/app/dashboard')
+					this.$router.push('/ocsreports/dashboard')
 				})
 				.catch(e => {
 					this.errorMessage = e

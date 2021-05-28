@@ -4,7 +4,7 @@
 
 <script>
 export default {
-	name: "App",
+	name: "ocsreports",
 	created() {
 		const currentPath = this.$router.history.current.path;
 
@@ -12,8 +12,8 @@ export default {
 			this.$router.push("/login");
 		}
 
-		if (currentPath === "/" || currentPath === "/app") {
-			this.$router.push("/app/dashboard");
+		if (currentPath === "/" || currentPath === "/ocsreports") {
+			this.$router.push("/ocsreports/dashboard");
 		}
 	},
 };

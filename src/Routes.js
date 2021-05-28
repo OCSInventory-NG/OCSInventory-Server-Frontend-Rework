@@ -29,7 +29,7 @@ export default new Router({
 			component: Error,
 		},
 		{
-			path: '/app',
+			path: '/ocsreports',
 			name: 'Layout',
 			component: Layout,
 			children: [
