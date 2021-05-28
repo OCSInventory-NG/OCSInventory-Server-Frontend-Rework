@@ -4,7 +4,7 @@
 
 <script>
 export default {
-	name: "ocsreports",
+	name: "Ocsreports",
 	created() {
 		const currentPath = this.$router.history.current.path;
 
