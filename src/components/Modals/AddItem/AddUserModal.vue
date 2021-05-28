@@ -280,11 +280,11 @@ export default {
 				rowDetails.user_permissions.forEach(permissionsDetails => {
 					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
 				})
-				rowDetails.user_permissions = tmpPermissions.join(", ")
+				rowDetails.user_permissions = tmpPermissions.join('\n')
 				rowDetails.groups.forEach(groupsDetails => {
 					tmpGroups.push(this.groupsLabel[groupsDetails])
 				})
-				rowDetails.groups = tmpGroups.join(", ")
+				rowDetails.groups = tmpGroups.join('\n')
 			})
 		},
 		// Get all permissions

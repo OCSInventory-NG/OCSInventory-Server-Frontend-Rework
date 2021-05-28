@@ -78,6 +78,7 @@
 				responsive
 				selectable
 				primary-key="id"
+				style="white-space: pre-line;"
 				@filtered="onFiltered"  
 			>
 				<template v-slot:head(selected)="">

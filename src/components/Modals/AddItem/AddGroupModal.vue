@@ -196,7 +196,7 @@ export default {
 				rowDetails.permissions.forEach(permissionsDetails => {
 					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
 				})
-				rowDetails.permissions = tmpPermissions.join(", ")
+				rowDetails.permissions = tmpPermissions.join('\n')
 			})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
