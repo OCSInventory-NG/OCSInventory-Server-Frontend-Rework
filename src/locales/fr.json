@@ -1,4 +1,5 @@
 {
+	"ocsreports": "OCS Inventory",
     "username": "Identifiant",
     "password": "Mot de passe",
 	"email": "Email",
@@ -72,5 +73,13 @@
 	"add_session": "Peut ajouter une session",
 	"change_session": "Peut modifier une session",
 	"delete_session": "Peut supprimer une session",
-	"view_session": "Peut voir les sessions"
+	"view_session": "Peut voir les sessions",
+	"add_template": "Peut ajouter un modèle",
+	"change_template": "Peut modifier un modèle",
+	"delete_template": "Peut supprimer un modèle",
+	"view_template": "Peut voir les modèles",
+	"add_section": "Peut ajouter une section",
+	"change_section": "Peut modifier une section",
+	"delete_section": "Peut supprimer une section",
+	"view_section": "Peut voir les sections"
 }

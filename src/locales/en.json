@@ -1,4 +1,6 @@
 {
+	"ocsreports": "OCS Inventory",
+
 	"username": "Username",
 	"password": "Password",
 	"email": "Email",
@@ -72,5 +74,13 @@
 	"add_session": "Can add session",
 	"change_session": "Can change session",
 	"delete_session": "Can delete session",
-	"view_session": "Can view session"
+	"view_session": "Can view session",
+	"add_template": "Can add template",
+	"change_template": "Can change template",
+	"delete_template": "Can delete template",
+	"view_template": "Can view template",
+	"add_section": "Can add section",
+	"change_section": "Can change section",
+	"delete_section": "Can delete section",
+	"view_section": "Can view section"
 }
