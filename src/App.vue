@@ -8,7 +8,7 @@ export default {
 	created() {
 		const currentPath = this.$router.history.current.path;
 
-		if (window.localStorage.getItem("authenticated") === "false") {
+		if (window.localStorage.getItem("authenticated") === "false" && localStorage.getItem('token_authentication') === null) {
 			this.$router.push("/login");
 		}
 
