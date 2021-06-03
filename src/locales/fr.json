@@ -81,5 +81,9 @@
 	"add_section": "Peut ajouter une section",
 	"change_section": "Peut modifier une section",
 	"delete_section": "Peut supprimer une section",
-	"view_section": "Peut voir les sections"
+	"view_section": "Peut voir les sections",
+	"add_field": "Peut ajouter un champs",
+	"change_field": "Peut modifier un champs",
+	"delete_field": "Peut supprimer un champs",
+	"view_field": "Peut voir les champs"
 }
