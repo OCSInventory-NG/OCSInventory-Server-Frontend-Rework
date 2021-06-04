@@ -20,7 +20,7 @@
 				/>
 			</b-input-group>
 
-			<b-button-toolbar>
+			<b-button-toolbar v-if="canexport">
 				<b-button-group class="mr-1">
 					<download-excel
 						:data="json_data"
@@ -36,6 +36,20 @@
 								aria-hidden="true"/>
 						</b-button>
 					</download-excel>
+				</b-button-group>
+			</b-button-toolbar>
+
+			<b-button-toolbar v-if="caneditconfig">
+				<b-button-group class="mr-1">
+					<b-button 
+						:title="$t('save_config')"
+						variant="success"
+						class="add-button"
+						@click="onSave"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'check']"/>
+					</b-button>
 				</b-button-group>
 			</b-button-toolbar>
 		</div>
@@ -102,10 +116,14 @@
 
 				<template #cell(value)="row">
 					<div 
-						v-for="value in row.item.value"
-						:key="value"
+						v-for="(value, key) in row.item.value"
+						:key="key"
 					>
-						<span>{{ value }}</span>
+						<b-form-input 
+							:id="row.item.name"
+							v-model="row.item.value[key]"
+							class="config-button"
+						/>
 					</div>
 				</template>
 
@@ -194,7 +212,9 @@ export default {
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: true },
 		candelete: { type: Boolean, default: true },
-		usecheckbox: { type: Boolean, default: true }
+		usecheckbox: { type: Boolean, default: true },
+		canexport: { type: Boolean, default: true },
+		caneditconfig: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -292,6 +312,9 @@ export default {
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')
+		},
+		onSave() {
+			this.$emit('reloadDatatable', this.rowdata)
 		}
 	}
 };

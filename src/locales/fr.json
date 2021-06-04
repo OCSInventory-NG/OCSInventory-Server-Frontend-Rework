@@ -40,6 +40,7 @@
 	"user_informations": "Informations de l'utilisateur",
 	"group_informations": "Informations du groupe",
 	"description": "Description",
+	"save_config": "Sauvegarder la configuration",
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",

@@ -32,7 +32,10 @@
 					id="generalDatatable"
 					:rowdata="rowdata"
 					:candelete="false"
+					:canedit="false"
 					:usecheckbox="false"
+					:canexport="false"
+					:caneditconfig="true"
 					editcomponent="EditConfigModal"
 					title="config"
 					@reloadDatatable="reloadDatatable"
@@ -99,8 +102,30 @@ export default {
 					this.loading = false
 				})
 		},
+		updateConfig() {
+			var config = []
+			this.rowdata.forEach(element => {
+				config.push({
+					name: element.name,
+					value: element.value
+				})
+			})
+			Axios.put("http://172.18.26.12:8000/config/", config, { headers: header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
+		},
 		reloadDatatable() {
-			this.getConfig()
+			this.updateConfig()
 		}
 	}
 }

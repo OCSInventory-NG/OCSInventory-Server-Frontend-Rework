@@ -69,6 +69,16 @@ thead {
     border-color: #961b7e!important;
 }
 
+.config-button {
+    border-top: none!important;
+    border-left: none!important;
+    border-right: none!important;
+    border-bottom: 1px solid #ced4da!important;
+    border-radius: 0!important;
+    box-shadow: none!important;
+    background-color: transparent!important;
+}
+
 // Pagination
 .pagination {
     font-weight: $font-weight-normal;

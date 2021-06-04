@@ -41,6 +41,7 @@
 	"user_informations": "User informations",
 	"group_informations": "Group informations",
 	"description": "Description",
+	"save_config": "Save configuration",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
