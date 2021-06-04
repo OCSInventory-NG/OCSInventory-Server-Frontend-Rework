@@ -40,6 +40,7 @@
 	"delete_msg": "Do you want to delete",
 	"user_informations": "User informations",
 	"group_informations": "Group informations",
+	"description": "Description",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
@@ -90,6 +91,10 @@
 	"change_field": "Can update field",
 	"delete_field": "Can delete field",
 	"view_field": "Can view fields",
+	"add_base": "Can add base",
+	"change_base": "Can update base",
+	"delete_base": "Can delete base",
+	"view_base": "Can view base",
 
 	"config_elem_15": "I'm a description",
 	"config_elem_17": "I'm a description",

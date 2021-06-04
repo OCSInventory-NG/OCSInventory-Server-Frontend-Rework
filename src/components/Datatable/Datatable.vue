@@ -113,11 +113,13 @@
 					<b-button-toolbar>
 						<b-button-group class="mr-1">
 							<component 
+								v-if="canedit"
 								:is="editcomponent"
 								v-bind="{ id: row.item.id }"
 								@reloadDatatable="reloadDatatable"
 							/>
-							<delete-item-modal
+							<delete-item-modal 
+								v-if="candelete"
 								:id="row.item.id"
 								:name="row.item.name || row.item.username"
 								:parameter="title"
@@ -189,7 +191,10 @@ export default {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
 		id: { type: String, default: '' },
-		editcomponent: { type: String, default: '' }
+		editcomponent: { type: String, default: '' },
+		canedit: { type: Boolean, default: true },
+		candelete: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: true }
 	},
 	data() {
 		return {
@@ -199,14 +204,7 @@ export default {
 			pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
 			totalRows: 1,
 			// Datatable datas
-			fields: [
-				{ 
-					key: "selected", 
-					label: "", 
-					sortable: false ,
-					visible: true,
-				}
-			],
+			fields: [],
 			// Search parameter
 			filter: null,
 			// Select row parameter
@@ -234,6 +232,15 @@ export default {
 		}
 	},
 	created() {
+		if(this.usecheckbox == true) {
+			this.fields.push({
+				key: "selected", 
+				label: "", 
+				sortable: false ,
+				visible: true,
+			})
+		}
+
 		this.rowdata.forEach(details => {
 			Object.keys(details).forEach( data => {
 				var array = {
@@ -251,13 +258,17 @@ export default {
 				index === -1 ? this.fields.push(array) : null
 			})
 		})
+
 		var actions = {
 			key: "actions", 
 			label: i18n.t('actions'), 
 			sortable: false ,
 			visible: true,
 		}
-		this.fields.push(actions)
+
+		if(this.canedit == true || this.candelete == true) {
+			this.fields.push(actions)
+		}
 	},
 	mounted() {
 		// Set the initial number of items

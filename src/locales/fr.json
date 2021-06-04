@@ -39,6 +39,7 @@
 	"delete_msg": "Voulez-vous supprimer",
 	"user_informations": "Informations de l'utilisateur",
 	"group_informations": "Informations du groupe",
+	"description": "Description",
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",
@@ -89,6 +90,10 @@
 	"change_field": "Peut modifier un champs",
 	"delete_field": "Peut supprimer un champs",
 	"view_field": "Peut voir les champs",
+	"add_base": "Peut ajouter une base",
+	"change_base": "Peut modifier une base",
+	"delete_base": "Peut supprimer une base",
+	"view_base": "Peut voir les bases",
 
 	"config_elem_15": "I'm a description",
 	"config_elem_17": "I'm a description",

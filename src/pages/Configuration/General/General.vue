@@ -31,6 +31,8 @@
 				<Datatable
 					id="generalDatatable"
 					:rowdata="rowdata"
+					:candelete="false"
+					:usecheckbox="false"
 					editcomponent="EditConfigModal"
 					title="config"
 					@reloadDatatable="reloadDatatable"
