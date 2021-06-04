@@ -31,6 +31,16 @@
 					icon-name="users-cog"
 					index="user_management"
 				/>
+				<NavLink
+					:active-item="activeItem"
+					:header="$t('config')"
+					:children-links="[
+						{ header: $t('general'), link: '/ocsreports/general' },
+					]"
+					link="/ocsreports/configuration"
+					icon-name="wrench"
+					index="configuration"
+				/>
 			</ul>
 		</nav>
 	</div>

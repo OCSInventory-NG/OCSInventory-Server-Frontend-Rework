@@ -14,6 +14,7 @@
 
 	"yes": "Oui",
 	"no": "Non",
+	"value": "Valeur",
 
 	"myaccount": "Mon compte",
 	"logout": "Déconnexion",
@@ -22,6 +23,8 @@
 	"usermanagement": "Gestion des utilisateurs",
 	"users": "Utilisateurs",
 	"groups": "Groupes",
+	"config": "Configurations",
+	"general": "Général",
 
 	"success_saved": "Configuration sauvegardée avec succès !",
 
@@ -85,5 +88,9 @@
 	"add_field": "Peut ajouter un champs",
 	"change_field": "Peut modifier un champs",
 	"delete_field": "Peut supprimer un champs",
-	"view_field": "Peut voir les champs"
+	"view_field": "Peut voir les champs",
+
+	"config_elem_15": "I'm a description",
+	"config_elem_17": "I'm a description",
+	"config_elem_24": "I'm a description"
 }

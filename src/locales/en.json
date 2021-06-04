@@ -15,6 +15,7 @@
 
 	"yes": "Yes",
 	"no": "No",
+	"value": "Value",
 
 	"myaccount": "My account",
 	"logout": "Logout",
@@ -23,6 +24,8 @@
 	"usermanagement": "User Management",
 	"users": "Users",
 	"groups": "Groups",
+	"config": "Configurations",
+	"general": "General",
 
 	"success_saved": "Configuration saved with success !",
 
@@ -86,5 +89,9 @@
 	"add_field": "Can add field",
 	"change_field": "Can update field",
 	"delete_field": "Can delete field",
-	"view_field": "Can view fields"
+	"view_field": "Can view fields",
+
+	"config_elem_15": "I'm a description",
+	"config_elem_17": "I'm a description",
+	"config_elem_24": "I'm a description"
 }

@@ -100,6 +100,15 @@
 					</template>
 				</template>
 
+				<template #cell(value)="row">
+					<div 
+						v-for="value in row.item.value"
+						:key="value"
+					>
+						<span>{{ value }}</span>
+					</div>
+				</template>
+
 				<template #cell(actions)="row">
 					<b-button-toolbar>
 						<b-button-group class="mr-1">

@@ -14,6 +14,9 @@ import Dashboard from '@/pages/Dashboard/Dashboard';
 import Users from '@/pages/UserManagement/Users/Users';
 import Groups from '@/pages/UserManagement/Groups/Groups';
 
+// Configurations
+import General from '@/pages/Configuration/General/General';
+
 Vue.use(Router);
 
 export default new Router({
@@ -52,6 +55,11 @@ export default new Router({
 					path: 'groups',
 					name: 'Groups',
 					component: Groups,
+				},
+				{
+					path: 'general',
+					name: 'General',
+					component: General,
 				},
 			],
 		},
