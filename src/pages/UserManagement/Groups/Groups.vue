@@ -45,6 +45,8 @@ export default {
 			errorMsg: null,
 			loading: true,
 			errored: false,
+			rowdataUserPermissionGroup: [],
+			rowdataUserPermissionUser: [],
 			canadd: false,
 			canedit: false,
 			candelete: false
@@ -60,38 +62,57 @@ export default {
 			.then(response => {
 				// Get permissions
 				response.data.forEach(details => {
-					this.rowdataUserPermissionGroup = details.groups
 					this.rowdataUserPermissionUser = details.user_permissions
+					details.groups.forEach(groups => {
+						Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+groups, { headers: header })
+							.then(groupresponse => {
+								groupresponse.data.permissions.forEach(groups => {
+									this.rowdataUserPermissionGroup[groups] = groups
+								})
+								if(this.rowdataUserPermissionUser.indexOf(12) !== -1 
+								|| this.rowdataUserPermissionGroup.indexOf(12) !== -1) {
+									Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+										.then(() => {
+											this.errorMsg = null
+											this.errored = false
+											if(this.rowdataUserPermissionUser.indexOf(9) !== -1 
+											|| this.rowdataUserPermissionGroup.indexOf(9) !== -1) {
+												this.canadd = true
+											}
+											if(this.rowdataUserPermissionUser.indexOf(10) !== -1 
+											|| this.rowdataUserPermissionGroup.indexOf(10) !== -1) {
+												this.canedit = true
+											}
+											if(this.rowdataUserPermissionUser.indexOf(11) !== -1 
+											|| this.rowdataUserPermissionGroup.indexOf(11) !== -1) {
+												this.candelete = true
+											}
+										})
+										.catch(e => {
+											this.errorMsg = e
+											this.errored = true
+										})
+										.finally(() => this.loading = false)
+								} else {
+									this.errorMsg = this.errorMsg = i18n.t("dont_have_right_to_see")
+									this.errored = true
+								}
+								this.errorMsg = null
+								this.errored = false
+							})
+							.catch(e => {
+								this.errorMsg = e
+								this.errored = true
+							})
+							.finally(() => this.loading = false)
+					})
 				})
-				if(this.rowdataUserPermissionUser.indexOf(12) !== -1) {
-					Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
-						.then(() => {
-							this.errorMsg = null
-							this.errored = false
-							if(this.rowdataUserPermissionUser.indexOf(9) !== -1) {
-								this.canadd = true
-							}
-							if(this.rowdataUserPermissionUser.indexOf(10) !== -1) {
-								this.canedit = true
-							}
-							if(this.rowdataUserPermissionUser.indexOf(11) !== -1) {
-								this.candelete = true
-							}
-						})
-						.catch(e => {
-							this.errorMsg = e
-							this.errored = true
-						})
-						.finally(() => this.loading = false)
-				} else {
-					this.errorMsg = this.errorMsg = i18n.t("dont_have_right_to_see")
-					this.errored = true
-				}	
 			})
 			.catch(e => {
 				this.errorMsg = e
 				this.errored = true
 			})
+			.finally(() => this.loading = false)
 	}
 }
 </script>
