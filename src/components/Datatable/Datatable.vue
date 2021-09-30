@@ -210,8 +210,8 @@ export default {
 		rowdata: { type: Array, default: null },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
-		canedit: { type: Boolean, default: true },
-		candelete: { type: Boolean, default: true },
+		canedit: { type: Boolean, default: false },
+		candelete: { type: Boolean, default: false },
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
 		caneditconfig: { type: Boolean, default: false }
