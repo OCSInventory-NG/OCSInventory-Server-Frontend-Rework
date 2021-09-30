@@ -97,14 +97,15 @@ export default {
 									this.errorMsg = this.errorMsg = i18n.t("dont_have_right_to_see")
 									this.errored = true
 								}
-								this.errorMsg = null
-								this.errored = false
 							})
 							.catch(e => {
 								this.errorMsg = e
 								this.errored = true
 							})
 					})
+					if(details.groups.length == 0) {
+						this.loading = false
+					}
 				})
 			})
 			.catch(e => {
