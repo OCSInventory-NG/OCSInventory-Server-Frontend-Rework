@@ -104,7 +104,6 @@ export default {
 								this.errorMsg = e
 								this.errored = true
 							})
-							.finally(() => this.loading = false)
 					})
 				})
 			})
@@ -112,7 +111,6 @@ export default {
 				this.errorMsg = e
 				this.errored = true
 			})
-			.finally(() => this.loading = false)
 	}
 }
 </script>
