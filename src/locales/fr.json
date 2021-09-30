@@ -98,5 +98,7 @@
 
 	"config_elem_15": "I'm a description",
 	"config_elem_17": "I'm a description",
-	"config_elem_24": "I'm a description"
+	"config_elem_24": "I'm a description",
+
+	"dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page"
 }
