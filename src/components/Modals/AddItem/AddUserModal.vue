@@ -193,7 +193,6 @@
 						</b-row>
 					</b-form>
 				</b-modal>
-
 				<Datatable
 					id="usersdatatable"
 					:rowdata="rowdata"
@@ -274,9 +273,9 @@ export default {
 				})
 		},
 		permissionsGroupsTreatment() {
-			var tmpPermissions = []
-			var tmpGroups = []
 			this.rowdata.forEach(rowDetails => {
+				var tmpPermissions = []
+				var tmpGroups = []
 				rowDetails.user_permissions.forEach(permissionsDetails => {
 					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
 				})

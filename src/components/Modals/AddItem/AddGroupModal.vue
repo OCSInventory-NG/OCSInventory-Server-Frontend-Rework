@@ -191,8 +191,8 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		permissionsTreatment() {
-			var tmpPermissions = []
 			this.rowdata.forEach(rowDetails => {
+				var tmpPermissions = []
 				rowDetails.permissions.forEach(permissionsDetails => {
 					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
 				})
