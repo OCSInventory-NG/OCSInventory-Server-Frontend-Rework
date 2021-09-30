@@ -83,7 +83,7 @@ export default {
 	methods: {
 		// Get all config
 		getConfig() {
-			Axios.get("http://172.18.26.12:8000/config", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: header })
 				.then(response => {
 					response.data.forEach(element => {
 						var tmpArray = [];
@@ -110,7 +110,7 @@ export default {
 					value: element.value
 				})
 			})
-			Axios.put("http://172.18.26.12:8000/config/", config, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"config/", config, { headers: header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

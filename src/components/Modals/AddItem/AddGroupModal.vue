@@ -162,7 +162,7 @@ export default {
 	methods: {
 		// Get all permissions
 		getPermissions() {
-			Axios.get("http://172.18.26.12:8000/permissions", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
 					response.data.forEach(permissionDetails => {
 						this.permissions.push({
@@ -177,7 +177,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()
@@ -203,7 +203,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post("http://172.18.26.12:8000/groups/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

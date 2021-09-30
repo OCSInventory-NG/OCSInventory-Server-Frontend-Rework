@@ -48,8 +48,8 @@ export default {
 			"Content-Type": "application/json;charset=utf-8",
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
-
-		Axios.get("http://172.18.26.12:8000/users/", { headers: header })
+		
+		Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errorMsg = null

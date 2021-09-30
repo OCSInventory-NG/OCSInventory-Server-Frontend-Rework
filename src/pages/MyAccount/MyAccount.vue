@@ -161,7 +161,7 @@ export default {
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
 
-		Axios.get("http://172.18.26.12:8000/myaccount/", { headers: header })
+		Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errorMsg = null
@@ -191,7 +191,7 @@ export default {
 					"last_name": details.last_name
 				}
 
-				Axios.patch("http://172.18.26.12:8000/myaccount/"+details.id+"/", jsonReturn, { headers: header })
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+details.id+"/", jsonReturn, { headers: header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

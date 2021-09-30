@@ -111,7 +111,7 @@ export default {
 				"Content-Type": "application/json;charset=utf-8",
 			}
 
-			Axios.post("http://172.18.26.12:8000/api-auth/token", loginOptions, { header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
 				.then(response => {
 					this.errorMessage = null
 					localStorage.setItem('token_authentication', response.data.token)

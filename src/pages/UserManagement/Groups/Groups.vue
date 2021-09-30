@@ -48,7 +48,7 @@ export default {
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
 
-		Axios.get("http://172.18.26.12:8000/groups/", { headers: header })
+		Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 			.then(() => {
 				this.errorMsg = null
 				this.errored = false
