@@ -28,174 +28,181 @@
 			<div
 				v-else
 			>
-				<b-button 
-					v-b-modal.add-user
-					:title="$t('adduser')"
-					variant="success"
-					class="add-button"
+				<div
+					v-if="canadd"
 				>
-					<font-awesome-icon 
-						:icon="['fas', 'plus']"/>
-				</b-button>
-
-				<b-modal 
-					id="add-user" 
-					:title="$t('adduser')"
-					hide-footer
-					modal-class="custom-modal"
-				>
-					<b-form
-						@submit="onSubmit"
+					<b-button 
+						v-b-modal.add-user
+						:title="$t('adduser')"
+						variant="success"
+						class="add-button"
 					>
-						<b-row>
-							<b-col>
-								<h4>{{ $t('user_informations') }}</h4>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group
-									:label="$t('username')" 
-									label-for="username"
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"/>
+					</b-button>
+
+					<b-modal 
+						id="add-user" 
+						:title="$t('adduser')"
+						hide-footer
+						modal-class="custom-modal"
+					>
+						<b-form
+							@submit="onSubmit"
+						>
+							<b-row>
+								<b-col>
+									<h4>{{ $t('user_informations') }}</h4>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('username')" 
+										label-for="username"
+									>
+										<b-form-input
+											id="username"
+											v-model="row.username"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+								<b-col>
+									<b-form-group
+										:label="$t('password')" 
+										label-for="password"
+									>
+										<b-form-input
+											id="password"
+											v-model="row.password"
+											type="password"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('email')" 
+										label-for="email"
+									>
+										<b-form-input
+											id="email"
+											v-model="row.email"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group 
+										:label="$t('first_name')" 
+										label-for="first_name"
+									>
+										<b-form-input
+											id="first_name"
+											v-model="row.first_name"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+								<b-col>
+									<b-form-group
+										:label="$t('last_name')" 
+										label-for="last_name"
+									>
+										<b-form-input
+											id="last_name"
+											v-model="row.last_name"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-checkbox
+										id="is_staff"
+										v-model="row.is_staff"
+										name="is_staff"
+										value="true"
+										unchecked-value="false"
+									>
+										{{ $t('is_staff') }}
+									</b-form-checkbox>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<h4>{{ $t('groups') }}</h4>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col
+									v-for="group in groups"
+									:key="group.id"
+									cols="4"
 								>
-									<b-form-input
-										id="username"
-										v-model="row.username"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-							<b-col>
-								<b-form-group
-									:label="$t('password')" 
-									label-for="password"
+									<b-form-checkbox
+										:id="group.code"
+										v-model="row.groups"
+										:name="group.code"
+										:value="group.id"
+										unchecked
+									>
+										{{ group.name }}
+									</b-form-checkbox>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<h4>{{ $t('user_permissions') }}</h4>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col
+									v-for="permission in permissions"
+									:key="permission.id"
+									cols="4"
 								>
-									<b-form-input
-										id="password"
-										v-model="row.password"
-										type="password"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group
-									:label="$t('email')" 
-									label-for="email"
+									<b-form-checkbox
+										:id="permission.code"
+										v-model="row.user_permissions"
+										:name="permission.code"
+										:value="permission.id"
+										unchecked
+									>
+										{{ permission.name }}
+									</b-form-checkbox>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col align-self="start"/>
+								<b-col 
+									align-self="center"
+									align="center"
 								>
-									<b-form-input
-										id="email"
-										v-model="row.email"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group 
-									:label="$t('first_name')" 
-									label-for="first_name"
-								>
-									<b-form-input
-										id="first_name"
-										v-model="row.first_name"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-							<b-col>
-								<b-form-group
-									:label="$t('last_name')" 
-									label-for="last_name"
-								>
-									<b-form-input
-										id="last_name"
-										v-model="row.last_name"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-checkbox
-									id="is_staff"
-									v-model="row.is_staff"
-									name="is_staff"
-									value="true"
-									unchecked-value="false"
-								>
-									{{ $t('is_staff') }}
-								</b-form-checkbox>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<h4>{{ $t('groups') }}</h4>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col
-								v-for="group in groups"
-								:key="group.id"
-								cols="4"
-							>
-								<b-form-checkbox
-									:id="group.code"
-									v-model="row.groups"
-									:name="group.code"
-									:value="group.id"
-									unchecked
-								>
-									{{ group.name }}
-								</b-form-checkbox>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<h4>{{ $t('user_permissions') }}</h4>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col
-								v-for="permission in permissions"
-								:key="permission.id"
-								cols="4"
-							>
-								<b-form-checkbox
-									:id="permission.code"
-									v-model="row.user_permissions"
-									:name="permission.code"
-									:value="permission.id"
-									unchecked
-								>
-									{{ permission.name }}
-								</b-form-checkbox>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col align-self="start"/>
-							<b-col 
-								align-self="center"
-								align="center"
-							>
-								<b-button 
-									type="submit"
-									variant="success"
-								>
-									{{ $t('add') }}
-								</b-button>
-							</b-col>
-							<b-col align-self="end"/>
-						</b-row>
-					</b-form>
-				</b-modal>
+									<b-button 
+										type="submit"
+										variant="success"
+									>
+										{{ $t('add') }}
+									</b-button>
+								</b-col>
+								<b-col align-self="end"/>
+							</b-row>
+						</b-form>
+					</b-modal>
+				</div>
+				
 				<Datatable
 					id="usersdatatable"
 					:rowdata="rowdata"
+					:canedit="canedit"
+					:candelete="candelete"
 					editcomponent="EditUserModal"
 					title="users"
 					@reloadDatatable="reloadDatatable"
@@ -221,6 +228,11 @@ export default {
 	components: {
 		Datatable,
 		Loader
+	},
+	props: {
+		canadd: { type: Boolean, default: false },
+		canedit: { type: Boolean, default: false },
+		candelete: { type: Boolean, default: false }
 	},
 	data() {
 		return {

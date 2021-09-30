@@ -28,87 +28,93 @@
 			<div
 				v-else
 			>
-				<b-button 
-					v-b-modal.add-group
-					:title="$t('addgroup')"
-					variant="success"
-					class="add-button"
+				<div
+					v-if="canadd"
 				>
-					<font-awesome-icon 
-						:icon="['fas', 'plus']"/>
-				</b-button>
-
-				<b-modal 
-					id="add-group" 
-					:title="$t('addgroup')"
-					hide-footer
-					modal-class="custom-modal"
-				>
-					<b-form
-						@submit="onSubmit"
+					<b-button 
+						v-b-modal.add-group
+						:title="$t('addgroup')"
+						variant="success"
+						class="add-button"
 					>
-						<b-row>
-							<b-col>
-								<h4>{{ $t('group_informations') }}</h4>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group
-									:label="$t('name')" 
-									label-for="name"
-								>
-									<b-form-input
-										id="name"
-										v-model="row.name"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<h4>{{ $t('user_permissions') }}</h4>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col
-								v-for="permission in permissions"
-								:key="permission.id"
-								cols="4"
-							>
-								<b-form-checkbox
-									:id="permission.code"
-									v-model="row.permissions"
-									:name="permission.code"
-									:value="permission.id"
-									unchecked
-								>
-									{{ permission.name }}
-								</b-form-checkbox>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col align-self="start"/>
-							<b-col 
-								align-self="center"
-								align="center"
-							>
-								<b-button 
-									type="submit"
-									variant="success"
-								>
-									{{ $t('add') }}
-								</b-button>
-							</b-col>
-							<b-col align-self="end"/>
-						</b-row>
-					</b-form>
-				</b-modal>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"/>
+					</b-button>
 
+					<b-modal 
+						id="add-group" 
+						:title="$t('addgroup')"
+						hide-footer
+						modal-class="custom-modal"
+					>
+						<b-form
+							@submit="onSubmit"
+						>
+							<b-row>
+								<b-col>
+									<h4>{{ $t('group_informations') }}</h4>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('name')" 
+										label-for="name"
+									>
+										<b-form-input
+											id="name"
+											v-model="row.name"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<h4>{{ $t('user_permissions') }}</h4>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col
+									v-for="permission in permissions"
+									:key="permission.id"
+									cols="4"
+								>
+									<b-form-checkbox
+										:id="permission.code"
+										v-model="row.permissions"
+										:name="permission.code"
+										:value="permission.id"
+										unchecked
+									>
+										{{ permission.name }}
+									</b-form-checkbox>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col align-self="start"/>
+								<b-col 
+									align-self="center"
+									align="center"
+								>
+									<b-button 
+										type="submit"
+										variant="success"
+									>
+										{{ $t('add') }}
+									</b-button>
+								</b-col>
+								<b-col align-self="end"/>
+							</b-row>
+						</b-form>
+					</b-modal>
+				</div>
+				
 				<Datatable
 					id="groupsdatatable"
 					:rowdata="rowdata"
+					:canedit="canedit"
+					:candelete="candelete"
 					editcomponent="EditGroupModal"
 					title="groups"
 					@reloadDatatable="reloadDatatable"
@@ -134,6 +140,11 @@ export default {
 	components: {
 		Datatable,
 		Loader
+	},
+	props: {
+		canadd: { type: Boolean, default: false },
+		canedit: { type: Boolean, default: false },
+		candelete: { type: Boolean, default: false }
 	},
 	data() {
 		return {
