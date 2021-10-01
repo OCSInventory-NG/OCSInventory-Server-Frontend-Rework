@@ -45,9 +45,9 @@ export default {
 			rowdata: [],
 			loading: true,
 			errored: false,
-			canadd: true,
-			canedit: true,
-			candelete: true
+			canadd: false,
+			canedit: false,
+			candelete: false
 		}
 	},
 	mounted() {
@@ -55,18 +55,30 @@ export default {
 			"Content-Type": "application/json;charset=utf-8",
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
+
+		if(localStorage.getItem('permissions').split(",").includes("16")) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
+				.then(response => {
+					this.rowdata = response.data
+					this.errorMsg = null
+					this.errored = false
+					if(localStorage.getItem('permissions').split(",").includes("13")) {
+						this.canadd = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("14")) {
+						this.canedit = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("15")) {
+						this.candelete = true
+					}
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		}
 		
-		Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
-			.then(response => {
-				this.rowdata = response.data
-				this.errorMsg = null
-				this.errored = false
-			})
-			.catch(e => {
-				this.errorMsg = e
-				this.errored = true
-			})
-			.finally(() => this.loading = false)
 	}
 }
 </script>

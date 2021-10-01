@@ -43,9 +43,9 @@ export default {
 			errorMsg: null,
 			loading: true,
 			errored: false,
-			canadd: true,
-			canedit: true,
-			candelete: true
+			canadd: false,
+			canedit: false,
+			candelete: false
 		}
 	},
 	mounted() {
@@ -54,16 +54,27 @@ export default {
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
 
-		Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
-			.then(() => {
-				this.errorMsg = null
-				this.errored = false
-			})
-			.catch(e => {
-				this.errorMsg = e
-				this.errored = true
-			})
-			.finally(() => this.loading = false)
+		if(localStorage.getItem('permissions').split(",").includes("12")) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+				.then(() => {
+					this.errorMsg = null
+					this.errored = false
+					if(localStorage.getItem('permissions').split(",").includes("9")) {
+						this.canadd = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("10")) {
+						this.canedit = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("11")) {
+						this.candelete = true
+					}
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		}
 	}
 }
 </script>
