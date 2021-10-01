@@ -82,6 +82,7 @@ export default {
 		logout() {
 			localStorage.setItem('authenticated', false);
 			localStorage.removeItem('token_authentication');
+			localStorage.removeItem('permissions');
 			this.$router.push('/login');
 		},
 		account() {
