@@ -92,7 +92,9 @@ export default {
 		};
 	},
 	created() {
-		if (localStorage.getItem('authenticated') === 'true' && localStorage.getItem('token_authentication') !== null) {
+		if (localStorage.getItem('authenticated') === 'true'
+		&& localStorage.getItem('token_authentication') !== null
+		&& localStorage.getItem('permissions') !== null) {
 			this.$router.push('/ocsreports/dashboard');
 		}
 	},
