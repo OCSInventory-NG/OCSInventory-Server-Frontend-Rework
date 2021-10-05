@@ -82,7 +82,7 @@ export default {
 			this.errorMsg = i18n.t("dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
-		}		
+		}
 	}
 }
 </script>
