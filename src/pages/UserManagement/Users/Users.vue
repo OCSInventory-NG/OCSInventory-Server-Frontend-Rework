@@ -30,6 +30,7 @@
 
 <script>
 import Axios from 'axios'
+import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader';
 import AddUserModal from '@/components/Modals/AddItem/AddUserModal';
 
@@ -77,8 +78,11 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
-		}
-		
+		} else {
+			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+		}		
 	}
 }
 </script>
