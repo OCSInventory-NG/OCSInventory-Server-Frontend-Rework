@@ -30,7 +30,7 @@
 	"success_saved": "Configuration sauvegardée avec succès !",
 
 	"actions": "Actions",
-	"is_staff": "Accès console",
+	"is_staff": "Super admin",
 	"user_permissions": "Permissions",
 	"permissions": "Permissions",
 	"adduser": "Ajouter un nouvel utilisateur",

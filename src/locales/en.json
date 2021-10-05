@@ -31,7 +31,7 @@
 	"success_saved": "Configuration saved with success !",
 
 	"actions": "Actions",
-	"is_staff": "Console access",
+	"is_staff": "Super admin",
 	"user_permissions": "Permissions",
 	"permissions": "Permissions",
 	"adduser": "Add a new user",
