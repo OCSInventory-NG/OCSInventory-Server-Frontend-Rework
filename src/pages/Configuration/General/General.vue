@@ -35,7 +35,7 @@
 					:canedit="false"
 					:usecheckbox="false"
 					:canexport="false"
-					:caneditconfig="true"
+					:caneditconfig="caneditconfig"
 					editcomponent="EditConfigModal"
 					title="config"
 					@reloadDatatable="reloadDatatable"
@@ -70,6 +70,7 @@ export default {
 			errored: false,
 			successed: false,
 			loading: true,
+			caneditconfig: false
 		}
 	},
 	watch: {
@@ -78,7 +79,16 @@ export default {
 		}
 	},
 	mounted() {
-		this.getConfig()
+		if(localStorage.getItem('permissions').split(",").includes("36")) {
+			if(localStorage.getItem('permissions').split(",").includes("13")) {
+				this.caneditconfig = true
+			}
+			this.getConfig()
+		} else {
+			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+		}	
 	},
 	methods: {
 		// Get all config
