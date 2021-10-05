@@ -79,8 +79,8 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("36")) {
-			if(localStorage.getItem('permissions').split(",").includes("13")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
 				this.caneditconfig = true
 			}
 			this.getConfig()

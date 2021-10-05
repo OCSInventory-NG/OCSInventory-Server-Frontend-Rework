@@ -57,19 +57,19 @@ export default {
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
 
-		if(localStorage.getItem('permissions').split(",").includes("16")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_user")) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
-					if(localStorage.getItem('permissions').split(",").includes("13")) {
+					if(localStorage.getItem('permissions').split(",").includes("add_user")) {
 						this.canadd = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("14")) {
+					if(localStorage.getItem('permissions').split(",").includes("change_user")) {
 						this.canedit = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("15")) {
+					if(localStorage.getItem('permissions').split(",").includes("delete_user")) {
 						this.candelete = true
 					}
 				})

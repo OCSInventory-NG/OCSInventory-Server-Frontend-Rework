@@ -55,18 +55,18 @@ export default {
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
 
-		if(localStorage.getItem('permissions').split(",").includes("12")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_group")) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 				.then(() => {
 					this.errorMsg = null
 					this.errored = false
-					if(localStorage.getItem('permissions').split(",").includes("9")) {
+					if(localStorage.getItem('permissions').split(",").includes("add_group")) {
 						this.canadd = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("10")) {
+					if(localStorage.getItem('permissions').split(",").includes("change_group")) {
 						this.canedit = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("11")) {
+					if(localStorage.getItem('permissions').split(",").includes("delete_group")) {
 						this.candelete = true
 					}
 				})
