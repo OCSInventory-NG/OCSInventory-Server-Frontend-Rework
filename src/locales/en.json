@@ -26,6 +26,7 @@
 	"groups": "Groups",
 	"config": "Configurations",
 	"general": "General",
+	"template": "Templates",
 
 	"success_saved": "Configuration saved with success !",
 

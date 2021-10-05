@@ -16,6 +16,7 @@ import Groups from '@/pages/UserManagement/Groups/Groups';
 
 // Configurations
 import General from '@/pages/Configuration/General/General';
+import Template from '@/pages/Configuration/Template/Template';
 
 Vue.use(Router);
 
@@ -60,6 +61,11 @@ export default new Router({
 					path: 'general',
 					name: 'General',
 					component: General,
+				},
+				{
+					path: 'template',
+					name: 'Template',
+					component: Template,
 				},
 			],
 		},
