@@ -81,7 +81,7 @@ export default {
 	name: 'EditFieldModal',
 	props: {
 		namefield: { type: String, default: null },
-		retrival_value: { type: String, default: null },
+		retrivalvalue: { type: String, default: null },
 		idmodal: { type: Number, required: true },
 		section: { type: Number, required: true },
 	},
@@ -101,7 +101,7 @@ export default {
 	},
 	created() {
 		this.row.name = this.namefield
-		this.row.retrival_value = this.retrival_value
+		this.row.retrival_value = this.retrivalvalue
 		this.row.id = this.idmodal
 		this.row.section = this.section
 	},

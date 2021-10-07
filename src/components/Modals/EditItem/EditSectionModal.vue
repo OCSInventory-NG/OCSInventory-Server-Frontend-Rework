@@ -111,8 +111,8 @@ export default {
 	name: 'EditSectionModal',
 	props: {
 		namesection: { type: String, default: null },
-		retrival_method: { type: String, default: null },
-		retrival_output: { type: String, default: null },
+		retrivalmethod: { type: String, default: null },
+		retrivaloutput: { type: String, default: null },
 		target: { type: String, default: null },
 		idmodal: { type: Number, required: true },
 		template: { type: Number, required: true },
@@ -146,8 +146,8 @@ export default {
 	},
 	created() {
 		this.row.name = this.namesection
-		this.row.retrival_method = this.retrival_method
-		this.row.retrival_output = this.retrival_output
+		this.row.retrival_method = this.retrivalmethod
+		this.row.retrival_output = this.retrivaloutput
 		this.row.target = this.target
 		this.row.id = this.idmodal
 		this.row.template = this.template

@@ -20,7 +20,7 @@
 								<b-button-group class="mr-1">
 									<EditFieldModal
 										:namefield="value.name"
-										:retrival_value="value.retrival_value"
+										:retrivalvalue="value.retrival_value"
 										:idmodal="value.id"
 										:section="value.section"
 										@reloadTemplate="reloadTemplate"

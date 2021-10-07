@@ -41,8 +41,8 @@
 										<b-button-group class="mr-1">
 											<EditSectionModal
 												:namesection="value.name"
-												:retrival_method="value.retrival_method"
-												:retrival_output="value.retrival_output"
+												:retrivalmethod="value.retrival_method"
+												:retrivaloutput="value.retrival_output"
 												:target="value.target"
 												:idmodal="value.id"
 												:template="value.template"

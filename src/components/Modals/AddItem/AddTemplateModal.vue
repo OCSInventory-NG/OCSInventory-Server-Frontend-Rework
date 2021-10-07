@@ -166,15 +166,6 @@ export default {
 					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
-					if(localStorage.getItem('permissions').split(",").includes("37")) {
-						this.canadd = true
-					}
-					if(localStorage.getItem('permissions').split(",").includes("38")) {
-						this.canedit = true
-					}
-					if(localStorage.getItem('permissions').split(",").includes("39")) {
-						this.candelete = true
-					}	
 				})
 				.catch(e => {
 					this.errorMsg = e
