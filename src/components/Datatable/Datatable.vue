@@ -130,6 +130,17 @@
 				<template #cell(actions)="row">
 					<b-button-toolbar>
 						<b-button-group class="mr-1">
+							<b-button 
+								v-if="canedittemplate"
+								:title="$t('edittemplate')"
+								variant="primary"
+								@click="goToEditTemplate(row.item.id)"
+							>
+								<b-icon 
+									icon="pencil-square" 
+									aria-hidden="true"
+								/>
+							</b-button >
 							<component 
 								v-if="canedit"
 								:is="editcomponent"
@@ -214,7 +225,8 @@ export default {
 		candelete: { type: Boolean, default: false },
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
-		caneditconfig: { type: Boolean, default: false }
+		caneditconfig: { type: Boolean, default: false },
+		canedittemplate: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -315,7 +327,10 @@ export default {
 		},
 		onSave() {
 			this.$emit('reloadDatatable', this.rowdata)
-		}
+		},
+		goToEditTemplate(id){
+			this.$router.push('/ocsreports/templates/edittemplate/'+id); 
+		},
 	}
 };
 </script>
