@@ -64,7 +64,10 @@
 									</b-button-toolbar>
 								</b-col>
 							</b-row><br><br>
-							<b-row  align-h="center" class="text-center">
+							<b-row  
+								align-h="center" 
+								class="text-center"
+							>
 								<b-col>
 									<FieldCollapse
 										:rowfielddata="rowfielddata"
