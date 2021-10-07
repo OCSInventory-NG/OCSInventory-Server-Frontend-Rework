@@ -89,6 +89,7 @@ export default {
 					this.errored = false
 					this.$bvModal.hide('delete-item'+this.row.id)
 					this.$emit('reloadDatatable')
+					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
 					this.errorMsg = e
