@@ -17,6 +17,7 @@ import Groups from '@/pages/UserManagement/Groups/Groups';
 // Configurations
 import General from '@/pages/Configuration/General/General';
 import Template from '@/pages/Configuration/Template/Template';
+import EditTemplate from '@/pages/Configuration/Template/EditTemplate';
 
 Vue.use(Router);
 
@@ -63,10 +64,16 @@ export default new Router({
 					component: General,
 				},
 				{
-					path: 'template',
+					path: 'templates',
 					name: 'Template',
-					component: Template,
+					component: Template
 				},
+				{
+					path: 'templates/edittemplate/:id',
+					name: 'EditTemplate',
+					component: EditTemplate,
+					props: true
+				}
 			],
 		},
 	],
