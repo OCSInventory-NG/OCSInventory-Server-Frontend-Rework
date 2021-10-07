@@ -21,6 +21,7 @@
 				<Datatable
 					id="assetsdatatable"
 					:rowdata="rowdata"
+					:usecheckbox="false"
 					title="assets"
 				/>
 			</div>
