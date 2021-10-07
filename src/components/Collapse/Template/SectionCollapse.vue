@@ -55,7 +55,21 @@
 												@reloadTemplate="reloadTemplate"
 											/>
 										</b-button-group>
+										<b-button-group class="mx-3">
+											<AddFieldModal
+												:section="value.id"
+												@reloadTemplate="reloadTemplate"
+											/>
+										</b-button-group>
 									</b-button-toolbar>
+								</b-col>
+							</b-row><br><br>
+							<b-row  align-h="center" class="text-center">
+								<b-col>
+									<FieldCollapse
+										:rowfielddata="rowfielddata"
+										@reloadTemplate="reloadTemplate"
+									/>
 								</b-col>
 							</b-row>
 						</b-card-text>
@@ -70,13 +84,15 @@
 import FieldCollapse from '@/components/Collapse/Template/FieldCollapse'
 import EditSectionModal from '@/components/Modals/EditItem/EditSectionModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
+import AddFieldModal from '@/components/Modals/AddItem/AddFieldModal'
 
 export default {
 	name: 'SectionCollapse',
 	components: {
 		FieldCollapse,
 		EditSectionModal,
-		DeleteItemModal
+		DeleteItemModal,
+		AddFieldModal
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
