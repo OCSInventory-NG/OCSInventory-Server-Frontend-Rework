@@ -7,10 +7,19 @@
 			:to="link" 
 			class="sidebar-link"
 		>
-			<span class="icon">
-				<font-awesome-icon 
-					:icon="['fas', iconName]"
-					style="font-size: 1.2em;"/>
+			<span class="">
+				<font-awesome-layers 
+					style="font-size: 1.7em;"
+					class="icon-group">
+					<font-awesome-icon 
+						icon="circle" 
+						style="color: transparent; font-size: 1.4em;"
+						class="icon"/>
+					<font-awesome-icon 
+						:icon="['fas', iconName]"
+						style="font-size: 1.2em;"
+						transform="shrink-6"/>
+				</font-awesome-layers>
 			</span>
 			{{ header }} 
 			<sup 
@@ -39,10 +48,19 @@
 				event="" 
 				class="d-flex sidebar-link"
 			>
-				<span class="icon">
-					<font-awesome-icon 
-						:icon="['fas', iconName]"
-						style="font-size: 1.2em;"/>
+				<span class="">
+					<font-awesome-layers 
+						style="font-size: 1.7em;"
+						class="icon-group">
+						<font-awesome-icon 
+							icon="circle" 
+							style="color: transparent; font-size: 1.4em;"
+							class="icon"/>
+						<font-awesome-icon 
+							:icon="['fas', iconName]"
+							style="font-size: 1.2em;"
+							transform="shrink-6"/>
+					</font-awesome-layers>
 				</span>
 				{{ header }} 
 				<sup 

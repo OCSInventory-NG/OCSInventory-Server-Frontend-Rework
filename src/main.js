@@ -37,9 +37,10 @@ import {
 	faPlus,
 	faWrench,
 	faCheck,
-	faDesktop
+	faDesktop,
+	faCircle
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueI18n);
 Vue.use(VueApexCharts)
@@ -54,6 +55,7 @@ Vue.use(VueComp);
 Vue.component('Widget', Widget);
 Vue.component('apexchart', VueApexCharts);
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('font-awesome-layers', FontAwesomeLayers)
 Vue.component('downloadExcel', JsonExcel);
 
 Vue.mixin(layoutMixin);
@@ -70,7 +72,8 @@ library.add({
 	faPlus,
 	faWrench,
 	faCheck,
-	faDesktop
+	faDesktop,
+	faCircle
 });
 
 Vue.config.productionTip = false;

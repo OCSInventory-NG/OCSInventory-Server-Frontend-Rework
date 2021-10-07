@@ -27,7 +27,7 @@ a.router-link-active {
     font-weight: $font-weight-semi-bold;
 }
 
-.hederLink .icon {
+.hederLink .icon-group {
     font-size: $font-size-larger;
     display: flex;
     justify-content: center;
@@ -47,18 +47,17 @@ a.router-link-active {
 }
 
 a.router-link-active .icon {
+    background: var(--sidebar-item-active-bg);
     border-radius: 50%;
-    background-color: var(--sidebar-item-active-bg);
-    padding: 6px;
 }
 
-.headerLink > a > .icon {
+.headerLink > a > span > .icon-group {
     margin-right: 17px;
     padding: 6px;
 }
 
-.headerLink > div > a > .icon {
-    margin-right: 17px;
+.headerLink > div > a > span > .icon-group {
+    margin-right: 22px;
     padding: 6px;
 }
 
