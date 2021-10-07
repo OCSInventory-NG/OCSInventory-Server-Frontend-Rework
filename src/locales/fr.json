@@ -61,6 +61,10 @@
 	"TBLE": "Format tableau",
 	"editsection": "Editer la section",
 	"addsection": "Ajouter une nouvelle section",
+	"addfield": "Ajouter un nouveau champs",
+	"editfield": "Editer le champs",
+	"retrival_value": "Valeur de récuparation",
+	"displayfields": "Afficher les champs",
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",

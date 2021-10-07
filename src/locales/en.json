@@ -62,6 +62,10 @@
 	"TBLE": "Table format",
 	"editsection": "Edit section",
 	"addsection": "Add a new section",
+	"addfield": "Add a new field",
+	"editfield": "Edit field",
+	"retrival_value": "Retrival value",
+	"displayfields": "Display fields",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
