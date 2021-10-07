@@ -68,6 +68,12 @@
 	"editfield": "Edit field",
 	"retrival_value": "Retrival value",
 	"displayfields": "Display fields",
+	"serial": "Serial number",
+	"osname": "OS name",
+	"osversion": "OS version",
+	"srcip": "Address IP",
+	"srcmac": "Macaddress",
+	"domain": "Domain",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",

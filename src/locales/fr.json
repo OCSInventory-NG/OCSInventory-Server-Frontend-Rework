@@ -67,6 +67,12 @@
 	"editfield": "Editer le champs",
 	"retrival_value": "Valeur de récuparation",
 	"displayfields": "Afficher les champs",
+	"serial": "Numéro de série",
+	"osname": "Nom OS",
+	"osversion": "Version OS",
+	"srcip": "Adresse IP",
+	"srcmac": "Adresse MAC",
+	"domain": "Domaine",
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",

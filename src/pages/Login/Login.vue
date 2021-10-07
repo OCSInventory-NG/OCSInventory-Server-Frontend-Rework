@@ -146,7 +146,7 @@ export default {
 											tmpUser[element] = element
 										});
 										this.errorMessage = null
-										localStorage.setItem('permissions', JSON.stringify(tmpUser))
+										localStorage.setItem('permissions', tmpUser)
 										this.$router.push('/ocsreports/dashboard')
 									})
 									.catch(e => {
@@ -155,7 +155,7 @@ export default {
 							});
 						} else {
 							if(tmpUser.length != 0) {
-								localStorage.setItem('permissions', JSON.stringify(tmpUser))
+								localStorage.setItem('permissions', tmpUser)
 								this.$router.push('/ocsreports/dashboard')
 							}
 							this.errorMessage = i18n.t("error_no_permissions")
