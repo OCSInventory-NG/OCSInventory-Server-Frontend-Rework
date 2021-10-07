@@ -17,21 +17,39 @@
 
 			<div
 				v-else
-			/>
+			>
+				<div
+					v-if="canadd"
+				>
+					<AddTemplateModal
+						:canadd="canadd"
+						:canedit="canedit"
+						:candelete="candelete"
+					/>
+				</div>
+
+				
+			</div>
 		</section>
 	</div>
 </template>
 
 <script>
-// eslint-disable-next-line
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
 import i18n from '../../../i18n'
+import Loader from '@/components/Loader/Loader'
+import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal'
+
+const header = {
+	"Content-Type": "application/json;charset=utf-8",
+	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+}
 
 export default {
 	name: 'TemplatePage',
 	components: {
-		Loader
+		Loader,
+		AddTemplateModal
 	},
 	data() {
 		return {
@@ -45,20 +63,39 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_template")) {
-			if(localStorage.getItem('permissions').split(",").includes("add_template")) {
-				this.canadd = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("change_template")) {
-				this.canedit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_template")) {
-				this.candelete = true
-			}			
+		if(localStorage.getItem('permissions').split(",").includes("40")) {
+			this.getTemplates()					
 		} else {
 			this.errorMsg = i18n.t("dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+		}
+	},
+	methods: {
+		getTemplates() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: header })
+				.then(response => {
+					this.rowdata = response.data
+					this.errorMsg = null
+					this.errored = false
+					if(localStorage.getItem('permissions').split(",").includes("37")) {
+						this.canadd = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("38")) {
+						this.canedit = true
+					}
+					if(localStorage.getItem('permissions').split(",").includes("39")) {
+						this.candelete = true
+					}	
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		},
+		reloadDatatable() {
+			this.getTemplates()
 		}
 	}
 }
