@@ -22,25 +22,35 @@
 				/>
 				<NavLink
 					:active-item="activeItem"
-					:header="$t('usermanagement')"
+					:header="$t('inventory')"
 					:children-links="[
-						{ header: $t('users'), link: '/ocsreports/users' },
-						{ header: $t('groups'), link: '/ocsreports/groups' },
+						{ header: $t('assets'), link: '/ocsreports/inventory/assets' },
 					]"
-					link="/ocsreports/user_management"
-					icon-name="users-cog"
-					index="user_management"
+					link="/ocsreports/inventory"
+					icon-name="desktop"
+					index="inventory"
 				/>
 				<NavLink
 					:active-item="activeItem"
-					:header="$t('config')"
+					:header="$t('usermanagement')"
 					:children-links="[
-						{ header: $t('general'), link: '/ocsreports/general' },
-						{ header: $t('templates'), link: '/ocsreports/templates' },
+						{ header: $t('users'), link: '/ocsreports/usermanagement/users' },
+						{ header: $t('groups'), link: '/ocsreports/usermanagement/groups' },
 					]"
-					link="/ocsreports/configuration"
+					link="/ocsreports/usermanagement"
+					icon-name="users-cog"
+					index="usermanagement"
+				/>
+				<NavLink
+					:active-item="activeItem"
+					:header="$t('configurations')"
+					:children-links="[
+						{ header: $t('general'), link: '/ocsreports/configurations/general' },
+						{ header: $t('templates'), link: '/ocsreports/configurations/templates' },
+					]"
+					link="/ocsreports/configurations"
 					icon-name="wrench"
-					index="configuration"
+					index="configurations"
 				/>
 			</ul>
 		</nav>

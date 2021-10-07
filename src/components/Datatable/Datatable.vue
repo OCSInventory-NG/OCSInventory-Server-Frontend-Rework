@@ -329,7 +329,7 @@ export default {
 			this.$emit('reloadDatatable', this.rowdata)
 		},
 		goToEditTemplate(id){
-			this.$router.push('/ocsreports/templates/edittemplate/'+id); 
+			this.$router.push('/ocsreports/configurations/templates/edittemplate/'+id); 
 		},
 	}
 };

@@ -36,7 +36,8 @@ import {
 	faAngleRight,
 	faPlus,
 	faWrench,
-	faCheck
+	faCheck,
+	faDesktop
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -68,7 +69,8 @@ library.add({
 	faAngleRight,
 	faPlus,
 	faWrench,
-	faCheck
+	faCheck,
+	faDesktop
 });
 
 Vue.config.productionTip = false;

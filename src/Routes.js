@@ -10,6 +10,9 @@ import MyAccount from '@/pages/MyAccount/MyAccount';
 // Main
 import Dashboard from '@/pages/Dashboard/Dashboard';
 
+// Inventory
+import Assets from '@/pages/Inventory/Assets/Assets';
+
 // User management
 import Users from '@/pages/UserManagement/Users/Users';
 import Groups from '@/pages/UserManagement/Groups/Groups';
@@ -49,30 +52,35 @@ export default new Router({
 					component: Dashboard,
 				},
 				{
-					path: 'users',
+					path: 'usermanagement/users',
 					name: 'Users',
 					component: Users,
 				},
 				{
-					path: 'groups',
+					path: 'usermanagement/groups',
 					name: 'Groups',
 					component: Groups,
 				},
 				{
-					path: 'general',
+					path: 'configurations/general',
 					name: 'General',
 					component: General,
 				},
 				{
-					path: 'templates',
+					path: 'configurations/templates',
 					name: 'Template',
 					component: Template
 				},
 				{
-					path: 'templates/edittemplate/:id',
+					path: 'configurations/templates/edittemplate/:id',
 					name: 'EditTemplate',
 					component: EditTemplate,
 					props: true
+				},
+				{
+					path: 'inventory/assets',
+					name: 'Assets',
+					component: Assets
 				}
 			],
 		},

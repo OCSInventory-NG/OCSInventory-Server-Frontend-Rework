@@ -24,9 +24,11 @@
 	"usermanagement": "User Management",
 	"users": "Users",
 	"groups": "Groups",
-	"config": "Configurations",
+	"configurations": "Configurations",
 	"general": "General",
 	"templates": "Templates",
+	"inventory": "Inventory",
+	"assets": "Assets",
 
 	"success_saved": "Configuration saved with success !",
 

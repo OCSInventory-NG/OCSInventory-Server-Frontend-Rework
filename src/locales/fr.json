@@ -23,9 +23,11 @@
 	"usermanagement": "Gestion des utilisateurs",
 	"users": "Utilisateurs",
 	"groups": "Groupes",
-	"config": "Configurations",
+	"configurations": "Configurations",
 	"general": "Général",
 	"template": "Modèle",
+	"inventory": "Inventaire",
+	"assests": "Actifs",
 
 	"success_saved": "Configuration sauvegardée avec succès !",
 
