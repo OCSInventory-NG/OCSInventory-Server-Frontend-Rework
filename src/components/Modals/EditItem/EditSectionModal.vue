@@ -1,5 +1,5 @@
 <template>
-	<div id="AddTemplateModal">
+	<div id="EditSectionModal">
 		<b-button 
 			v-b-modal="'edit-section.'+idmodal"
 			:title="$t('editsection')"
@@ -89,7 +89,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('add') }}
+							{{ $t('save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end"/>
@@ -101,8 +101,6 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
 
 const header = {
 	"Content-Type": "application/json;charset=utf-8",
@@ -110,11 +108,7 @@ const header = {
 }
 
 export default {
-	name: 'AddTemplateModal',
-	components: {
-		Datatable,
-		Loader
-	},
+	name: 'EditSectionModal',
 	props: {
 		namesection: { type: String, default: null },
 		retrival_method: { type: String, default: null },
