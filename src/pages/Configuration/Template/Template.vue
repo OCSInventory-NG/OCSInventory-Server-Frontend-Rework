@@ -63,7 +63,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("40")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_template")) {
 			this.getTemplates()					
 		} else {
 			this.errorMsg = i18n.t("dont_have_right_to_see")
@@ -78,13 +78,13 @@ export default {
 					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
-					if(localStorage.getItem('permissions').split(",").includes("37")) {
+					if(localStorage.getItem('permissions').split(",").includes("add_template")) {
 						this.canadd = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("38")) {
+					if(localStorage.getItem('permissions').split(",").includes("change_template")) {
 						this.canedit = true
 					}
-					if(localStorage.getItem('permissions').split(",").includes("39")) {
+					if(localStorage.getItem('permissions').split(",").includes("delete_template")) {
 						this.candelete = true
 					}	
 				})

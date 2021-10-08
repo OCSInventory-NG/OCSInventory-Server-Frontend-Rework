@@ -132,35 +132,13 @@ export default {
 			}
 
 			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: header })
-				.then(response => {
-					var tmpUser = []
-					response.data.forEach(element => {
-						element.user_permissions.forEach(userPerm => {
-							tmpUser[userPerm] = userPerm
-						});
-						if(element.groups.length != 0) {
-							element.groups.forEach(groups => {
-								Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+groups, { headers: header })
-									.then(groupResponse => {
-										groupResponse.data.permissions.forEach(element => {
-											tmpUser[element] = element
-										});
-										this.errorMessage = null
-										localStorage.setItem('permissions', tmpUser)
-										this.$router.push('/ocsreports/dashboard')
-									})
-									.catch(e => {
-										this.errorMessage = e
-									})
-							});
-						} else {
-							if(tmpUser.length != 0) {
-								localStorage.setItem('permissions', tmpUser)
-								this.$router.push('/ocsreports/dashboard')
-							}
-							this.errorMessage = i18n.t("error_no_permissions")
-						}
-					});
+				.then(responseAccount => {
+					var tmpUser = responseAccount.data.full_permissions
+					if(tmpUser.length != 0) {
+						localStorage.setItem('permissions', tmpUser)
+						this.$router.push('/ocsreports/dashboard')
+					}
+					this.errorMessage = i18n.t("error_no_permissions")
 				})
 				.catch(e => {
 					this.errorMessage = e

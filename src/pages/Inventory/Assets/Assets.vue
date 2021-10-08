@@ -55,7 +55,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("52")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
