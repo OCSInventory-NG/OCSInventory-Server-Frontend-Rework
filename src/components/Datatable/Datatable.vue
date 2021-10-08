@@ -275,11 +275,15 @@ export default {
 
 		this.rowdata.forEach(details => {
 			Object.keys(details).forEach( data => {
+				var visible = true
+				if(data == "sections") {
+					visible = false
+				}
 				var array = {
 					key: data,
 					label: i18n.t(data),
 					sortable: true,
-					visible: true,
+					visible: visible,
 				}
 				// Initialize CSV export header
 				

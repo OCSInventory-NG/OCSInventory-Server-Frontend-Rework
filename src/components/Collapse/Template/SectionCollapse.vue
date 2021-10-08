@@ -65,12 +65,13 @@
 								</b-col>
 							</b-row><br><br>
 							<b-row  
+								v-if="value.fields[0]"
 								align-h="center" 
 								class="text-center"
 							>
 								<b-col>
 									<FieldCollapse
-										:rowfielddata="rowfielddata"
+										:rowfielddata="value.fields"
 										@reloadTemplate="reloadTemplate"
 									/>
 								</b-col>
@@ -99,7 +100,6 @@ export default {
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
-		rowfielddata: { type: Array, default: null },
 	},
 	methods: {
 		reloadTemplate() {

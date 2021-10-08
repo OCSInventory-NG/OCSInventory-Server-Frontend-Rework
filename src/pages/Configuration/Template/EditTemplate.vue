@@ -38,7 +38,6 @@
 
 				<SectionCollapse
 					:rowsectiondata="rowsectiondata"
-					:rowfielddata="rowfielddata"
 					@reloadTemplate="reloadTemplate"
 				/>
 
@@ -73,7 +72,6 @@ export default {
 			errorMsg: null,
 			rowtemplatedata: [],
 			rowsectiondata: [],
-			rowfielddata: [],
 			succesMsg: null,
 			successed: false,
 			loading: true,
@@ -93,32 +91,7 @@ export default {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/"+this.id, { headers: header })
 				.then(response => {
 					this.rowtemplatedata = response.data
-					this.errorMsg = null
-					this.errored = false
-					this.getSections()
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-		},
-		getSections() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"sections/", { headers: header })
-				.then(response => {
-					this.rowsectiondata = response.data
-					this.errorMsg = null
-					this.errored = false
-					this.getFields()
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-		},
-		getFields() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"fields/", { headers: header })
-				.then(response => {
-					this.rowfielddata = response.data
+					this.rowsectiondata = response.data.sections
 					this.errorMsg = null
 					this.errored = false
 				})
