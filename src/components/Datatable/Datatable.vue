@@ -43,7 +43,6 @@
 				<b-button-group class="mr-1">
 					<vue-blob-json-csv
 						:data="selected || rowdata"
-						:title="$t('export_template')"
 						tag-name="button"
 						file-type="json"
 						file-name="templates"
