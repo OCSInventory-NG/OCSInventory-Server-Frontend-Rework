@@ -74,6 +74,7 @@
 	"srcip": "Address IP",
 	"srcmac": "Macaddress",
 	"domain": "Domain",
+	"sections": "Sections",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
