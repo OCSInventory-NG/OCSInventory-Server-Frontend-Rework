@@ -18,17 +18,11 @@
 			<div
 				v-else
 			>
-				<div
-					v-if="canadd"
-				>
-					<AddTemplateModal
-						:canadd="canadd"
-						:canedit="canedit"
-						:candelete="candelete"
-					/>
-				</div>
-
-				
+				<AddTemplateModal
+					:canadd="canadd"
+					:canedit="canedit"
+					:candelete="candelete"
+				/>
 			</div>
 		</section>
 	</div>
