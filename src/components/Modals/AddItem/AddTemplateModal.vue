@@ -103,6 +103,8 @@
 					:rowdata="rowdata"
 					:canedittemplate="canedit"
 					:candelete="candelete"
+					:canexport="false"
+					:exporttemplate="true"
 					title="templates"
 					@reloadDatatable="reloadDatatable"
 				/>

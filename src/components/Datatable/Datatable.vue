@@ -39,6 +39,25 @@
 				</b-button-group>
 			</b-button-toolbar>
 
+			<b-button-toolbar v-if="exporttemplate">
+				<b-button-group class="mr-1">
+					<vue-blob-json-csv
+						:data="selected || rowdata"
+						:title="$t('export_template')"
+						tag-name="button"
+						file-type="json"
+						file-name="templates"
+						class="btn export-btn btn-secondary"
+					>
+						<b-icon 
+							icon="download" 
+							aria-hidden="true"/>
+					</vue-blob-json-csv>
+				</b-button-group>
+			</b-button-toolbar>
+
+			
+
 			<b-button-toolbar v-if="caneditconfig">
 				<b-button-group class="mr-1">
 					<b-button 
@@ -93,7 +112,8 @@
 				selectable
 				primary-key="id"
 				style="white-space: pre-line;"
-				@filtered="onFiltered"  
+				@filtered="onFiltered"
+				@row-selected="onRowSelected"
 			>
 				<template v-slot:head(selected)="">
 					<b-form-group>
@@ -226,7 +246,8 @@ export default {
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
 		caneditconfig: { type: Boolean, default: false },
-		canedittemplate: { type: Boolean, default: false }
+		canedittemplate: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -241,6 +262,7 @@ export default {
 			filter: null,
 			// Select row parameter
 			selectMode: 'multi',
+			selected: null,
 			// Sort datatable parameters
 			sortDesc: null,
 			sortBy: null,
@@ -322,8 +344,15 @@ export default {
 		selectAllRows() {
 			if(this.$refs.selectableTable.selectedRows[0] === true) {
 				this.$refs.selectableTable.clearSelected()
+				this.selected = this.rowdata
 			} else {
 				this.$refs.selectableTable.selectAllRows()
+			}
+		},
+		onRowSelected(items) {
+			this.selected = items
+			if(this.selected.length == 0) {
+				this.selected = this.rowdata
 			}
 		},
 		reloadDatatable() {

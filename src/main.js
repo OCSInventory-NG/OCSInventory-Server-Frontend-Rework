@@ -22,7 +22,8 @@ import JsonExcel from "vue-json-excel";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import VueI18n from 'vue-i18n';
-import i18n from './i18n'
+import i18n from './i18n';
+import VueBlobJsonCsv from 'vue-blob-json-csv';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { 
@@ -51,6 +52,7 @@ Vue.use(Trend);
 Vue.use(Toasted, { duration: 10000 });
 Vue.use(VueAxios, axios);
 Vue.use(VueComp);
+Vue.use(VueBlobJsonCsv);
 
 Vue.component('Widget', Widget);
 Vue.component('apexchart', VueApexCharts);

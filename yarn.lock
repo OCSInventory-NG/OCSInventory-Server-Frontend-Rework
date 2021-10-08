@@ -2242,6 +2242,13 @@
     "escalade" "^3.1.1"
     "node-releases" "^1.1.70"
 
+"buefy@^0.8.12":
+  "integrity" "sha512-pg8Cn0m9cjqp2/vaKT4VIfU8KIumuX/gAT1GtearXRs56+kKqAPx3j9O8cm9W6P4jPUCHajKX6H8AqD0ram2Bg=="
+  "resolved" "https://registry.npmjs.org/buefy/-/buefy-0.8.20.tgz"
+  "version" "0.8.20"
+  dependencies:
+    "bulma" "0.7.5"
+
 "buffer-crc32@~0.2.3":
   "integrity" "sha1-DTM+PwDqxQqhRUq9MO+MKl2ackI="
   "resolved" "https://registry.npmjs.org/buffer-crc32/-/buffer-crc32-0.2.13.tgz"
@@ -2280,6 +2287,11 @@
   "integrity" "sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug="
   "resolved" "https://registry.npmjs.org/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz"
   "version" "3.0.0"
+
+"bulma@0.7.5":
+  "integrity" "sha512-cX98TIn0I6sKba/DhW0FBjtaDpxTelU166pf7ICXpCCuplHWyu6C9LYZmL5PEsnePIeJaiorsTEzzNk3Tsm1hw=="
+  "resolved" "https://registry.npmjs.org/bulma/-/bulma-0.7.5.tgz"
+  "version" "0.7.5"
 
 "bytes@3.0.0":
   "integrity" "sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg="
@@ -8448,6 +8460,11 @@
   dependencies:
     "lowercase-keys" "^1.0.0"
 
+"ress@^1.2.2":
+  "integrity" "sha1-T9AGgcjTzqp59d4eVKqtFWF+l3c="
+  "resolved" "https://registry.npmjs.org/ress/-/ress-1.2.2.tgz"
+  "version" "1.2.2"
+
 "restore-cursor@^2.0.0":
   "integrity" "sha1-n37ih/gv0ybU/RYpI9YhKe7g368="
   "resolved" "https://registry.npmjs.org/restore-cursor/-/restore-cursor-2.0.0.tgz"
@@ -9994,6 +10011,17 @@
   "resolved" "https://registry.npmjs.org/vue-axios/-/vue-axios-3.2.4.tgz"
   "version" "3.2.4"
 
+"vue-blob-json-csv@^0.1.7":
+  "integrity" "sha512-7cHsAppT/FmKm1NhyU9KzP7NYHqRB4u7hc//xZogXJ5NpFt+CY8gwLcuZh5Ou1BxQpoBscQ2hLc5619kakO5GQ=="
+  "resolved" "https://registry.npmjs.org/vue-blob-json-csv/-/vue-blob-json-csv-0.1.7.tgz"
+  "version" "0.1.7"
+  dependencies:
+    "buefy" "^0.8.12"
+    "core-js" "^2.6.5"
+    "ress" "^1.2.2"
+    "vue" "^2.6.10"
+    "vue-json-pretty" "^1.6.3"
+
 "vue-cli-plugin-i18n@~2.1.0":
   "integrity" "sha512-YBLaoY61eQP1BoSu29xK5711HghTooLmtYbxdXHNz9pOjN4/kX1MDpl6hMaHNkec4/r2hR3MHDWyJqed51Iuaw=="
   "resolved" "https://registry.npmjs.org/vue-cli-plugin-i18n/-/vue-cli-plugin-i18n-2.1.0.tgz"
@@ -10074,6 +10102,11 @@
   dependencies:
     "downloadjs" "^1.4.7"
 
+"vue-json-pretty@^1.6.3":
+  "integrity" "sha512-GHi8q6QLx8fw8XDhAgztlC6emupptpmV5a+yd4UxteEoPqGHXwpgscTbTTxwH2GEdmYXHAt+GLg5tAsenLZKDA=="
+  "resolved" "https://registry.npmjs.org/vue-json-pretty/-/vue-json-pretty-1.8.1.tgz"
+  "version" "1.8.1"
+
 "vue-loader@^15.7.0":
   "integrity" "sha512-j0cqiLzwbeImIC6nVIby2o/ABAWhlppyL/m5oJ67R5MloP0hj/DtFgb0Zmq3J9CG7AJ+AXIvHVnJAPBvrLyuDg=="
   "resolved" "https://registry.npmjs.org/vue-loader/-/vue-loader-15.9.6.tgz"
@@ -10126,7 +10159,7 @@
     "rollup-plugin-commonjs" "^7.0.0"
     "rollup-plugin-node-resolve" "^2.0.0"
 
-"vue@^ 3.0.0 || ^ 2.0.0", "vue@^2.0.0", "vue@^2.2.4", "vue@^2.2.6", "vue@^2.5.18", "vue@^2.5.22", "vue@^2.6.11", "vue@^2.6.12", "vue@>=1.0.0", "vue@~2":
+"vue@^ 3.0.0 || ^ 2.0.0", "vue@^2.0.0", "vue@^2.2.4", "vue@^2.2.6", "vue@^2.5.18", "vue@^2.5.22", "vue@^2.6.10", "vue@^2.6.11", "vue@^2.6.12", "vue@>=1.0.0", "vue@~2":
   "integrity" "sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.12.tgz"
   "version" "2.6.12"

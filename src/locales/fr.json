@@ -74,6 +74,8 @@
 	"srcmac": "Adresse MAC",
 	"domain": "Domaine",
 	"sections": "Sections",
+	"export_template": "Exporter JSON",
+	"import_template": "Importer JSON",
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",
