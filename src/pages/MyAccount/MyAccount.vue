@@ -30,9 +30,6 @@
 				</div>
 
 				<div
-					v-for="row in rowdata" 
-					v-else
-					:key="row.id"
 					class="account-config"
 				>
 					<b-form
@@ -46,10 +43,10 @@
 								>
 									<b-form-input
 										id="username"
-										v-model="row.username"
+										v-model="rowdata.username"
 										required
 										disabled
-									>{{ row.username }}</b-form-input>
+									>{{ rowdata.username }}</b-form-input>
 								</b-form-group>
 							</b-col>
 							<b-col>
@@ -59,7 +56,7 @@
 								>
 									<b-form-input
 										id="password"
-										v-model="row.password"
+										v-model="rowdata.password"
 										type="password"
 										required
 									/>
@@ -74,9 +71,9 @@
 								>
 									<b-form-input
 										id="email"
-										v-model="row.email"
+										v-model="rowdata.email"
 										required
-									>{{ row.email }}</b-form-input>
+									>{{ rowdata.email }}</b-form-input>
 								</b-form-group>
 							</b-col>
 						</b-row>
@@ -88,9 +85,9 @@
 								>
 									<b-form-input
 										id="first_name"
-										v-model="row.first_name"
+										v-model="rowdata.first_name"
 										required
-									>{{ row.first_name }}</b-form-input>
+									>{{ rowdata.first_name }}</b-form-input>
 								</b-form-group>
 							</b-col>
 							<b-col>
@@ -100,9 +97,9 @@
 								>
 									<b-form-input
 										id="last_name"
-										v-model="row.last_name"
+										v-model="rowdata.last_name"
 										required
-									>{{ row.last_name }}</b-form-input>
+									>{{ rowdata.last_name }}</b-form-input>
 								</b-form-group>
 							</b-col>
 						</b-row>
