@@ -57,17 +57,9 @@
 
 			<b-button-toolbar v-if="exporttemplate">
 				<b-button-group class="mr-1">
-					<vue-blob-json-csv
-						:data="selected || rowdata"
-						tag-name="button"
-						file-type="json"
-						file-name="templates"
-						class="btn export-btn btn-secondary"
-					>
-						<b-icon 
-							icon="upload" 
-							aria-hidden="true"/>
-					</vue-blob-json-csv>
+					<ImportTemplateModal
+						@reloadDatatable="reloadDatatable"
+					/>
 				</b-button-group>
 			</b-button-toolbar>			
 
@@ -241,13 +233,15 @@ import i18n from '../../i18n'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
+import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 
 export default {
 	name: 'Datatable',
 	components: {
 		EditGroupModal,
 		EditUserModal,
-		DeleteItemModal
+		DeleteItemModal,
+		ImportTemplateModal
 	},
 	props: {
 		title: { type: String, default: '' },

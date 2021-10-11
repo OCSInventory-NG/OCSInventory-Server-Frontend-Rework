@@ -12,6 +12,7 @@
 	"add": "Add",
 	"search": "Search",
 	"result": "Result(s)",
+	"send": "Send",
 
 	"yes": "Yes",
 	"no": "No",
@@ -76,7 +77,8 @@
 	"domain": "Domain",
 	"sections": "Sections",
 	"export_template": "Export JSON",
-	"import_template": "Import JSON",
+	"import_template": "Import JSON Template",
+	"select_template_file": "Select your JSON template file",
 
 	"id": "id",
 	"add_logentry": "Can add log entry",
