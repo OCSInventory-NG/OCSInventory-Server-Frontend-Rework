@@ -51,11 +51,6 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'GeneralPage',
 	components: {
@@ -93,6 +88,11 @@ export default {
 	methods: {
 		// Get all config
 		getConfig() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+
 			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: header })
 				.then(response => {
 					response.data.forEach(element => {
@@ -113,6 +113,11 @@ export default {
 				})
 		},
 		updateConfig() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+
 			var config = []
 			this.rowdata.forEach(element => {
 				config.push({

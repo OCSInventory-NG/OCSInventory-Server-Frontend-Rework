@@ -52,11 +52,6 @@ import Loader from '@/components/Loader/Loader'
 import SectionCollapse from '@/components/Collapse/Template/SectionCollapse'
 import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal.vue'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'TemplatePage',
 	components: {
@@ -88,6 +83,11 @@ export default {
 	},
 	methods: {
 		getTemplate() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+
 			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/"+this.id, { headers: header })
 				.then(response => {
 					this.rowtemplatedata = response.data

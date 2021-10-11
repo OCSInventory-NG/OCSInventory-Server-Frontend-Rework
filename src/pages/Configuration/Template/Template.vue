@@ -35,11 +35,6 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'TemplatePage',
 	components: {
@@ -69,6 +64,11 @@ export default {
 	},
 	methods: {
 		getTemplates() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+
 			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
