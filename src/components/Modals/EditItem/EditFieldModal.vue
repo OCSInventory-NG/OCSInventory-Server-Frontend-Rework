@@ -72,11 +72,6 @@
 <script>
 import Axios from 'axios'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'EditFieldModal',
 	props: {
@@ -108,6 +103,11 @@ export default {
 	methods: {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+
 			event.preventDefault()
 			
 			Axios.put(process.env.VUE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: header })

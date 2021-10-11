@@ -218,11 +218,6 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'AddUserModal',
 	components: {
@@ -269,6 +264,10 @@ export default {
 	methods: {
 		// Get all users
 		getUsers() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
@@ -300,6 +299,10 @@ export default {
 		},
 		// Get all permissions
 		getPermissions() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
 					response.data.forEach(permissionDetails => {
@@ -315,6 +318,10 @@ export default {
 		},
 		// Get groups
 		getGroups() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
@@ -329,6 +336,10 @@ export default {
 				.finally(() => this.getUsers())
 		},
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			Axios.post(process.env.VUE_APP_API_ROUTE+"users/", this.row, { headers: header })
 				.then(() => {

@@ -130,11 +130,6 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'AddGroupModal',
 	components: {
@@ -173,6 +168,10 @@ export default {
 	methods: {
 		// Get all permissions
 		getPermissions() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
 					response.data.forEach(permissionDetails => {
@@ -188,6 +187,10 @@ export default {
 		},
 		// Get groups
 		getGroups() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
@@ -212,6 +215,10 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			
 			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: header })

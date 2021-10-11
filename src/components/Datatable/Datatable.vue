@@ -55,7 +55,21 @@
 				</b-button-group>
 			</b-button-toolbar>
 
-			
+			<b-button-toolbar v-if="exporttemplate">
+				<b-button-group class="mr-1">
+					<vue-blob-json-csv
+						:data="selected || rowdata"
+						tag-name="button"
+						file-type="json"
+						file-name="templates"
+						class="btn export-btn btn-secondary"
+					>
+						<b-icon 
+							icon="upload" 
+							aria-hidden="true"/>
+					</vue-blob-json-csv>
+				</b-button-group>
+			</b-button-toolbar>			
 
 			<b-button-toolbar v-if="caneditconfig">
 				<b-button-group class="mr-1">

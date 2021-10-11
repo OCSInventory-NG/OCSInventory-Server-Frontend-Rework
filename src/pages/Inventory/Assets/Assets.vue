@@ -35,11 +35,6 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: "Assets",
 	components: {
@@ -55,6 +50,10 @@ export default {
 		}
 	},
 	mounted() {
+		const header = {
+			"Content-Type": "application/json;charset=utf-8",
+			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+		}
 		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: header })
 				.then(response => {

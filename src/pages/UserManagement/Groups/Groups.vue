@@ -54,7 +54,6 @@ export default {
 			"Content-Type": "application/json;charset=utf-8",
 			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 		}
-
 		if(localStorage.getItem('permissions').split(",").includes("view_group")) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
 				.then(() => {

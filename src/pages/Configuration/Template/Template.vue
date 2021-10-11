@@ -22,6 +22,7 @@
 					:canadd="canadd"
 					:canedit="canedit"
 					:candelete="candelete"
+					:exporttemplate="exportemplate"
 				/>
 			</div>
 		</section>
@@ -53,7 +54,8 @@ export default {
 			errored: false,
 			canadd: false,
 			canedit: false,
-			candelete: false
+			candelete: false,
+			exportemplate: false,
 		}
 	},
 	mounted() {
@@ -74,12 +76,15 @@ export default {
 					this.errored = false
 					if(localStorage.getItem('permissions').split(",").includes("add_template")) {
 						this.canadd = true
+						this.exportemplate = true
 					}
 					if(localStorage.getItem('permissions').split(",").includes("change_template")) {
 						this.canedit = true
+						this.exportemplate = true
 					}
 					if(localStorage.getItem('permissions').split(",").includes("delete_template")) {
 						this.candelete = true
+						this.exportemplate = true
 					}	
 				})
 				.catch(e => {

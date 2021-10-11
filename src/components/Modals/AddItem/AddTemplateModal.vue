@@ -104,7 +104,7 @@
 					:canedittemplate="canedit"
 					:candelete="candelete"
 					:canexport="false"
-					:exporttemplate="true"
+					:exporttemplate="exporttemplate"
 					title="templates"
 					@reloadDatatable="reloadDatatable"
 				/>
@@ -118,11 +118,6 @@ import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'AddTemplateModal',
 	components: {
@@ -132,7 +127,8 @@ export default {
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
-		candelete: { type: Boolean, default: false }
+		candelete: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -163,6 +159,10 @@ export default {
 	},
 	methods: {
 		getTemplates() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: header })
 				.then(response => {
 					this.rowdata = response.data
@@ -180,6 +180,10 @@ export default {
 		},
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			
 			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: header })

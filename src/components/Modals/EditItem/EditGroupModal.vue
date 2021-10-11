@@ -87,11 +87,6 @@
 import Axios from 'axios'
 import i18n from '../../../i18n'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'EditGroupModal',
 	props: {
@@ -118,6 +113,10 @@ export default {
 	methods: {
 		// Get all permissions
 		getPermissions() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
 					response.data.forEach(permissionDetails => {
@@ -131,6 +130,10 @@ export default {
 		},
 		// Get groups
 		getGroup() {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+this.id+"/", { headers: header })
 				.then(response => {
 					this.row = response.data
@@ -144,6 +147,10 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			Axios.put(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: header })
 				.then(() => {

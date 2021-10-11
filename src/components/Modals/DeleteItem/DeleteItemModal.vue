@@ -52,11 +52,6 @@
 <script>
 import Axios from 'axios'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'DeleteItemModal',
 	props: {
@@ -80,6 +75,10 @@ export default {
 	methods: {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			Axios.delete(process.env.VUE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: header })
 				.then(() => {

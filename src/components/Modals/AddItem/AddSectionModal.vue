@@ -100,11 +100,6 @@
 <script>
 import Axios from 'axios'
 
-const header = {
-	"Content-Type": "application/json;charset=utf-8",
-	"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-}
-
 export default {
 	name: 'AddSectionModal',
 	props: {
@@ -145,6 +140,10 @@ export default {
 	methods: {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 			event.preventDefault()
 			
 			Axios.post(process.env.VUE_APP_API_ROUTE+"sections/", this.row, { headers: header })
