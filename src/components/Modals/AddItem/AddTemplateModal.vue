@@ -135,6 +135,7 @@ export default {
 			row: {
 				name: null,
 				os: 'WIN',
+				sections: []
 			},
 			rowdata: [],
 			loading: true,

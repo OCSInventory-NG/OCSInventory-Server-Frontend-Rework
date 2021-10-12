@@ -120,6 +120,7 @@ export default {
 				retrival_method: null,
 				retrival_output: null,
 				target: null,
+				fields: [],
 				template: null
 			},
 			errorMsg: null,

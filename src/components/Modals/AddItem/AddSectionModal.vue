@@ -113,6 +113,7 @@ export default {
 				retrival_method: 'FILE',
 				retrival_output: 'PTXT',
 				target: null,
+				fields: [],
 				template: null
 			},
 			rowdata: [],
