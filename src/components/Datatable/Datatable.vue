@@ -298,6 +298,11 @@ export default {
 			return this.fields.filter(field => field.visible)
 		}
 	},
+	watch: {
+		rowdata: function () {
+			this.totalRows = this.rowdata.length
+		},
+	},
 	created() {
 		if(this.usecheckbox == true) {
 			this.fields.push({
