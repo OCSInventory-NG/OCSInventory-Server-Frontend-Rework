@@ -13,6 +13,7 @@
 	"search": "Search",
 	"result": "Result(s)",
 	"send": "Send",
+	"show_hide": "Show / Hide",
 
 	"yes": "Yes",
 	"no": "No",
@@ -79,8 +80,10 @@
 	"export_template": "Export JSON",
 	"import_template": "Import JSON Template",
 	"select_template_file": "Select your JSON template file",
+	"template": "Template",
+	"uuid": "UUID",
 
-	"id": "id",
+	"id": "ID",
 	"add_logentry": "Can add log entry",
 	"change_logentry": "Can update log entry",
 	"delete_logentry": "Can delete log entry",

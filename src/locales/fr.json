@@ -1,5 +1,6 @@
 {
 	"ocsreports": "OCS Inventory",
+
     "username": "Identifiant",
     "password": "Mot de passe",
 	"email": "Email",
@@ -11,6 +12,8 @@
 	"add": "Ajouter",
 	"search": "Rechercher",
 	"result": "Résultat(s)",
+	"send": "Envoyer",
+	"show_hide": "Afficher / Cacher",
 
 	"yes": "Oui",
 	"no": "Non",
@@ -25,7 +28,7 @@
 	"groups": "Groupes",
 	"configurations": "Configurations",
 	"general": "Général",
-	"template": "Modèle",
+	"templates": "Modèle",
 	"inventory": "Inventaire",
 	"assests": "Actifs",
 
@@ -76,6 +79,10 @@
 	"sections": "Sections",
 	"export_template": "Exporter JSON",
 	"import_template": "Importer JSON",
+	"select_template_file": "Sélectionner votre modèle de template JSON",
+	"template": "Modèle",
+	"uuid": "UUID",
+
 
 	"id": "id",
 	"add_logentry": "Peut ajouter une entrée log",
