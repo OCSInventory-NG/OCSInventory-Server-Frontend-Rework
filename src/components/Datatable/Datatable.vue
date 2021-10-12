@@ -76,27 +76,31 @@
 					</b-button>
 				</b-button-group>
 			</b-button-toolbar>
+
+			<!-- Show/Hide columns -->
+			<b-dropdown 
+				:text="$t('show_hide')"
+				class="mx-1"
+				variant="dark"
+				right 
+			>
+				<b-dropdown-item
+					v-for="field in fields" 
+					:key="field.key"
+					:active="!field.visible"
+					v-model="field.visible"
+					@click="field.visible = !field.visible"
+				>
+					{{ $t(field.key) }}
+				</b-dropdown-item>
+			</b-dropdown>
 		</div>
 
 		<div align="center">
 			<p>{{ totalRows }} {{ $t('result') }}</p>
 		</div>
 
-		<!-- Show/Hide columns -->
-		<!--<b-row>
-			<b-col>
-				<b-checkbox
-					:disabled="visibleFields.length == 1 && field.visible"
-					v-for="field in fields" 
-					:key="field.key" 
-					v-model="field.visible" 
-					inline
-				>
-					{{ field.key }}
-				</b-checkbox>
-			</b-col>
-		</b-row>
-		<br><br>-->
+		<br><br>
 
 		<!-- Datatable -->
 		<div class="overflow-auto">
@@ -289,6 +293,8 @@ export default {
 	computed: {
 		// Initialize visible fields
 		visibleFields() {
+			localStorage.removeItem(this.title)
+			localStorage.setItem(this.title, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
 		}
 	},
@@ -302,27 +308,40 @@ export default {
 			})
 		}
 
-		this.rowdata.forEach(details => {
-			Object.keys(details).forEach( data => {
-				var visible = true
-				if(data == "sections") {
-					visible = false
+		if(localStorage.getItem(this.title) != null && localStorage.getItem(this.title) != "") {
+			JSON.parse(localStorage.getItem(this.title)).forEach( visible => {
+				if(visible.key != "selected" && visible.key != "actions") {
+					var arrayVisible = visible
+
+					// Initialize datatable header
+					var index = this.fields.findIndex(x => x.key==visible);
+					index === -1 ? this.fields.push(arrayVisible) : null
 				}
-				var array = {
-					key: data,
-					label: i18n.t(data),
-					sortable: true,
-					visible: visible,
-				}
-				// Initialize CSV export header
-				
-				this.json_fields[data] = data
-				
-				// Initialize datatable header
-				var index = this.fields.findIndex(x => x.key==data);
-				index === -1 ? this.fields.push(array) : null
 			})
-		})
+		} else {
+			this.rowdata.forEach(details => {
+				Object.keys(details).forEach( data => {
+					var visible = true
+					if(data == "sections") {
+						visible = false
+					}
+
+					var array = {
+						key: data,
+						label: i18n.t(data),
+						sortable: true,
+						visible: visible,
+					}
+					
+					// Initialize CSV export header
+					this.json_fields[data] = data
+					
+					// Initialize datatable header
+					var index = this.fields.findIndex(x => x.key==data);
+					index === -1 ? this.fields.push(array) : null
+				})
+			})
+		}
 
 		var actions = {
 			key: "actions", 
