@@ -55,6 +55,7 @@ thead {
 
 // Export button
 .export-btn,
+.btn-dark,
 .icon-btn
 .input-group-text {
     color: #fff!important;
@@ -67,6 +68,11 @@ thead {
     color: #fff!important;
     background-color: #961b7e!important;
     border-color: #961b7e!important;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #16181b!important;
+    background-color: #eceef0!important;
 }
 
 .config-button {
