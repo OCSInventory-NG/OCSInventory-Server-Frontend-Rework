@@ -12,6 +12,7 @@ import Dashboard from '@/pages/Dashboard/Dashboard';
 
 // Inventory
 import Assets from '@/pages/Inventory/Assets/Assets';
+import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover';
 
 // User management
 import Users from '@/pages/UserManagement/Users/Users';
@@ -81,6 +82,11 @@ export default new Router({
 					path: 'inventory/assets',
 					name: 'Assets',
 					component: Assets
+				},
+				{
+					path: 'inventory/ipdiscover',
+					name: 'Ipdiscover',
+					component: Ipdiscover
 				}
 			],
 		},

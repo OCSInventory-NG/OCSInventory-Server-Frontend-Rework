@@ -25,6 +25,7 @@
 					:header="$t('inventory')"
 					:children-links="[
 						{ header: $t('assets'), link: '/ocsreports/inventory/assets' },
+						{ header: $t('ipdiscover'), link: '/ocsreports/inventory/ipdiscover' },
 					]"
 					link="/ocsreports/inventory"
 					icon-name="desktop"
