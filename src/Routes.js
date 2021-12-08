@@ -43,7 +43,7 @@ export default new Router({
 			component: Layout,
 			children: [
 				{
-					path: 'my_account',
+					path: 'myaccount',
 					name: 'MyAccount',
 					component: MyAccount,
 				},
