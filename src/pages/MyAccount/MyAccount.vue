@@ -179,32 +179,29 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			this.rowdata.forEach(details => {
+			var jsonReturn = {
+				"password": this.rowdata.password,
+				"email": this.rowdata.email,
+				"first_name": this.rowdata.first_name,
+				"last_name": this.rowdata.last_name
+			}
 
-				var jsonReturn = {
-					"password": details.password,
-					"email": details.email,
-					"first_name": details.first_name,
-					"last_name": details.last_name
-				}
-
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+details.id+"/", jsonReturn, { headers: header })
-					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
-						this.errorMsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errorMsg = e
-						this.errored = true
-						this.succesMsg = null
-						this.successed = false
-					})
-					.finally(() => {
-						this.loading = false
-					})
-			})
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
+				.finally(() => {
+					this.loading = false
+				})
 		}
 	}
 }
