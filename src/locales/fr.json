@@ -138,11 +138,25 @@
 	"change_base": "Peut modifier une base",
 	"delete_base": "Peut supprimer une base",
 	"view_base": "Peut voir les bases",
+	"add_netdevice": "Peut ajouter un périphérique réseau",
+	"change_netdevice": "Peut modifier un périphérique réseau",
+	"delete_netdevice": "Peut supprimer un périphérique réseau",
+	"view_netdevice": "Peut voir les périphériques réseau",
+	"add_netgroup": "Peut ajouter un groupe réseau",
+	"change_netgroup": "Peut modifier un groupe réseau",
+	"delete_netgroup": "Peut supprimer un groupe réseau",
+	"view_netgroup": "Peut voir les groupes réseau",
+	"add_network": "Peut ajouter un réseau",
+	"change_network": "Peut modifier un réseau",
+	"delete_network": "Peut supprimer un réseau",
+	"view_network": "Peut voir les réseaux",
 
 	"config_elem_15": "I'm a description",
 	"config_elem_17": "I'm a description",
 	"config_elem_24": "I'm a description",
 
 	"dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page",
-	"error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur"
+	"error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
+
+	"ipdiscover": "IpDiscover"
 }

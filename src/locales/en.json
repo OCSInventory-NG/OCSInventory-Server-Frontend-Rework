@@ -137,11 +137,25 @@
 	"change_base": "Can update base",
 	"delete_base": "Can delete base",
 	"view_base": "Can view base",
+	"add_netdevice": "Can add net device",
+	"change_netdevice": "Can update net device",
+	"delete_netdevice": "Can delete net device",
+	"view_netdevice": "Can view net device",
+	"add_netgroup": "Can add net group",
+	"change_netgroup": "Can update net group",
+	"delete_netgroup": "Can delete net group",
+	"view_netgroup": "Can view net group",
+	"add_network": "Can add network",
+	"change_network": "Can update network",
+	"delete_network": "Can delete network",
+	"view_network": "Can view network",
 
 	"config_elem_15": "I'm a description",
 	"config_elem_17": "I'm a description",
 	"config_elem_24": "I'm a description",
 
 	"dont_have_right_to_see": "You don't have the rights to view this page",
-	"error_no_permissions": "You don't have any permission, please contact your administrator"
+	"error_no_permissions": "You don't have any permission, please contact your administrator",
+
+	"ipdiscover": "IpDiscover"
 }
