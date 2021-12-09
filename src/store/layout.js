@@ -3,36 +3,36 @@ import isScreen from '@/core/screenHelper';
 export default {
 	namespaced: true,
 	state: {
-		sidebarClose: false,
-		sidebarStatic: false,
+		sidebarclose: false,
+		sidebarstatic: false,
 		sidebarActiveElement: null,
 	},
 	mutations: {
 		toggleSidebar(state) {
-			const nextState = !state.sidebarStatic;
+			const nextState = !state.sidebarstatic;
 
-			localStorage.sidebarStatic = nextState;
-			state.sidebarStatic = nextState;
+			localStorage.sidebarstatic = nextState;
+			state.sidebarstatic = nextState;
 
 			if (!nextState && (isScreen('lg') || isScreen('xl'))) {
-				state.sidebarClose = true;
+				state.sidebarclose = true;
 			}
 		},
 		switchSidebar(state, value) {
 			if (value) {
-				state.sidebarClose = value;
+				state.sidebarclose = value;
 			} else {
-				state.sidebarClose = !state.sidebarClose;
+				state.sidebarclose = !state.sidebarclose;
 			}
 		},
 		handleSwipe(state, e) {
 			if ('ontouchstart' in window) {
 				if (e.direction === 4) {
-					state.sidebarClose = false;
+					state.sidebarclose = false;
 				}
 
-				if (e.direction === 2 && !state.sidebarClose) {
-					state.sidebarClose = true;
+				if (e.direction === 2 && !state.sidebarclose) {
+					state.sidebarclose = true;
 				}
 			}
 		},

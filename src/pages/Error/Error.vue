@@ -1,16 +1,16 @@
 <template>
 	<div class="error-page">
 		<b-container>
-			<div class="errorContainer mx-auto">
-				<h1 class="errorCode">404</h1>
-				<p class="errorInfo">
+			<div class="errorcontainer mx-auto">
+				<h1 class="errorcode">404</h1>
+				<p class="errorinfo">
 					Oops, it seems that this page does not exist.
 				</p>
-				<p class="errorHelp mb-3">
+				<p class="errorhelp mb-3">
 					If you are sure it should, search for it.
 				</p>
 			</div>
-			<footer class="pageFooter">
+			<footer class="pagefooter">
 				2021 &copy; OCS Inventory
 			</footer>
 		</b-container>
