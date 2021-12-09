@@ -1,6 +1,6 @@
 # OCSInventory-Server-Frontend-Rework
 
-Rework of the web interace using vue
+Rework of the web interacted using vue
 
 ## Installation
 

@@ -1,28 +1,23 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "node": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:vue/recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parserOptions": {
-        "sourceType": "module"
-    },
-    "plugins": [
-         "vue"
-    ],
-    "rules": {
-    	"indent": ["error", "tab"],
-        "max-len": ["error", { "code": 128 }],
-        "no-tabs": 0,
-        "vue/html-indent": ["error", "tab"],
-        "vue/multi-word-component-names": "off"
-    }
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:vue/recommended"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": ["vue"],
+  "rules": {
+    "indent": ["error", "tab"],
+    "max-len": ["error", { "code": 128 }],
+    "no-tabs": 0,
+    "vue/html-indent": ["error", "tab"],
+    "vue/multi-word-component-names": "off"
+  }
 }
