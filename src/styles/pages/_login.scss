@@ -21,15 +21,15 @@
 
   // Login button
   .auth-btn {
-    background-color: var(--background-button-color) !important;
+    background-color: #20222e !important;
     color: $white !important;
     margin-top: 20px;
     width: 100%;
   }
 
   .auth-btn:hover {
-    background-color: var(--background-button-color-hover) !important;
-    border-color: var(--background-button-color-hover) !important;
+    background-color: #961b7e !important;
+    border-color: #961b7e !important;
     color: $white !important;
   }
 

@@ -25,3 +25,6 @@ linters:
 
   IdSelector:
     enabled: false
+
+  ColorVariable:
+    enabled: false
