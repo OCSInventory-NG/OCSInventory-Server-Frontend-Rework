@@ -1,47 +1,45 @@
-/**
- *===========================================
- * MY ACCOUNT PAGE
- *===========================================
- */
+// ===========================================
+//  MY ACCOUNT PAGE
+// ===========================================
+
 #MyAccount {
+  align-items: center;
+  -webkit-box-align: center;
+  -webkit-box-pack: justify;
+  display: flex;
+  -ms-flex-align: center;
+  flex-direction: column;
+  -ms-flex-pack: justify;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+
+  #formSection {
+    background-color: $white;
+    box-shadow: 0 0 4px var(--box-shadow-color);
+    font-size: 10pt;
+    padding: 4px;
+    width: 60%;
+  }
+
+  .account-config {
     width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: center;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
 
-    #formSection {
-        width: 60%;
-        -webkit-box-shadow: 0 0 4px #b6b5b5;
-        box-shadow: 0 0 4px #b6b5b5;
-        font-size: 10pt;
-        padding: 4px;
-        background-color: white;
+    > form > .row {
+      padding: 12px;
     }
+  }
 
-    .account-config {
-        width: 100%;
-    }
+  label {
+    font-weight: bold;
+  }
 
-    .account-config > form > .row {
-        padding: 12px;
-    }
-
-    label {
-        font-weight: bold;
-    }
-
-    .form-control {
-        border-top: none!important;
-        border-left: none!important;
-        border-right: none!important;
-        border-bottom: 1px solid #ced4da;
-        border-radius: 0!important;
-        box-shadow: none!important;
-    }
+  .form-control {
+    border-bottom: 1px solid var(--border-bottom-button-color);
+    border-left: none !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+  }
 }
