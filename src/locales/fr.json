@@ -91,6 +91,9 @@
   "mask": "Mask",
   "netdevices": "Périphériques réseaux",
   "group": "Groupe",
+  "datatype": "Type",
+  "datatarget": "Cible",
+  "accountinfo_values": "Valeurs",
 
   "id": "id",
   "add_logentry": "Peut ajouter une entrée log",

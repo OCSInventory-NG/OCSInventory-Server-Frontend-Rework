@@ -91,6 +91,9 @@
   "mask": "Mask",
   "netdevices": "Net devices",
   "group": "Group",
+  "datatype": "Type",
+  "datatarget": "Target",
+  "accountinfo_values": "Values",
 
   "id": "ID",
   "add_logentry": "Can add log entry",
