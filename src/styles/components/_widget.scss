@@ -1,263 +1,257 @@
 .title {
-	margin-top: 0;
-	color: $widget-title-color;
+  color: $widget-title-color;
+  margin-top: 0;
 
-	@include clearfix();
+  @include clearfix();
 }
 
 .widget {
-	display: block;
-	position: relative;
-	margin-bottom: $grid-gutter-width;
-	padding: $widget-padding-vertical $widget-padding-horizontal;
-	background: $widget-bg-color;
-	border-radius: $border-radius-sm;
-	box-shadow: var(--widget-shadow);
+  background: $widget-bg-color;
+  border-radius: $border-radius-sm;
+  box-shadow: var(--widget-shadow);
+  display: block;
+  margin-bottom: $grid-gutter-width;
+  padding: $widget-padding-vertical $widget-padding-horizontal;
+  position: relative;
 
-	&.loading {
-		min-height: 150px;
-	}
+  &.loading {
+    min-height: 150px;
+  }
 
-	[control='collapse'] {
-		display: unset;
-	}
+  [control='collapse'] {
+    display: unset;
+  }
 
-	[control='expand'] {
-		display: none;
-	}
+  [control='expand'] {
+    display: none;
+  }
 
-	[control='fullscreen'] {
-		display: unset;
-	}
+  [control='fullscreen'] {
+    display: unset;
+  }
 
-	[control='restore'] {
-		display: none;
-	}
+  [control='restore'] {
+    display: none;
+  }
 
-	&.collapsed {
-		min-height: unset;
+  &.collapsed {
+    min-height: unset;
 
-		[control='collapse'] {
-			display: none;
-		}
+    [control='collapse'] {
+      display: none;
+    }
 
-		[control='expand'] {
-			display: unset;
-		}
-	}
+    [control='expand'] {
+      display: unset;
+    }
+  }
 
-	&.fullscreened {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		margin: 0;
-		z-index: 10000;
+  &.fullscreened {
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10000;
 
-		[control='fullscreen'] {
-			display: none;
-		}
+    [control='fullscreen'] {
+      display: none;
+    }
 
-		[control='restore'] {
-			display: unset;
-		}
-	}
+    [control='restore'] {
+      display: unset;
+    }
+  }
 
-	> header {
-		margin: (-$widget-padding-vertical) (-$widget-padding-horizontal);
-		padding: $widget-padding-vertical $widget-padding-horizontal;
+  > header {
+    margin: (-$widget-padding-vertical) (-$widget-padding-horizontal);
+    padding: $widget-padding-vertical $widget-padding-horizontal;
 
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6 {
-			margin: 0;
-		}
-	}
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+    }
 
-	.loader {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
+    .widget-body.p-0 + footer {
+      margin-top: $widget-padding-vertical;
+    }
+  }
 
-		.spinner {
-			position: absolute;
-			top: 50%;
-			width: 100%; //ie fix
-			margin-top: -10px;
-			font-size: 20px;
-			text-align: center;
-		}
-	}
+  .loader {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
 
-	.widget-body.p-0 {
-		margin: $widget-padding-vertical (-$widget-padding-horizontal) (-$widget-padding-vertical);
-	}
+    .spinner {
+      font-size: 20px;
+      margin-top: -10px;
+      position: absolute;
+      text-align: center;
+      top: 50%;
+      width: 100%; //ie fix
+    }
+  }
+
+  .widget-body.p-0 {
+    margin: $widget-padding-vertical (-$widget-padding-horizontal) (-$widget-padding-vertical);
+  }
 
 
-	&.bg-transparent {
-		box-shadow: none;
-	}
+  &.bg-transparent {
+    box-shadow: none;
+  }
 }
 
-.widgetBody {
-	@include clearfix();
+.widgetbody {
+  @include clearfix();
 
-	> footer {
-		margin: $spacer/2 (-$widget-padding-horizontal) (-$widget-padding-vertical);
-		padding: 10px 20px;
-	}
+  > footer {
+    margin: $spacer / 2 (-$widget-padding-horizontal) (-$widget-padding-vertical);
+    padding: 10px 20px;
+  }
 }
 
-.widget .widget-body.p-0 + footer {
-	margin-top: $widget-padding-vertical;
-}
+.widgetcontrols {
+  font-size: $font-size-sm;
+  padding: 14px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
 
-.widgetControls + .widgetBody {
-  	margin-top: $widget-padding-vertical;
-}
+  a {
+    border-radius: 4px;
+    color: rgba($black, .4);
+    padding: 1px 4px;
 
-.widgetControls {
-	position: absolute;
-	z-index: 1;
-	top: 0;
-	right: 0;
-	padding: 14px;
-	font-size: $font-size-sm;
+    @include transition(color .15s ease-in-out);
 
-	a {
-		padding: 1px 4px;
-		border-radius: 4px;
-		color: rgba($black, 0.4);
+    &:hover {
+      color: rgba($black, .1);
+      text-decoration: none;
+    }
 
-		@include transition(color 0.15s ease-in-out);
+    .la {
+      position: relative;
+      top: 2px;
+    }
+  }
 
-		&:hover {
-			color: rgba($black, 0.1);
-			text-decoration: none;
-		}
-
-		.la {
-			position: relative;
-			top: 2px;
-		}
-	}
+  + .widgetbody {
+    margin-top: $widget-padding-vertical;
+  }
 }
 
 .inverse {
-	top: 2px;
-	position: relative;
-	margin-left: 3px;
+  margin-left: 3px;
+  position: relative;
+  top: 2px;
 }
 
 .widget-image {
-    position: relative;
-    overflow: hidden;
-    margin: (-$widget-padding-vertical) (-$widget-padding-horizontal);
-    border-radius: $border-radius;
+  border-radius: $border-radius;
+  margin: (-$widget-padding-vertical) (-$widget-padding-horizontal);
+  overflow: hidden;
+  position: relative;
 
-    > img {
-		max-width: 100%;
-		border-radius: $border-radius $border-radius 0 0;
-		transition: transform 0.15s ease;
-    }
+  > img {
+    border-radius: $border-radius $border-radius 0 0;
+    max-width: 100%;
+    transition: transform .15s ease;
+  }
 
-    .title {
-		position: absolute;
-		top: 0;
-		left: 0;
-		margin: 20px;
-    }
+  .title {
+    left: 0;
+    margin: 20px;
+    position: absolute;
+    top: 0;
+  }
 
-    .info {
-		position: absolute;
-		top: 0;
-		right: 0;
-		margin: 20px;
-    }
+  .info {
+    margin: 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  > img:hover > img {
+    transform: scale(1.1, 1.1);
+  }
 }
 
-.widget-top-overflow,
-.widget-middle-overflow {
-	position: relative;
-	margin: 0 (-$widget-padding-horizontal);
+.widget-top-overflow, .widget-middle-overflow {
+  margin: 0 (-$widget-padding-horizontal);
+  position: relative;
 
-	> img {
-		max-width: 100%;
-	}
+  > img {
+    max-width: 100%;
+  }
 }
 
 .widget-top-overflow {
-	margin-top: (-$widget-padding-vertical);
-	border-top-left-radius: $border-radius;
-	border-top-right-radius: $border-radius;
-	overflow: hidden;
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
+  margin-top: (-$widget-padding-vertical);
+  overflow: hidden;
 
-	> img {
-		border-top-left-radius: $border-radius;
-		border-top-right-radius: $border-radius;
-	}
+  > img {
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+  }
 
-	> .btn-toolbar {
-		position: absolute;
-		top: 0;
-		right: 0;
-		z-index: 1;
-		margin-right: $widget-padding-horizontal;
+  > .btn-toolbar {
+    margin-right: $widget-padding-horizontal;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
 
-		@include media-breakpoint-up(md) {
-			top: auto;
-			bottom: 0;
-		}
-	}
-}
-
-.widget-image > img:hover > img {
-	transform: scale(1.1, 1.1);
+    @include media-breakpoint-up(md) {
+      bottom: 0;
+      top: auto;
+    }
+  }
 }
 
 .widget-footer-bottom {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
 }
 
 .widget-sm {
-	height: 230px;
+  height: 230px;
 }
 
 .widget-md {
-	height: 373px;
+  height: 373px;
 }
 
 .widget-padding-md {
-	padding: $widget-padding-vertical $widget-padding-horizontal;
+  padding: $widget-padding-vertical $widget-padding-horizontal;
 }
 
 .widget-padding-lg {
-	padding: $widget-padding-vertical*2 $widget-padding-horizontal*2;
+  padding: $widget-padding-vertical * 2 $widget-padding-horizontal * 2;
 }
 
 .widget-body-container {
-	position: relative;
-	height: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .widget-icon {
-	font-size: 42px;
-	height: 60px;
-	line-height: 45px;
-	display: inline-block;
+  display: inline-block;
+  font-size: 42px;
+  height: 60px;
+  line-height: 45px;
 }
 
 
 .widget-loader {
-	position: absolute;
-	top: 0;
-	left: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
 }

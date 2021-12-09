@@ -1,30 +1,27 @@
-/**
- *===========================================
- * MODALS COMPONENT
- *===========================================
- */
+// ===========================================
+//  MODALS COMPONENT
+// ===========================================
 
 @media (min-width: 576px) {
-    .modal-dialog {
-        max-width: 700px!important;
-    }
+  .modal-dialog {
+    max-width: 700px !important;
+  }
 }
 
-.custom-modal {    
-    .modal-body > form > .row {
-        padding: 5px!important;
-    }
+.custom-modal {
+  .modal-body > form > .row {
+    padding: 5px !important;
+  }
 
-    .form-control {
-        border-top: none!important;
-        border-left: none!important;
-        border-right: none!important;
-        border-bottom: 1px solid #ced4da!important;
-        border-radius: 0!important;
-        box-shadow: none!important;
-    }
+  .form-control {
+    border-left: none !important;
+    border-radius: 0 !important;
+    border-right: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+  }
 
-    h4 {
-        margin-top: 10px!important;
-    }
+  h4 {
+    margin-top: 10px !important;
+  }
 }

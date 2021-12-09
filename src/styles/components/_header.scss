@@ -1,107 +1,107 @@
-/**
- *===========================================
- * HEADER
- *===========================================
- */
+// ===========================================
+//  HEADER
+// ===========================================
 
 .app-header.navbar {
-    height: $navbar-height;
-    z-index: 100;
-    padding: 0 1.85rem 0;
-    background: var(--navbar-bg);
-    box-shadow: var(--navbar-shadow);
-    transition: $transition-base;
-    border: none;
-    font-weight: 500;
-    justify-content: flex-start;
+  background: var(--navbar-bg);
+  border: 0;
+  box-shadow: var(--navbar-shadow);
+  font-weight: 500;
+  height: $navbar-height;
+  justify-content: flex-start;
+  padding: 0 1.85rem;
+  transition: $transition-base;
+  z-index: 100;
 
-    .nav {
-        height: 100%;
-        padding: 0;
+  .nav {
+    height: 100%;
+    padding: 0;
 
-        .nav-item {
-            .nav-link, .nav-link > a {
-                display: flex;
-                align-items: center;
-                height: 100%;
-                position: relative;
-                padding: 0.5rem;
-                color: $navbar-link-color;
-
-                @include hover {
-                    color: $navbar-link-hover-color;
-                    background: $navbar-link-hover-bg;
-                    text-decoration: none;
-                }
-
-                .la {
-                    font-size: 20px;
-
-                    @include media-breakpoint-down(sm) {
-                        font-size: 27px;
-                    }
-                }
-            }
-        }
-    }
-
-    .navbarBrand {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
+    .nav-item {
+      .nav-link, .nav-link > a {
         align-items: center;
-        font-weight: 700;
-        font-size: 1.25rem;
-        pointer-events: none;
+        color: $navbar-link-color;
+        display: flex;
+        height: 100%;
+        padding: .5rem;
+        position: relative;
 
-        svg {
-            font-size: 10px;
+        @include hover {
+          background: $navbar-link-hover-bg;
+          color: $navbar-link-hover-color;
+          text-decoration: none;
         }
+
+        .la {
+          font-size: 20px;
+
+          @include media-breakpoint-down(sm) {
+            font-size: 27px;
+          }
+        }
+      }
+    }
+  }
+
+  .navbarbrand {
+    align-items: center;
+    bottom: 0;
+    display: flex;
+    font-size: 1.25rem;
+    font-weight: 700;
+    justify-content: center;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    svg {
+      font-size: 10px;
+    }
+  }
+
+  &.header-dark {
+    .nav {
+      .nav-item {
+        .nav-link, .nav-link > a {
+          color: $white;
+
+          @include hover {
+            color: $perso-rgba;
+          }
+        }
+      }
     }
 
-    &.header-dark {
-        .nav {
-            .nav-item {
-                .nav-link, .nav-link > a {
-                    color: $white;
-
-                    @include hover {
-                        color: rgba($white, 0.7);
-                    }
-                }
-            }
-        }
-
-        input::placeholder {
-            color: rgba($white, 0.7);
-        }
-
-        .navbarBrand {
-            color: $white;
-        }
+    input::placeholder {
+      color: $perso-rgba;
     }
 
-    @include media-breakpoint-down(md) {
-        padding: 0 $spacer/2;
+    .navbarbrand {
+      color: $white;
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    padding: 0 $spacer / 2;
+  }
+
+  .dropdown-toggle::after {
+    display: none;
+  }
+
+  .settingsdropdown {
+    .dropdown-item:focus {
+      outline: none;
     }
 
-    .dropdown-toggle::after {
-        display: none;
-    }
+    ul {
+      width: 12rem;
 
-    .settingsDropdown {
-        .dropdown-item:focus {
-            outline: none;
-        }
-        ul {
-            width: 12rem;
-            li {
-                padding: 4px 0;
-            }
-        }
+      li {
+        padding: 4px 0;
+      }
     }
+  }
 }
