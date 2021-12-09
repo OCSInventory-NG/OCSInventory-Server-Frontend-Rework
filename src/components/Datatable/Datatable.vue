@@ -317,7 +317,8 @@ export default {
 			JSON.parse(localStorage.getItem(this.title)).forEach( visible => {
 				if(visible.key != "selected" && visible.key != "actions") {
 					var arrayVisible = visible
-
+					// Initialize CSV export header
+					this.json_fields[visible.key] = visible.key
 					// Initialize datatable header
 					var index = this.fields.findIndex(x => x.key==visible);
 					index === -1 ? this.fields.push(arrayVisible) : null
