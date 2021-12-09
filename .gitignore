@@ -107,3 +107,7 @@ dist
 
 # Ignore visual file
 .vscode/
+
+# Ignore mega-linter locals tests
+.mega-linter.yml
+report/
