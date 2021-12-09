@@ -1,7 +1,7 @@
 <template>
 	<div class="sidebar-wrapper">
 		<nav
-			:class="{sidebar: true, sidebarStatic, sidebarOpened}"
+			:class="{sidebar: true, sidebarstatic, sidebarOpened}"
 			@mouseenter="sidebarMouseEnter"
 			@mouseleave="sidebarMouseLeave"
 		>
@@ -68,8 +68,8 @@ export default {
 	components: { NavLink },
 	computed: {
 		...mapState('layout', {
-			sidebarStatic: state => state.sidebarStatic,
-			sidebarOpened: state => !state.sidebarClose,
+			sidebarstatic: state => state.sidebarstatic,
+			sidebarOpened: state => !state.sidebarclose,
 			activeItem: state => state.sidebarActiveElement,
 		}),
 	},
@@ -84,13 +84,13 @@ export default {
 			this.changeSidebarActive(paths.join('/'));
 		},
 		sidebarMouseEnter() {
-			if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
+			if (!this.sidebarstatic && (isScreen('lg') || isScreen('xl'))) {
 				this.switchSidebar(false);
 				this.setActiveByRoute();
 			}
 		},
 		sidebarMouseLeave() {
-			if (!this.sidebarStatic && (isScreen('lg') || isScreen('xl'))) {
+			if (!this.sidebarstatic && (isScreen('lg') || isScreen('xl'))) {
 				this.switchSidebar(true);
 				this.changeSidebarActive(null);
 			}

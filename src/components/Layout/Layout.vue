@@ -1,5 +1,5 @@
 <template>
-	<div :class="[{root: true, sidebarClose, sidebarStatic}, 'ocs-dashboard']">
+	<div :class="[{root: true, sidebarclose, sidebarstatic}, 'ocs-dashboard']">
 		<Sidebar />
 		<div class="wrap">
 			<Header />
@@ -12,7 +12,7 @@
 				<transition name="router-animation">
 					<router-view />
 				</transition>
-				<footer class="contentFooter">
+				<footer class="contentfooter">
 					Copyright OCS Inventory 2021
 				</footer>
 			</v-touch>
@@ -32,14 +32,14 @@ export default {
 	name: 'Layout',
 	components: { Sidebar, Header, BreadcrumbHistory },
 	computed: {
-		...mapState(["sidebarClose", "sidebarStatic"]),
+		...mapState(["sidebarclose", "sidebarstatic"]),
 	},
 	created() {
-		const staticSidebar = JSON.parse(localStorage.getItem('sidebarStatic'));
+		const staticSidebar = JSON.parse(localStorage.getItem('sidebarstatic'));
 
 		if (staticSidebar) {
-			this.$store.state.layout.sidebarStatic = true;
-		} else if (!this.sidebarClose) {
+			this.$store.state.layout.sidebarstatic = true;
+		} else if (!this.sidebarclose) {
 			setTimeout(() => {
 				this.switchSidebar(true);
 				this.changeSidebarActive(null);
@@ -59,7 +59,7 @@ export default {
 		handleWindowResize() {
 			const width = window.innerWidth;
 
-			if (width <= 768 && this.sidebarStatic) {
+			if (width <= 768 && this.sidebarstatic) {
 				this.toggleSidebar();
 				this.changeSidebarActive(null);
 			}

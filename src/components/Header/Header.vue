@@ -14,13 +14,13 @@
 				</a>
 			</b-nav-item>
 		</b-nav>
-		<a class="navbarBrand d-md-none">
+		<a class="navbarbrand d-md-none">
 			OCS Inventory
 		</a>
 		<b-nav class="ml-auto">
 			<b-nav-item-dropdown 
 				id="v-step-2" 
-				class="settingsDropdown d-sm-down-none" 
+				class="settingsdropdown d-sm-down-none" 
 				no-caret 
 				right
 			>
@@ -53,12 +53,12 @@ import { mapState, mapActions } from 'vuex';
 export default {
 	name: 'Header',
 	computed: {
-		...mapState('layout', ['sidebarClose', 'sidebarStatic']),
+		...mapState('layout', ['sidebarclose', 'sidebarstatic']),
 	},
 	methods: {
 		...mapActions('layout', ['toggleSidebar', 'switchSidebar', 'changeSidebarActive']),
 		switchSidebarMethod() {
-			if (!this.sidebarClose) {
+			if (!this.sidebarclose) {
 				this.switchSidebar(true);
 				this.changeSidebarActive(null);
 			} else {
@@ -69,7 +69,7 @@ export default {
 			}
 		},
 		toggleSidebarMethod() {
-			if (this.sidebarStatic) {
+			if (this.sidebarstatic) {
 				this.toggleSidebar();
 				this.changeSidebarActive(null);
 			} else {

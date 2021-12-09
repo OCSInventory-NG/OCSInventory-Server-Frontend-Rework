@@ -1,7 +1,7 @@
 <template>
 	<li 
 		v-if="!childrenLinks && isHeader" 
-		:class="{headerLink: true, className}"
+		:class="{headerlink: true, className}"
 	>
 		<router-link 
 			:to="link" 
@@ -25,7 +25,7 @@
 			<sup 
 				v-if="label" 
 				:class="'text-' + labelColor" 
-				class="headerLabel"
+				class="headerlabel"
 			>
 				{{ label }}
 			</sup>
@@ -40,7 +40,7 @@
 	</li>
 	<li 
 		v-else-if="childrenLinks" 
-		:class="{headerLink: true, className}"
+		:class="{headerlink: true, className}"
 	>
 		<div @click="() => togglePanelCollapse(link)">
 			<router-link 
@@ -66,11 +66,11 @@
 				<sup 
 					v-if="label" 
 					:class="'text-' + labelColor" 
-					class="ml-1 headerLabel"
+					class="ml-1 headerlabel"
 				>
 					{{ label }}
 				</sup>
-				<div :class="{caretWrapper: true, carretActive: isActive}">
+				<div :class="{caretwrapper: true, carretactive: isActive}">
 					<font-awesome-icon :icon="['fas', 'angle-right']"/>
 				</div>
 			</router-link>
@@ -98,7 +98,7 @@
 			<sup 
 				v-if="label" 
 				:class="'text-' + labelColor" 
-				class="headerLabel"
+				class="headerlabel"
 			>
 				{{ label }}
 			</sup>
@@ -116,7 +116,7 @@ export default {
 		header: { type: String, default: '' },
 		iconName: { type: String, default: '' },
 		c: { type: String, default: '' },
-		headerLink: { type: String, default: '' },
+		headerlink: { type: String, default: '' },
 		link: { type: String, default: '' },
 		childrenLinks: { type: Array, default: null },
 		className: { type: String, default: '' },
@@ -129,19 +129,19 @@ export default {
 	},
 	data() {
 		return {
-			headerLinkWasClicked: true,
+			headerlinkWasClicked: true,
 		};
 	},
 	computed: {
 		isActive() {
-			return (this.activeItem && this.activeItem.includes(this.index) && this.headerLinkWasClicked);
+			return (this.activeItem && this.activeItem.includes(this.index) && this.headerlinkWasClicked);
 		},
 	},
 	methods: {
 		...mapActions('layout', ['changeSidebarActive']),
 		togglePanelCollapse(link) {
 			this.changeSidebarActive(link);
-			this.headerLinkWasClicked = !this.headerLinkWasClicked || !this.activeItem.includes(this.index);
+			this.headerlinkWasClicked = !this.headerlinkWasClicked || !this.activeItem.includes(this.index);
 		},
 	},
 };

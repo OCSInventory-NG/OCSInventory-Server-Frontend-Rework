@@ -20,7 +20,7 @@
 		<!--eslint-enable-->
 		<div 
 			v-if="!customControls && mainControls"
-			class="widgetControls widget-controls"
+			class="widgetcontrols widget-controls"
 		>
 			<a 
 				v-if="settings || settingsInverse" 
@@ -128,12 +128,12 @@
 		<div 
 			v-if="customControls" 
 			ref="customControlsRef" 
-			class="widgetControls widget-controls" 
+			class="widgetcontrols widget-controls" 
 			v-html="customControls"/>
 		<!--eslint-enable-->
 		<div 
-			ref="widgetBodyRef" 
-			:class="`widgetBody widget-body ${bodyClass}`"
+			ref="widgetbodyRef" 
+			:class="`widgetbody widget-body ${bodyClass}`"
 			:style="{display: state === 'collapse' ? 'none' : ''}"
 		>
 			<Loader 
