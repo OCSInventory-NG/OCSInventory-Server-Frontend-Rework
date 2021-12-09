@@ -32,11 +32,14 @@
   "templates": "Templates",
   "inventory": "Inventory",
   "assets": "Assets",
+  "config": "Configuration",
+  "ipdiscover": "IpDiscover",
 
   "success_saved": "Configuration saved with success !",
 
   "actions": "Actions",
-  "is_staff": "Super admin",
+  "is_staff": "Is staff",
+  "is_superuser": "Super admin",
   "user_permissions": "Permissions",
   "permissions": "Permissions",
   "adduser": "Add a new user",
@@ -83,6 +86,10 @@
   "select_template_file": "Select your JSON template file",
   "template": "Template",
   "uuid": "UUID",
+  "netid": "NETID",
+  "mask": "Mask",
+  "netdevices": "Net devices",
+  "group": "Group",
 
   "id": "ID",
   "add_logentry": "Can add log entry",
@@ -149,13 +156,23 @@
   "change_network": "Can update network",
   "delete_network": "Can delete network",
   "view_network": "Can view network",
+  "add_accountinfoconfig":"Can add accouninfo configuration",
+  "change_accountinfoconfig":"Can change accountinfo configuration",
+  "delete_accountinfoconfig":"Can delete accountinfo configuration",
+  "view_accountinfoconfig":"Can view accountinfo configurations",
+  "add_accountinfodata":"Can add accouninfo data",
+  "change_accountinfodata":"Can change accouninfo data",
+  "delete_accountinfodata":"Can delete accouninfo data",
+  "view_accountinfodata":"Can view accouninfo datas",
+  "add_accountinfovalue":"Can add accouninfo value",
+  "change_accountinfovalue":"Can change accouninfo value",
+  "delete_accountinfovalue":"Can delete accouninfo value",
+  "view_accountinfovalue":"Can view accouninfo values",
 
   "config_elem_15": "I'm a description",
   "config_elem_17": "I'm a description",
   "config_elem_24": "I'm a description",
 
   "dont_have_right_to_see": "You don't have the rights to view this page",
-  "error_no_permissions": "You don't have any permission, please contact your administrator",
-
-  "ipdiscover": "IpDiscover"
+  "error_no_permissions": "You don't have any permission, please contact your administrator"
 }

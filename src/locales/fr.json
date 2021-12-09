@@ -32,11 +32,14 @@
   "templates": "Modèle",
   "inventory": "Inventaire",
   "assests": "Actifs",
+  "config": "Configuration",
+  "ipdiscover": "IpDiscover",
 
   "success_saved": "Configuration sauvegardée avec succès !",
 
   "actions": "Actions",
   "is_staff": "Super admin",
+  "is_superuser": "Super admin",
   "user_permissions": "Permissions",
   "permissions": "Permissions",
   "adduser": "Ajouter un nouvel utilisateur",
@@ -83,6 +86,10 @@
   "select_template_file": "Sélectionner votre modèle de template JSON",
   "template": "Modèle",
   "uuid": "UUID",
+  "netid": "NETID",
+  "mask": "Mask",
+  "netdevices": "Périphériques réseaux",
+  "group": "Groupe",
 
   "id": "id",
   "add_logentry": "Peut ajouter une entrée log",
@@ -149,13 +156,23 @@
   "change_network": "Peut modifier un réseau",
   "delete_network": "Peut supprimer un réseau",
   "view_network": "Peut voir les réseaux",
+  "add_accountinfoconfig":"Peut ajouter une configuration de donnée administrative",
+  "change_accountinfoconfig":"Peut modifier une configuration de donnée administrative",
+  "delete_accountinfoconfig":"Peut supprimer une configuration de donnée administrative",
+  "view_accountinfoconfig":"Peut voir les configurations de données administratives",
+  "add_accountinfodata":"Peut ajouter une donnée administrative",
+  "change_accountinfodata":"Peut modifier une donnée administrative",
+  "delete_accountinfodata":"Peut supprimer une donnée administrative",
+  "view_accountinfodata":"Peut voir les données administratives",
+  "add_accountinfovalue":"Peut ajouter une valeur de donnée administrative",
+  "change_accountinfovalue":"Peut modifier une valeur de donnée administrative",
+  "delete_accountinfovalue":"Peut supprimer une valeur de donnée administrative",
+  "view_accountinfovalue":"Peut voir les valeurs de données administratives",
 
   "config_elem_15": "I'm a description",
   "config_elem_17": "I'm a description",
   "config_elem_24": "I'm a description",
 
   "dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page",
-  "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
-
-  "ipdiscover": "IpDiscover"
+  "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur"  
 }
