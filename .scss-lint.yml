@@ -1,0 +1,27 @@
+linters:
+  VendorPrefix:
+    enabled: false
+
+  ImportantRule:
+    enabled: false
+
+  SelectorDepth:
+    enabled: false
+
+  SingleLinePerSelector:
+    enabled: false
+
+  NestingDepth:
+    enabled: false
+
+  DeclarationOrder:
+    enabled: false
+
+  QualifyingElement:
+    enabled: false
+
+  SelectorFormat:
+    enabled: false
+
+  IdSelector:
+    enabled: false
