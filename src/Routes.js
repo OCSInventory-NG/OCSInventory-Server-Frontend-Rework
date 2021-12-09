@@ -22,6 +22,7 @@ import Groups from '@/pages/UserManagement/Groups/Groups';
 import General from '@/pages/Configuration/General/General';
 import Template from '@/pages/Configuration/Template/Template';
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate';
+import Accountinfo from '@/pages/Configuration/Accountinfo/Accountinfo';
 
 Vue.use(Router);
 
@@ -77,6 +78,11 @@ export default new Router({
 					name: 'EditTemplate',
 					component: EditTemplate,
 					props: true
+				},
+				{
+					path: 'configurations/accountinfo',
+					name: 'Accountinfo',
+					component: Accountinfo
 				},
 				{
 					path: 'inventory/assets',

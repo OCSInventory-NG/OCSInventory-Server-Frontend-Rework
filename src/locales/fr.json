@@ -34,6 +34,7 @@
   "assests": "Actifs",
   "config": "Configuration",
   "ipdiscover": "IpDiscover",
+  "accountinfo": "Donnée administrative",
 
   "success_saved": "Configuration sauvegardée avec succès !",
 

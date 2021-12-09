@@ -34,6 +34,7 @@
   "assets": "Assets",
   "config": "Configuration",
   "ipdiscover": "IpDiscover",
+  "accountinfo": "Administrative data",
 
   "success_saved": "Configuration saved with success !",
 

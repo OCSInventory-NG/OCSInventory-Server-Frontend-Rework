@@ -48,6 +48,7 @@
 					:children-links="[
 						{ header: $t('general'), link: '/ocsreports/configurations/general' },
 						{ header: $t('templates'), link: '/ocsreports/configurations/templates' },
+						{ header: $t('accountinfo'), link: '/ocsreports/configurations/accountinfo' },
 					]"
 					link="/ocsreports/configurations"
 					icon-name="wrench"
