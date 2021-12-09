@@ -1,6 +1,4 @@
-/**
- * Custom application mixins available through out the app
- */
+// Custom application mixins available through out the app
 
 // define sass mixin
 // Generates single property classes
@@ -56,9 +54,9 @@
 
 @mixin sidebar-scrollbar() {
   &::-webkit-scrollbar {
+    background: var(--sidebar-bg-color);
     height: 8px;
     width: 4px;
-    background: var(--sidebar-bg-color);
   }
 
   &::-webkit-scrollbar-track {
@@ -66,8 +64,8 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    border: none;
     background-color: transparent;
+    border: 0;
   }
 
   &:hover::-webkit-scrollbar-thumb {

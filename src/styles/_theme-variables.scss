@@ -1,29 +1,39 @@
 .root {
   &.ocs-dashboard {
-    --logo-color: #FFFFFF;
-    --body-bg: #F9FBFD;
-    --light-color: #F6F6E9;
 
-    --sidebar-bg-color: #20222E;
-    --sidebar-color: #C2C2C2;
-    --sidebar-color-item: #FFFFFF;
-    --sidebar-action-bg: #181922;
-    --sidebar-item-active: var(--light-color);
-    --sidebar-item-active-bg: #961B7E;
-    --sidebar-badge-bg: #005792;
+    --background-button-color: #20222e;
+    --background-button-color-hover: #961b7e;
+    --background-color-dropdown-item-active: #eceef0;
 
-    --sidebar-nav-title-color: var(--light-color);
+    --body-bg: #f9fbfd;
+    --border-bottom-button-color: #ced4da;
+    --box-shadow-color: #b6b5b5;
 
-    --widget-shadow-color: 75, 102, 171;
+    --color-auth-footer: #636c72;
+    --color-login-grey: #888;
 
-    --navbar-bg: #FFF;
+    --light-color: #f6f6e9;
+    --logo-color: #ffffff;
+
+    --navbar-bg: #fff;
     --navbar-shadow: 0 15px 20px -20px rgba(var(--widget-shadow-color), 0.1), 0 0 15px rgba(var(--widget-shadow-color), 0.06);
 
-
-    // dependable variables
-    --sidebar-progress-bg-color: var(--sidebar-action-bg);
+    --sidebar-action-bg: #181922;
+    --sidebar-badge-bg: #005792;
+    --sidebar-bg-color: #20222e;
+    --sidebar-color: #c2c2c2;
+    --sidebar-color-item: #ffffff;
     --sidebar-icon-active: var(--sidebar-color-item);
+    --sidebar-item-active: var(--light-color);
+    --sidebar-item-active-bg: #961b7b;
     --sidebar-item-hover-bg-color: var(--sidebar-action-bg);
+    --sidebar-nav-title-color: var(--light-color);
+    --sidebar-progress-bg-color: var(--sidebar-action-bg);
+
+    --text-button-color: #fff;
+    --text-color-dropdown-item-active: #16181b;
+
     --widget-shadow: 4px 4px 30px rgba(var(--widget-shadow-color), 0.2);
+    --widget-shadow-color: 75, 102, 171;
   }
 }
