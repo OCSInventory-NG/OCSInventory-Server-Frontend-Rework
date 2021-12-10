@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader';
 import AddUserModal from '@/components/Modals/AddItem/AddUserModal';
@@ -43,7 +42,6 @@ export default {
 	data() {
 		return {
 			errorMsg: null,
-			rowdata: [],
 			loading: true,
 			errored: false,
 			canadd: false,
@@ -52,32 +50,17 @@ export default {
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
-
 		if(localStorage.getItem('permissions').split(",").includes("view_user")) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
-				.then(response => {
-					this.rowdata = response.data
-					this.errorMsg = null
-					this.errored = false
-					if(localStorage.getItem('permissions').split(",").includes("add_user")) {
-						this.canadd = true
-					}
-					if(localStorage.getItem('permissions').split(",").includes("change_user")) {
-						this.canedit = true
-					}
-					if(localStorage.getItem('permissions').split(",").includes("delete_user")) {
-						this.candelete = true
-					}
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			if(localStorage.getItem('permissions').split(",").includes("add_user")) {
+				this.canadd = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("change_user")) {
+				this.canedit = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("delete_user")) {
+				this.candelete = true
+			}
+			this.loading = false
 		} else {
 			this.errorMsg = i18n.t("dont_have_right_to_see")
 			this.errored = true
