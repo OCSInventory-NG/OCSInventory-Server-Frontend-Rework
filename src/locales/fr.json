@@ -35,6 +35,9 @@
   "config": "Configuration",
   "ipdiscover": "IpDiscover",
   "accountinfo": "Donnée administrative",
+  "accountinfo/config": "Données administratives",
+  "accountinfo/data": "Donnée administrative",
+  "snmp": "Snmp",
 
   "success_saved": "Configuration sauvegardée avec succès !",
 
@@ -94,6 +97,8 @@
   "datatype": "Type",
   "datatarget": "Cible",
   "accountinfo_values": "Valeurs",
+  "addaccountinfo": "Ajouter une donnée administrative",
+  "editaccountinfo": "Modifier une donnée administrative",
 
   "id": "id",
   "add_logentry": "Peut ajouter une entrée log",
