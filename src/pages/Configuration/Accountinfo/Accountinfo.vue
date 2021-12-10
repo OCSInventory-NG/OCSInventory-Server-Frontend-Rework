@@ -18,11 +18,10 @@
 			<div
 				v-else
 			>
-				<Datatable
-					id="accountinfodatatable"
-					:rowdata="rowdata"
-					:usecheckbox="false"
-					title="accountinfo"
+				<AddAccountinfoModal
+					:canadd="canadd"
+					:canedit="canedit"
+					:candelete="candelete"
 				/>
 			</div>
 		</section>
@@ -30,59 +29,40 @@
 </template>
 
 <script>
-import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
+import AddAccountinfoModal from '@/components/Modals/AddItem/AddAccountinfoModal'
 
 export default {
 	name: "Accountinfo",
 	components: {
 		Loader,
-		Datatable
+		AddAccountinfoModal
 	},
 	data() {
 		return {
 			errorMsg: null,
-			rowdata: [],
 			loading: true,
 			errored: false,
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
 		if(localStorage.getItem('permissions').split(",").includes("view_accountinfoconfig")) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: header })
-				.then(response => {
-					this.rowdata = response.data
-					this.accountinfovaluesTreatment()
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			if(localStorage.getItem('permissions').split(",").includes("add_accountinfoconfig")) {
+				this.canadd = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("change_accountinfoconfig")) {
+				this.canedit = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("delete_accountinfoconfig")) {
+				this.candelete = true
+			}
+			this.loading = false			
 		} else {
 			this.errorMsg = i18n.t("dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
-	methods: {
-		accountinfovaluesTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpValues = []
-				rowDetails.accountinfo_values.forEach(valuesDetails => {
-					tmpValues.push(valuesDetails.value)
-				})
-				rowDetails.accountinfo_values = tmpValues.join('\n')
-			})
-		},
-	}
 }
 </script>

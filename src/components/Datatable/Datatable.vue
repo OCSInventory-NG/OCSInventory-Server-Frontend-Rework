@@ -236,6 +236,7 @@
 import i18n from '../../i18n'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
+import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 
@@ -244,6 +245,7 @@ export default {
 	components: {
 		EditGroupModal,
 		EditUserModal,
+		EditAccountinfoModal,
 		DeleteItemModal,
 		ImportTemplateModal
 	},
