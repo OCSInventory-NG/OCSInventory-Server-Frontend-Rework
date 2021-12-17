@@ -132,8 +132,12 @@
 					:rowdata="rowdata"
 					:canedit="canedit"
 					:candelete="candelete"
+					:canaddvalue="canaddvalue"
 					editcomponent="EditAccountinfoModal"
 					title="accountinfo/config"
+					titlevalue="accountinfo_param"
+					adddvalueroute="accountinfo/value"
+					reconciliationname="accountinfo_config"
 					@reloadDatatable="reloadDatatable"
 				/>
 			</div>
@@ -156,7 +160,8 @@ export default {
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
-		candelete: { type: Boolean, default: false }
+		candelete: { type: Boolean, default: false },
+		canaddvalue: { type: Boolean, default: false },
 	},
 	data() {
 		return {
