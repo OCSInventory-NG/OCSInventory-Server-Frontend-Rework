@@ -170,6 +170,14 @@
 									aria-hidden="true"
 								/>
 							</b-button >
+							<DoAllActionsItemModal 
+								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
+								:id="row.item.id"
+								:route="adddvalueroute"
+								:titlevalue="titlevalue"
+								:reconciliationname="reconciliationname"
+								@reloadDatatable="reloadDatatable"
+							/>
 							<component 
 								v-if="canedit"
 								:is="editcomponent"
@@ -239,6 +247,7 @@ import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
+import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
 
 export default {
 	name: 'Datatable',
@@ -247,6 +256,7 @@ export default {
 		EditUserModal,
 		EditAccountinfoModal,
 		DeleteItemModal,
+		DoAllActionsItemModal,
 		ImportTemplateModal
 	},
 	props: {
@@ -261,6 +271,10 @@ export default {
 		caneditconfig: { type: Boolean, default: false },
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
+		canaddvalue: { type: Boolean, default: true },
+		titlevalue: { type: String, default: '' },
+		adddvalueroute: { type: String, default: '' },
+		reconciliationname: { type: String, default: '' },
 	},
 	data() {
 		return {
@@ -290,6 +304,10 @@ export default {
 					},
 				],
 			],
+			datatypes: [
+				'SELECT',
+				'CHECKBOX'
+			]
 		};
 	},
 	computed: {
