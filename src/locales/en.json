@@ -99,6 +99,7 @@
   "accountinfo_values": "Values",
   "addaccountinfo": "Add administrative data",
   "editaccountinfo": "Update administrative data",
+  "accountinfo_param": "Manage Administrative data values",
 
   "id": "ID",
   "add_logentry": "Can add log entry",
