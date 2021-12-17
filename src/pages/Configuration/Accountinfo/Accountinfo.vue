@@ -22,6 +22,7 @@
 					:canadd="canadd"
 					:canedit="canedit"
 					:candelete="candelete"
+					:canaddvalue="canaddvalue"
 				/>
 			</div>
 		</section>
@@ -41,6 +42,10 @@ export default {
 	},
 	data() {
 		return {
+			canadd: false,
+			canedit: false,
+			candelete: false,
+			canaddvalue: false,
 			errorMsg: null,
 			loading: true,
 			errored: false,
@@ -56,6 +61,9 @@ export default {
 			}
 			if(localStorage.getItem('permissions').split(",").includes("delete_accountinfoconfig")) {
 				this.candelete = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("add_accountinfovalue")) {
+				this.canaddvalue = true
 			}
 			this.loading = false			
 		} else {
