@@ -3,7 +3,8 @@
 		:options="options" 
 		:series="series" 
 		height="100%" 
-		type="bar"/>
+		type="bar"
+	/>
 </template>
 
 <script>

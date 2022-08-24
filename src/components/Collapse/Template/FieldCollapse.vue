@@ -2,19 +2,26 @@
 	<div id="FieldCollapse">
 		<div>
 			<!-- Via array of string IDs passed to directive value -->
-			<b-button v-b-toggle="idcollapse">{{ $t('displayfields') }}</b-button>
+			<b-button v-b-toggle="idcollapse">
+				{{ $t('displayfields') }}
+			</b-button>
 
 			<!-- Elements to collapse -->
 			<b-collapse 
 				v-for="(value, key) in rowfielddata"
-				:key="key"
 				:id="'field-'+value.id"
-				class="mt-2">
+				:key="key"
+				class="mt-2"
+			>
 				<b-card>
 					<b-row class="text-center">
-						<b-col cols="3"><b>{{ $t('name') }} :</b> {{ value.name }}</b-col>
-						<b-col cols="3"><b>{{ $t('retrival_value') }} :</b> {{ value.retrival_value }}</b-col>
-						<b-col cols="4"/>
+						<b-col cols="3">
+							<b>{{ $t('name') }} :</b> {{ value.name }}
+						</b-col>
+						<b-col cols="3">
+							<b>{{ $t('retrival_value') }} :</b> {{ value.retrival_value }}
+						</b-col>
+						<b-col cols="4" />
 						<b-col>
 							<b-button-toolbar>
 								<b-button-group class="mr-1">

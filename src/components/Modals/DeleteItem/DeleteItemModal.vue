@@ -9,7 +9,7 @@
 				icon="x" 
 				aria-hidden="true"
 			/>
-		</b-button >
+		</b-button>
 
 		<b-modal 
 			:id="idModal" 
@@ -26,11 +26,13 @@
 						<b-form-input 
 							v-model="text" 
 							hidden
-						>{{ id }}</b-form-input>
+						>
+							{{ id }}
+						</b-form-input>
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col align-self="start"/>
+					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
 						align="center"
@@ -42,7 +44,7 @@
 							{{ $t('yes') }}
 						</b-button>
 					</b-col>
-					<b-col align-self="end"/>
+					<b-col align-self="end" />
 				</b-row>
 			</b-form>
 		</b-modal>

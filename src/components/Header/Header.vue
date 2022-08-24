@@ -10,7 +10,8 @@
 				>
 					<font-awesome-icon 
 						:icon="['fas', 'bars']" 
-						size="2x"/>
+						size="2x"
+					/>
 				</a>
 			</b-nav-item>
 		</b-nav>
@@ -27,7 +28,8 @@
 				<template slot="button-content">
 					<font-awesome-icon 
 						:icon="['fas', 'cog']" 
-						size="2x"/>
+						size="2x"
+					/>
 				</template>
 				<b-dropdown-item-button @click="account">
 					<font-awesome-icon 

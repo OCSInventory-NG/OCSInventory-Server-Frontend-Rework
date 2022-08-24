@@ -9,7 +9,7 @@
 				icon="pencil-square" 
 				aria-hidden="true"
 			/>
-		</b-button >
+		</b-button>
 
 		<b-modal 
 			:id="idModal" 
@@ -158,7 +158,7 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col align-self="start"/>
+					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
 						align="center"
@@ -170,7 +170,7 @@
 							{{ $t('save') }}
 						</b-button>
 					</b-col>
-					<b-col align-self="end"/>
+					<b-col align-self="end" />
 				</b-row>
 			</b-form>
 		</b-modal>

@@ -11,12 +11,16 @@
 	>
 		<h5 
 			v-if="title && typeof title === 'string' && !customHeader" 
-			class="title">{{ title }}</h5>
+			class="title"
+		>
+			{{ title }}
+		</h5>
 		<!-- eslint-disable vue/no-v-html -->
 		<header 
 			v-if="title && customHeader" 
 			class="title" 
-			v-html="title"/>
+			v-html="title"
+		/>
 		<!--eslint-enable-->
 		<div 
 			v-if="!customControls && mainControls"
@@ -24,20 +28,24 @@
 		>
 			<a 
 				v-if="settings || settingsInverse" 
-				href="#">
-				<i class="la la-cog"/>
+				href="#"
+			>
+				<i class="la la-cog" />
 			</a>
 			<a 
 				v-if="refresh" 
 				:id="`reloadId-${randomId}`" 
 				href="#" 
-				@click="loadWidgster($event)">
+				@click="loadWidgster($event)"
+			>
 				<strong 
 					v-if="typeof refresh === 'string'" 
-					class="text-gray-light">{{ refresh }}</strong>
+					class="text-gray-light"
+				>{{ refresh }}</strong>
 				<i 
 					v-else 
-					class="la la-refresh"/>
+					class="la la-refresh"
+				/>
 				<b-tooltip
 					v-if="showTooltip"
 					:placement="tooltipPlacement"
@@ -50,8 +58,9 @@
 				v-if="fullscreen && state !== 'fullscreen'" 
 				:id="`fullscreenId-${randomId}`" 
 				href="#" 
-				@click="changeState($event, 'fullscreen')">
-				<i class="glyphicon glyphicon-resize-full"/>
+				@click="changeState($event, 'fullscreen')"
+			>
+				<i class="glyphicon glyphicon-resize-full" />
 				<b-tooltip
 					v-if="showTooltip"
 					:placement="tooltipPlacement"
@@ -64,8 +73,9 @@
 				v-if="fullscreen && state === 'fullscreen'" 
 				:id="`restoreId-${randomId}`" 
 				href="#" 
-				@click="changeState($event, 'default')">
-				<i class="glyphicon glyphicon-resize-small"/>
+				@click="changeState($event, 'default')"
+			>
+				<i class="glyphicon glyphicon-resize-small" />
 				<b-tooltip
 					v-if="showTooltip"
 					:placement="tooltipPlacement"
@@ -78,8 +88,9 @@
 				<a 
 					:id="`collapseId-${randomId}`" 
 					href="#" 
-					@click="changeState($event, 'collapse')">
-					<i class="la la-angle-down"/>
+					@click="changeState($event, 'collapse')"
+				>
+					<i class="la la-angle-down" />
 					<b-tooltip
 						v-if="showTooltip"
 						:placement="tooltipPlacement"
@@ -93,8 +104,9 @@
 				<a 
 					:id="`expandId-${randomId}`" 
 					href="#" 
-					@click="changeState($event, 'default')">
-					<i class="la la-angle-up"/>
+					@click="changeState($event, 'default')"
+				>
+					<i class="la la-angle-up" />
 					<b-tooltip
 						v-if="showTooltip"
 						:placement="tooltipPlacement"
@@ -108,13 +120,16 @@
 				v-if="close" 
 				:id="`closeId-${randomId}`" 
 				href="#" 
-				@click="closeWidget($event)">
+				@click="closeWidget($event)"
+			>
 				<strong 
 					v-if="typeof refresh === 'string'" 
-					class="text-gray-light">{{ close }}</strong>
+					class="text-gray-light"
+				>{{ close }}</strong>
 				<i 
 					v-else 
-					class="la la-remove"/>
+					class="la la-remove"
+				/>
 				<b-tooltip
 					v-if="showTooltip"
 					:placement="tooltipPlacement"
@@ -129,7 +144,8 @@
 			v-if="customControls" 
 			ref="customControlsRef" 
 			class="widgetcontrols widget-controls" 
-			v-html="customControls"/>
+			v-html="customControls"
+		/>
 		<!--eslint-enable-->
 		<div 
 			ref="widgetbodyRef" 
@@ -139,8 +155,9 @@
 			<Loader 
 				v-if="fetchingData && showLoader" 
 				:class="'widget-loader'" 
-				:size="40"/>
-			<slot v-else/>
+				:size="40"
+			/>
+			<slot v-else />
 		</div>
 	</section>
 </template>

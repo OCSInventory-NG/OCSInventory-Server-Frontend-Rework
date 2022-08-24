@@ -1,6 +1,6 @@
 <template>
 	<div v-if="!excluded">
-		<b-breadcrumb :items="tree"/>
+		<b-breadcrumb :items="tree" />
 	</div>
 </template>
 

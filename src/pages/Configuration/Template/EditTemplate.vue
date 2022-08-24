@@ -12,7 +12,7 @@
 
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
 			<div
@@ -40,7 +40,6 @@
 					:rowsectiondata="rowsectiondata"
 					@reloadTemplate="reloadTemplate"
 				/>
-
 			</div>
 		</section>
 	</div>

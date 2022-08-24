@@ -9,8 +9,9 @@
 			<b-input-group class="mb-1 input-filter">
 				<b-input-group-prepend 
 					is-text 
-					class="icon-btn">
-					<b-icon icon="search"/>
+					class="icon-btn"
+				>
+					<b-icon icon="search" />
 				</b-input-group-prepend>
 				<b-form-input 
 					id="filter-input" 
@@ -30,10 +31,12 @@
 					>
 						<b-button 
 							title="Export CSV" 
-							class="export-btn">
+							class="export-btn"
+						>
 							<b-icon 
 								icon="download" 
-								aria-hidden="true"/>
+								aria-hidden="true"
+							/>
 						</b-button>
 					</download-excel>
 				</b-button-group>
@@ -50,7 +53,8 @@
 					>
 						<b-icon 
 							icon="download" 
-							aria-hidden="true"/>
+							aria-hidden="true"
+						/>
 					</vue-blob-json-csv>
 				</b-button-group>
 			</b-button-toolbar>
@@ -72,7 +76,8 @@
 						@click="onSave"
 					>
 						<font-awesome-icon 
-							:icon="['fas', 'check']"/>
+							:icon="['fas', 'check']"
+						/>
 					</b-button>
 				</b-button-group>
 			</b-button-toolbar>
@@ -87,8 +92,8 @@
 				<b-dropdown-item
 					v-for="field in fields" 
 					:key="field.key"
-					:active="!field.visible"
 					v-model="field.visible"
+					:active="!field.visible"
 					@click="field.visible = !field.visible"
 				>
 					{{ $t(field.key) }}
@@ -124,21 +129,22 @@
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
 			>
-				<template v-slot:head(selected)="">
+				<template #head(selected)="">
 					<b-form-group>
 						<input 
 							type="checkbox" 
-							@click="selectAllRows">
+							@click="selectAllRows"
+						>
 					</b-form-group>
 				</template>
 
 				<template #cell(selected)="{ rowSelected }">
 					<template v-if="rowSelected">
-						<b-icon icon="check-square-fill"/>
+						<b-icon icon="check-square-fill" />
 						<span class="sr-only">Selected</span>
 					</template>
 					<template v-else>
-						<b-icon icon="dash-square"/>
+						<b-icon icon="dash-square" />
 						<span class="sr-only">Not selected</span>
 					</template>
 				</template>
@@ -169,7 +175,7 @@
 									icon="pencil-square" 
 									aria-hidden="true"
 								/>
-							</b-button >
+							</b-button>
 							<DoAllActionsItemModal 
 								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
 								:id="row.item.id"
@@ -202,7 +208,8 @@
 			<b-col 
 				sm="3" 
 				md="3" 
-				class="my-1">
+				class="my-1"
+			>
 				<b-form-group
 					label="Per page"
 					label-for="per-page-select"
@@ -225,7 +232,8 @@
 			<b-col 
 				sm="3" 
 				md="3" 
-				class="my-1">
+				class="my-1"
+			>
 				<b-pagination
 					v-model="currentPage"
 					:total-rows="totalRows"
@@ -236,7 +244,6 @@
 				/>
 			</b-col>
 		</b-row>
-
 	</div>
 </template>
 

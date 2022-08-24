@@ -2,7 +2,9 @@
 	<div class="error-page">
 		<b-container>
 			<div class="errorcontainer mx-auto">
-				<h1 class="errorcode">404</h1>
+				<h1 class="errorcode">
+					404
+				</h1>
 				<p class="errorinfo">
 					Oops, it seems that this page does not exist.
 				</p>

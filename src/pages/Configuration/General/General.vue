@@ -22,7 +22,7 @@
 
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
 			<div

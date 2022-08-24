@@ -12,7 +12,7 @@
 
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
 			<div
@@ -21,7 +21,8 @@
 				<AddGroupModal 
 					:canadd="canadd"
 					:canedit="canedit"
-					:candelete="candelete" />
+					:candelete="candelete"
+				/>
 			</div>
 		</section>
 	</div>

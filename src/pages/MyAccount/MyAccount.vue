@@ -1,7 +1,6 @@
 <template>
 	<b-container fluid>
 		<div id="MyAccount">
-			
 			<section v-if="successed">
 				<b-alert 
 					:show="!!succesMsg" 
@@ -26,7 +25,7 @@
 				id="formSection"
 			>
 				<div v-if="loading">
-					<Loader/>
+					<Loader />
 				</div>
 
 				<div
@@ -46,7 +45,9 @@
 										v-model="rowdata.username"
 										required
 										disabled
-									>{{ rowdata.username }}</b-form-input>
+									>
+										{{ rowdata.username }}
+									</b-form-input>
 								</b-form-group>
 							</b-col>
 							<b-col>
@@ -73,7 +74,9 @@
 										id="email"
 										v-model="rowdata.email"
 										required
-									>{{ rowdata.email }}</b-form-input>
+									>
+										{{ rowdata.email }}
+									</b-form-input>
 								</b-form-group>
 							</b-col>
 						</b-row>
@@ -87,7 +90,9 @@
 										id="first_name"
 										v-model="rowdata.first_name"
 										required
-									>{{ rowdata.first_name }}</b-form-input>
+									>
+										{{ rowdata.first_name }}
+									</b-form-input>
 								</b-form-group>
 							</b-col>
 							<b-col>
@@ -99,12 +104,14 @@
 										id="last_name"
 										v-model="rowdata.last_name"
 										required
-									>{{ rowdata.last_name }}</b-form-input>
+									>
+										{{ rowdata.last_name }}
+									</b-form-input>
 								</b-form-group>
 							</b-col>
 						</b-row>
 						<b-row>
-							<b-col align-self="start"/>
+							<b-col align-self="start" />
 							<b-col 
 								align-self="center"
 								align="center"
@@ -116,7 +123,7 @@
 									{{ $t('save') }}
 								</b-button>
 							</b-col>
-							<b-col align-self="end"/>
+							<b-col align-self="end" />
 						</b-row>
 					</b-form>
 				</div>

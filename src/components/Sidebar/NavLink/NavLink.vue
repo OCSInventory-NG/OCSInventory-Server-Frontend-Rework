@@ -10,15 +10,18 @@
 			<span class="">
 				<font-awesome-layers 
 					style="font-size: 1.7em;"
-					class="icon-group">
+					class="icon-group"
+				>
 					<font-awesome-icon 
 						icon="circle" 
 						style="color: transparent; font-size: 1.4em;"
-						class="icon"/>
+						class="icon"
+					/>
 					<font-awesome-icon 
 						:icon="['fas', iconName]"
 						style="font-size: 1.2em;"
-						transform="shrink-6"/>
+						transform="shrink-6"
+					/>
 				</font-awesome-layers>
 			</span>
 			{{ header }} 
@@ -51,15 +54,18 @@
 				<span class="">
 					<font-awesome-layers 
 						style="font-size: 1.7em;"
-						class="icon-group">
+						class="icon-group"
+					>
 						<font-awesome-icon 
 							icon="circle" 
 							style="color: transparent; font-size: 1.4em;"
-							class="icon"/>
+							class="icon"
+						/>
 						<font-awesome-icon 
 							:icon="['fas', iconName]"
 							style="font-size: 1.2em;"
-							transform="shrink-6"/>
+							transform="shrink-6"
+						/>
 					</font-awesome-layers>
 				</span>
 				{{ header }} 
@@ -71,7 +77,7 @@
 					{{ label }}
 				</sup>
 				<div :class="{caretwrapper: true, carretactive: isActive}">
-					<font-awesome-icon :icon="['fas', 'angle-right']"/>
+					<font-awesome-icon :icon="['fas', 'angle-right']" />
 				</div>
 			</router-link>
 		</div>
@@ -82,12 +88,12 @@
 			<ul class="sub-menu">
 				<NavLink 
 					v-for="childLink in childrenLinks"
+					:key="childLink.link"
 					:active-item="activeItem"
 					:header="childLink.header"
 					:index="childLink.index"
 					:link="childLink.link"
 					:children-links="childLink.childrenLinks"
-					:key="childLink.link"
 				/>
 			</ul>
 		</b-collapse>

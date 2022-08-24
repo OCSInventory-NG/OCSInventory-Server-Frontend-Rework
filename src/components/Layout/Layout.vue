@@ -8,7 +8,7 @@
 				class="content"
 				@swipe="handleSwipe"
 			>
-				<breadcrumb-history/>
+				<breadcrumb-history />
 				<transition name="router-animation">
 					<router-view />
 				</transition>

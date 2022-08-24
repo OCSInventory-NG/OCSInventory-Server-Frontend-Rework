@@ -13,15 +13,15 @@
 	>
 		<grid-item 
 			v-for="item in layout"
+			:key="item.i"
 			:x="item.x"
 			:y="item.y"
 			:w="item.w"
 			:h="item.h"
 			:i="item.i"
-			:key="item.i"
 		>
 			<template v-if="layoutLoaded">
-				<Chart/>
+				<Chart />
 			</template>
 		</grid-item>
 	</grid-layout>
