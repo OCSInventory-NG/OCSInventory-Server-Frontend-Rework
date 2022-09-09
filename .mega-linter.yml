@@ -11,4 +11,5 @@ DISABLE:
   - COPYPASTE # Comment to disable checks of abusive copy-pastes
   - SPELL # Comment to disable checks of spelling mistakes # - SPELL # Uncomment to disable checks of spelling mistakes
 SHOW_ELAPSED_TIME: true
+REPOSITORY_TRIVY_DISABLE_ERRORS: true
 FILEIO_REPORTER: false
