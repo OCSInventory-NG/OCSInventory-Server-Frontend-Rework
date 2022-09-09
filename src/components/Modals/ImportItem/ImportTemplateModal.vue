@@ -1,14 +1,12 @@
 <template>
-	<div id="ImportTemplateModal">
+	<div id="import-template-modal">
 		<b-button 
 			v-b-modal.import-template
 			:title="$t('import_template')"
-			variant="secondary"
-			class="export-btn"
+			class="form-control btn"
 		>
-			<b-icon 
-				icon="upload" 
-				aria-hidden="true"
+			<font-awesome-icon 
+				:icon="['fas', 'upload']"
 			/>
 		</b-button>
 
@@ -16,8 +14,24 @@
 			id="import-template" 
 			:title="$t('import_template')"
 			hide-footer
-			modal-class="custom-modal"
+			size="md"
+			modal-class="custom-modal modal-blur"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('import_template') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>
@@ -94,7 +108,7 @@ export default {
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

@@ -1,13 +1,42 @@
 <template>
-	<li 
-		v-if="!childrenLinks && isHeader" 
-		:class="{headerlink: true, className}"
+	<!-- Menu without children item -->
+	<b-nav-item 
+		v-if="!childrenLinks && isHeader"
+		:href="link" 
+		class="nav-item"
 	>
-		<router-link 
-			:to="link" 
-			class="sidebar-link"
-		>
-			<span class="">
+		<span class="nav-link-icon d-md-none d-lg-inline-block">
+			<font-awesome-layers 
+				style="font-size: 1.7em;"
+				class="icon-group"
+			>
+				<font-awesome-icon 
+					icon="circle" 
+					style="color: transparent; font-size: 1.4em;"
+					class="icon"
+				/>
+				<font-awesome-icon 
+					:icon="['fas', iconName]"
+					style="font-size: 1.2em;"
+					transform="shrink-6"
+				/>
+			</font-awesome-layers>
+		</span>
+		<span class="nav-link-title">
+			{{ header }} 
+		</span>
+	</b-nav-item>
+
+	<!-- Menu with children items -->
+	<b-nav-item-dropdown 
+		v-else-if="childrenLinks"
+		id="my-nav-dropdown"
+		class="nav-item dropdown"
+		no-caret
+		right
+	>
+		<template slot="button-content">
+			<span class="nav-link-icon d-md-none d-lg-inline-block">
 				<font-awesome-layers 
 					style="font-size: 1.7em;"
 					class="icon-group"
@@ -24,114 +53,31 @@
 					/>
 				</font-awesome-layers>
 			</span>
-			{{ header }} 
-			<sup 
-				v-if="label" 
-				:class="'text-' + labelColor" 
-				class="headerlabel"
-			>
-				{{ label }}
-			</sup>
-			<b-badge 
-				v-if="badge" 
-				variant="primary" 
-				pill
-			>
-				{{ badge }}
-			</b-badge>
-		</router-link>
-	</li>
-	<li 
-		v-else-if="childrenLinks" 
-		:class="{headerlink: true, className}"
-	>
-		<div @click="() => togglePanelCollapse(link)">
-			<router-link 
-				:to="link" 
-				event="" 
-				class="d-flex sidebar-link"
-			>
-				<span class="">
-					<font-awesome-layers 
-						style="font-size: 1.7em;"
-						class="icon-group"
-					>
-						<font-awesome-icon 
-							icon="circle" 
-							style="color: transparent; font-size: 1.4em;"
-							class="icon"
-						/>
-						<font-awesome-icon 
-							:icon="['fas', iconName]"
-							style="font-size: 1.2em;"
-							transform="shrink-6"
-						/>
-					</font-awesome-layers>
-				</span>
+			<span class="nav-link-title">
 				{{ header }} 
-				<sup 
-					v-if="label" 
-					:class="'text-' + labelColor" 
-					class="ml-1 headerlabel"
-				>
-					{{ label }}
-				</sup>
-				<div :class="{caretwrapper: true, carretactive: isActive}">
-					<font-awesome-icon :icon="['fas', 'angle-right']" />
-				</div>
-			</router-link>
-		</div>
-		<b-collapse 
-			:id="'collapse' + index" 
-			:visible="isActive"
+			</span>
+		</template>
+		<b-dropdown-item
+			v-for="childLink in childrenLinks"
+			:key="childLink.link"
+			:href="childLink.link"
 		>
-			<ul class="sub-menu">
-				<NavLink 
-					v-for="childLink in childrenLinks"
-					:key="childLink.link"
-					:active-item="activeItem"
-					:header="childLink.header"
-					:index="childLink.index"
-					:link="childLink.link"
-					:children-links="childLink.childrenLinks"
-				/>
-			</ul>
-		</b-collapse>
-	</li>
-	<li v-else>
-		<router-link :to="index !== 'menu' && link">
-			{{ header }} 
-			<sup 
-				v-if="label" 
-				:class="'text-' + labelColor" 
-				class="headerlabel"
-			>
-				{{ label }}
-			</sup>
-		</router-link>
-	</li>
+			{{ childLink.header }}
+		</b-dropdown-item>
+	</b-nav-item-dropdown>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-
 export default {
 	name: 'NavLink',
 	props: {
-		badge: { type: String, default: '' },
 		header: { type: String, default: '' },
-		iconName: { type: String, default: '' },
-		c: { type: String, default: '' },
-		headerlink: { type: String, default: '' },
 		link: { type: String, default: '' },
 		childrenLinks: { type: Array, default: null },
-		className: { type: String, default: '' },
 		isHeader: { type: Boolean, default: false },
-		deep: { type: Number, default: 0 },
-		activeItem: { type: String, default: '' },
-		label: { type: String, default: '' },
-		labelColor: { type: String, default: 'warning' },
+		iconName: { type: String, default: '' },
 		index: { type: String, default: '' },
+		activeItem: { type: String, default: '' },
 	},
 	data() {
 		return {
@@ -142,13 +88,6 @@ export default {
 		isActive() {
 			return (this.activeItem && this.activeItem.includes(this.index) && this.headerlinkWasClicked);
 		},
-	},
-	methods: {
-		...mapActions('layout', ['changeSidebarActive']),
-		togglePanelCollapse(link) {
-			this.changeSidebarActive(link);
-			this.headerlinkWasClicked = !this.headerlinkWasClicked || !this.activeItem.includes(this.index);
-		},
-	},
-};
+	}
+}
 </script>

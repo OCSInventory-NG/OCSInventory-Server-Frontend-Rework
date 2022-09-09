@@ -1,51 +1,67 @@
 <template>
 	<div id="DeleteItemModal">
-		<b-button 
+		<button 
 			v-b-modal="idModal"
-			:title="$t('deleteitem')"
-			variant="danger"
+			:title="$t('edituser')"
+			class="btn btn-ghost-danger"
 		>
-			<b-icon 
-				icon="x" 
-				aria-hidden="true"
+			<font-awesome-icon 
+				:icon="['fas', 'trash-can']"
 			/>
-		</b-button>
+		</button>
 
 		<b-modal 
 			:id="idModal" 
 			:title="$t('deleteitem')"
 			hide-footer
-			modal-class="custom-modal"
+			modal-class="modal modal-blur"
+			size="sm"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('deleteitem') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>
-				<b-row>
-					<b-col>
-						<p>{{ $t("delete_msg") }} {{ name }} ?</p>
-						<b-form-input 
-							v-model="text" 
-							hidden
-						>
-							{{ id }}
-						</b-form-input>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col align-self="start" />
-					<b-col 
-						align-self="center"
-						align="center"
+				<div class="text-center">
+					<font-awesome-icon 
+						:icon="['fas', 'triangle-exclamation']"
+						size="5x"
+						color="#d63939"
+					/>
+					<p><b>{{ $t('deletevalid') }}</b></p>
+					<p>{{ $t('delete_msg') }} {{ name }} ?</p>
+					<b-form-input 
+						v-model="text" 
+						hidden
 					>
-						<b-button 
-							type="submit"
-							variant="success"
-						>
-							{{ $t('yes') }}
-						</b-button>
-					</b-col>
-					<b-col align-self="end" />
-				</b-row>
+						{{ id }}
+					</b-form-input>
+				</div>
+				<div class="w-100 text-center">
+					<div class="row">
+						<div class="col">
+							<button 
+								type="submit"
+								class="btn btn-danger"
+							>
+								{{ $t('delete_msg2') }}
+							</button>
+						</div>
+					</div>
+				</div>
 			</b-form>
 		</b-modal>
 	</div>
@@ -93,7 +109,7 @@ export default {
 					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

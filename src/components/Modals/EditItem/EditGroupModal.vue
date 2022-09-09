@@ -1,22 +1,37 @@
 <template>
-	<div id="EditGroupModal">
-		<b-button 
+	<div id="edit-group-modal">
+		<button 
 			v-b-modal="idModal"
 			:title="$t('editgroup')"
-			variant="primary"
+			class="btn btn-ghost-dark"
 		>
-			<b-icon 
-				icon="pencil-square" 
-				aria-hidden="true"
+			<font-awesome-icon 
+				:icon="['fas', 'pencil']"
 			/>
-		</b-button>
+		</button>
 
 		<b-modal 
 			:id="idModal" 
 			:title="$t('editgroup')"
 			hide-footer
-			modal-class="custom-modal"
+			modal-class="custom-modal modal-blur"
+			size="xl"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('editgroup') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>

@@ -1,108 +1,143 @@
 <template>
-	<div id="AddSectionModal">
-		<b-button 
-			v-b-modal.add-section
-			:title="$t('addsection')"
-			variant="success"
-			class="add-button"
-		>
-			<font-awesome-icon 
-				:icon="['fas', 'plus']"
-			/>
-		</b-button>
-
-		<b-modal 
-			id="add-section" 
-			:title="$t('addsection')"
-			hide-footer
-			modal-class="custom-modal"
-		>
-			<b-form
-				@submit="onSubmit"
-			>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('name')" 
-							label-for="name"
-						>
-							<b-form-input
-								id="name"
-								v-model="row.name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('retrival_method')" 
-							label-for="retrival_method"
-						>
-							<b-form-select
-								id="retrival_method"
-								v-model="row.retrival_method" 
-								:options="methodoptions" 
-								class="mb-3"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('retrival_output')" 
-							label-for="retrival_output"
-						>
-							<b-form-select
-								id="retrival_output"
-								v-model="row.retrival_output" 
-								:options="outputoptions" 
-								class="mb-3"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('target')" 
-							label-for="target"
-						>
-							<b-form-input
-								id="target"
-								v-model="row.target"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col align-self="start" />
-					<b-col 
-						align-self="center"
-						align="center"
+	<div 
+		id="add-section-modal"
+		class="container-xl"
+	>
+		<div class="page-header d-print-none text-white">
+			<div class="row align-items-center">
+				<div class="col">
+					<div class="page-pretitle">
+						<Breadcrumb />
+					</div>
+					<h2 class="page-title">
+						{{ $t('edittemplate') }}
+					</h2>
+				</div>
+				<div class="col-auto ms-auto">
+					<b-button
+						v-b-modal.add-section
+						:title="$t('addsection')"
+						variant="primary"
+						class="d-none d-sm-inline-block"
 					>
-						<b-button 
-							type="submit"
-							variant="success"
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('addsection') }}
+					</b-button>
+
+					<b-modal 
+						id="add-section" 
+						:title="$t('addsection')"
+						hide-footer
+						modal-class="custom-modal modal-blur"
+					>
+						<template #modal-header="{ close }">
+							<h5 class="modal-title">
+								{{ $t('addsection') }}
+							</h5>
+							<b-button 
+								size="sm" 
+								variant="outline-danger" 
+								@click="close()"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'xmark']"
+									size="1x"
+								/>
+							</b-button>
+						</template>
+						<b-form
+							@submit="onSubmit"
 						>
-							{{ $t('add') }}
-						</b-button>
-					</b-col>
-					<b-col align-self="end" />
-				</b-row>
-			</b-form>
-		</b-modal>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('name')" 
+										label-for="name"
+									>
+										<b-form-input
+											id="name"
+											v-model="row.name"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('retrival_method')" 
+										label-for="retrival_method"
+									>
+										<b-form-select
+											id="retrival_method"
+											v-model="row.retrival_method" 
+											:options="methodoptions" 
+											class="mb-3"
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('retrival_output')" 
+										label-for="retrival_output"
+									>
+										<b-form-select
+											id="retrival_output"
+											v-model="row.retrival_output" 
+											:options="outputoptions" 
+											class="mb-3"
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
+										:label="$t('target')" 
+										label-for="target"
+									>
+										<b-form-input
+											id="target"
+											v-model="row.target"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col align-self="start" />
+								<b-col 
+									align-self="center"
+									align="center"
+								>
+									<b-button 
+										type="submit"
+										variant="success"
+									>
+										{{ $t('add') }}
+									</b-button>
+								</b-col>
+								<b-col align-self="end" />
+							</b-row>
+						</b-form>
+					</b-modal>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 
 export default {
 	name: 'AddSectionModal',
+	components: { Breadcrumb },
 	props: {
 		template: { type: Number, required: true },
 	},
@@ -158,7 +193,7 @@ export default {
 					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

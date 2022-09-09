@@ -1,125 +1,157 @@
 <template>
-	<div id="AddGroupModal">
+	<div id="add-group-modal">
+		<!-- Display success box message -->
 		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="$t('success_saved')" 
 				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display info if no error -->
 		<section v-else>
 			<div v-if="loading">
 				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<div
-					v-if="canadd"
-				>
-					<b-button 
-						v-b-modal.add-group
-						:title="$t('addgroup')"
-						variant="success"
-						class="add-button"
-					>
-						<font-awesome-icon 
-							:icon="['fas', 'plus']"
-						/>
-					</b-button>
+			<!-- Header page -->
+			<div v-else>
+				<div class="page-header d-print-none text-white">
+					<div class="row align-items-center">
+						<div class="col">
+							<div class="page-pretitle">
+								<Breadcrumb />
+							</div>
+							<h2 class="page-title">
+								{{ $t(pageTitle) }}
+							</h2>
+						</div>
+						<div class="col-auto ms-auto">
+							<!-- Button to add group -->
+							<b-button
+								v-if="canadd"
+								v-b-modal.add-group
+								:title="$t('addgroup')"
+								variant="primary"
+								class="d-none d-sm-inline-block"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'plus']"
+								/>
+								{{ $t('addgroup') }}
+							</b-button>
 
-					<b-modal 
-						id="add-group" 
-						:title="$t('addgroup')"
-						hide-footer
-						modal-class="custom-modal"
-					>
-						<b-form
-							@submit="onSubmit"
-						>
-							<b-row>
-								<b-col>
-									<h4>{{ $t('group_informations') }}</h4>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('name')" 
-										label-for="name"
-									>
-										<b-form-input
-											id="name"
-											v-model="row.name"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<h4>{{ $t('user_permissions') }}</h4>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col
-									v-for="permission in permissions"
-									:key="permission.id"
-									cols="4"
-								>
-									<b-form-checkbox
-										:id="permission.code"
-										v-model="row.permissions"
-										:name="permission.code"
-										:value="permission.id"
-										unchecked
-									>
-										{{ permission.name }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col align-self="start" />
-								<b-col 
-									align-self="center"
-									align="center"
-								>
+							<!-- Modal to add group -->
+							<b-modal 
+								id="add-group" 
+								:title="$t('addgroup')"
+								size="xl"
+								hide-footer
+								modal-class="custom-modal modal-blur"
+							>
+								<template #modal-header="{ close }">
+									<h5 class="modal-title">
+										{{ $t('addgroup') }}
+									</h5>
 									<b-button 
-										type="submit"
-										variant="success"
+										size="sm" 
+										variant="outline-danger" 
+										@click="close()"
 									>
-										{{ $t('add') }}
+										<font-awesome-icon 
+											:icon="['fas', 'xmark']"
+											size="1x"
+										/>
 									</b-button>
-								</b-col>
-								<b-col align-self="end" />
-							</b-row>
-						</b-form>
-					</b-modal>
+								</template>
+								<b-form
+									@submit="onSubmit"
+								>
+									<b-row>
+										<b-col>
+											<h4>{{ $t('group_informations') }}</h4>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-group
+												:label="$t('name')" 
+												label-for="name"
+											>
+												<b-form-input
+													id="name"
+													v-model="row.name"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<h4>{{ $t('user_permissions') }}</h4>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col
+											v-for="permission in permissions"
+											:key="permission.id"
+											cols="4"
+										>
+											<b-form-checkbox
+												:id="permission.code"
+												v-model="row.permissions"
+												:name="permission.code"
+												:value="permission.id"
+												unchecked
+											>
+												{{ permission.name }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col align-self="start" />
+										<b-col 
+											align-self="center"
+											align="center"
+										>
+											<b-button 
+												type="submit"
+												variant="success"
+											>
+												{{ $t('add') }}
+											</b-button>
+										</b-col>
+										<b-col align-self="end" />
+									</b-row>
+								</b-form>
+							</b-modal>
+						</div>
+					</div>
 				</div>
-				
-				<Datatable
-					id="groupsdatatable"
-					:rowdata="rowdata"
-					:canedit="canedit"
-					:candelete="candelete"
-					editcomponent="EditGroupModal"
-					title="groups"
-					@reloadDatatable="reloadDatatable"
-				/>
+				<!-- Display datatable -->
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<Datatable
+								id="groups-datatable"
+								:rowdata="rowdata"
+								:canedit="canedit"
+								:candelete="candelete"
+								editcomponent="EditGroupModal"
+								title="groups"
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -129,18 +161,18 @@
 import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Alert from '@/components/Alert/Alert'
 import Datatable from '@/components/Datatable/Datatable'
 
 export default {
 	name: 'AddGroupModal',
-	components: {
-		Datatable,
-		Loader
-	},
+	components: { Loader, Breadcrumb, Alert, Datatable },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
-		candelete: { type: Boolean, default: false }
+		candelete: { type: Boolean, default: false },
+		pageTitle: { type: String, default: "" }
 	},
 	data() {
 		return {

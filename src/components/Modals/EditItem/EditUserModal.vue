@@ -1,22 +1,37 @@
 <template>
-	<div id="EditUserModal">
-		<b-button 
+	<div id="edit-user-modal">
+		<button 
 			v-b-modal="idModal"
-			:title="$t('editgroup')"
-			variant="primary"
+			:title="$t('edituser')"
+			class="btn btn-ghost-dark"
 		>
-			<b-icon 
-				icon="pencil-square" 
-				aria-hidden="true"
+			<font-awesome-icon 
+				:icon="['fas', 'pencil']"
 			/>
-		</b-button>
+		</button>
 
 		<b-modal 
 			:id="idModal" 
-			:title="$t('editgroup')"
+			:title="$t('edituser')"
 			hide-footer
-			modal-class="custom-modal"
+			modal-class="custom-modal modal-blur"
+			size="xl"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('edituser') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>
@@ -136,28 +151,6 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col>
-						<h4>{{ $t('user_permissions') }}</h4>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col
-						v-for="permission in permissions"
-						:key="permission.id"
-						cols="4"
-					>
-						<b-form-checkbox
-							:id="permission.code"
-							v-model="row.user_permissions"
-							:name="permission.code"
-							:value="permission.id"
-							unchecked
-						>
-							{{ permission.name }}
-						</b-form-checkbox>
-					</b-col>
-				</b-row>
-				<b-row>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -179,7 +172,6 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
 
 export default {
 	name: 'EditUserModal',
@@ -195,10 +187,8 @@ export default {
 				first_name: null,
 				last_name: null,
 				is_staff: false,
-				groups: [],
-				user_permissions: []
+				groups: []
 			},
-			permissions: [],
 			groups: [],
 			errorMsg: null,
 			succesMsg: null,
@@ -209,7 +199,6 @@ export default {
 	},
 	mounted() {
 		this.getUser()
-		this.getPermissions()
 		this.getGroups()		
 	},
 	methods: {
@@ -228,23 +217,6 @@ export default {
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
-				})
-		},
-		// Get all permissions
-		getPermissions() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
-				.then(response => {
-					response.data.forEach(permissionDetails => {
-						this.permissions.push({
-							id: permissionDetails.id,
-							code: "permission_"+this.id+"_"+permissionDetails.id,
-							name: i18n.t(permissionDetails.codename)
-						})
-					})
 				})
 		},
 		// Get groups
