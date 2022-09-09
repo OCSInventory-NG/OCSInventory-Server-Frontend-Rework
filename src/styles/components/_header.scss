@@ -1,107 +1,20 @@
 // ===========================================
-//  HEADER
+//  HEADER COMPONENT
 // ===========================================
 
-.app-header.navbar {
-  background: var(--navbar-bg);
-  border: 0;
-  box-shadow: var(--navbar-shadow);
-  font-weight: 500;
-  height: $navbar-height;
-  justify-content: flex-start;
-  padding: 0 1.85rem;
-  transition: $transition-base;
-  z-index: 100;
+.logo-size {
+    width: 120px;
+    height: 50px;
+}
 
-  .nav {
-    height: 100%;
-    padding: 0;
-
-    .nav-item {
-      .nav-link, .nav-link > a {
-        align-items: center;
-        color: $navbar-link-color;
-        display: flex;
-        height: 100%;
-        padding: .5rem;
-        position: relative;
-
-        @include hover {
-          background: $navbar-link-hover-bg;
-          color: $navbar-link-hover-color;
-          text-decoration: none;
-        }
-
-        .la {
-          font-size: 20px;
-
-          @include media-breakpoint-down(sm) {
-            font-size: 27px;
-          }
-        }
-      }
-    }
-  }
-
-  .navbarbrand {
-    align-items: center;
-    bottom: 0;
-    display: flex;
-    font-size: 1.25rem;
-    font-weight: 700;
-    justify-content: center;
-    left: 0;
-    pointer-events: none;
-    position: absolute;
+#setting-dropdown > ul {
     right: 0;
-    top: 0;
+}
 
-    svg {
-      font-size: 10px;
+a {
+    align-items: center;
+
+    > span > .icon-group {
+        padding-bottom: 5px;
     }
-  }
-
-  &.header-dark {
-    .nav {
-      .nav-item {
-        .nav-link, .nav-link > a {
-          color: $white;
-
-          @include hover {
-            color: $perso-rgba;
-          }
-        }
-      }
-    }
-
-    input::placeholder {
-      color: $perso-rgba;
-    }
-
-    .navbarbrand {
-      color: $white;
-    }
-  }
-
-  @include media-breakpoint-down(md) {
-    padding: 0 $spacer / 2;
-  }
-
-  .dropdown-toggle::after {
-    display: none;
-  }
-
-  .settingsdropdown {
-    .dropdown-item:focus {
-      outline: none;
-    }
-
-    ul {
-      width: 12rem;
-
-      li {
-        padding: 4px 0;
-      }
-    }
-  }
 }

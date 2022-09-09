@@ -1,109 +1,11 @@
+// ===========================================
+//  DATATABLE COMPONENT
+// ===========================================
 
-//===========================================
-// DATATABLE
-//===========================================
-
-
-// Page
-.datatable-custom {
-  box-shadow: 0 0 4px var(--box-shadow-color);
-  display: grid;
-  font-size: 10pt;
-  grid-template-rows: 64px auto auto;
-  padding: 4px;
+tbody, td, tfoot, th, thead, tr {
+    border-color: #f2f3f4;
 }
 
-// Table
-.header-table {
-  align-items: center;
-  -webkit-box-align: center;
-  -webkit-box-pack: justify;
-  //display: box;
-  //display: flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  padding: 10px 20px;
-  position: relative;
-  width: 100%;
-}
-
-table > thead > tr > th {
-  border-bottom-width: 1px !important;
-  border-top: none !important;
-  text-transform: uppercase;
-}
-
-thead {
-  color: rgb(0, 0, 0 / 50%);
-  font-size: 10pt;
-  font-weight: lighter;
-}
-
-// Search bar
-.input-filter {
-  margin-left: 30%;
-  margin-right: 30%;
-}
-
-.form-group {
-  margin-bottom: 0 !important;
-}
-
-// Export button
-.export-btn, .btn-dark, .icon-btn .input-group-text {
-  background-color: var(--background-button-color) !important;
-  border-color: var(--background-button-color) !important;
-  color: var(--text-button-color) !important;
-}
-
-.export-btn:focus, .export-btn:hover {
-  background-color: var(--background-button-color-hover) !important;
-  border-color: var(--background-button-color-hover) !important;
-  color: var(--text-button-color) !important;
-}
-
-.dropdown-item.active, .dropdown-item:active {
-  background-color: var(--background-color-dropdown-item-active) !important;
-  color: var(--text-color-dropdown-item-active) !important;
-}
-
-.config-button {
-  background-color: transparent !important;
-  border-bottom: 1px solid var(--border-bottom-button-color) !important;
-  border-left: none !important;
-  border-radius: 0 !important;
-  border-right: none !important;
-  border-top: none !important;
-  box-shadow: none !important;
-}
-
-// Pagination
-.pagination {
-  font-weight: $font-weight-normal;
-
-  > .page-item {
-    display: inline;
-
-    // Remove list-style and block-level defaults
-    > .page-link, > span {
-      border-radius: $border-radius;
-      margin: 0 2px;
-    }
-
-    > .page-link {
-      border: 0;
-      text-decoration: none;
-    }
-  }
-}
-
-.pagination-align {
-  justify-content: flex-end;
-}
-
-.page-item.active .page-link {
-  background-color: var(--background-button-color-hover) !important;
-  border-color: var(--background-button-color-hover) !important;
+.my-pagination {
+    float: right;
 }

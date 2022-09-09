@@ -2,59 +2,16 @@
 //  LOGIN PAGE
 // ===========================================
 
-// Page
 .auth-page {
-  height: 100vh;
-  padding-top: 10vh;
-}
+    padding-top: 15%;
 
-.widget-auth {
-  max-width: 360px;
-  padding: 30px !important;
+    .form-login {
+        padding-top: 5%;
+    }
 
-  .widget-auth-info {
-    color: var(--color-login-grey);
-    font-size: 13px;
-    margin-bottom: 0;
-    text-align: center;
-  }
-
-  // Login button
-  .auth-btn {
-    background-color: #20222e !important;
-    color: $white !important;
-    margin-top: 20px;
-    width: 100%;
-  }
-
-  .auth-btn:hover {
-    background-color: #961b7e !important;
-    border-color: #961b7e !important;
-    color: $white !important;
-  }
-
-  // Logo
-  .logo {
-    margin-bottom: 20px;
-  }
-
-  // Form input
-  .login-form-group {
-    margin-top: 10px;
-  }
-}
-
-// Footer
-.auth-footer {
-  color: var(--color-auth-footer);
-  font-size: 13px;
-  margin-bottom: 25px;
-  text-align: center;
-
-  @media (min-height: 600px) {
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    right: 0;
-  }
+    .auth-btn {
+        background-color: $ocs-black;
+        border-color: $ocs-black;
+        color: $white;
+    }
 }

@@ -1,7 +1,7 @@
-//===========================================
-// BREADCRUMB
-//===========================================
+// ===========================================
+//  BREADCRUMB COMPONENT
+// ===========================================
 
-.breadcrumb > .breadcrumb-item > a {
-  color: var(--background-button-color);
+.breadcrumb-item > a:hover {
+    text-decoration: none;
 }
