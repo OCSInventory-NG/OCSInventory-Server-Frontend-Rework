@@ -1,27 +1,28 @@
 <template>
-	<div id="Groups">
+	<div 
+		id="user" 
+		class="container-xl"
+	>
+		<!-- Error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Datatable -->
 		<section v-else>
 			<div v-if="loading">
 				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<AddGroupModal 
+			<div v-else>
+				<AddUserModal
 					:canadd="canadd"
 					:canedit="canedit"
 					:candelete="candelete"
+					page-title="users"
 				/>
 			</div>
 		</section>
@@ -29,16 +30,14 @@
 </template>
 
 <script>
-import i18n from '../../../i18n'
+import AddUserModal from '@/components/Modals/AddItem/AddUserModal';
 import Loader from '@/components/Loader/Loader';
-import AddGroupModal from '@/components/Modals/AddItem/AddGroupModal';
+import i18n from '../../../i18n'
+import Alert from '@/components/Alert/Alert.vue';
 
 export default {
-	name: "Groups",
-	components: {
-		Loader,
-		AddGroupModal
-	},
+	name: "User",
+	components: { AddUserModal, Loader, Alert },
 	data() {
 		return {
 			errorMsg: null,
@@ -50,14 +49,14 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_group")) {
-			if(localStorage.getItem('permissions').split(",").includes("add_group")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("add_user")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("change_user")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("delete_user")) {
 				this.candelete = true
 			}
 			this.loading = false

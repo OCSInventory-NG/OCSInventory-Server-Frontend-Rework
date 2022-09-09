@@ -1,33 +1,36 @@
 <template>
-	<div class="auth-page">
-		<b-container>
-			<div 
-				class="logo" 
-				align="center"
-			>
-				<img 
-					src="../../assets/img/illu_communaute.png" 
-					class="ocs-logo"
+	<div class="auth-page container">
+		<div class="row">
+			<div class="col-2" />
+			<div class="col-4">
+				<div 
+					class="logo" 
+					align="center"
 				>
+					<img 
+						src="../../assets/illu_communaute.png" 
+						class="ocs-logo"
+					>
+				</div>
 			</div>
-			<Widget 
-				class="widget-auth mx-auto" 
-				title="" 
-				custom-header
-			>
+
+			<div class="col-4 form-login">
 				<form 
 					class="mt" 
 					@submit.prevent="login"
 				>
-					<b-alert 
-						:show="!!errorMessage" 
-						class="alert-sm" 
+					<!-- Alert component -->
+					<Alert 
+						:message="errorMessage"
 						variant="danger"
-					>
-						{{ errorMessage }}
-					</b-alert>
+					/>
+
+					<!-- Language selection -->
 					<div class="form-group locale-changer login-form-group">
-						<b-form-select v-model="$root.$i18n.locale">
+						<b-form-select 
+							v-model="$root.$i18n.locale"
+							class="form-select"
+						>
 							<b-form-select-option 
 								v-for="(lang, i) in langs" 
 								:key="`Lang${i}`" 
@@ -37,6 +40,8 @@
 							</b-form-select-option>
 						</b-form-select>
 					</div>
+
+					<!-- Username -->
 					<div class="form-group login-form-group">
 						<input 
 							ref="email" 
@@ -47,6 +52,8 @@
 							name="email"
 						>
 					</div>
+
+					<!-- Password -->
 					<div class="form-group login-form-group">
 						<input 
 							ref="password" 
@@ -57,46 +64,37 @@
 							name="password"
 						>
 					</div>
+					
+					<!-- Submit button -->
 					<b-button 
-						type="submit" 
-						size="sm" 
+						type="submit"
 						class="auth-btn mb-3" 
 						variant="inverse"
 					>
-						Login
+						{{ $t('login') }}
 					</b-button>
 				</form>
-			</Widget>
-		</b-container>
-		<footer class="auth-footer">
-			Copyright OCS Inventory 2021
-		</footer>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
-import Widget from '@/components/Widget/Widget';
 import Axios from 'axios';
 import i18n from '../../i18n';
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'LoginPage',
-	components: { Widget },
+	components: { Alert },
 	data() {
 		return {
 			errorMessage: null,
 			langs: {
-				'fr': "Français",
-				'en': "English"
-			},
+				'fr': 'Français',
+				'en': 'English'
+			}
 		};
-	},
-	created() {
-		if (localStorage.getItem('authenticated') === 'true'
-		&& localStorage.getItem('token_authentication') !== null
-		&& localStorage.getItem('permissions') !== null) {
-			this.$router.push('/ocsreports/dashboard');
-		}
 	},
 	methods: {
 		login() {
@@ -111,7 +109,7 @@ export default {
 			const header = {
 				"Access-Control-Allow-Origin" : "*",
 				"Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-				"Content-Type": "application/json;charset=utf-8",
+				"Content-Type": "application/json;charset=utf-8"
 			}
 
 			Axios.post(process.env.VUE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
@@ -136,14 +134,14 @@ export default {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {
 						localStorage.setItem('permissions', tmpUser)
-						this.$router.push('/ocsreports/dashboard')
+						this.$router.push('/dashboard')
 					}
 					this.errorMessage = i18n.t("error_no_permissions")
 				})
 				.catch(e => {
 					this.errorMessage = e
 				})
-		},
+		}
 	},
-};
+}
 </script>

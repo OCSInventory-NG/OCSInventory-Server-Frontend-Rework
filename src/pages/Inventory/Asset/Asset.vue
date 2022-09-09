@@ -1,13 +1,14 @@
 <template>
-	<div id="Assets">
+	<div 
+		id="assets" 
+		class="container-xl"
+	>
+		<!-- Error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
 		<section v-else>
@@ -15,15 +16,24 @@
 				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<Datatable
-					id="assetsdatatable"
-					:rowdata="rowdata"
-					:usecheckbox="false"
-					title="assets"
+			<div v-else>
+				<!-- Page header -->
+				<PageHeader 
+					page-title="assets"
 				/>
+				<!-- Display Datatable -->
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<Datatable
+								id="assets-datatable"
+								:rowdata="rowdata"
+								:usecheckbox="false"
+								title="assets"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -34,13 +44,12 @@ import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
+import PageHeader from '@/components/Header/PageHeader' 
 
 export default {
-	name: "Assets",
-	components: {
-		Loader,
-		Datatable
-	},
+	name: 'Assets',
+	components: { Loader, Datatable, Alert, PageHeader },
 	data() {
 		return {
 			errorMsg: null,
@@ -62,7 +71,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

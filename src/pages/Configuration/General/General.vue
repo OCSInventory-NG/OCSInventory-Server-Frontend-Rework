@@ -1,23 +1,22 @@
 <template>
-	<div id="GeneralPage">
+	<div
+		id="general" 
+		class="container-xl"
+	>
+		<!-- Display success box message -->
 		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="$t('success_saved')" 
 				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
 		<section v-else>
@@ -25,21 +24,30 @@
 				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<Datatable
-					id="generalDatatable"
-					:rowdata="rowdata"
-					:candelete="false"
-					:canedit="false"
-					:usecheckbox="false"
-					:canexport="false"
-					:caneditconfig="caneditconfig"
-					editcomponent="EditConfigModal"
-					title="config"
-					@reloadDatatable="reloadDatatable"
+			<div v-else>
+				<!-- Page header -->
+				<PageHeader 
+					page-title="config"
 				/>
+
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<Datatable
+								id="generalDatatable"
+								:rowdata="rowdata"
+								:candelete="false"
+								:canedit="false"
+								:usecheckbox="false"
+								:canexport="false"
+								:caneditconfig="caneditconfig"
+								editcomponent="EditConfigModal"
+								title="config"
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -50,13 +58,12 @@ import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
+import PageHeader from '@/components/Header/PageHeader'
 
 export default {
-	name: 'GeneralPage',
-	components: {
-		Datatable,
-		Loader
-	},
+	name: 'General',
+	components: { Datatable, Alert, Loader, PageHeader },
 	data() {
 		return {
 			rowdata: [],
@@ -107,7 +114,7 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.loading = false
 				})
@@ -133,7 +140,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

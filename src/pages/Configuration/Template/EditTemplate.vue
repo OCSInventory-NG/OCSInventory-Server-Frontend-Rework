@@ -1,13 +1,14 @@
 <template>
-	<div id="EditTemplatePage">
+	<div 
+		id="edit-template"
+		class="container-xl"
+	>
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
 		<section v-else>
@@ -15,31 +16,31 @@
 				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<b-row class="text-center">
-					<b-col cols="1">
-						<AddSectionModal
-							:template="rowtemplatedata.id"
-							@reloadTemplate="reloadTemplate"
-						/>
-					</b-col>
-					<b-col cols="10">
-						<h2> {{ rowtemplatedata.name }} </h2><br>
-					</b-col>
-				</b-row>
-				<b-row class="text-center">
-					<b-col>
-						<p>{{ $t('os') }} : {{ $t(rowtemplatedata.os) }}</p>
-						<p>{{ $t('last_update') }} : {{ rowtemplatedata.last_update }}</p>
-					</b-col>
-				</b-row>
-
-				<SectionCollapse
-					:rowsectiondata="rowsectiondata"
+			<div v-else>
+				<AddSectionModal
+					:template="rowtemplatedata.id"
 					@reloadTemplate="reloadTemplate"
 				/>
+
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<b-row class="text-center">
+								<h2>{{ rowtemplatedata.name }}</h2>
+							</b-row>
+							<b-row class="text-center">
+								<b-col>
+									<p>{{ $t('os') }} : {{ $t(rowtemplatedata.os) }}</p>
+									<p>{{ $t('last_update') }} : {{ rowtemplatedata.last_update }}</p>
+								</b-col>
+							</b-row>
+							<SectionCollapse
+								:rowsectiondata="rowsectiondata"
+								@reloadTemplate="reloadTemplate"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -49,15 +50,13 @@
 import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 import SectionCollapse from '@/components/Collapse/Template/SectionCollapse'
-import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal.vue'
+import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal'
+import Alert from '@/components/Alert/Alert'
 
 export default {
-	name: 'TemplatePage',
+	name: 'EditTemplate',
 	components: {
-		Loader,
-		SectionCollapse,
-		AddSectionModal
-	},
+		Loader, AddSectionModal, Alert, SectionCollapse	},
 	props: {
 		id: { type: String, required: true },
 	},
@@ -95,7 +94,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
