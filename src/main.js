@@ -1,90 +1,48 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import VueTouch from 'vue-touch';
-import Trend from 'vuetrend';
-import Toasted from 'vue-toasted';
-import VueApexCharts from 'vue-apexcharts';
-import VueComp from '@vue/composition-api';
+/* eslint-disable */ 
+import Vue from 'vue'
+import router from './routes'
+import App from './App'
+/***** BOOTSTRAP *****/
+import BootstrapVue from 'bootstrap-vue'
+Vue.use(BootstrapVue)
 
-import store from './store';
-import router from './Routes';
-import App from './App';
-import layoutMixin from './mixins/layout';
-import Widget from './components/Widget/Widget';
+/***** AXIOS *****/
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+Vue.use(VueAxios, axios)
 
-import axios from 'axios';
-import VueAxios from 'vue-axios';
+/***** I18N *****/
+import i18n from './i18n'
+Vue.use(i18n)
 
-import JsonExcel from "vue-json-excel";
+/***** JSON/EXCEL *****/
+import JsonExcel from "vue-json-excel"
+Vue.component('downloadExcel', JsonExcel)
 
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import VueI18n from 'vue-i18n';
-import i18n from './i18n';
-import VueBlobJsonCsv from 'vue-blob-json-csv';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
+/***** ICONS *****/
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { 
-	faUserSecret, 
-	faUsersCog, 
-	faHome, 
-	faBars, 
-	faCog, 
-	faPowerOff, 
-	faUser, 
-	faAngleRight,
-	faPlus,
-	faWrench,
-	faCheck,
-	faDesktop,
-	faCircle
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome';
-
-Vue.use(VueI18n);
-Vue.use(VueApexCharts)
-Vue.use(BootstrapVue);
-Vue.use(BootstrapVueIcons)
-Vue.use(VueTouch);
-Vue.use(Trend);
-Vue.use(Toasted, { duration: 10000 });
-Vue.use(VueAxios, axios);
-Vue.use(VueComp);
-Vue.use(VueBlobJsonCsv);
-
-Vue.component('Widget', Widget);
-Vue.component('apexchart', VueApexCharts);
+	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
+	faXmark, faDesktop, faWrench, faCheck, faUpload
+} from '@fortawesome/free-solid-svg-icons'
+import {
+	faSquare, faSquareCheck
+} from '@fortawesome/free-regular-svg-icons'
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
-Vue.component('downloadExcel', JsonExcel);
-
-Vue.mixin(layoutMixin);
-
 library.add({ 
-	faUserSecret, 
-	faUsersCog, 
-	faHome, 
-	faBars, 
-	faCog, 
-	faPowerOff, 
-	faUser, 
-	faAngleRight,
-	faPlus,
-	faWrench,
-	faCheck,
-	faDesktop,
-	faCircle
-});
+	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
+	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload
+})
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false
 
-/* eslint-disable no-new */
 new Vue({
-	el: '#app',
-	store,
 	router,
 	i18n,
-	render: h => h(App)
-});
+	axios,
+	render: h => h(App),
+}).$mount('#app')

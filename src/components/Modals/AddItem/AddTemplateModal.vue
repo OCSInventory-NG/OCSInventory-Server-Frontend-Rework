@@ -1,113 +1,145 @@
 <template>
-	<div id="AddTemplateModal">
+	<div id="add-template-modal">
+		<!-- Display success box message -->
 		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="$t('success_saved')" 
 				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display info if no error -->
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<div
-					v-if="canadd"
-				>
-					<b-button 
-						v-b-modal.add-template
-						:title="$t('addtemplate')"
-						variant="success"
-						class="add-button"
-					>
-						<font-awesome-icon 
-							:icon="['fas', 'plus']"/>
-					</b-button>
+			<!-- Header page -->
+			<div v-else>
+				<div class="page-header d-print-none text-white">
+					<div class="row align-items-center">
+						<div class="col">
+							<div class="page-pretitle">
+								<Breadcrumb />
+							</div>
+							<h2 class="page-title">
+								{{ $t(pageTitle) }}
+							</h2>
+						</div>
+						<div class="col-auto ms-auto">
+							<!-- Button to add template -->
+							<b-button
+								v-if="canadd"
+								v-b-modal.add-template
+								:title="$t('addtemplate')"
+								variant="primary"
+								class="d-none d-sm-inline-block"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'plus']"
+								/>
+								{{ $t('addtemplate') }}
+							</b-button>
 
-					<b-modal 
-						id="add-template" 
-						:title="$t('addtemplate')"
-						hide-footer
-						modal-class="custom-modal"
-					>
-						<b-form
-							@submit="onSubmit"
-						>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('name')" 
-										label-for="name"
-									>
-										<b-form-input
-											id="name"
-											v-model="row.name"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('os')" 
-										label-for="os"
-									>
-										<b-form-select
-											id="os"
-											v-model="row.os" 
-											:options="options" 
-											class="mb-3"
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col align-self="start"/>
-								<b-col 
-									align-self="center"
-									align="center"
-								>
+							<!-- Modal to add template -->
+							<b-modal 
+								id="add-template" 
+								:title="$t('addtemplate')"
+								hide-footer
+								modal-class="custom-modal modal-blur"
+							>
+								<template #modal-header="{ close }">
+									<h5 class="modal-title">
+										{{ $t('addtemplate') }}
+									</h5>
 									<b-button 
-										type="submit"
-										variant="success"
+										size="sm" 
+										variant="outline-danger" 
+										@click="close()"
 									>
-										{{ $t('add') }}
+										<font-awesome-icon 
+											:icon="['fas', 'xmark']"
+											size="1x"
+										/>
 									</b-button>
-								</b-col>
-								<b-col align-self="end"/>
-							</b-row>
-						</b-form>
-					</b-modal>
+								</template>
+								<b-form
+									@submit="onSubmit"
+								>
+									<b-row>
+										<b-col>
+											<b-form-group
+												:label="$t('name')" 
+												label-for="name"
+											>
+												<b-form-input
+													id="name"
+													v-model="row.name"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-group
+												:label="$t('os')" 
+												label-for="os"
+											>
+												<b-form-select
+													id="os"
+													v-model="row.os" 
+													:options="options" 
+													class="mb-3"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col align-self="start" />
+										<b-col 
+											align-self="center"
+											align="center"
+										>
+											<b-button 
+												type="submit"
+												variant="success"
+											>
+												{{ $t('add') }}
+											</b-button>
+										</b-col>
+										<b-col align-self="end" />
+									</b-row>
+								</b-form>
+							</b-modal>
+						</div>
+					</div>
 				</div>
-				
-				<Datatable
-					id="templatesdatatable"
-					:rowdata="rowdata"
-					:canedittemplate="canedit"
-					:candelete="candelete"
-					:canexport="false"
-					:exporttemplate="exporttemplate"
-					title="templates"
-					@reloadDatatable="reloadDatatable"
-				/>
+				<!-- Display datatable -->
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<Datatable
+								id="templates-datatable"
+								:rowdata="rowdata"
+								:canedittemplate="canedit"
+								:candelete="candelete"
+								:canexport="false"
+								:exporttemplate="exporttemplate"
+								title="templates"
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -117,18 +149,18 @@
 import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 
 export default {
 	name: 'AddTemplateModal',
-	components: {
-		Datatable,
-		Loader
-	},
+	components: { Datatable, Loader, Alert, Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		exporttemplate: { type: Boolean, default: false }
+		exporttemplate: { type: Boolean, default: true },
+		pageTitle: { type: String, default: "" }
 	},
 	data() {
 		return {
@@ -171,7 +203,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -196,7 +228,7 @@ export default {
 					this.$bvModal.hide('add-template')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

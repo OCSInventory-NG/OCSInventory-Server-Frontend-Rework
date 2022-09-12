@@ -1,212 +1,223 @@
 <template>
-	<div id="AddUserModal">
+	<div id="add-user-modal">
+		<!-- Display success box message -->
 		<section v-if="successed">
-			<b-alert 
-				:show="!!succesMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="$t('success_saved')" 
 				variant="success"
-			>
-				{{ $t('success_saved') }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
-
+		
+		<!-- Display info if no error -->
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
-				<div
-					v-if="canadd"
-				>
-					<b-button 
-						v-b-modal.add-user
-						:title="$t('adduser')"
-						variant="success"
-						class="add-button"
-					>
-						<font-awesome-icon 
-							:icon="['fas', 'plus']"/>
-					</b-button>
+			<!-- Header page -->
+			<div v-else>
+				<div class="page-header d-print-none text-white">
+					<div class="row align-items-center">
+						<div class="col">
+							<div class="page-pretitle">
+								<Breadcrumb />
+							</div>
+							<h2 class="page-title">
+								{{ $t(pageTitle) }}
+							</h2>
+						</div>
+						<div class="col-auto ms-auto">
+							<!-- Button to add user -->
+							<b-button
+								v-if="canadd"
+								v-b-modal.add-user
+								:title="$t('adduser')"
+								variant="primary"
+								class="d-none d-sm-inline-block"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'plus']"
+								/>
+								{{ $t('adduser') }}
+							</b-button>
 
-					<b-modal 
-						id="add-user" 
-						:title="$t('adduser')"
-						hide-footer
-						modal-class="custom-modal"
-					>
-						<b-form
-							@submit="onSubmit"
-						>
-							<b-row>
-								<b-col>
-									<h4>{{ $t('user_informations') }}</h4>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('username')" 
-										label-for="username"
-									>
-										<b-form-input
-											id="username"
-											v-model="row.username"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-								<b-col>
-									<b-form-group
-										:label="$t('password')" 
-										label-for="password"
-									>
-										<b-form-input
-											id="password"
-											v-model="row.password"
-											type="password"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('email')" 
-										label-for="email"
-									>
-										<b-form-input
-											id="email"
-											v-model="row.email"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group 
-										:label="$t('first_name')" 
-										label-for="first_name"
-									>
-										<b-form-input
-											id="first_name"
-											v-model="row.first_name"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-								<b-col>
-									<b-form-group
-										:label="$t('last_name')" 
-										label-for="last_name"
-									>
-										<b-form-input
-											id="last_name"
-											v-model="row.last_name"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-checkbox
-										id="is_staff"
-										v-model="row.is_staff"
-										name="is_staff"
-										value="true"
-										unchecked-value="false"
-									>
-										{{ $t('is_staff') }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<h4>{{ $t('groups') }}</h4>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col
-									v-for="group in groups"
-									:key="group.id"
-									cols="4"
-								>
-									<b-form-checkbox
-										:id="group.code"
-										v-model="row.groups"
-										:name="group.code"
-										:value="group.id"
-										unchecked
-									>
-										{{ group.name }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col>
-									<h4>{{ $t('user_permissions') }}</h4>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col
-									v-for="permission in permissions"
-									:key="permission.id"
-									cols="4"
-								>
-									<b-form-checkbox
-										:id="permission.code"
-										v-model="row.user_permissions"
-										:name="permission.code"
-										:value="permission.id"
-										unchecked
-									>
-										{{ permission.name }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col align-self="start"/>
-								<b-col 
-									align-self="center"
-									align="center"
-								>
+							<!-- Modal to add user -->
+							<b-modal 
+								id="add-user" 
+								:title="$t('adduser')"
+								size="xl"
+								hide-footer
+								modal-class="custom-modal modal-blur"
+							>
+								<template #modal-header="{ close }">
+									<h5 class="modal-title">
+										{{ $t('adduser') }}
+									</h5>
 									<b-button 
-										type="submit"
-										variant="success"
+										size="sm" 
+										variant="outline-danger" 
+										@click="close()"
 									>
-										{{ $t('add') }}
+										<font-awesome-icon 
+											:icon="['fas', 'xmark']"
+											size="1x"
+										/>
 									</b-button>
-								</b-col>
-								<b-col align-self="end"/>
-							</b-row>
-						</b-form>
-					</b-modal>
+								</template>
+								<b-form
+									@submit="onSubmit"
+								>
+									<b-row>
+										<b-col>
+											<h4>{{ $t('user_informations') }}</h4>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-group
+												:label="$t('username')" 
+												label-for="username"
+											>
+												<b-form-input
+													id="username"
+													v-model="row.username"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+										<b-col>
+											<b-form-group
+												:label="$t('password')" 
+												label-for="password"
+											>
+												<b-form-input
+													id="password"
+													v-model="row.password"
+													type="password"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-group
+												:label="$t('email')" 
+												label-for="email"
+											>
+												<b-form-input
+													id="email"
+													v-model="row.email"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-group 
+												:label="$t('first_name')" 
+												label-for="first_name"
+											>
+												<b-form-input
+													id="first_name"
+													v-model="row.first_name"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+										<b-col>
+											<b-form-group
+												:label="$t('last_name')" 
+												label-for="last_name"
+											>
+												<b-form-input
+													id="last_name"
+													v-model="row.last_name"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<b-form-checkbox
+												id="is_staff"
+												v-model="row.is_staff"
+												name="is_staff"
+												value="true"
+												unchecked-value="false"
+											>
+												{{ $t('is_staff') }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col>
+											<h4>{{ $t('groups') }}</h4>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col
+											v-for="group in groups"
+											:key="group.id"
+											cols="4"
+										>
+											<b-form-checkbox
+												:id="group.code"
+												v-model="row.groups"
+												:name="group.code"
+												:value="group.id"
+												unchecked
+											>
+												{{ group.name }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row>
+										<b-col align-self="start" />
+										<b-col 
+											align-self="center"
+											align="center"
+										>
+											<b-button 
+												type="submit"
+												variant="success"
+											>
+												{{ $t('add') }}
+											</b-button>
+										</b-col>
+										<b-col align-self="end" />
+									</b-row>
+								</b-form>
+							</b-modal>
+						</div>
+					</div>
 				</div>
-				
-				<Datatable
-					id="usersdatatable"
-					:rowdata="rowdata"
-					:canedit="canedit"
-					:candelete="candelete"
-					editcomponent="EditUserModal"
-					title="users"
-					@reloadDatatable="reloadDatatable"
-				/>
+				<!-- Display datatable -->
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<Datatable
+								id="users-datatable"
+								:rowdata="rowdata"
+								:canedit="canedit"
+								:candelete="candelete"
+								editcomponent="EditUserModal"
+								title="users"
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -214,20 +225,19 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Alert from '@/components/Alert/Alert'
 import Datatable from '@/components/Datatable/Datatable'
 
 export default {
 	name: 'AddUserModal',
-	components: {
-		Datatable,
-		Loader
-	},
+	components: { Loader, Breadcrumb, Alert, Datatable },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
-		candelete: { type: Boolean, default: false }
+		candelete: { type: Boolean, default: false },
+		pageTitle: { type: String, default: "" }
 	},
 	data() {
 		return {
@@ -244,8 +254,6 @@ export default {
 			rowdata: [],
 			groups: [],
 			groupsLabel: [],
-			permissions: [],
-			permissionsLabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -259,7 +267,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.getPermissions()
+		this.getGroups()
 	},
 	methods: {
 		// Get all users
@@ -285,36 +293,12 @@ export default {
 		},
 		permissionsGroupsTreatment() {
 			this.rowdata.forEach(rowDetails => {
-				var tmpPermissions = []
 				var tmpGroups = []
-				rowDetails.user_permissions.forEach(permissionsDetails => {
-					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
-				})
-				rowDetails.user_permissions = tmpPermissions.join('\n')
 				rowDetails.groups.forEach(groupsDetails => {
 					tmpGroups.push(this.groupsLabel[groupsDetails])
 				})
 				rowDetails.groups = tmpGroups.join('\n')
 			})
-		},
-		// Get all permissions
-		getPermissions() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
-				.then(response => {
-					response.data.forEach(permissionDetails => {
-						this.permissions.push({
-							id: permissionDetails.id,
-							code: "permission_"+permissionDetails.id,
-							name: i18n.t(permissionDetails.codename)
-						})
-						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
-					})
-				})
-				.finally(() => this.getGroups())
 		},
 		// Get groups
 		getGroups() {
@@ -347,9 +331,10 @@ export default {
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
+					this.$bvModal.hide('add-user')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

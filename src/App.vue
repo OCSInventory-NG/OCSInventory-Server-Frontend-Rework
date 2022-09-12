@@ -1,10 +1,15 @@
 <template>
-	<router-view />
+	<div id="ocsreports">
+		<vue-extend-layouts loading="loading" />
+	</div>
 </template>
 
 <script>
+import VueExtendLayouts from 'vue-extend-layout'
+
 export default {
 	name: "Ocsreports",
+	components: { VueExtendLayouts },
 	created() {
 		const currentPath = this.$router.history.current.path;
 
@@ -19,7 +24,7 @@ export default {
 			this.$router.push("/login");
 		}
 	},
-};
+}
 </script>
 
-<style src="./styles/theme.scss" lang="scss" />
+<style src="./styles/ocsreports.scss" lang="scss" />

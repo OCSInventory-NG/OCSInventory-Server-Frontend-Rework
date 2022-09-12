@@ -1,17 +1,10 @@
 <template>
-	<div class="sidebar-wrapper">
-		<nav
-			:class="{sidebar: true, sidebarstatic, sidebarOpened}"
-			@mouseenter="sidebarMouseEnter"
-			@mouseleave="sidebarMouseLeave"
-		>
-			<header class="logo">
-				<router-link to="/ocsreports/dashboard">
-					<span class="primary-word">OCS</span>
-					<span class="secondary-word"> Inventory</span>
-				</router-link>
-			</header>
-			<ul class="nav">
+	<div 
+		id="navbar-menu" 
+		class="collapse navbar-collapse"
+	>
+		<div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
+			<b-nav class="navbar-nav">
 				<NavLink
 					:active-item="activeItem"
 					:header="$t('dashboard')"
@@ -54,48 +47,16 @@
 					icon-name="wrench"
 					index="configurations"
 				/>
-			</ul>
-		</nav>
+			</b-nav>
+		</div>
 	</div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
-import isScreen from '@/core/screenHelper';
 import NavLink from './NavLink/NavLink';
 
 export default {
 	name: 'Sidebar',
-	components: { NavLink },
-	computed: {
-		...mapState('layout', {
-			sidebarstatic: state => state.sidebarstatic,
-			sidebarOpened: state => !state.sidebarclose,
-			activeItem: state => state.sidebarActiveElement,
-		}),
-	},
-	created() {
-		this.setActiveByRoute();
-	},
-	methods: {
-		...mapActions('layout', ['changeSidebarActive', 'switchSidebar']),
-		setActiveByRoute() {
-			const paths = this.$route.fullPath.split('/');
-			paths.pop();
-			this.changeSidebarActive(paths.join('/'));
-		},
-		sidebarMouseEnter() {
-			if (!this.sidebarstatic && (isScreen('lg') || isScreen('xl'))) {
-				this.switchSidebar(false);
-				this.setActiveByRoute();
-			}
-		},
-		sidebarMouseLeave() {
-			if (!this.sidebarstatic && (isScreen('lg') || isScreen('xl'))) {
-				this.switchSidebar(true);
-				this.changeSidebarActive(null);
-			}
-		},
-	},
-};
+	components: { NavLink }
+}
 </script>

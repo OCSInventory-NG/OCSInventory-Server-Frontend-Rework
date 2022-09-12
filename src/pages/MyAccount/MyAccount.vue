@@ -1,139 +1,158 @@
 <template>
-	<b-container fluid>
-		<div id="MyAccount">
-			
-			<section v-if="successed">
-				<b-alert 
-					:show="!!succesMsg" 
-					class="alert-sm" 
-					variant="success"
-				>
-					{{ $t('success_saved') }}
-				</b-alert>
-			</section>
+	<div
+		id="my-account" 
+		class="container-xl"
+	>
+		<!-- Display success box message -->
+		<section v-if="successed">
+			<Alert 
+				:message="$t('success_saved')" 
+				variant="success"
+			/>
+		</section>
 
-			<section v-if="errored">
-				<b-alert 
-					:show="!!errorMsg" 
-					class="alert-sm" 
-					variant="danger"
-				>
-					{{ errorMsg }}
-				</b-alert>
-			</section>
+		<!-- Display error box message -->
+		<section v-if="errored">
+			<Alert 
+				:message="errorMsg" 
+				variant="danger"
+			/>
+		</section>
 
-			<section
-				id="formSection"
-			>
-				<div v-if="loading">
-					<Loader/>
-				</div>
+		<!-- Display info if no error -->
+		<section v-else>
+			<div v-if="loading">
+				<Loader />
+			</div>
 
-				<div
-					class="account-config"
-				>
-					<b-form
-						@submit="onSubmit"
-					>
-						<b-row>
-							<b-col>
-								<b-form-group
-									:label="$t('username')" 
-									label-for="username"
-								>
-									<b-form-input
-										id="username"
-										v-model="rowdata.username"
-										required
-										disabled
-									>{{ rowdata.username }}</b-form-input>
-								</b-form-group>
-							</b-col>
-							<b-col>
-								<b-form-group
-									:label="$t('password')" 
-									label-for="password"
-								>
-									<b-form-input
-										id="password"
-										v-model="rowdata.password"
-										type="password"
-										required
-									/>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group
-									:label="$t('email')" 
-									label-for="email"
-								>
-									<b-form-input
-										id="email"
-										v-model="rowdata.email"
-										required
-									>{{ rowdata.email }}</b-form-input>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col>
-								<b-form-group 
-									:label="$t('first_name')" 
-									label-for="first_name"
-								>
-									<b-form-input
-										id="first_name"
-										v-model="rowdata.first_name"
-										required
-									>{{ rowdata.first_name }}</b-form-input>
-								</b-form-group>
-							</b-col>
-							<b-col>
-								<b-form-group
-									:label="$t('last_name')" 
-									label-for="last_name"
-								>
-									<b-form-input
-										id="last_name"
-										v-model="rowdata.last_name"
-										required
-									>{{ rowdata.last_name }}</b-form-input>
-								</b-form-group>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col align-self="start"/>
-							<b-col 
-								align-self="center"
-								align="center"
+			<!-- Header page -->
+			<div v-else>
+				<!-- Page header -->
+				<PageHeader 
+					page-title="myaccount"
+				/>
+
+				<!-- Display my account form -->
+				<div class="page-body">
+					<div class="card">
+						<div class="card-body">
+							<b-form
+								@submit="onSubmit"
 							>
-								<b-button 
-									type="submit"
-									variant="success"
-								>
-									{{ $t('save') }}
-								</b-button>
-							</b-col>
-							<b-col align-self="end"/>
-						</b-row>
-					</b-form>
+								<b-row>
+									<b-col>
+										<!-- USERNAME -->
+										<b-form-group
+											:label="$t('username')" 
+											label-for="username"
+										>
+											<b-form-input
+												id="username"
+												v-model="rowdata.username"
+												required
+												disabled
+											>
+												{{ rowdata.username }}
+											</b-form-input>
+										</b-form-group>
+									</b-col>
+									<b-col>
+										<!-- PASSWORD -->
+										<b-form-group
+											:label="$t('password')" 
+											label-for="password"
+										>
+											<b-form-input
+												id="password"
+												v-model="rowdata.password"
+												type="password"
+												required
+											/>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row>
+									<b-col>
+										<!-- EMAIL -->
+										<b-form-group
+											:label="$t('email')" 
+											label-for="email"
+										>
+											<b-form-input
+												id="email"
+												v-model="rowdata.email"
+												required
+											>
+												{{ rowdata.email }}
+											</b-form-input>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row>
+									<b-col>
+										<!-- FIRSTNAME -->
+										<b-form-group 
+											:label="$t('first_name')" 
+											label-for="first_name"
+										>
+											<b-form-input
+												id="first_name"
+												v-model="rowdata.first_name"
+												required
+											>
+												{{ rowdata.first_name }}
+											</b-form-input>
+										</b-form-group>
+									</b-col>
+									<b-col>
+										<!-- LASTNAME -->
+										<b-form-group
+											:label="$t('last_name')" 
+											label-for="last_name"
+										>
+											<b-form-input
+												id="last_name"
+												v-model="rowdata.last_name"
+												required
+											>
+												{{ rowdata.last_name }}
+											</b-form-input>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row>
+									<b-col align-self="start" />
+									<b-col 
+										align-self="center"
+										align="center"
+									>
+										<b-button 
+											type="submit"
+											variant="success"
+										>
+											{{ $t('save') }}
+										</b-button>
+									</b-col>
+									<b-col align-self="end" />
+								</b-row>
+							</b-form>
+						</div>
+					</div>
 				</div>
-			</section>
-		</div>
-	</b-container>
+			</div>
+		</section>
+	</div>
 </template>
 
 <script>
 import Axios from 'axios'
+import PageHeader from '@/components/Header/PageHeader'
+import Alert from '@/components/Alert/Alert'
 import Loader from '@/components/Loader/Loader';
 
 export default {
 	name: "MyAccount",
-	components: {
-		Loader
-	},
+	components: { PageHeader, Alert, Loader },
 	data() {
 		return {
 			errorMsg: null,
@@ -194,7 +213,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

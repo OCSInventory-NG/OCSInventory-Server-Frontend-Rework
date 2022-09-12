@@ -1,0 +1,20 @@
+// ===========================================
+//  OCSREPORTS THEME IMPORT
+// ===========================================
+
+@import 'variables';
+
+@import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+@import '../../node_modules/bootstrap-vue/dist/bootstrap-vue.min.css';
+@import '../../node_modules/@tabler/core/dist/css/tabler.min.css';
+
+@import 'general';
+
+// Pages
+@import 'pages/login';
+
+// Components
+@import 'components/header';
+@import 'components/breadcrumb';
+@import 'components/datatable';
+@import 'components/modal';

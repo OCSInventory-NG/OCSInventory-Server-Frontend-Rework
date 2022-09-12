@@ -1,10 +1,6 @@
 <template>
-	<div class="data-loader">
-		<b-icon
-			icon="three-dots"
-			animation="cylon"
-			font-scale="4"
-		/>
+	<div class="progress progress-sm">
+		<div class="progress-bar progress-bar-indeterminate" />
 	</div>
 </template>
 

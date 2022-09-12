@@ -1,28 +1,28 @@
 <template>
-	<div id="TemplatePage">
+	<div
+		id="template" 
+		class="container-xl"
+	>
+		<!-- Display error box message -->
 		<section v-if="errored">
-			<b-alert 
-				:show="!!errorMsg" 
-				class="alert-sm" 
+			<Alert 
+				:message="errorMsg" 
 				variant="danger"
-			>
-				{{ errorMsg }}
-			</b-alert>
+			/>
 		</section>
 
+		<!-- Datatable -->
 		<section v-else>
 			<div v-if="loading">
-				<Loader/>
+				<Loader />
 			</div>
 
-			<div
-				v-else
-			>
+			<div v-else>
 				<AddTemplateModal
 					:canadd="canadd"
 					:canedit="canedit"
 					:candelete="candelete"
-					:exporttemplate="exportemplate"
+					page-title="templates"
 				/>
 			</div>
 		</section>
@@ -31,15 +31,13 @@
 
 <script>
 import i18n from '../../../i18n'
+import Alert from '@/components/Alert/Alert'
 import Loader from '@/components/Loader/Loader'
 import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal'
 
 export default {
-	name: 'TemplatePage',
-	components: {
-		Loader,
-		AddTemplateModal
-	},
+	name: 'Template',
+	components: { Alert, Loader, AddTemplateModal },
 	data() {
 		return {
 			errorMsg: null,

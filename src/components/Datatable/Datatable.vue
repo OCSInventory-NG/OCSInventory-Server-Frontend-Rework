@@ -3,146 +3,150 @@
 		:id="id" 
 		class="datatable-custom"
 	>
+		<!-- Header datatable -->
 		<div class="header-table">
-			<h4>{{ $t(title) }}</h4>
-			<!-- Search bar -->
-			<b-input-group class="mb-1 input-filter">
-				<b-input-group-prepend 
-					is-text 
-					class="icon-btn">
-					<b-icon icon="search"/>
-				</b-input-group-prepend>
-				<b-form-input 
-					id="filter-input" 
-					v-model="filter"
-					:placeholder="$t('search')"
-					type="search"
-				/>
-			</b-input-group>
+			<div class="row">
+				<!-- Search bar -->
+				<div class="input-icon col">
+					<b-form-input 
+						id="filter-input" 
+						v-model="filter"
+						:placeholder="$t('search')"
+						type="search"
+						class="form-control-rounded"
+					/>
+					<span class="input-icon-addon">
+						<font-awesome-icon 
+							:icon="['fas', 'magnifying-glass']"
+						/>
+					</span>
+				</div>
 
-			<b-button-toolbar v-if="canexport">
-				<b-button-group class="mr-1">
-					<download-excel
-						:data="json_data"
-						:fields="json_fields"
-						type="csv"
-						name="export.xls"
-					>
-						<b-button 
-							title="Export CSV" 
-							class="export-btn">
-							<b-icon 
-								icon="download" 
-								aria-hidden="true"/>
-						</b-button>
-					</download-excel>
-				</b-button-group>
-			</b-button-toolbar>
+				<!-- Export Excel -->
+				<div
+					v-if="canexport"
+					class="col-2" 
+				>
+					<b-button-group class="mr-1">
+						<download-excel
+							:data="json_data"
+							:fields="json_fields"
+							type="csv"
+							name="export.xls"
+						>
+							<button 
+								:title="$t('download')"
+								class="form-control btn"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'download']"
+								/>
+							</button>
+						</download-excel>
+					</b-button-group>
+				</div>
 
-			<b-button-toolbar v-if="exporttemplate">
-				<b-button-group class="mr-1">
-					<vue-blob-json-csv
-						:data="selected || rowdata"
-						tag-name="button"
-						file-type="json"
-						file-name="templates"
-						class="btn export-btn btn-secondary"
-					>
-						<b-icon 
-							icon="download" 
-							aria-hidden="true"/>
-					</vue-blob-json-csv>
-				</b-button-group>
-			</b-button-toolbar>
-
-			<b-button-toolbar v-if="exporttemplate">
-				<b-button-group class="mr-1">
+				<!-- Export template -->
+				<div
+					v-if="exporttemplate"
+					class="col"
+				>
 					<ImportTemplateModal
 						@reloadDatatable="reloadDatatable"
 					/>
-				</b-button-group>
-			</b-button-toolbar>			
+				</div>
 
-			<b-button-toolbar v-if="caneditconfig">
-				<b-button-group class="mr-1">
-					<b-button 
-						:title="$t('save_config')"
-						variant="success"
-						class="add-button"
-						@click="onSave"
-					>
-						<font-awesome-icon 
-							:icon="['fas', 'check']"/>
-					</b-button>
-				</b-button-group>
-			</b-button-toolbar>
-
-			<!-- Show/Hide columns -->
-			<b-dropdown 
-				:text="$t('show_hide')"
-				class="mx-1"
-				variant="dark"
-				right 
-			>
-				<b-dropdown-item
-					v-for="field in fields" 
-					:key="field.key"
-					:active="!field.visible"
-					v-model="field.visible"
-					@click="field.visible = !field.visible"
+				<!-- Save configuration -->
+				<div
+					v-if="caneditconfig"
+					class="col"
 				>
-					{{ $t(field.key) }}
-				</b-dropdown-item>
-			</b-dropdown>
+					<b-button-group class="mr-1">
+						<b-button 
+							:title="$t('save_config')"
+							variant="success"
+							class="add-button"
+							@click="onSave"
+						>
+							<font-awesome-icon 
+								:icon="['fas', 'check']"
+							/>
+						</b-button>
+					</b-button-group>
+				</div>
+
+				<!-- Show/Hide columns -->
+				<div class="col">
+					<b-dropdown 
+						:text="$t('show_hide')"
+					>
+						<b-dropdown-item
+							v-for="field in fields" 
+							:key="field.key"
+							v-model="field.visible"
+							:active="!field.visible"
+							@click="field.visible = !field.visible"
+						>
+							{{ $t(field.key) }}
+						</b-dropdown-item>
+					</b-dropdown>
+				</div>
+			</div>
 		</div>
 
+		<!-- Total row number -->
 		<div align="center">
 			<p>{{ totalRows }} {{ $t('result') }}</p>
 		</div>
 
-		<br><br>
-
 		<!-- Datatable -->
 		<div class="overflow-auto">
-			<b-table 
-				id="data-list" 
-				ref="selectableTable" 
-				:select-mode="selectMode" 
-				:items="rowdata"
+			<b-table
+				id="data-list"  
+				ref="selectableTable"
+				responsive
+				selectable
+				striped
+				hover
+				:select-mode="selectMode"
+				:items="rowdata" 
 				:fields="visibleFields"
 				:sort-by.sync="sortBy"
 				:sort-desc.sync="sortDesc"
 				:per-page="perPage"
 				:current-page="currentPage"
 				:filter="filter"
-				striped
-				hover
-				responsive
-				selectable
 				primary-key="id"
 				style="white-space: pre-line;"
+				class="table-vcenter"
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
 			>
-				<template v-slot:head(selected)="">
+				<!-- Selected row -->
+				<template #head(selected)="">
 					<b-form-group>
 						<input 
 							type="checkbox" 
-							@click="selectAllRows">
+							@click="selectAllRows"
+						>
 					</b-form-group>
 				</template>
-
 				<template #cell(selected)="{ rowSelected }">
+					<!-- If row is selected -->
 					<template v-if="rowSelected">
-						<b-icon icon="check-square-fill"/>
-						<span class="sr-only">Selected</span>
+						<font-awesome-icon 
+							:icon="['far', 'square-check']"
+						/>
 					</template>
+					<!-- If row is not selected -->
 					<template v-else>
-						<b-icon icon="dash-square"/>
-						<span class="sr-only">Not selected</span>
+						<font-awesome-icon 
+							:icon="['far', 'square']"
+						/>
 					</template>
 				</template>
 
+				<!-- Edit row for configuration -->
 				<template #cell(value)="row">
 					<div 
 						v-for="(value, key) in row.item.value"
@@ -156,34 +160,28 @@
 					</div>
 				</template>
 
+				<!-- Actions buttons -->
 				<template #cell(actions)="row">
 					<b-button-toolbar>
-						<b-button-group class="mr-1">
-							<b-button 
+						<b-button-group class="mx-1">
+							<button 
 								v-if="canedittemplate"
 								:title="$t('edittemplate')"
-								variant="primary"
+								class="btn btn-ghost-dark"
 								@click="goToEditTemplate(row.item.id)"
 							>
-								<b-icon 
-									icon="pencil-square" 
-									aria-hidden="true"
+								<font-awesome-icon 
+									:icon="['fas', 'pencil']"
 								/>
-							</b-button >
-							<DoAllActionsItemModal 
-								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
-								:id="row.item.id"
-								:route="adddvalueroute"
-								:titlevalue="titlevalue"
-								:reconciliationname="reconciliationname"
-								@reloadDatatable="reloadDatatable"
-							/>
+							</button>
+							<!-- Edit button -->
 							<component 
-								v-if="canedit"
 								:is="editcomponent"
+								v-if="canedit"
 								v-bind="{ id: row.item.id }"
 								@reloadDatatable="reloadDatatable"
 							/>
+							<!-- Delete button -->
 							<delete-item-modal 
 								v-if="candelete"
 								:id="row.item.id"
@@ -199,19 +197,13 @@
 
 		<!-- Pagination -->
 		<b-row class="pagination-align">
-			<b-col 
-				sm="3" 
-				md="3" 
-				class="my-1">
+			<b-col>
 				<b-form-group
 					label="Per page"
 					label-for="per-page-select"
-					label-cols-sm="6"
-					label-cols-md="4"
-					label-cols-lg="3"
-					label-align-sm="right"
+					label-cols-sm="3"
+					label-align-sm=""
 					label-size="sm"
-					class="mb-0"
 				>
 					<b-form-select
 						id="per-page-select"
@@ -222,41 +214,32 @@
 				</b-form-group>
 			</b-col>
 
-			<b-col 
-				sm="3" 
-				md="3" 
-				class="my-1">
+			<b-col>
 				<b-pagination
 					v-model="currentPage"
 					:total-rows="totalRows"
 					:per-page="perPage"
-					align="fill"
+					align="right"
 					size="sm"
-					class="my-0"
 				/>
 			</b-col>
 		</b-row>
-
 	</div>
 </template>
 
 <script>
 import i18n from '../../i18n'
-import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
-import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
+import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
-import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
 
 export default {
 	name: 'Datatable',
 	components: {
-		EditGroupModal,
 		EditUserModal,
-		EditAccountinfoModal,
+		EditGroupModal,
 		DeleteItemModal,
-		DoAllActionsItemModal,
 		ImportTemplateModal
 	},
 	props: {
@@ -414,8 +397,8 @@ export default {
 			this.$emit('reloadDatatable', this.rowdata)
 		},
 		goToEditTemplate(id){
-			this.$router.push('/ocsreports/configurations/templates/edittemplate/'+id); 
+			this.$router.push('/configurations/templates/edittemplate/'+id); 
 		},
 	}
-};
+}
 </script>

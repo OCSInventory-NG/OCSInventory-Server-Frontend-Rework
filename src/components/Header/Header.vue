@@ -1,84 +1,65 @@
 <template>
-	<b-navbar class="header d-print-none app-header">
-		<b-nav>
-			<b-nav-item>
-				<a 
-					id="barsTooltip" 
-					class="d-md-down-none px-2" 
-					href="#" 
-					@click="toggleSidebarMethod"
-				>
-					<font-awesome-icon 
-						:icon="['fas', 'bars']" 
-						size="2x"/>
-				</a>
-			</b-nav-item>
-		</b-nav>
-		<a class="navbarbrand d-md-none">
-			OCS Inventory
-		</a>
-		<b-nav class="ml-auto">
-			<b-nav-item-dropdown 
-				id="v-step-2" 
-				class="settingsdropdown d-sm-down-none" 
-				no-caret 
-				right
+	<header class="navbar navbar-expand-md navbar-dark navbar-overlap d-print-none">
+		<div class="container-xl">
+			<button 
+				class="navbar-toggler" 
+				type="button" 
+				data-bs-toggle="collapse" 
+				data-bs-target="#navbar-menu"
 			>
-				<template slot="button-content">
-					<font-awesome-icon 
-						:icon="['fas', 'cog']" 
-						size="2x"/>
-				</template>
-				<b-dropdown-item-button @click="account">
-					<font-awesome-icon 
-						:icon="['fas', 'user']"
-						class="mr-3"
-					/>My Account
-				</b-dropdown-item-button>
-				<b-dropdown-divider />
-				<b-dropdown-item-button @click="logout">
-					<font-awesome-icon 
-						:icon="['fas', 'power-off']"
-						class="mr-3"
-					/>Log Out
-				</b-dropdown-item-button>
-			</b-nav-item-dropdown>
-		</b-nav>
-	</b-navbar>
+				<span class="navbar-toggler-icon" />
+			</button>
+			<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+				<a href="/ocsreports/dashboard">
+					<img 
+						src="../../assets/logo-white.png"
+						alt="OCS Inventory" 
+						class="navbar-brand-image logo-size"
+					>
+				</a>
+			</h1>
+
+			<!-- USER SETTING / LOGOUT -->
+			<div class="navbar-nav flex-row order-md-last">
+				<b-nav-item-dropdown
+					id="setting-dropdown"
+					no-caret 
+				>
+					<template slot="button-content">
+						<font-awesome-icon 
+							icon="gear"
+							transform="shrink-6"
+							size="2x"
+						/>
+					</template>
+					<b-dropdown-item-button @click="account">
+						<font-awesome-icon 
+							:icon="['fas', 'user']"
+							class="mr-3"
+						/>My Account
+					</b-dropdown-item-button>
+					<b-dropdown-divider />
+					<b-dropdown-item-button @click="logout">
+						<font-awesome-icon 
+							:icon="['fas', 'power-off']"
+							class="mr-3"
+						/>Log Out
+					</b-dropdown-item-button>
+				</b-nav-item-dropdown>
+			</div>
+
+			<Sidebar />
+		</div>
+	</header>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import Sidebar from '@/components/Sidebar/Sidebar'
 
 export default {
 	name: 'Header',
-	computed: {
-		...mapState('layout', ['sidebarclose', 'sidebarstatic']),
-	},
+	components: { Sidebar },
 	methods: {
-		...mapActions('layout', ['toggleSidebar', 'switchSidebar', 'changeSidebarActive']),
-		switchSidebarMethod() {
-			if (!this.sidebarclose) {
-				this.switchSidebar(true);
-				this.changeSidebarActive(null);
-			} else {
-				this.switchSidebar(false);
-				const paths = this.$route.fullPath.split('/');
-				paths.pop();
-				this.changeSidebarActive(paths.join('/'));
-			}
-		},
-		toggleSidebarMethod() {
-			if (this.sidebarstatic) {
-				this.toggleSidebar();
-				this.changeSidebarActive(null);
-			} else {
-				this.toggleSidebar();
-				const paths = this.$route.fullPath.split('/');
-				paths.pop();
-				this.changeSidebarActive(paths.join('/'));
-			}
-		},
 		logout() {
 			localStorage.setItem('authenticated', false);
 			localStorage.removeItem('token_authentication');
@@ -86,8 +67,8 @@ export default {
 			this.$router.push('/login');
 		},
 		account() {
-			this.$router.push('/ocsreports/myaccount');
+			this.$router.push('/myaccount');
 		},
 	}
-};
+}
 </script>

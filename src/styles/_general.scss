@@ -1,49 +1,8 @@
-// GENERAL
+// ===========================================
+//  OCSREPORTS THEME
+// ===========================================
 
-html {
-  font-size: $font-size-initial;
-  font-weight: 100;
-  overflow: hidden;
-}
-
-body {
-  color: $text-color;
-  overflow-x: hidden;
-}
-
-html,
-body,
-.my-app-class {
-  height: 100%;
-}
-
-a,
-.dropdown-item,
-.btn {
-  cursor: pointer;
-  font-family: $font-family-base;
-  transition: color .1s ease-in-out, background-color .1s ease-in-out, border-color .1s ease-in-out;
-}
-
-th {
-  font-weight: 600;
-}
-
-label {
-  font-weight: 400;
-}
-
-strong {
-  font-weight: 700;
-}
-
-ul,
-ol {
-  list-style: none;
-  padding-left: 0;
-}
-
-ul ul,
-ol ul {
-  list-style: none;
+.form-control {
+  margin-bottom: 7px;
+  margin-top: 7px;
 }

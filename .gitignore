@@ -109,5 +109,5 @@ dist
 .vscode/
 
 # Ignore mega-linter locals tests
-.mega-linter.yml
 report/
+megalinter-reports/

@@ -1,13 +1,24 @@
-# OCSInventory-Server-Frontend-Rework
+# ocsreports
 
-Rework of the web interacted using vue
+## Project setup
+```
+npm install
+```
 
-NodeJS version => 16.13.1
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-## Installation
+### Compiles and minifies for production
+```
+npm run build
+```
 
-      1 - npm install
+### Lints and fixes files
+```
+npm run lint
+```
 
-      2 - npm run-script build
-
-      3 - npm run serve
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

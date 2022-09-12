@@ -1,5 +1,5 @@
 <template>
-	<div id="AddFieldModal">
+	<div id="add-field-modal">
 		<b-button 
 			v-b-modal.add-field
 			:title="$t('addfield')"
@@ -7,15 +7,31 @@
 			class="add-button"
 		>
 			<font-awesome-icon 
-				:icon="['fas', 'plus']"/>
+				:icon="['fas', 'plus']"
+			/>
 		</b-button>
 
 		<b-modal 
 			id="add-field" 
 			:title="$t('addfield')"
 			hide-footer
-			modal-class="custom-modal"
+			modal-class="custom-modal modal-blur"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('addfield') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>
@@ -48,7 +64,7 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col align-self="start"/>
+					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
 						align="center"
@@ -60,7 +76,7 @@
 							{{ $t('add') }}
 						</b-button>
 					</b-col>
-					<b-col align-self="end"/>
+					<b-col align-self="end" />
 				</b-row>
 			</b-form>
 		</b-modal>
@@ -112,7 +128,7 @@ export default {
 					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

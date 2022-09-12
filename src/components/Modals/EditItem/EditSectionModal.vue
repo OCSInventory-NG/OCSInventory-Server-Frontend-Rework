@@ -1,23 +1,36 @@
 <template>
-	<div id="EditSectionModal">
-		<b-button 
+	<div id="edit-section-modal">
+		<button 
 			v-b-modal="'edit-section.'+idmodal"
 			:title="$t('editsection')"
-			variant="primary"
-			class="add-button"
+			class="btn btn-ghost-dark"
 		>
-			<b-icon 
-				icon="pencil-square" 
-				aria-hidden="true"
+			<font-awesome-icon 
+				:icon="['fas', 'pencil']"
 			/>
-		</b-button>
+		</button>
 
 		<b-modal 
 			:id="'edit-section.'+idmodal"
 			:title="$t('editsection')"
 			hide-footer
-			modal-class="custom-modal"
+			modal-class="custom-modal modal-blur"
 		>
+			<template #modal-header="{ close }">
+				<h5 class="modal-title">
+					{{ $t('edituser') }}
+				</h5>
+				<b-button 
+					size="sm" 
+					variant="outline-danger" 
+					@click="close()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
+			</template>
 			<b-form
 				@submit="onSubmit"
 			>
@@ -80,7 +93,7 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col align-self="start"/>
+					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
 						align="center"
@@ -92,7 +105,7 @@
 							{{ $t('save') }}
 						</b-button>
 					</b-col>
-					<b-col align-self="end"/>
+					<b-col align-self="end" />
 				</b-row>
 			</b-form>
 		</b-modal>
@@ -166,7 +179,7 @@ export default {
 					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
