@@ -100,21 +100,10 @@
 										</b-col>
 									</b-row>
 									<b-row>
-										<b-col
-											v-for="permission in permissions"
-											:key="permission.id"
-											cols="4"
-										>
-											<b-form-checkbox
-												:id="permission.code"
-												v-model="row.permissions"
-												:name="permission.code"
-												:value="permission.id"
-												unchecked
-											>
-												{{ permission.name }}
-											</b-form-checkbox>
-										</b-col>
+										<Matrix 
+											:rowtab="permissions"
+											:rowlabel="permissionslabel"
+										/>
 									</b-row>
 									<b-row>
 										<b-col align-self="start" />
@@ -164,10 +153,11 @@ import Loader from '@/components/Loader/Loader'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 import Alert from '@/components/Alert/Alert'
 import Datatable from '@/components/Datatable/Datatable'
+import Matrix from '@/components/Matrix/Matrix'
 
 export default {
 	name: 'AddGroupModal',
-	components: { Loader, Breadcrumb, Alert, Datatable },
+	components: { Loader, Breadcrumb, Alert, Datatable, Matrix },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -182,7 +172,7 @@ export default {
 			},
 			rowdata: [],
 			permissions: [],
-			permissionsLabel: [],
+			permissionslabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -207,13 +197,30 @@ export default {
 			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
+					var array = ["add_", "change_", "delete_", "view_"]
+					var labeltmp = new Set()
 					response.data.forEach(permissionDetails => {
-						this.permissions.push({
-							id: permissionDetails.id,
-							code: "permission_"+permissionDetails.id,
-							name: i18n.t(permissionDetails.codename)
+						array.forEach(type => {
+							if(~permissionDetails.codename.indexOf(type)) {
+								var permissionKey = permissionDetails.codename.replace(type, "")
+								
+								this.permissions.push({
+									id: permissionDetails.id,
+									code: "permission_" + permissionDetails.id,
+									name: permissionDetails.codename,
+									key: permissionKey,
+									type: type.replace("_", "")
+								})
+
+								labeltmp.add(permissionKey)
+							}
 						})
-						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
+					})
+					labeltmp.forEach(label => {
+						this.permissionslabel.push({
+							id: label,
+							trad: i18n.t(label)
+						})
 					})
 				})
 				.finally(() => this.getGroups())
@@ -241,7 +248,7 @@ export default {
 			this.rowdata.forEach(rowDetails => {
 				var tmpPermissions = []
 				rowDetails.permissions.forEach(permissionsDetails => {
-					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
+					tmpPermissions.push(this.permissionslabel[permissionsDetails])
 				})
 				rowDetails.permissions = tmpPermissions.join('\n')
 			})
