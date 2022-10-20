@@ -1,7 +1,7 @@
 <template>
 	<div id="add-field-modal">
 		<b-button 
-			v-b-modal.add-field
+			v-b-modal="idModal"
 			:title="$t('addfield')"
 			variant="success"
 			class="add-button"
@@ -12,7 +12,7 @@
 		</b-button>
 
 		<b-modal 
-			id="add-field" 
+			:id="idModal" 
 			:title="$t('addfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
@@ -103,7 +103,8 @@ export default {
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
-			successed: false
+			successed: false,
+			idModal: 'add-field'+this.section,
 		}
 	},
 	created() {
@@ -124,7 +125,7 @@ export default {
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('add-field')
+					this.$bvModal.hide(this.idModal)
 					this.$emit('reloadTemplate')
 				})
 				.catch(e => {
@@ -132,7 +133,7 @@ export default {
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('add-field')
+					this.$bvModal.hide(this.idModal)
 				})
 		}
 	}

@@ -2,7 +2,7 @@
 	<div id="DeleteItemModal">
 		<button 
 			v-b-modal="idModal"
-			:title="$t('edituser')"
+			:title="$t('deleteitem')"
 			class="btn btn-ghost-danger"
 		>
 			<font-awesome-icon 
