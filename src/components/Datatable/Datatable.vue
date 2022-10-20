@@ -174,6 +174,15 @@
 									:icon="['fas', 'pencil']"
 								/>
 							</button>
+							<!-- Do all actions button -->
+							<DoAllActionsItemModal 
+								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
+								:id="row.item.id"
+								:route="adddvalueroute"
+								:titlevalue="titlevalue"
+								:reconciliationname="reconciliationname"
+								@reloadDatatable="reloadDatatable"
+							/>
 							<!-- Edit button -->
 							<component 
 								:is="editcomponent"
@@ -231,15 +240,19 @@
 import i18n from '../../i18n'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
+import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
+import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
 
 export default {
 	name: 'Datatable',
 	components: {
 		EditUserModal,
 		EditGroupModal,
+		EditAccountinfoModal,
 		DeleteItemModal,
+		DoAllActionsItemModal,
 		ImportTemplateModal
 	},
 	props: {
