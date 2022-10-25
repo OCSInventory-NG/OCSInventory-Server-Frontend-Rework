@@ -127,6 +127,7 @@ export default {
 			idModal: 'manage-item'+this.id,
 			text: null,
 			datavalues: [{value: ""}],
+			dataToRemove: [],
 			get: this.reconciliationname+"="+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -159,6 +160,14 @@ export default {
 					})
 				}
 			})
+
+			if(this.dataToRemove.length > 0) {
+				this.dataToRemove.forEach(data => {
+					this.onDelete(data.id)
+				})
+			}
+
+			this.dataToRemove = []
 
 			if(jsonUpdate.length > 0) {
 				this.onUpdate(jsonUpdate)
@@ -218,14 +227,29 @@ export default {
 					this.successed = false
 				})
 		},
-		onDelete(json) {
-			Axios.post(process.env.VUE_APP_API_ROUTE+this.route+"/"+json, { headers: this.header })
+		onDelete(id) {
+			Axios.delete(process.env.VUE_APP_API_ROUTE+this.route+"/"+id, { headers: this.header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
 		},
 		addField(value, fieldType) {
-			fieldType.push({ value: "" });
+			fieldType.push({ value: "" })
 		},
 		removeField(index, fieldType) {
-			fieldType.splice(index, 1);
+			if(typeof fieldType[index].id !== 'undefined') {
+				this.dataToRemove.push(fieldType[index])
+			}
+			fieldType.splice(index, 1)
 		},
 	}
 }
