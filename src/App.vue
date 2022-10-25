@@ -14,7 +14,7 @@ export default {
 		const currentPath = this.$router.history.current.path;
 
 		if (currentPath === "/" || currentPath === "/ocsreports") {
-			this.$router.push("/ocsreports/dashboard");
+			this.$router.push("/dashboard");
 		}
 
 		if (localStorage.getItem("authenticated") === null
