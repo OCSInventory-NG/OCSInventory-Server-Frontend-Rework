@@ -57,13 +57,24 @@
 				{{ header }} 
 			</span>
 		</template>
-		<b-dropdown-item
+		<div
 			v-for="childLink in childrenLinks"
 			:key="childLink.link"
-			:href="childLink.link"
 		>
-			{{ childLink.header }}
-		</b-dropdown-item>
+			<b-dropdown-header
+				v-if="childLink.main"
+				:href="childLink.link"
+				class="dropdown-header"
+			>
+				{{ childLink.header }}
+			</b-dropdown-header>
+			<b-dropdown-item
+				v-else
+				:href="childLink.link"
+			>
+				{{ childLink.header }}
+			</b-dropdown-item>
+		</div>
 	</b-nav-item-dropdown>
 </template>
 
@@ -73,6 +84,7 @@ export default {
 	props: {
 		header: { type: String, default: '' },
 		link: { type: String, default: '' },
+		main: { type: String, default: null },
 		childrenLinks: { type: Array, default: null },
 		isHeader: { type: Boolean, default: false },
 		iconName: { type: String, default: '' },
