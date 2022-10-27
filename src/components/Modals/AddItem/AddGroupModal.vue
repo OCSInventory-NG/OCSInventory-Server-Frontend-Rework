@@ -101,8 +101,10 @@
 									</b-row>
 									<b-row>
 										<Matrix 
+											v-model="row.permissions"
 											:rowtab="permissions"
 											:rowlabel="permissionslabel"
+											@permissions="row.permissions = $event"
 										/>
 									</b-row>
 									<b-row>
@@ -178,6 +180,10 @@ export default {
 			errored: false,
 			successed: false,
 			loading: true,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -199,18 +205,29 @@ export default {
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
+
 					response.data.forEach(permissionDetails => {
 						array.forEach(type => {
 							if(~permissionDetails.codename.indexOf(type)) {
 								var permissionKey = permissionDetails.codename.replace(type, "")
-								
-								this.permissions.push({
-									id: permissionDetails.id,
-									code: "permission_" + permissionDetails.id,
-									name: permissionDetails.codename,
-									key: permissionKey,
-									type: type.replace("_", "")
-								})
+
+								if(typeof this.permissions[permissionKey] === 'undefined') {
+									this.permissions[permissionKey] = [{
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									}]
+								} else {
+									this.permissions[permissionKey].push({
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									})
+								}
 
 								labeltmp.add(permissionKey)
 							}
@@ -248,20 +265,32 @@ export default {
 			this.rowdata.forEach(rowDetails => {
 				var tmpPermissions = []
 				rowDetails.permissions.forEach(permissionsDetails => {
-					tmpPermissions.push(this.permissionslabel[permissionsDetails])
+					this.permissionslabel.forEach(label => {
+						this.permissions[label.id].forEach(permissions => {
+							if(permissions.id == permissionsDetails) {
+								if(typeof tmpPermissions[label.trad] === 'undefined') {
+									tmpPermissions[label.trad] = [i18n.t(permissions.type)]
+								} else {
+									tmpPermissions[label.trad].push(i18n.t(permissions.type)) 
+								}
+							}
+						})					
+					})
 				})
-				rowDetails.permissions = tmpPermissions.join('\n')
+
+				var tmpTradPermission = []
+				Object.keys(tmpPermissions).forEach(key => {
+					tmpTradPermission.push(key+" : "+tmpPermissions[key].join(', '))
+				});
+
+				rowDetails.permissions = tmpTradPermission.join('\n')
 			})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
