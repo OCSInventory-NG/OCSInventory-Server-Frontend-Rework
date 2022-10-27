@@ -1,6 +1,6 @@
 <template>
 	<div 
-		id="group"
+		id="groups"
 		class="container-xl"
 	>
 		<!-- Error box message -->
