@@ -96,7 +96,7 @@
 									</b-row>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('user_permissions') }}</h4>
+											<h4>{{ $t('permissions') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
