@@ -62,21 +62,13 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col
-						v-for="permission in permissions"
-						:key="permission.id"
-						cols="4"
-					>
-						<b-form-checkbox
-							:id="permission.code"
-							v-model="row.permissions"
-							:name="permission.code"
-							:value="permission.id"
-							unchecked
-						>
-							{{ permission.name }}
-						</b-form-checkbox>
-					</b-col>
+					<Matrix 
+						v-model="row.permissions"
+						:rowtab="permissions"
+						:rowlabel="permissionslabel"
+						:rowpermissions="row.permissions"
+						@permissions="row.permissions = $event"
+					/>
 				</b-row>
 				<b-row>
 					<b-col align-self="start" />
@@ -101,9 +93,11 @@
 <script>
 import Axios from 'axios'
 import i18n from '../../../i18n'
+import Matrix from '@/components/Matrix/Matrix'
 
 export default {
 	name: 'EditGroupModal',
+	components: { Matrix },
 	props: {
 		id: { type: Number, default: null }
 	},
@@ -114,11 +108,16 @@ export default {
 				permissions: []
 			},
 			permissions: [],
+			permissionslabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'edit-group'+this.id
+			idModal: 'edit-group'+this.id,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	mounted() {
@@ -128,17 +127,42 @@ export default {
 	methods: {
 		// Get all permissions
 		getPermissions() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
+					var array = ["add_", "change_", "delete_", "view_"]
+					var labeltmp = new Set()
+
 					response.data.forEach(permissionDetails => {
-						this.permissions.push({
-							id: permissionDetails.id,
-							code: "permission_"+this.id+"_"+permissionDetails.id,
-							name: i18n.t(permissionDetails.codename)
+						array.forEach(type => {
+							if(~permissionDetails.codename.indexOf(type)) {
+								var permissionKey = permissionDetails.codename.replace(type, "")
+
+								if(typeof this.permissions[permissionKey] === 'undefined') {
+									this.permissions[permissionKey] = [{
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									}]
+								} else {
+									this.permissions[permissionKey].push({
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									})
+								}
+
+								labeltmp.add(permissionKey)
+							}
+						})
+					})
+					labeltmp.forEach(label => {
+						this.permissionslabel.push({
+							id: label,
+							trad: i18n.t(label)
 						})
 					})
 				})

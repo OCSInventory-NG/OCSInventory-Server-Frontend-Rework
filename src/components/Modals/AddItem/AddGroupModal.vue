@@ -96,25 +96,16 @@
 									</b-row>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('user_permissions') }}</h4>
+											<h4>{{ $t('permissions') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
-										<b-col
-											v-for="permission in permissions"
-											:key="permission.id"
-											cols="4"
-										>
-											<b-form-checkbox
-												:id="permission.code"
-												v-model="row.permissions"
-												:name="permission.code"
-												:value="permission.id"
-												unchecked
-											>
-												{{ permission.name }}
-											</b-form-checkbox>
-										</b-col>
+										<Matrix 
+											v-model="row.permissions"
+											:rowtab="permissions"
+											:rowlabel="permissionslabel"
+											@permissions="row.permissions = $event"
+										/>
 									</b-row>
 									<b-row>
 										<b-col align-self="start" />
@@ -164,10 +155,11 @@ import Loader from '@/components/Loader/Loader'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 import Alert from '@/components/Alert/Alert'
 import Datatable from '@/components/Datatable/Datatable'
+import Matrix from '@/components/Matrix/Matrix'
 
 export default {
 	name: 'AddGroupModal',
-	components: { Loader, Breadcrumb, Alert, Datatable },
+	components: { Loader, Breadcrumb, Alert, Datatable, Matrix },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -182,12 +174,16 @@ export default {
 			},
 			rowdata: [],
 			permissions: [],
-			permissionsLabel: [],
+			permissionslabel: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -207,13 +203,41 @@ export default {
 			}
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
 				.then(response => {
+					var array = ["add_", "change_", "delete_", "view_"]
+					var labeltmp = new Set()
+
 					response.data.forEach(permissionDetails => {
-						this.permissions.push({
-							id: permissionDetails.id,
-							code: "permission_"+permissionDetails.id,
-							name: i18n.t(permissionDetails.codename)
+						array.forEach(type => {
+							if(~permissionDetails.codename.indexOf(type)) {
+								var permissionKey = permissionDetails.codename.replace(type, "")
+
+								if(typeof this.permissions[permissionKey] === 'undefined') {
+									this.permissions[permissionKey] = [{
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									}]
+								} else {
+									this.permissions[permissionKey].push({
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									})
+								}
+
+								labeltmp.add(permissionKey)
+							}
 						})
-						this.permissionsLabel[permissionDetails.id] = i18n.t(permissionDetails.codename)
+					})
+					labeltmp.forEach(label => {
+						this.permissionslabel.push({
+							id: label,
+							trad: i18n.t(label)
+						})
 					})
 				})
 				.finally(() => this.getGroups())
@@ -241,20 +265,32 @@ export default {
 			this.rowdata.forEach(rowDetails => {
 				var tmpPermissions = []
 				rowDetails.permissions.forEach(permissionsDetails => {
-					tmpPermissions.push(this.permissionsLabel[permissionsDetails])
+					this.permissionslabel.forEach(label => {
+						this.permissions[label.id].forEach(permissions => {
+							if(permissions.id == permissionsDetails) {
+								if(typeof tmpPermissions[label.trad] === 'undefined') {
+									tmpPermissions[label.trad] = [i18n.t(permissions.type)]
+								} else {
+									tmpPermissions[label.trad].push(i18n.t(permissions.type)) 
+								}
+							}
+						})					
+					})
 				})
-				rowDetails.permissions = tmpPermissions.join('\n')
+
+				var tmpTradPermission = []
+				Object.keys(tmpPermissions).forEach(key => {
+					tmpTradPermission.push(key+" : "+tmpPermissions[key].join(', '))
+				});
+
+				rowDetails.permissions = tmpTradPermission.join('\n')
 			})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

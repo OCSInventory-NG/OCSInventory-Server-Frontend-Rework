@@ -16,6 +16,11 @@
   "show_hide": "Afficher / Cacher",
   "selected": "Sélectioné",
   "download": "Télécharger",
+  "update": "Mettre à jour",
+  "view": "Voir",
+  "delete": "Supprimer",
+  "change": "Update",
+  "all": "Tous",
 
   "yes": "Oui",
   "no": "Non",
