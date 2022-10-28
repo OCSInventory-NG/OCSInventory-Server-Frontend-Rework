@@ -47,7 +47,6 @@
   "accountinfo/data": "Administrative data",
   "snmp": "Snmp",
   "system": "System",
-  "network": "Network",
 
   "success_saved": "Configuration saved with success !",
 
@@ -115,6 +114,8 @@
   "accountinfo_param": "Manage Administrative data values",
   "id": "ID",
   "type": "Type",
+  "addnetgroup": "Add a Network group",
+  "editnetgroup": "Edit network group",
 
   "add_logentry": "Can add log entry",
   "change_logentry": "Can update log entry",
@@ -203,8 +204,8 @@
   "section": "Section",
   "field": "Field",
   "base": "Base",
-  "netdevice": "Net device",
-  "netgroup": "Net group",
+  "netdevice": "Network device",
+  "netgroup": "Network group",
   "network": "Network",
   "accountinfoconfig":"Accouninfo configuration",
   "accountinfodata":"Accouninfo data",
