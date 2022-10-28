@@ -41,6 +41,8 @@
   "accountinfo/config": "Administrative data",
   "accountinfo/data": "Administrative data",
   "snmp": "Snmp",
+  "system": "System",
+  "network": "Network",
 
   "success_saved": "Configuration saved with success !",
 
