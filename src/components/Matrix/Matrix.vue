@@ -77,7 +77,8 @@ export default {
 	name: "Matrix",
 	props: {
 		rowtab: { type: Array, default: null },
-		rowlabel: { type: Array, default: null }
+		rowlabel: { type: Array, default: null },
+		rowpermissions: { type: Array, default: null },
 	},
 	data() {
 		return {
@@ -89,6 +90,9 @@ export default {
 		selectedPermissionsArray: function () {
 			this.$emit('permissions', this.selectedPermissionsArray)
 		}
+	},
+	mounted() {
+		this.selectedPermissionsArray = this.rowpermissions
 	},
 	methods: {
 		selectAllPermission(line) {
