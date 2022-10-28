@@ -45,6 +45,8 @@
 						{ header: $t('templates'), link: '/ocsreports/configurations/templates' },
 						{ header: $t('inventory'), link: '', main: 'inventory'},
 						{ header: $t('accountinfo'), link: '/ocsreports/configurations/accountinfo' },
+						{ header: $t('network'), link: '', main: 'network'},
+						{ header: $t('netgroup'), link: '/ocsreports/configurations/netgroup' },
 					]"
 					link="/ocsreports/configurations"
 					icon-name="wrench"

@@ -19,6 +19,7 @@ import General from '@/pages/Configuration/General/General'
 import Accountinfo from '@/pages/Configuration/Accountinfo/Accountinfo'
 import Template from '@/pages/Configuration/Template/Template'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
+import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
 
 Vue.use(Router)
 
@@ -74,6 +75,11 @@ export default new Router({
 			name: 'EditTemplate',
 			component: EditTemplate,
 			props: true
+		},
+		{
+			path: '/configurations/netgroup',
+			name: 'NetworkGroup',
+			component: NetworkGroup
 		},
 		{
 			path: '/inventory/assets',
