@@ -241,6 +241,7 @@ import i18n from '../../i18n'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
+import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -251,6 +252,7 @@ export default {
 		EditUserModal,
 		EditGroupModal,
 		EditAccountinfoModal,
+		EditNetworkGroupModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
