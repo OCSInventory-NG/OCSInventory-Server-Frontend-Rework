@@ -194,7 +194,11 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'edit-user'+this.id
+			idModal: 'edit-user'+this.id,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	mounted() {
@@ -204,11 +208,7 @@ export default {
 	methods: {
 		// Get user
 		getUser() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.id+"/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -221,11 +221,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -238,12 +234,8 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			Axios.put(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
