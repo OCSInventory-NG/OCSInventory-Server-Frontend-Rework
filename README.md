@@ -1,4 +1,4 @@
-# ocsreports
+# OCS Inventory Reports
 
 ## Project setup
 ```
