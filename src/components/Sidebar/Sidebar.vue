@@ -18,7 +18,7 @@
 					:header="$t('inventory')"
 					:children-links="[
 						{ header: $t('assets'), link: '/ocsreports/inventory/assets' },
-						{ header: $t('network'), link: '', main: 'network'},
+						{ header: $t('network'), link: 'networkinventory', main: 'network'},
 						{ header: $t('ipdiscover'), link: '/ocsreports/inventory/ipdiscover' },
 					]"
 					link="/ocsreports/inventory"
@@ -41,11 +41,11 @@
 					:header="$t('configurations')"
 					:children-links="[
 						{ header: $t('general'), link: '/ocsreports/configurations/general' },
-						{ header: $t('system'), link: '', main: 'system'},
+						{ header: $t('system'), link: 'systemconfig', main: 'system'},
 						{ header: $t('templates'), link: '/ocsreports/configurations/templates' },
-						{ header: $t('inventory'), link: '', main: 'inventory'},
+						{ header: $t('inventory'), link: 'inventoryconfig', main: 'inventory'},
 						{ header: $t('accountinfo'), link: '/ocsreports/configurations/accountinfo' },
-						{ header: $t('network'), link: '', main: 'network'},
+						{ header: $t('network'), link: 'networkconfig', main: 'network'},
 						{ header: $t('netgroup'), link: '/ocsreports/configurations/netgroup' },
 					]"
 					link="/ocsreports/configurations"
