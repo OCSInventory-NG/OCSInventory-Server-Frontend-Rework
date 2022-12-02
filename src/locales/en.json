@@ -102,7 +102,7 @@
   "select_template_file": "Select your JSON template file",
   "template": "Template",
   "uuid": "UUID",
-  "netid": "NETID",
+  "netid": "NetID",
   "mask": "Mask",
   "netdevices": "Net devices",
   "group": "Group",
@@ -116,6 +116,7 @@
   "type": "Type",
   "addnetgroup": "Add a Network group",
   "editnetgroup": "Edit network group",
+  "unknown_network": "Unknown networks",
 
   "add_logentry": "Can add log entry",
   "change_logentry": "Can update log entry",

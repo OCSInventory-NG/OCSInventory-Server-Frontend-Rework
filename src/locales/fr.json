@@ -102,7 +102,7 @@
   "select_template_file": "Sélectionner votre modèle de template JSON",
   "template": "Modèle",
   "uuid": "UUID",
-  "netid": "NETID",
+  "netid": "NetID",
   "mask": "Mask",
   "netdevices": "Périphériques réseaux",
   "group": "Groupe",
@@ -116,6 +116,7 @@
   "type": "Type",
   "addnetgroup": "Ajouter un groupe Réseaux",
   "editnetgroup": "Editer un groupe Réseaux",
+  "unknown_network": "Réseaux inconnus",
 
   "add_logentry": "Peut ajouter une entrée log",
   "change_logentry": "Peut modifier une entrée log",
