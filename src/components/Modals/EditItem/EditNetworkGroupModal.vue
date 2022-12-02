@@ -67,6 +67,22 @@
 					</b-col>
 				</b-row>
 				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('network')" 
+							label-for="network"
+						>
+							<b-form-select
+								id="network"
+								v-model="netid" 
+								:options="networks" 
+								class="mb-3"
+								multiple
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -100,6 +116,8 @@ export default {
 				name: null,
 				description: null,
 			},
+			netid: [],
+			networks: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -121,14 +139,58 @@ export default {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
+					this.getNetworks()
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 				})
 		},
+		getNetworks() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+				.then(response => {
+					response.data.forEach(network => {
+						this.networks.push({
+							value: network.id,
+							text: network.netid
+						})
+					});
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+		},
+		updateNetworks() {
+			this.netid.forEach(element => {
+				var json = {
+					group: this.row.id
+				}
+
+				Axios.put(process.env.VUE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			});
+		},
 		onSubmit(event) {
 			event.preventDefault()
+
+			if(this.netid.length > 0) {
+				this.updateNetworks()
+			}
+
 			Axios.put(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
