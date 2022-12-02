@@ -242,6 +242,7 @@ import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
 import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
+import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -253,6 +254,7 @@ export default {
 		EditGroupModal,
 		EditAccountinfoModal,
 		EditNetworkGroupModal,
+		EditNetworkModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
