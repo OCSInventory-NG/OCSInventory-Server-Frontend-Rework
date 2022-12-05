@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-network-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('editnetwork')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -137,24 +137,27 @@ export default {
 		}
 	},
 	created() {
-		this.getNetworks()
+		//this.getNetworks()
 	},
 	methods: {
+		loadData(id) {
+			this.getNetworks(id)
+		},
 		// Retrieve networks info by id
-		getNetworks() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/"+this.id+"/", { headers: this.header })
+		getNetworks(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.getNetGroup()
+					this.getNetGroup(id)
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
 		},
-		getNetGroup() {
+		getNetGroup(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroup.push({
@@ -169,7 +172,7 @@ export default {
 					});
 					this.errorMsg = null
 					this.errored = false
-					this.dataFormatting()
+					this.$bvModal.show('edit-network'+id)
 				})
 				.catch(e => {
 					this.errorMsg = e.message

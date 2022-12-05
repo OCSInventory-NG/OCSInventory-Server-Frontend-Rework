@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-group-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('editgroup')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -120,13 +120,12 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		this.getPermissions()
-		this.getGroup()		
-	},
 	methods: {
+		loadData(id) {
+			this.getPermissions(id)
+		},
 		// Get all permissions
-		getPermissions() {
+		getPermissions(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
@@ -165,19 +164,17 @@ export default {
 							trad: i18n.t(label)
 						})
 					})
+					this.getGroup(id)
 				})
 		},
 		// Get groups
-		getGroup() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+this.id+"/", { headers: header })
+		getGroup(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
+					this.$bvModal.show('edit-group'+id)
 				})
 				.catch(e => {
 					this.errorMsg = e
@@ -186,12 +183,8 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			Axios.put(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

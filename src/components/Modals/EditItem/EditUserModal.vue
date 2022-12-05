@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-user-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('edituser')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -201,18 +201,18 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		this.getUser()
-		this.getGroups()		
-	},
 	methods: {
+		loadData(id) {
+			this.getUser(id)
+		},
 		// Get user
-		getUser() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.id+"/", { headers: this.header })
+		getUser(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
+					this.getGroups(id)
 				})
 				.catch(e => {
 					this.errorMsg = e
@@ -220,7 +220,7 @@ export default {
 				})
 		},
 		// Get groups
-		getGroups() {
+		getGroups(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
@@ -230,6 +230,7 @@ export default {
 							name: groupDetails.name
 						})
 					})
+					this.$bvModal.show('edit-user'+id)
 				})
 		},
 		// Submit group creation and call getGroups to reload datatable datas

@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-netgroup-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('editnetgroup')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -129,24 +129,24 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		this.getNetgroup()	
-	},
 	methods: {
-		getNetgroup() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.id+"/", { headers: this.header })
+		loadData(id) {
+			this.getNetgroup(id)
+		},
+		getNetgroup(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.getNetworks()
+					this.getNetworks(id)
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 				})
 		},
-		getNetworks() {
+		getNetworks(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(network => {
@@ -157,6 +157,7 @@ export default {
 					});
 					this.errorMsg = null
 					this.errored = false
+					this.$bvModal.show('edit-netgroup'+id)
 				})
 				.catch(e => {
 					this.errorMsg = e

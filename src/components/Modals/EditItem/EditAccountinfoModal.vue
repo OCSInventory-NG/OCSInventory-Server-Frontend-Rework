@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-accountinfo-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('editaccountinfo')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -100,24 +100,25 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'edit-accountinfo'+this.id
-		}
-	},
-	created() {
-		this.getAccountinfo()	
-	},
-	methods: {
-		// Get accountinfo
-		getAccountinfo() {
-			const header = {
+			idModal: 'edit-accountinfo'+this.id,
+			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.id+"/", { headers: header })
+		}
+	},
+	methods: {
+		loadData(id) {
+			this.getAccountinfo(id)
+		},
+		// Get accountinfo
+		getAccountinfo(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
+					this.$bvModal.show('edit-accountinfo'+id)
 				})
 				.catch(e => {
 					this.errorMsg = e
@@ -126,10 +127,6 @@ export default {
 		},
 		// Submit edit accountinfo creation and call refresh edit template to reload
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
 			var update = {
@@ -137,7 +134,7 @@ export default {
 				description: this.row.description
 			}
 
-			Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
