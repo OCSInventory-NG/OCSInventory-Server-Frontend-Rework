@@ -218,6 +218,7 @@
 						id="per-page-select"
 						v-model="perPage"
 						:options="pageOptions"
+						class="form-select"
 						size="sm"
 					/>
 				</b-form-group>

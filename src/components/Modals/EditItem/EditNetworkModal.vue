@@ -71,7 +71,7 @@
 								id="netgroup"
 								v-model="row.group" 
 								:options="netgroup" 
-								class="mb-3"
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>

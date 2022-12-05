@@ -58,7 +58,7 @@
 								id="retrival_method"
 								v-model="row.retrival_method" 
 								:options="methodoptions" 
-								class="mb-3"
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>
@@ -73,7 +73,7 @@
 								id="retrival_output"
 								v-model="row.retrival_output" 
 								:options="outputoptions" 
-								class="mb-3"
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>

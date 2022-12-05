@@ -112,7 +112,7 @@
 													id="datatype"
 													v-model="row.datatype" 
 													:options="datatypeoptions" 
-													class="mb-3"
+													class="mb-3 form-select"
 												/>
 											</b-form-group>
 										</b-col>
@@ -127,7 +127,7 @@
 													id="datatarget"
 													v-model="row.datatarget" 
 													:options="datatargetoptions" 
-													class="mb-3"
+													class="mb-3 form-select"
 												/>
 											</b-form-group>
 										</b-col>

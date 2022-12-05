@@ -98,7 +98,7 @@
 													id="os"
 													v-model="row.os" 
 													:options="options" 
-													class="mb-3"
+													class="mb-3 form-select"
 												/>
 											</b-form-group>
 										</b-col>

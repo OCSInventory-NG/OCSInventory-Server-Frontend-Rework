@@ -76,7 +76,7 @@
 								id="network"
 								v-model="netid" 
 								:options="networks" 
-								class="mb-3"
+								class="mb-3 form-select"
 								multiple
 							/>
 						</b-form-group>
