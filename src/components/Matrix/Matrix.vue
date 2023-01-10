@@ -92,7 +92,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.selectedPermissionsArray = this.rowpermissions
+		this.selectedPermissionsArray = this.rowpermissions ?? []
 	},
 	methods: {
 		selectAllPermission(line) {
