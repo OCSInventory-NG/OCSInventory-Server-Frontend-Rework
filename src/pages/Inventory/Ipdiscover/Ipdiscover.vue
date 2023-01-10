@@ -34,6 +34,7 @@
 								:groupid="value.id"
 								:candelete="candelete"
 								:canedit="canedit"
+								:canaccesschild="canviewnetdevice"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
