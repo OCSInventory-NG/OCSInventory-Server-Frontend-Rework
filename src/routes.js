@@ -93,7 +93,7 @@ export default new Router({
 			component: Ipdiscover
 		},
 		{
-			path: '/inventory/ipdiscover/netdevice/:id',
+			path: '/inventory/netdevices/:id?',
 			name: 'Netdevice',
 			component: Netdevice
 		}
