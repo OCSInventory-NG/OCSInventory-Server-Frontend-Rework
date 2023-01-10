@@ -119,9 +119,15 @@
 				primary-key="id"
 				style="white-space: pre-line;"
 				class="table-vcenter"
+				show-empty
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
 			>
+				<!-- No data available -->
+				<template #empty="">
+					{{ $t('no_data') }}
+				</template>
+
 				<!-- Selected row -->
 				<template #head(selected)="">
 					<b-form-group>
@@ -131,6 +137,7 @@
 						>
 					</b-form-group>
 				</template>
+
 				<template #cell(selected)="{ rowSelected }">
 					<!-- If row is selected -->
 					<template v-if="rowSelected">

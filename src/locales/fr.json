@@ -21,6 +21,7 @@
   "delete": "Supprimer",
   "change": "Update",
   "all": "Tous",
+  "no_data": "Aucune donnée disponible",
 
   "yes": "Oui",
   "no": "Non",
