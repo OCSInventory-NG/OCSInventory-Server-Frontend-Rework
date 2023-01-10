@@ -8,6 +8,6 @@
 
 <script>
 export default {
-	name: 'LoginCOmponent'   // you can enter any name (optional)
+	name: 'LoginComponent'   // you can enter any name (optional)
 }
 </script>
