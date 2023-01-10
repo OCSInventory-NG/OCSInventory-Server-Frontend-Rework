@@ -147,7 +147,10 @@
 				</template>
 
 				<!-- Netdevice redirection -->
-				<template #cell(netdevices)="row">
+				<template 
+					v-if="canaccesschild"
+					#cell(netdevices)="row"
+				>
 					<a 
 						:href="'/ocsreports/inventory/ipdiscover/netdevice/'+row.item.id"
 					>
@@ -284,6 +287,7 @@ export default {
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: true },
+		canaccesschild: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
