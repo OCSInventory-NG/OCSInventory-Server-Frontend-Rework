@@ -36,14 +36,16 @@
 						<font-awesome-icon 
 							:icon="['fas', 'user']"
 							class="mr-3"
-						/>My Account
+						/>
+						<p>{{ $t('myaccount') }}</p>
 					</b-dropdown-item-button>
 					<b-dropdown-divider />
 					<b-dropdown-item-button @click="logout">
 						<font-awesome-icon 
 							:icon="['fas', 'power-off']"
 							class="mr-3"
-						/>Log Out
+						/>
+						<p>{{ $t('logout') }}</p>
 					</b-dropdown-item-button>
 				</b-nav-item-dropdown>
 			</div>
