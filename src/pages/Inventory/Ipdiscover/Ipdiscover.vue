@@ -65,6 +65,7 @@ export default {
 			errored: false,
 			canedit: false,
 			candelete: false,
+			canviewnetdevice: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -78,6 +79,9 @@ export default {
 			}
 			if(localStorage.getItem('permissions').split(",").includes("delete_network")) {
 				this.candelete = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("view_netdevice")) {
+				this.canviewnetdevice = true
 			}
 			this.getNetworks()
 		} else {
