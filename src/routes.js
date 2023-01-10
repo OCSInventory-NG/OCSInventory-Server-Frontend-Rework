@@ -11,6 +11,7 @@ import Dashboard from '@/pages/Dashboard/Dashboard'
 // Inventory
 import Assets from '@/pages/Inventory/Asset/Asset'
 import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover'
+import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -90,6 +91,11 @@ export default new Router({
 			path: '/inventory/ipdiscover',
 			name: 'Ipdiscover',
 			component: Ipdiscover
-		}	
+		},
+		{
+			path: '/inventory/ipdiscover/netdevice/:id',
+			name: 'Netdevice',
+			component: Netdevice
+		}
 	],
 })
