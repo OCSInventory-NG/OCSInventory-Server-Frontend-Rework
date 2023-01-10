@@ -152,7 +152,7 @@
 					#cell(netdevices)="row"
 				>
 					<a 
-						:href="'/ocsreports/inventory/ipdiscover/netdevice/'+row.item.id"
+						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
 					>
 						{{ row.item.netdevices }}
 					</a>
