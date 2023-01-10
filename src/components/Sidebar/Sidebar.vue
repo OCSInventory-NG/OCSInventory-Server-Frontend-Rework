@@ -29,6 +29,10 @@
 							header: $t('ipdiscover'), link: '/ocsreports/inventory/ipdiscover', 
 							route:'Ipdiscover', column: 'network' 
 						},
+						{ 
+							header: $t('netdevices'), link: '/ocsreports/inventory/netdevices', 
+							route:'Netdevice', column: 'network' 
+						},
 					]"
 					link="/ocsreports/inventory"
 					icon-name="desktop"
@@ -65,7 +69,7 @@
 					]"
 					:children-links="[
 						{ 
-							header: $t('general'), link: '/ocsreports/configurations/general', 
+							header: $t('general_configuration'), link: '/ocsreports/configurations/general', 
 							route:'General', column: 'general' 
 						},
 						{ 
