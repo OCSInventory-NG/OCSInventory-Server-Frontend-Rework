@@ -63,7 +63,6 @@
 					:header="$t('configurations')"
 					:column-dividers="[
 						{ header: $t('general'), identifier: 'general' },
-						{ header: $t('system'), identifier: 'system' },
 						{ header: $t('inventory'), identifier: 'inventory' },
 						{ header: $t('network'), identifier: 'network' },
 					]"
@@ -74,7 +73,7 @@
 						},
 						{ 
 							header: $t('templates'), link: '/ocsreports/configurations/templates', 
-							route:'Template', column: 'system' 
+							route:'Template', column: 'inventory' 
 						},
 						{ 
 							header: $t('accountinfo'), link: '/ocsreports/configurations/accountinfo', 
