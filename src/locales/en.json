@@ -36,6 +36,7 @@
   "users": "Users",
   "groups": "Groups",
   "configurations": "Configurations",
+  "general_configuration": "General configuration",
   "general": "General",
   "templates": "Templates",
   "inventory": "Inventory",
