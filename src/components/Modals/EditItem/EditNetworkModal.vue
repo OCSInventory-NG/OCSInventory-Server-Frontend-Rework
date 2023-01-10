@@ -136,9 +136,6 @@ export default {
 			}
 		}
 	},
-	created() {
-		//this.getNetworks()
-	},
 	methods: {
 		loadData(id) {
 			this.getNetworks(id)
