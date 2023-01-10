@@ -146,6 +146,15 @@
 					</template>
 				</template>
 
+				<!-- Netdevice redirection -->
+				<template #cell(netdevices)="row">
+					<a 
+						:href="'/ocsreports/inventory/ipdiscover/netdevice/'+row.item.id"
+					>
+						{{ row.item.netdevices }}
+					</a>
+				</template>
+
 				<!-- Edit row for configuration -->
 				<template #cell(value)="row">
 					<div 
@@ -244,6 +253,7 @@ import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
 import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
 import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
+import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -256,6 +266,7 @@ export default {
 		EditAccountinfoModal,
 		EditNetworkGroupModal,
 		EditNetworkModal,
+		EditNetdeviceModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -417,6 +428,9 @@ export default {
 		goToEditTemplate(id){
 			this.$router.push('/configurations/templates/edittemplate/'+id); 
 		},
+		goToNetdevices(id) {
+			this.$router.push('/inventory/netdevice/'+id); 
+		}
 	}
 }
 </script>
