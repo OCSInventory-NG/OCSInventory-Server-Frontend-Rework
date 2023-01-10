@@ -85,7 +85,10 @@ export default {
 	methods: {
 		// Retrieve netdevice
 		getNetdevice() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices?network="+this.$route.params.id, { headers: this.header })
+			var extendedRoute = "/"
+			if(this.$route.params.id) extendedRoute = "?network="+this.$route.params.id
+
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
