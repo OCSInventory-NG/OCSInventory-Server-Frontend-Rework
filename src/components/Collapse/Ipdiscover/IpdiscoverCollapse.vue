@@ -36,6 +36,7 @@
 								title="networks"
 								:candelete="candelete"
 								:canedit="canedit"
+								:canaccesschild="canaccesschild"
 								editcomponent="EditNetworkModal"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -60,6 +61,7 @@ export default {
 		rowdata: { type: Array, default: null },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		canaccesschild: { type: Boolean, default: false },
 	},
 	methods: {
 		reloadDatatable() {
