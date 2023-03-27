@@ -1,5 +1,5 @@
 <template>
-	<div id="add-accountinfo-modal">
+	<div id="add-network-group-modal">
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
@@ -22,8 +22,8 @@
 				<Loader />
 			</div>
 
+			<!-- Header page -->
 			<div v-else>
-				<!-- Header page -->
 				<div class="page-header d-print-none text-white">
 					<div class="row align-items-center">
 						<div class="col">
@@ -35,30 +35,30 @@
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
-							<!-- Button to add accountinfo -->
+							<!-- Button to add netgroup -->
 							<b-button
 								v-if="canadd"
-								v-b-modal.add-accountinfo
-								:title="$t('addaccountinfo')"
+								v-b-modal.add-netgroup
+								:title="$t('addnetgroup')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('addaccountinfo') }}
+								{{ $t('addnetgroup') }}
 							</b-button>
 
-							<!-- Modal to add accountinfo -->
+							<!-- Modal to add netgroup -->
 							<b-modal 
-								id="add-accountinfo" 
-								:title="$t('addaccountinfo')"
+								id="add-netgroup" 
+								:title="$t('addnetgroup')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('addaccountinfo') }}
+										{{ $t('addnetgroup') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -103,36 +103,6 @@
 										</b-col>
 									</b-row>
 									<b-row>
-										<b-col>
-											<b-form-group
-												:label="$t('datatype')" 
-												label-for="datatype"
-											>
-												<b-form-select
-													id="datatype"
-													v-model="row.datatype" 
-													:options="datatypeoptions" 
-													class="mb-3 form-select"
-												/>
-											</b-form-group>
-										</b-col>
-									</b-row>
-									<b-row>
-										<b-col>
-											<b-form-group
-												:label="$t('datatarget')" 
-												label-for="datatarget"
-											>
-												<b-form-select
-													id="datatarget"
-													v-model="row.datatarget" 
-													:options="datatargetoptions" 
-													class="mb-3 form-select"
-												/>
-											</b-form-group>
-										</b-col>
-									</b-row>
-									<b-row>
 										<b-col align-self="start" />
 										<b-col 
 											align-self="center"
@@ -157,16 +127,12 @@
 					<div class="card">
 						<div class="card-body">
 							<Datatable
-								id="accountinfodatatable"
+								id="netgroup-datatable"
 								:rowdata="rowdata"
 								:canedit="canedit"
 								:candelete="candelete"
-								:canaddvalue="canaddvalue"
-								editcomponent="EditAccountinfoModal"
-								title="accountinfo/config"
-								titlevalue="accountinfo_param"
-								adddvalueroute="accountinfo/value"
-								reconciliationname="accountinfo_config"
+								editcomponent="EditNetworkGroupModal"
+								title="netgroups"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -179,52 +145,36 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 import Alert from '@/components/Alert/Alert'
+import Datatable from '@/components/Datatable/Datatable'
 
 export default {
-	name: "AddAccountinfoModal",
-	components: {
-		Datatable,
-		Loader,
-		Alert,
-		Breadcrumb
-	},
+	name: "AddNetworkGroupModal",
+	components: { Loader, Breadcrumb, Alert, Datatable },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		canaddvalue: { type: Boolean, default: false },
 		pageTitle: { type: String, default: "" }
 	},
 	data() {
 		return {
 			row: {
 				name: null,
-				description: null,
-				datatype: 'TEXT',
-				datatarget: 'ASSET'
+				description: null
 			},
 			rowdata: [],
-			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			datatargetoptions: [
-				{ value: 'ASSET', text: i18n.t("assets") },
-				{ value: 'IPDISCOVER', text: i18n.t("ipdiscover") },
-				{ value: 'SNMP', text: i18n.t("snmp") }
-			],
-			datatypeoptions: [
-				{ value: 'TEXT', text: 'TEXT' },
-				{ value: 'TEXTAREA', text: 'TEXTAREA' },
-				{ value: 'SELECT', text: 'SELECT' },
-				{ value: 'CHECKBOX', text: 'CHECKBOX' },
-			]
+			loading: true,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -233,18 +183,13 @@ export default {
 		}
 	},
 	mounted() {
-		this.getAccountinfoConfig()
+		this.getNetgroup()
 	},
 	methods: {
-		getAccountinfoConfig() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: header })
+		getNetgroup() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.accountinfovaluesTreatment()
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -252,44 +197,30 @@ export default {
 					this.errorMsg = e
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
-		},
-		accountinfovaluesTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpValues = []
-				rowDetails.accountinfo_values.forEach(valuesDetails => {
-					tmpValues.push(valuesDetails.value)
+				.finally(() => {
+					this.loading = false
 				})
-				rowDetails.accountinfo_values = tmpValues.join('\n')
-			})
 		},
-		reloadDatatable() {
-			this.getAccountinfoConfig()
-		},
-		// Submit template creation and call getAccountinfoConfig to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('add-accountinfo')
+					this.$bvModal.hide('add-netgroup')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('add-accountinfo')
 				})
-				.finally(() => this.getAccountinfoConfig())
+				.finally(() => this.getNetgroup())
+		},
+		reloadDatatable() {
+			this.getNetgroup()
 		}
 	}
 }

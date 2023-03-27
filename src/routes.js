@@ -11,6 +11,7 @@ import Dashboard from '@/pages/Dashboard/Dashboard'
 // Inventory
 import Assets from '@/pages/Inventory/Asset/Asset'
 import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover'
+import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -19,6 +20,7 @@ import General from '@/pages/Configuration/General/General'
 import Accountinfo from '@/pages/Configuration/Accountinfo/Accountinfo'
 import Template from '@/pages/Configuration/Template/Template'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
+import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
 
 Vue.use(Router)
 
@@ -76,6 +78,11 @@ export default new Router({
 			props: true
 		},
 		{
+			path: '/configurations/netgroup',
+			name: 'NetworkGroup',
+			component: NetworkGroup
+		},
+		{
 			path: '/inventory/assets',
 			name: 'Assets',
 			component: Assets
@@ -84,6 +91,11 @@ export default new Router({
 			path: '/inventory/ipdiscover',
 			name: 'Ipdiscover',
 			component: Ipdiscover
-		}	
+		},
+		{
+			path: '/inventory/netdevices/:id?',
+			name: 'Netdevice',
+			component: Netdevice
+		}
 	],
 })

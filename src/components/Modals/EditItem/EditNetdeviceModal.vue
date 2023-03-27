@@ -1,9 +1,9 @@
 <template>
-	<div id="edit-field-modal">
+	<div id="edit-netdevice-modal">
 		<button 
-			v-b-modal="'edit-field.'+idmodal"
-			:title="$t('editfield')"
+			:title="$t('editnetdevice')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -11,14 +11,14 @@
 		</button>
 
 		<b-modal 
-			:id="'edit-field.'+idmodal"
-			:title="$t('editfield')"
+			:id="idmodal"
+			:title="$t('editnetdevice')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('edituser') }}
+					{{ row.ip }} - {{ row.mac }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -38,31 +38,27 @@
 					<b-col>
 						<b-form-group
 							:label="$t('name')" 
-							label-for="name"
+							label-for="netname"
 						>
 							<b-form-input
-								id="name"
-								v-model="row.name"
+								id="netname"
+								v-model="row.netname"
 								required
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('retrival_value')" 
-							label-for="retrival_value"
-						>
-							<b-form-input
-								id="retrival_value"
-								v-model="row.retrival_value"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
+					<b-form-input
+						id="ip"
+						v-model="row.ip"
+						hidden
+					/>
+					<b-form-input
+						id="mac"
+						v-model="row.mac"
+						hidden
+					/>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -86,57 +82,65 @@
 import Axios from 'axios'
 
 export default {
-	name: 'EditFieldModal',
+	name: 'EditNetdeviceModal',
 	props: {
-		namefield: { type: String, default: null },
-		retrivalvalue: { type: String, default: null },
-		idmodal: { type: Number, required: true },
-		section: { type: Number, required: true },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
-				id: null,
-				name: null,
-				retrival_value: null,
-				section: null
+				netname: null,
+				ip: null,
+				mac: null
 			},
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			idmodal: 'edit-netdevice'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
-	created() {
-		this.row.name = this.namefield
-		this.row.retrival_value = this.retrivalvalue
-		this.row.id = this.idmodal
-		this.row.section = this.section
-	},
 	methods: {
-		// Submit edit section creation and call refresh edit template to reload
+		loadData(id) {
+			this.getNetdevice(id)
+		},
+		// Retrieve networks info by id
+		getNetdevice(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
+				.then(response => {
+					this.row = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.$bvModal.show('edit-netdevice'+id)
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		// Submit edit netdevice creation and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-field.'+this.row.id)
-					this.$emit('reloadTemplate')
+					this.$bvModal.hide('edit-netdevice'+this.row.id)
+					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-field.'+this.row.id)
+					this.$bvModal.hide('edit-netdevice'+this.row.id)
 				})
 		},
 	}

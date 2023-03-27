@@ -1,7 +1,7 @@
 <template>
-	<div id="edit-accountinfo-modal">
+	<div id="edit-netgroup-modal">
 		<button 
-			:title="$t('editaccountinfo')"
+			:title="$t('editnetgroup')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -11,14 +11,14 @@
 		</button>
 
 		<b-modal 
-			:id="idModal"
-			:title="$t('editaccountinfo')"
+			:id="idModal" 
+			:title="$t('editnetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('editaccountinfo') }}
+					{{ $t('editnetgroup') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -44,10 +44,13 @@
 								id="name"
 								v-model="row.name"
 								required
-							/>
+							>
+								{{ row.name }}
+							</b-form-input>
 						</b-form-group>
 					</b-col>
-				</b-row><b-row>
+				</b-row>
+				<b-row>
 					<b-col>
 						<b-form-group
 							:label="$t('description')" 
@@ -57,6 +60,24 @@
 								id="description"
 								v-model="row.description"
 								required
+							>
+								{{ row.description }}
+							</b-form-input>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('network')" 
+							label-for="network"
+						>
+							<b-form-select
+								id="network"
+								v-model="netid" 
+								:options="networks" 
+								class="mb-3 form-select"
+								multiple
 							/>
 						</b-form-group>
 					</b-col>
@@ -85,22 +106,23 @@
 import Axios from 'axios'
 
 export default {
-	name: "EditAccountinfoModal",
+	name: "EditNetworkGroupModal",
 	props: {
-		id: { type: Number, required: true },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
-				id: null,
 				name: null,
-				description: null
+				description: null,
 			},
+			netid: [],
+			networks: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'edit-accountinfo'+this.id,
+			idModal: 'edit-netgroup'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -109,48 +131,84 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.getAccountinfo(id)
+			this.getNetgroup(id)
 		},
-		// Get accountinfo
-		getAccountinfo(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
+		getNetgroup(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.show('edit-accountinfo'+id)
+					this.getNetworks(id)
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 				})
 		},
-		// Submit edit accountinfo creation and call refresh edit template to reload
+		getNetworks(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+				.then(response => {
+					response.data.forEach(network => {
+						this.networks.push({
+							value: network.id,
+							text: network.netid
+						})
+					});
+					this.errorMsg = null
+					this.errored = false
+					this.$bvModal.show('edit-netgroup'+id)
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+		},
+		updateNetworks() {
+			this.netid.forEach(element => {
+				var json = {
+					group: this.row.id
+				}
+
+				Axios.put(process.env.VUE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			});
+		},
 		onSubmit(event) {
 			event.preventDefault()
-			
-			var update = {
-				name: this.row.name,
-				description: this.row.description
+
+			if(this.netid.length > 0) {
+				this.updateNetworks()
 			}
 
-			Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-accountinfo'+this.row.id)
+					this.$bvModal.hide('edit-netgroup'+this.row.id)
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-accountinfo'+this.row.id)
+					this.$bvModal.hide('edit-netgroup'+this.row.id)
 				})
-		},
+		}
 	}
 }
 </script>

@@ -4,6 +4,7 @@
 		v-if="!childrenLinks && isHeader"
 		:href="link" 
 		class="nav-item"
+		:class="{ active: isActive == header }"
 	>
 		<span class="nav-link-icon d-md-none d-lg-inline-block">
 			<font-awesome-layers 
@@ -33,7 +34,6 @@
 		id="my-nav-dropdown"
 		class="nav-item dropdown"
 		no-caret
-		right
 	>
 		<template slot="button-content">
 			<span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -57,23 +57,30 @@
 				{{ header }} 
 			</span>
 		</template>
-		<div
-			v-for="childLink in childrenLinks"
-			:key="childLink.link"
-		>
-			<b-dropdown-header
-				v-if="childLink.main"
-				:href="childLink.link"
-				class="dropdown-header"
+		<div class="dropdown-menu-columns">
+			<div
+				v-for="columnDivider in columnDividers"
+				:key="columnDivider.identifier"
+				class="dropdown-menu-column"
 			>
-				{{ childLink.header }}
-			</b-dropdown-header>
-			<b-dropdown-item
-				v-else
-				:href="childLink.link"
-			>
-				{{ childLink.header }}
-			</b-dropdown-item>
+				<b-dropdown-header
+					class="dropdown-header"
+				>
+					{{ columnDivider.header }}
+				</b-dropdown-header>
+				<div
+					v-for="childLink in childrenLinks"
+					:key="childLink.link"
+				>
+					<b-dropdown-item
+						v-if="childLink.column == columnDivider.identifier"
+						:href="childLink.link"
+						:class="{ active: isActive == childLink.route }"
+					>
+						{{ childLink.header }}
+					</b-dropdown-item>
+				</div>
+			</div>
 		</div>
 	</b-nav-item-dropdown>
 </template>
@@ -86,20 +93,11 @@ export default {
 		link: { type: String, default: '' },
 		main: { type: String, default: null },
 		childrenLinks: { type: Array, default: null },
+		columnDividers: { type: Array, default: null },
 		isHeader: { type: Boolean, default: false },
 		iconName: { type: String, default: '' },
 		index: { type: String, default: '' },
-		activeItem: { type: String, default: '' },
-	},
-	data() {
-		return {
-			headerlinkWasClicked: true,
-		};
-	},
-	computed: {
-		isActive() {
-			return (this.activeItem && this.activeItem.includes(this.index) && this.headerlinkWasClicked);
-		},
+		isActive: { type: String, default: '' }
 	}
 }
 </script>

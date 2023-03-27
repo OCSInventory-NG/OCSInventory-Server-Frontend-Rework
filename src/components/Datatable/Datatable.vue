@@ -119,9 +119,15 @@
 				primary-key="id"
 				style="white-space: pre-line;"
 				class="table-vcenter"
+				show-empty
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
 			>
+				<!-- No data available -->
+				<template #empty="">
+					{{ $t('no_data') }}
+				</template>
+
 				<!-- Selected row -->
 				<template #head(selected)="">
 					<b-form-group>
@@ -131,6 +137,7 @@
 						>
 					</b-form-group>
 				</template>
+
 				<template #cell(selected)="{ rowSelected }">
 					<!-- If row is selected -->
 					<template v-if="rowSelected">
@@ -144,6 +151,18 @@
 							:icon="['far', 'square']"
 						/>
 					</template>
+				</template>
+
+				<!-- Netdevice redirection -->
+				<template 
+					v-if="canaccesschild"
+					#cell(netdevices)="row"
+				>
+					<a 
+						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
+					>
+						{{ row.item.netdevices }}
+					</a>
 				</template>
 
 				<!-- Edit row for configuration -->
@@ -218,6 +237,7 @@
 						id="per-page-select"
 						v-model="perPage"
 						:options="pageOptions"
+						class="form-select"
 						size="sm"
 					/>
 				</b-form-group>
@@ -241,6 +261,9 @@ import i18n from '../../i18n'
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
 import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
+import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
+import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
+import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -251,6 +274,9 @@ export default {
 		EditUserModal,
 		EditGroupModal,
 		EditAccountinfoModal,
+		EditNetworkGroupModal,
+		EditNetworkModal,
+		EditNetdeviceModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -268,6 +294,7 @@ export default {
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: true },
+		canaccesschild: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
@@ -412,6 +439,9 @@ export default {
 		goToEditTemplate(id){
 			this.$router.push('/configurations/templates/edittemplate/'+id); 
 		},
+		goToNetdevices(id) {
+			this.$router.push('/inventory/netdevice/'+id); 
+		}
 	}
 }
 </script>

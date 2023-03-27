@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-user-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('edituser')"
 			class="btn btn-ghost-dark"
+			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -194,25 +194,25 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idModal: 'edit-user'+this.id
-		}
-	},
-	mounted() {
-		this.getUser()
-		this.getGroups()		
-	},
-	methods: {
-		// Get user
-		getUser() {
-			const header = {
+			idModal: 'edit-user'+this.id,
+			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.id+"/", { headers: header })
+		}
+	},
+	methods: {
+		loadData(id) {
+			this.getUser(id)
+		},
+		// Get user
+		getUser(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
+					this.getGroups(id)
 				})
 				.catch(e => {
 					this.errorMsg = e
@@ -220,12 +220,8 @@ export default {
 				})
 		},
 		// Get groups
-		getGroups() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+		getGroups(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -234,16 +230,13 @@ export default {
 							name: groupDetails.name
 						})
 					})
+					this.$bvModal.show('edit-user'+id)
 				})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			Axios.put(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

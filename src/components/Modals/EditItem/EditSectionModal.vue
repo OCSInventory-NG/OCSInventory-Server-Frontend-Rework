@@ -58,7 +58,7 @@
 								id="retrival_method"
 								v-model="row.retrival_method" 
 								:options="methodoptions" 
-								class="mb-3"
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>
@@ -73,7 +73,7 @@
 								id="retrival_output"
 								v-model="row.retrival_output" 
 								:options="outputoptions" 
-								class="mb-3"
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>
@@ -149,7 +149,11 @@ export default {
 				{ value: 'PTXT', text: 'Plain text' },
 				{ value: 'JSON', text: 'JSON format' },
 				{ value: 'TBLE', text: 'Table format' }
-			]
+			],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	created() {
@@ -163,13 +167,9 @@ export default {
 	methods: {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
