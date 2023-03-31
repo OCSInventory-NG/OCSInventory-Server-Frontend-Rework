@@ -25,22 +25,38 @@
 				<div class="page-body">
 					<div class="card">
 						<div class="card-body">
-							<div class="hr-text">Informations</div>
+							<div class="hr-text">
+								Informations
+							</div>
 							<div class="datagrid">
 								<div 
 									v-for="(value,key) in rowdata"
 									:key="key"
 									class="datagrid-item"
 								>
-									<div class="datagrid-title">{{ $t(key) }}</div>
-									<div class="datagrid-content">{{ value }}</div>
+									<div class="datagrid-title">
+										{{ $t(key) }}
+									</div>
+									<div class="datagrid-content">
+										{{ value }}
+									</div>
 								</div>
 							</div>
 							<br><br>
 							<div>
-								<b-tabs content-class="mt-3" fill>
-									<b-tab title="Administrative data" active><p>I'm the first tab</p></b-tab>
-									<b-tab title="Inventory sections"><p>I'm the second tab</p></b-tab>
+								<b-tabs
+									content-class="mt-3"
+									fill
+								>
+									<b-tab
+										title="Administrative data"
+										active
+									>
+										<p>I'm the first tab</p>
+									</b-tab>
+									<b-tab title="Inventory sections">
+										<p>I'm the second tab</p>
+									</b-tab>
 								</b-tabs>
 							</div>
 						</div>
