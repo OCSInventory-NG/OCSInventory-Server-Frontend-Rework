@@ -21,6 +21,8 @@ import Accountinfo from '@/pages/Configuration/Accountinfo/Accountinfo'
 import Template from '@/pages/Configuration/Template/Template'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
 import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
+// Detail
+import Detail from '@/pages/Detail/Detail'
 
 Vue.use(Router)
 
@@ -96,6 +98,11 @@ export default new Router({
 			path: '/inventory/netdevices/:id?',
 			name: 'Netdevice',
 			component: Netdevice
+		},
+		{
+			path: '/inventory/:type/details/:id',
+			name: 'Detail',
+			component: Detail
 		}
 	],
 })

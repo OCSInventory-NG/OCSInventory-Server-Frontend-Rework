@@ -158,10 +158,18 @@
 					v-if="canaccesschild"
 					#cell(netdevices)="row"
 				>
-					<a 
-						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
-					>
+					<a :href="'/ocsreports/inventory/netdevices/'+row.item.id">
 						{{ row.item.netdevices }}
+					</a>
+				</template>
+
+				<!-- Assets redirection -->
+				<template 
+					v-if="canaccessdetails"
+					#cell(name)="row"
+				>
+					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+						{{ row.item.name }}
 					</a>
 				</template>
 
@@ -295,6 +303,7 @@ export default {
 		exporttemplate: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: true },
 		canaccesschild: { type: Boolean, default: false },
+		canaccessdetails: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
