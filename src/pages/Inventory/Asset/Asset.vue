@@ -29,6 +29,7 @@
 								id="assets-datatable"
 								:rowdata="rowdata"
 								:usecheckbox="false"
+								:canaccessdetails="true"
 								title="assets"
 							/>
 						</div>
@@ -56,15 +57,15 @@ export default {
 			rowdata: [],
 			loading: true,
 			errored: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
 		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
