@@ -3,13 +3,28 @@
 // ===========================================
 
 .active > a {
-  color: #972081 !important;
+  //color: #972081 !important;
 }
 
-.dropdown-header > header {
-  padding-left: 0 !important;
+.navbar-expand-md .nav-item.active::after {
+  border-color: #972081;
 }
 
 .nav-link-title {
   padding-top: 5px;
+}
+
+.dropdown-header {
+  color: $white;
+  text-decoration: underline;
+  text-decoration-color: #972081;
+
+  > header {
+    padding-left: 0 !important;
+  }
+}
+
+.dropdown-toggle::after {
+  border-right: 0;
+  border-top: 0;
 }

@@ -33,7 +33,6 @@
 		v-else-if="childrenLinks"
 		id="my-nav-dropdown"
 		class="nav-item dropdown"
-		no-caret
 	>
 		<template slot="button-content">
 			<span class="nav-link-icon d-md-none d-lg-inline-block">
