@@ -60,7 +60,11 @@
 										title="Administrative data"
 										active
 									>
-										<p>I'm the first tab</p>
+										<Accountinfo
+											:id="rowdata.id"
+											:type="type"
+											:canedit="canedit"
+										/>
 									</b-tab>
 									<b-tab title="Inventory sections">
 										<p>I'm the second tab</p>
@@ -81,17 +85,20 @@ import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 //import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader' 
+import PageHeader from '@/components/Header/PageHeader'
+import Accountinfo from '@/components/Accountinfo/Accountinfo'
 
 export default {
 	name: 'Detail',
-	components: { Loader, Alert, PageHeader },
+	components: { Loader, Alert, PageHeader, Accountinfo },
 	data() {
 		return {
 			errorMsg: null,
 			rowdata: [],
 			loading: true,
 			errored: false,
+			canedit: true,
+			type: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -100,8 +107,14 @@ export default {
 	},
 	mounted() {
 		var extendedRoute = null
-		if(this.$route.params.type == 'assets') extendedRoute = "asset/bases/"+this.$route.params.id
-		if(this.$route.params.type == 'netdevice') extendedRoute = "netdevices/"+this.$route.params.id
+		if(this.$route.params.type == 'assets') {
+			extendedRoute = "asset/bases/"+this.$route.params.id
+			this.type = "ASSET"
+		}
+		if(this.$route.params.type == 'netdevice') {
+			extendedRoute = "netdevices/"+this.$route.params.id
+			this.type = "IPDISCOVER"
+		}
 
 		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
