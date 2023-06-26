@@ -28,3 +28,7 @@ button.dropdown-item {
     margin-right: 7px;
   }
 }
+
+[data-bs-theme=dark] .navbar-brand-autodark .navbar-brand-image {
+  filter: none;
+}
