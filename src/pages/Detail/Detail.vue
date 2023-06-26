@@ -17,10 +17,18 @@
 			</div>
 
 			<div v-else>
-				<!-- Page header -->
+				<!-- Page header for asset -->
 				<PageHeader 
+					v-if="rowdata.name"
 					:page-title="rowdata.name"
 				/>
+
+				<!-- Page header for netdevice -->
+				<PageHeader 
+					v-if="rowdata.netname"
+					:page-title="rowdata.netname"
+				/>
+
 				<!-- Display details -->
 				<div class="page-body">
 					<div class="card">
@@ -93,6 +101,7 @@ export default {
 	mounted() {
 		var extendedRoute = null
 		if(this.$route.params.type == 'assets') extendedRoute = "asset/bases/"+this.$route.params.id
+		if(this.$route.params.type == 'netdevice') extendedRoute = "netdevices/"+this.$route.params.id
 
 		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
