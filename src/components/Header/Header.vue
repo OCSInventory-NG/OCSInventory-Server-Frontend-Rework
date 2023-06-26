@@ -1,5 +1,8 @@
 <template>
-	<header class="navbar navbar-expand-md navbar-dark navbar-overlap d-print-none">
+	<header 
+		class="navbar navbar-expand-md navbar-overlap d-print-none" 
+		data-bs-theme="dark"
+	>
 		<div class="container-xl">
 			<button 
 				class="navbar-toggler" 
