@@ -6,12 +6,8 @@
   //color: #972081 !important;
 }
 
-.navbar-expand-md .nav-item.active:after {
+.navbar-expand-md .nav-item.active::after {
   border-color: #972081;
-}
-
-.dropdown-header > header {
-  padding-left: 0 !important;
 }
 
 .nav-link-title {
@@ -19,13 +15,16 @@
 }
 
 .dropdown-header {
-  color: white;
+  color: $white;
   text-decoration: underline;
   text-decoration-color: #972081;
-  text-decoration-thickness: 0.2rem;
+
+  > header {
+    padding-left: 0 !important;
+  }
 }
 
-.dropdown-toggle:after {
-  border-top: none;
-  border-right: none;
+.dropdown-toggle::after {
+  border-right: 0;
+  border-top: 0;
 }
