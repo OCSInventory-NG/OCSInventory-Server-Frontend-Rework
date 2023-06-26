@@ -173,6 +173,16 @@
 					</a>
 				</template>
 
+				<!-- Netdevices redirection -->
+				<template 
+					v-if="canaccessdetails"
+					#cell(netname)="row"
+				>
+					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+						{{ row.item.netname }}
+					</a>
+				</template>
+
 				<!-- Edit row for configuration -->
 				<template #cell(value)="row">
 					<div 
