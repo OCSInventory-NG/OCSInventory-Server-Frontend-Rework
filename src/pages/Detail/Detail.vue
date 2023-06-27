@@ -57,14 +57,17 @@
 									fill
 								>
 									<b-tab
-										title="Administrative data"
+										:title="$t('accountinfo')"
 										active
 									>
-										<Accountinfo
-											:id="rowdata.id"
-											:type="type"
-											:canedit="canedit"
-										/>
+										<fieldset class="form-fieldset">
+											<Accountinfo
+												:id="rowdata.id"
+												:type="type"
+												:canedit="canedit"
+												:slug="slug"
+											/>
+										</fieldset>
 									</b-tab>
 									<b-tab title="Inventory sections">
 										<p>I'm the second tab</p>
@@ -99,6 +102,7 @@ export default {
 			errored: false,
 			canedit: true,
 			type: null,
+			slug: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -110,10 +114,12 @@ export default {
 		if(this.$route.params.type == 'assets') {
 			extendedRoute = "asset/bases/"+this.$route.params.id
 			this.type = "ASSET"
+			this.slug = "base.base"
 		}
 		if(this.$route.params.type == 'netdevice') {
 			extendedRoute = "netdevices/"+this.$route.params.id
 			this.type = "IPDISCOVER"
+			this.slug = "netdevice.netdevice"
 		}
 
 		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })
