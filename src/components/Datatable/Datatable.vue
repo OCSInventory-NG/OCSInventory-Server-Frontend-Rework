@@ -13,7 +13,7 @@
 						v-model="filter"
 						:placeholder="$t('search')"
 						type="search"
-						class="form-control-rounded"
+						class="form-control"
 					/>
 					<span class="input-icon-addon">
 						<font-awesome-icon 
