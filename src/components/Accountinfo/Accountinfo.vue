@@ -1,5 +1,13 @@
 <template>
 	<div id="Accountinfo">
+		<!-- Display success box message -->
+		<section v-if="successed">
+			<Alert 
+				:message="$t('success_saved')" 
+				variant="success"
+			/>
+		</section>
+		
 		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
@@ -26,10 +34,11 @@
 						<b-col v-if="value.type=='TEXT'">
 							<b-form-group
 								:label="value.name" 
-								:label-for="value.id"
+								:label-for="'field_'+value.id"
+								class="form-label"
 							>
 								<b-form-input
-									:id="value.id"
+									:id="'field_'+value.id"
 									v-model="value.value"
 								/>
 							</b-form-group>
@@ -38,10 +47,11 @@
 						<b-col v-if="value.type=='TEXTAREA'">
 							<b-form-group
 								:label="value.name" 
-								:label-for="value.id"
+								:label-for="'field_'+value.id"
+								class="form-label"
 							>
 								<b-form-textarea
-									:id="value.id"
+									:id="'field_'+value.id"
 									v-model="value.value"
 									rows="3"
 									max-rows="6"
@@ -52,10 +62,11 @@
 						<b-col v-if="value.type=='SELECT'">
 							<b-form-group
 								:label="value.name" 
-								:label-for="value.id"
+								:label-for="'field_'+value.id"
+								class="form-label"
 							>
 								<b-form-select
-									:id="value.id"
+									:id="'field_'+value.id"
 									v-model="value.value"
 									:options="value.values"
 									class="mb-3 form-select"
@@ -66,15 +77,31 @@
 						<b-col v-if="value.type=='CHECKBOX'">
 							<b-form-group
 								:label="value.name" 
-								:label-for="value.id"
+								:label-for="'field_'+value.id"
+								class="form-label"
 							>
 								<b-form-checkbox-group
-									:id="value.id"
-									v-model="selected"
+									:id="'field_'+value.id"
+									v-model="value.value"
 									:options="value.values"
 								/>
 							</b-form-group>
 						</b-col>
+					</b-row>
+					<b-row>
+						<b-col align-self="start" />
+						<b-col 
+							align-self="center"
+							align="center"
+						>
+							<b-button 
+								type="submit"
+								variant="success"
+							>
+								{{ $t('update') }}
+							</b-button>
+						</b-col>
+						<b-col align-self="end" />
 					</b-row>
 				</b-form>
 			</div>
@@ -99,20 +126,22 @@ export default {
 	data() {
 		return {
 			rowdata: [],
-			selected: [],
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			dataWithValue: [
-				"SELECT",
-				"CHECKBOX"
-			],
+			create: true,
+			accountid : null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
+		}
+	},
+	watch: {
+		successed: function() {
+			setTimeout(() => this.successed = false, 10000)
 		}
 	},
 	mounted() {
@@ -127,7 +156,7 @@ export default {
 							id: rowDetails.id,
 							name: rowDetails.name,
 							type: rowDetails.datatype,
-							value: null,
+							value: (rowDetails.datatype == "CHECKBOX") ? [] : null,
 							values: this.getAccountinfoValue(rowDetails.accountinfo_values)
 						})
 					})
@@ -160,8 +189,11 @@ export default {
 							if(rowDetails.accountdata[value.id]) {
 								this.rowdata[key].value = rowDetails.accountdata[value.id]
 							}
+							this.accountid = rowDetails.id
+							this.create = false
 						}
 					})
+
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -171,8 +203,48 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		onSubmit() {
+		onSubmit(event) {
+			event.preventDefault()
 
+			var json = {
+				object_id: this.id,
+				object_slug: this.slug,
+				accountdata: {}
+			}
+
+			this.rowdata.forEach(rowDetails => {
+				json.accountdata[rowDetails.id] = rowDetails.value
+			})
+
+			if(this.create) {
+				Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			} else {
+				Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			}
 		}
 	}
 }
