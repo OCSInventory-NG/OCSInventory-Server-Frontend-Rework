@@ -92,6 +92,123 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
+				<div v-if="outputoptionoptions[row.retrival_output]">
+					<b-row>
+						<b-col>
+							<h4>{{ $t('retrieval_output_options') }}</h4>
+						</b-col>
+					</b-row>
+					<div
+						v-for="(value, key) in outputoptionoptions[row.retrival_output]"
+						:key="key"
+					>
+						<b-row v-if="key == 'use_index'">
+							<b-col>
+								<b-form-checkbox
+									id="use_index"
+									v-model="row.options.use_index"
+									name="use_index"
+									value="true"
+									unchecked-value="false"
+								>
+									{{ $t('use_index') }}
+								</b-form-checkbox>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'remove_line'">
+							<b-col>
+								<b-form-group
+									:label="$t('remove_line')" 
+									label-for="remove_line"
+								>
+									<b-form-input
+										id="remove_line"
+										v-model="row.options.remove_line"
+									/>
+								</b-form-group>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'override_line_used'">
+							<b-col>
+								<b-form-group
+									:label="$t('override_line_used')" 
+									label-for="override_line_used"
+								>
+									<b-form-input
+										id="override_line_used"
+										v-model="row.options.override_line_used"
+										type="number"
+									/>
+								</b-form-group>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'need_format'">
+							<b-col>
+								<b-form-checkbox
+									id="need_format"
+									v-model="row.options.need_format"
+									name="need_format"
+									value="true"
+									unchecked-value="false"
+								>
+									{{ $t('need_format') }}
+								</b-form-checkbox>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'submap'">
+							<b-col>
+								<b-form-group
+									:label="$t('submap')" 
+									label-for="submap"
+								>
+									<b-form-input
+										id="submap"
+										v-model="row.options.submap"
+									/>
+								</b-form-group>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'is_list'">
+							<b-col>
+								<b-form-checkbox
+									id="is_list"
+									v-model="row.options.is_list"
+									name="is_list"
+									value="true"
+									unchecked-value="false"
+								>
+									{{ $t('is_list') }}
+								</b-form-checkbox>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'multiple'">
+							<b-col>
+								<b-form-checkbox
+									id="multiple"
+									v-model="row.options.multiple"
+									name="multiple"
+									:value="true"
+									:unchecked-value="false"
+								>
+									{{ $t('multiple') }}
+								</b-form-checkbox>
+							</b-col>
+						</b-row>
+						<b-row v-if="key == 'separator'">
+							<b-col>
+								<b-form-group
+									:label="$t('separator')" 
+									label-for="separator"
+								>
+									<b-form-input
+										id="separator"
+										v-model="row.options.separator"
+									/>
+								</b-form-group>
+							</b-col>
+						</b-row>
+					</div>
+				</div>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
@@ -118,23 +235,13 @@ import Axios from 'axios'
 export default {
 	name: 'EditSectionModal',
 	props: {
-		namesection: { type: String, default: null },
-		retrivalmethod: { type: String, default: null },
-		retrivaloutput: { type: String, default: null },
-		target: { type: String, default: null },
+		rowsectiondata: { type: Object, default: null },
 		idmodal: { type: Number, required: true },
 		template: { type: Number, required: true },
 	},
 	data() {
 		return {
-			row: {
-				id: null,
-				name: null,
-				retrival_method: null,
-				retrival_output: null,
-				target: null,
-				template: null
-			},
+			row: null,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -153,14 +260,27 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
+			outputoptionoptions: {
+				"TBLE": {
+					"use_index": false,
+					"remove_line": [],
+					"override_line_used": null
+				},
+				"JSON": {
+					"need_format": false,
+					"submap": null,
+					"is_list": false
+				},
+				"REGX": {
+					"multiple": false,
+					"separator": null
+				}
 			}
 		}
 	},
 	created() {
-		this.row.name = this.namesection
-		this.row.retrival_method = this.retrivalmethod
-		this.row.retrival_output = this.retrivaloutput
-		this.row.target = this.target
+		this.row = this.rowsectiondata
 		this.row.id = this.idmodal
 		this.row.template = this.template
 	},
