@@ -41,9 +41,7 @@
 									<b-button-toolbar>
 										<b-button-group class="mr-1">
 											<EditSectionModal
-												:namesection="value.name"
-												:retrivalmethod="value.retrival_method"
-												:retrivaloutput="value.retrival_output"
+												:rowsectiondata="value"
 												:target="value.target"
 												:idmodal="value.id"
 												:template="value.template"
@@ -64,7 +62,23 @@
 										</b-button-group>
 									</b-button-toolbar>
 								</b-col>
-							</b-row><br><br>
+							</b-row>
+							<div v-if="outputoptionoptions[value.retrival_output]">
+								<b-row class="text-center">
+									<b-col><b>{{ $t('retrieval_output_options') }}</b></b-col>
+								</b-row>
+								<b-row class="text-center">
+									<b-col
+										v-for="(option,optionname) in value.options"
+										:key="optionname"
+									>
+										<p v-if="optionname in outputoptionoptions[value.retrival_output]">
+											<b>{{ $t(optionname) }} :</b> {{ option }}
+										</p>
+									</b-col>
+								</b-row>
+							</div>
+							<!--<br><br>-->
 							<b-row  
 								v-if="value.fields[0]"
 								align-h="center" 
@@ -101,6 +115,26 @@ export default {
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
+	},
+	data() {
+		return {
+			outputoptionoptions: {
+				"TBLE": {
+					"use_index": false,
+					"remove_line": [],
+					"override_line_used": null
+				},
+				"JSON": {
+					"need_format": false,
+					"submap": null,
+					"is_list": false
+				},
+				"REGX": {
+					"multiple": false,
+					"separator": null
+				}
+			}
+		}
 	},
 	methods: {
 		reloadTemplate() {
