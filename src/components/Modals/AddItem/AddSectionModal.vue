@@ -82,6 +82,20 @@
 							<b-row>
 								<b-col>
 									<b-form-group
+										:label="$t('target')" 
+										label-for="target"
+									>
+										<b-form-input
+											id="target"
+											v-model="row.target"
+											required
+										/>
+									</b-form-group>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col>
+									<b-form-group
 										:label="$t('retrival_output')" 
 										label-for="retrival_output"
 									>
@@ -94,20 +108,123 @@
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row>
-								<b-col>
-									<b-form-group
-										:label="$t('target')" 
-										label-for="target"
-									>
-										<b-form-input
-											id="target"
-											v-model="row.target"
-											required
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
+							<div v-if="outputoptionoptions[row.retrival_output]">
+								<b-row>
+									<b-col>
+										<h4>{{ $t('retrieval_output_options') }}</h4>
+									</b-col>
+								</b-row>
+								<div
+									v-for="(value, key) in outputoptionoptions[row.retrival_output]"
+									:key="key"
+								>
+									<b-row v-if="key == 'use_index'">
+										<b-col>
+											<b-form-checkbox
+												id="use_index"
+												v-model="row.options.use_index"
+												name="use_index"
+												value="true"
+												unchecked-value="false"
+											>
+												{{ $t('use_index') }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'remove_line'">
+										<b-col>
+											<b-form-group
+												:label="$t('remove_line')" 
+												label-for="remove_line"
+											>
+												<b-form-input
+													id="remove_line"
+													v-model="row.options.remove_line"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'override_line_used'">
+										<b-col>
+											<b-form-group
+												:label="$t('override_line_used')" 
+												label-for="override_line_used"
+											>
+												<b-form-input
+													id="override_line_used"
+													v-model="row.options.override_line_used"
+													type="number"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'need_format'">
+										<b-col>
+											<b-form-checkbox
+												id="need_format"
+												v-model="row.options.need_format"
+												name="need_format"
+												value="true"
+												unchecked-value="false"
+											>
+												{{ $t('need_format') }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'submap'">
+										<b-col>
+											<b-form-group
+												:label="$t('submap')" 
+												label-for="submap"
+											>
+												<b-form-input
+													id="submap"
+													v-model="row.options.submap"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'is_list'">
+										<b-col>
+											<b-form-checkbox
+												id="is_list"
+												v-model="row.options.is_list"
+												name="is_list"
+												value="true"
+												unchecked-value="false"
+											>
+												{{ $t('is_list') }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'multiple'">
+										<b-col>
+											<b-form-checkbox
+												id="multiple"
+												v-model="row.options.multiple"
+												name="multiple"
+												:value="true"
+												:unchecked-value="false"
+											>
+												{{ $t('multiple') }}
+											</b-form-checkbox>
+										</b-col>
+									</b-row>
+									<b-row v-if="key == 'separator'">
+										<b-col>
+											<b-form-group
+												:label="$t('separator')" 
+												label-for="separator"
+											>
+												<b-form-input
+													id="separator"
+													v-model="row.options.separator"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+								</div>
+							</div>
 							<b-row>
 								<b-col align-self="start" />
 								<b-col 
@@ -147,10 +264,20 @@ export default {
 				id: null,
 				name: null,
 				retrival_method: 'FILE',
-				retrival_output: 'PTXT',
+				retrival_output: null,
 				target: null,
 				fields: [],
-				template: null
+				template: null,
+				options: {
+					"use_index": false,
+					"remove_line": null,
+					"override_line_used": null,
+					"need_format": false,
+					"submap": null,
+					"is_list": false,
+					"multiple": false,
+					"separator": null
+				}
 			},
 			rowdata: [],
 			loading: true,
@@ -167,8 +294,26 @@ export default {
 			outputoptions: [
 				{ value: 'PTXT', text: 'Plain text' },
 				{ value: 'JSON', text: 'JSON format' },
-				{ value: 'TBLE', text: 'Table format' }
-			]
+				{ value: 'TBLE', text: 'Table format' },
+				{ value: 'REGX', text: 'Regex processing' },
+				{ value: 'GREP', text: 'Grep command output' }
+			],
+			outputoptionoptions: {
+				"TBLE": {
+					"use_index": false,
+					"remove_line": [],
+					"override_line_used": null
+				},
+				"JSON": {
+					"need_format": false,
+					"submap": null,
+					"is_list": false
+				},
+				"REGX": {
+					"multiple": false,
+					"separator": null
+				}
+			}
 		}
 	},
 	created() {
