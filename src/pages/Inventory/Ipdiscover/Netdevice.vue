@@ -30,6 +30,7 @@
 								:rowdata="rowdata"
 								:canedit="canedit"
 								:candelete="candelete"
+								:canaccessdetails="true"
 								editcomponent="EditNetdeviceModal"
 								title="netdevice"
 								@reloadDatatable="reloadDatatable"

@@ -13,7 +13,7 @@
 						v-model="filter"
 						:placeholder="$t('search')"
 						type="search"
-						class="form-control-rounded"
+						class="form-control"
 					/>
 					<span class="input-icon-addon">
 						<font-awesome-icon 
@@ -170,6 +170,16 @@
 				>
 					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
 						{{ row.item.name }}
+					</a>
+				</template>
+
+				<!-- Netdevices redirection -->
+				<template 
+					v-if="canaccessdetails"
+					#cell(netname)="row"
+				>
+					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+						{{ row.item.netname }}
 					</a>
 				</template>
 

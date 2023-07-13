@@ -16,8 +16,7 @@
 
 .dropdown-header {
   color: $white;
-  text-decoration: underline;
-  text-decoration-color: #972081;
+  text-decoration: solid underline #972081 .2rem;
 
   > header {
     padding-left: 0 !important;
