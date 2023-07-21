@@ -96,8 +96,8 @@ export default {
 	},
 	methods: {
 		selectAllPermission(line) {
-			var checked = line.path[0].checked
-			var id = line.path[0].id
+			var checked = line.srcElement.checked
+			var id = line.srcElement.id
 			var search = null
 			var all = []
 
