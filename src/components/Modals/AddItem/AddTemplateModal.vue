@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -31,7 +31,7 @@
 								<Breadcrumb />
 							</div>
 							<h2 class="page-title">
-								{{ $t(pageTitle) }}
+								{{ $t('title.'+pageTitle) }}
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
@@ -39,26 +39,26 @@
 							<b-button
 								v-if="canadd"
 								v-b-modal.add-template
-								:title="$t('addtemplate')"
+								:title="$t('template.addtemplate')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('addtemplate') }}
+								{{ $t('template.addtemplate') }}
 							</b-button>
 
 							<!-- Modal to add template -->
 							<b-modal 
 								id="add-template" 
-								:title="$t('addtemplate')"
+								:title="$t('template.addtemplate')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('addtemplate') }}
+										{{ $t('template.addtemplate') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,7 +77,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('name')" 
+												:label="$t('user.name')" 
 												label-for="name"
 											>
 												<b-form-input
@@ -91,7 +91,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('os')" 
+												:label="$t('inventory.os')" 
 												label-for="os"
 											>
 												<b-form-select
@@ -113,7 +113,7 @@
 												type="submit"
 												variant="success"
 											>
-												{{ $t('add') }}
+												{{ $t('generic.add') }}
 											</b-button>
 										</b-col>
 										<b-col align-self="end" />
@@ -135,6 +135,7 @@
 								:canexport="false"
 								:exporttemplate="exporttemplate"
 								title="templates"
+								translationkey="template."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>

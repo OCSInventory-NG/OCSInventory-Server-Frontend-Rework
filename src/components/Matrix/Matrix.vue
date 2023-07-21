@@ -3,12 +3,12 @@
 		<table class="table w-full">
 			<thead>
 				<tr align="center">
-					<th>{{ $t("type") }}</th>
+					<th>{{ $t("generic.type") }}</th>
 					<th 
 						v-for="action in headertab"
 						:key="action"
 					>
-						{{ $t(action) }}
+						{{ $t('generic.'+action) }}
 					</th>
 				</tr>
 			</thead>
@@ -41,7 +41,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td>{{ $t('all') }}</td>
+					<td>{{ $t('generic.all') }}</td>
 					<td
 						v-for="action in headertab"
 						:key="action"
@@ -59,12 +59,12 @@
 
 			<thead>
 				<tr align="center">
-					<th>{{ $t("type") }}</th>
+					<th>{{ $t("generic.type") }}</th>
 					<th 
 						v-for="action in headertab"
 						:key="action"
 					>
-						{{ $t(action) }}
+						{{ $t('generic.'+action) }}
 					</th>
 				</tr>
 			</thead>

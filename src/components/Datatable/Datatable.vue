@@ -11,7 +11,7 @@
 					<b-form-input 
 						id="filter-input" 
 						v-model="filter"
-						:placeholder="$t('search')"
+						:placeholder="$t('generic.search')"
 						type="search"
 						class="form-control"
 					/>
@@ -35,7 +35,7 @@
 							name="export.xls"
 						>
 							<button 
-								:title="$t('download')"
+								:title="$t('generic.download')"
 								class="form-control btn"
 							>
 								<font-awesome-icon 
@@ -63,7 +63,7 @@
 				>
 					<b-button-group class="mr-1">
 						<b-button 
-							:title="$t('save_config')"
+							:title="$t('configuration.save_config')"
 							variant="success"
 							class="add-button"
 							@click="onSave"
@@ -78,7 +78,7 @@
 				<!-- Show/Hide columns -->
 				<div class="col">
 					<b-dropdown 
-						:text="$t('show_hide')"
+						:text="$t('generic.show_hide')"
 					>
 						<b-dropdown-item
 							v-for="field in fields" 
@@ -87,7 +87,8 @@
 							:active="!field.visible"
 							@click="field.visible = !field.visible"
 						>
-							{{ $t(field.key) }}
+							<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
+							<label v-else>{{ $t('generic.'+field.key) }}</label>
 						</b-dropdown-item>
 					</b-dropdown>
 				</div>
@@ -96,7 +97,7 @@
 
 		<!-- Total row number -->
 		<div align="center">
-			<p>{{ totalRows }} {{ $t('result') }}</p>
+			<p>{{ totalRows }} {{ $t('generic.result') }}</p>
 		</div>
 
 		<!-- Datatable -->
@@ -125,7 +126,7 @@
 			>
 				<!-- No data available -->
 				<template #empty="">
-					{{ $t('no_data') }}
+					{{ $t('generic.no_data') }}
 				</template>
 
 				<!-- Selected row -->
@@ -203,7 +204,7 @@
 						<b-button-group class="mx-1">
 							<button 
 								v-if="canedittemplate"
-								:title="$t('edittemplate')"
+								:title="$t('template.edittemplate')"
 								class="btn btn-ghost-dark"
 								@click="goToEditTemplate(row.item.id)"
 							>
@@ -218,6 +219,7 @@
 								:route="adddvalueroute"
 								:titlevalue="titlevalue"
 								:reconciliationname="reconciliationname"
+								:translationkey="translationkey"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Edit button -->
@@ -317,6 +319,7 @@ export default {
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
+		translationkey: { type: String, default: '' },
 	},
 	data() {
 		return {
@@ -369,7 +372,7 @@ export default {
 		if(this.usecheckbox == true) {
 			this.fields.push({
 				key: "selected", 
-				label: "", 
+				label: i18n.t('generic.selected'), 
 				sortable: false ,
 				visible: true,
 			})
@@ -396,7 +399,7 @@ export default {
 
 					var array = {
 						key: data,
-						label: i18n.t(data),
+						label: i18n.t(this.translationkey+data),
 						sortable: true,
 						visible: visible,
 					}
@@ -413,7 +416,7 @@ export default {
 
 		var actions = {
 			key: "actions", 
-			label: i18n.t('actions'), 
+			label: i18n.t('generic.actions'), 
 			sortable: false ,
 			visible: true,
 		}

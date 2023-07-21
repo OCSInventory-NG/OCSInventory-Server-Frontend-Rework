@@ -2,7 +2,7 @@
 	<div id="DeleteItemModal">
 		<button 
 			v-b-modal="idModal"
-			:title="$t('deleteitem')"
+			:title="$t('generic.deleteitem')"
 			class="btn btn-ghost-danger"
 		>
 			<font-awesome-icon 
@@ -12,14 +12,14 @@
 
 		<b-modal 
 			:id="idModal" 
-			:title="$t('deleteitem')"
+			:title="$t('generic.deleteitem')"
 			hide-footer
 			modal-class="modal modal-blur"
 			size="sm"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('deleteitem') }}
+					{{ $t('generic.deleteitem') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -41,8 +41,8 @@
 						size="5x"
 						color="#d63939"
 					/>
-					<p><b>{{ $t('deletevalid') }}</b></p>
-					<p>{{ $t('delete_msg') }} {{ name }} ?</p>
+					<p><b>{{ $t('message.deletevalid') }}</b></p>
+					<p>{{ $t('message.delete_msg') }} {{ name }} ?</p>
 					<b-form-input 
 						v-model="text" 
 						hidden
@@ -57,7 +57,7 @@
 								type="submit"
 								class="btn btn-danger"
 							>
-								{{ $t('delete_msg2') }}
+								{{ $t('generic.delete_msg2') }}
 							</button>
 						</div>
 					</div>

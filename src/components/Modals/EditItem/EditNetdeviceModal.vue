@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-netdevice-modal">
 		<button 
-			:title="$t('editnetdevice')"
+			:title="$t('network.editnetdevice')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,7 +12,7 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('editnetdevice')"
+			:title="$t('network.editnetdevice')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
@@ -37,7 +37,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="netname"
 						>
 							<b-form-input
@@ -68,7 +68,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />

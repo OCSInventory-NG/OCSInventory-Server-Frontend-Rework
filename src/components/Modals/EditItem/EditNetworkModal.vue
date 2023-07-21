@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-network-modal">
 		<button 
-			:title="$t('editnetwork')"
+			:title="$t('network.editnetwork')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,7 +12,7 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('editnetwork')"
+			:title="$t('network.editnetwork')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
@@ -37,7 +37,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -51,7 +51,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('description')" 
+							:label="$t('generic.description')" 
 							label-for="description"
 						>
 							<b-form-input
@@ -64,7 +64,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('netgroup')" 
+							:label="$t('title.netgroup')" 
 							label-for="netgroup"
 						>
 							<b-form-select
@@ -96,7 +96,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -159,7 +159,7 @@ export default {
 				.then(response => {
 					this.netgroup.push({
 						value: null,
-						text: i18n.t("unknown_network")
+						text: i18n.t("network.unknown_network")
 					})
 					response.data.forEach(element => {
 						this.netgroup.push({

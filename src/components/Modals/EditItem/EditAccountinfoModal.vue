@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-accountinfo-modal">
 		<button 
-			:title="$t('editaccountinfo')"
+			:title="$t('accountinfo.editaccountinfo')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,13 +12,13 @@
 
 		<b-modal 
 			:id="idModal"
-			:title="$t('editaccountinfo')"
+			:title="$t('accountinfo.editaccountinfo')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('editaccountinfo') }}
+					{{ $t('accountinfo.editaccountinfo') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,7 +37,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -50,7 +50,7 @@
 				</b-row><b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('description')" 
+							:label="$t('generic.description')" 
 							label-for="description"
 						>
 							<b-form-input
@@ -71,7 +71,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />

@@ -38,6 +38,7 @@
 								:canedit="canedit"
 								:canaccesschild="canaccesschild"
 								editcomponent="EditNetworkModal"
+								translationkey="network."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</b-card-text>

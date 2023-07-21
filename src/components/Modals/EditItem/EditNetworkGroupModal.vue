@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-netgroup-modal">
 		<button 
-			:title="$t('editnetgroup')"
+			:title="$t('network.editnetgroup')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,13 +12,13 @@
 
 		<b-modal 
 			:id="idModal" 
-			:title="$t('editnetgroup')"
+			:title="$t('network.editnetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('editnetgroup') }}
+					{{ $t('network.editnetgroup') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,7 +37,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -53,7 +53,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('description')" 
+							:label="$t('generic.description')" 
 							label-for="description"
 						>
 							<b-form-input
@@ -69,7 +69,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network')" 
+							:label="$t('title.network')" 
 							label-for="network"
 						>
 							<b-form-select
@@ -92,7 +92,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />

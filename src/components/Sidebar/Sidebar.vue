@@ -7,7 +7,7 @@
 			<b-nav class="navbar-nav">
 				<NavLink
 					:is-active="activeItem"
-					:header="$t('dashboard')"
+					:header="$t('title.dashboard')"
 					link="/ocsreports/dashboard"
 					icon-name="home"
 					index="dashboard"
@@ -15,22 +15,22 @@
 				/>
 				<NavLink
 					:is-active="activeItem"
-					:header="$t('inventory')"
+					:header="$t('title.inventory')"
 					:column-dividers="[
-						{ header: $t('general'), identifier: 'general' },
-						{ header: $t('network'), identifier: 'network' },
+						{ header: $t('title.general'), identifier: 'general' },
+						{ header: $t('title.network'), identifier: 'network' },
 					]"
 					:children-links="[
 						{ 
-							header: $t('assets'), link: '/ocsreports/inventory/assets', 
+							header: $t('title.assets'), link: '/ocsreports/inventory/assets', 
 							route:'Assets', column: 'general' 
 						},
 						{ 
-							header: $t('ipdiscover'), link: '/ocsreports/inventory/ipdiscover', 
+							header: $t('title.ipdiscover'), link: '/ocsreports/inventory/ipdiscover', 
 							route:'Ipdiscover', column: 'network' 
 						},
 						{ 
-							header: $t('netdevices'), link: '/ocsreports/inventory/netdevices', 
+							header: $t('title.netdevices'), link: '/ocsreports/inventory/netdevices', 
 							route:'Netdevice', column: 'network' 
 						},
 					]"
@@ -40,17 +40,17 @@
 				/>
 				<NavLink
 					:is-active="activeItem"
-					:header="$t('usermanagement')"
+					:header="$t('title.usermanagement')"
 					:column-dividers="[
-						{ header: $t('management'), identifier: 'management' }
+						{ header: $t('title.management'), identifier: 'management' }
 					]"
 					:children-links="[
 						{ 
-							header: $t('users'), link: '/ocsreports/usermanagement/users', 
+							header: $t('title.users'), link: '/ocsreports/usermanagement/users', 
 							route:'User', column: 'management' 
 						},
 						{ 
-							header: $t('groups'), link: '/ocsreports/usermanagement/groups', 
+							header: $t('title.groups'), link: '/ocsreports/usermanagement/groups', 
 							route:'Group', column: 'management' 
 						},
 					]"
@@ -60,27 +60,27 @@
 				/>
 				<NavLink
 					:is-active="activeItem"
-					:header="$t('configurations')"
+					:header="$t('title.configurations')"
 					:column-dividers="[
-						{ header: $t('general'), identifier: 'general' },
-						{ header: $t('inventory'), identifier: 'inventory' },
-						{ header: $t('network'), identifier: 'network' },
+						{ header: $t('title.general'), identifier: 'general' },
+						{ header: $t('title.inventory'), identifier: 'inventory' },
+						{ header: $t('title.network'), identifier: 'network' },
 					]"
 					:children-links="[
 						{ 
-							header: $t('general_configuration'), link: '/ocsreports/configurations/general', 
+							header: $t('title.general_configuration'), link: '/ocsreports/configurations/general', 
 							route:'General', column: 'general' 
 						},
 						{ 
-							header: $t('templates'), link: '/ocsreports/configurations/templates', 
+							header: $t('title.templates'), link: '/ocsreports/configurations/templates', 
 							route:'Template', column: 'inventory' 
 						},
 						{ 
-							header: $t('accountinfo'), link: '/ocsreports/configurations/accountinfo', 
+							header: $t('title.accountinfo'), link: '/ocsreports/configurations/accountinfo', 
 							route:'Accountinfo', column: 'inventory' 
 						},
 						{ 
-							header: $t('netgroup'), link: '/ocsreports/configurations/netgroup', 
+							header: $t('title.netgroup'), link: '/ocsreports/configurations/netgroup', 
 							route:'NetworkGroup', column: 'network' 
 						},
 					]"

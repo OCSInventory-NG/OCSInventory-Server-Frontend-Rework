@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -31,7 +31,7 @@
 								<Breadcrumb />
 							</div>
 							<h2 class="page-title">
-								{{ $t(pageTitle) }}
+								{{ $t('title.'+pageTitle) }}
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
@@ -39,27 +39,27 @@
 							<b-button
 								v-if="canadd"
 								v-b-modal.add-group
-								:title="$t('addgroup')"
+								:title="$t('group.addgroup')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('addgroup') }}
+								{{ $t('group.addgroup') }}
 							</b-button>
 
 							<!-- Modal to add group -->
 							<b-modal 
 								id="add-group" 
-								:title="$t('addgroup')"
+								:title="$t('group.addgroup')"
 								size="xl"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('addgroup') }}
+										{{ $t('group.addgroup') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,13 +77,13 @@
 								>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('group_informations') }}</h4>
+											<h4>{{ $t('group.group_informations') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('name')" 
+												:label="$t('user.name')" 
 												label-for="name"
 											>
 												<b-form-input
@@ -96,7 +96,7 @@
 									</b-row>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('permissions') }}</h4>
+											<h4>{{ $t('group.permissions') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
@@ -117,7 +117,7 @@
 												type="submit"
 												variant="success"
 											>
-												{{ $t('add') }}
+												{{ $t('generic.add') }}
 											</b-button>
 										</b-col>
 										<b-col align-self="end" />
@@ -138,6 +138,7 @@
 								:candelete="candelete"
 								editcomponent="EditGroupModal"
 								title="groups"
+								translationkey="group."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -236,7 +237,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t(label)
+							trad: i18n.t('permission.'+label)
 						})
 					})
 				})
@@ -269,9 +270,9 @@ export default {
 						this.permissions[label.id].forEach(permissions => {
 							if(permissions.id == permissionsDetails) {
 								if(typeof tmpPermissions[label.trad] === 'undefined') {
-									tmpPermissions[label.trad] = [i18n.t(permissions.type)]
+									tmpPermissions[label.trad] = [i18n.t('generic.'+permissions.type)]
 								} else {
-									tmpPermissions[label.trad].push(i18n.t(permissions.type)) 
+									tmpPermissions[label.trad].push(i18n.t('generic.'+permissions.type)) 
 								}
 							}
 						})					

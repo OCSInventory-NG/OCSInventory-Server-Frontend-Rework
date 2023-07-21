@@ -1,7 +1,7 @@
 <template>
 	<div id="edit-group-modal">
 		<button 
-			:title="$t('editgroup')"
+			:title="$t('group.editgroup')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,14 +12,14 @@
 
 		<b-modal 
 			:id="idModal" 
-			:title="$t('editgroup')"
+			:title="$t('group.editgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('editgroup') }}
+					{{ $t('group.editgroup') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,13 +37,13 @@
 			>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('group_informations') }}</h4>
+						<h4>{{ $t('group.group_informations') }}</h4>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -58,7 +58,7 @@
 				</b-row>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('permissions') }}</h4>
+						<h4>{{ $t('group.permissions') }}</h4>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -80,7 +80,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -161,7 +161,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t(label)
+							trad: i18n.t('permission.'+label)
 						})
 					})
 					this.getGroup(id)

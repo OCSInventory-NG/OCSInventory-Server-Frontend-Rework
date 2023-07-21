@@ -25,7 +25,12 @@ export default {
 				.slice(1)
 				.map(route => route
 					.split('_')
-					.map(word => i18n.t(word))
+					.map(word => {
+						if(i18n.te('title.' + word)) {
+							return i18n.t('title.' + word)
+						}
+						return i18n.t(word)
+					})
 					.join(' ')
 				);
 		}

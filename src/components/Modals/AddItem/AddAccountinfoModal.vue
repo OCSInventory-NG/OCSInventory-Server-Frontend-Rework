@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -31,7 +31,7 @@
 								<Breadcrumb />
 							</div>
 							<h2 class="page-title">
-								{{ $t(pageTitle) }}
+								{{ $t('title.'+pageTitle) }}
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
@@ -39,26 +39,26 @@
 							<b-button
 								v-if="canadd"
 								v-b-modal.add-accountinfo
-								:title="$t('addaccountinfo')"
+								:title="$t('accountinfo.addaccountinfo')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('addaccountinfo') }}
+								{{ $t('accountinfo.addaccountinfo') }}
 							</b-button>
 
 							<!-- Modal to add accountinfo -->
 							<b-modal 
 								id="add-accountinfo" 
-								:title="$t('addaccountinfo')"
+								:title="$t('accountinfo.addaccountinfo')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('addaccountinfo') }}
+										{{ $t('accountinfo.addaccountinfo') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,7 +77,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('name')" 
+												:label="$t('user.name')" 
 												label-for="name"
 											>
 												<b-form-input
@@ -91,7 +91,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('description')" 
+												:label="$t('generic.description')" 
 												label-for="description"
 											>
 												<b-form-input
@@ -105,7 +105,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('datatype')" 
+												:label="$t('accountinfo.datatype')" 
 												label-for="datatype"
 											>
 												<b-form-select
@@ -120,7 +120,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('datatarget')" 
+												:label="$t('accountinfo.datatarget')" 
 												label-for="datatarget"
 											>
 												<b-form-select
@@ -142,7 +142,7 @@
 												type="submit"
 												variant="success"
 											>
-												{{ $t('add') }}
+												{{ $t('generic.add') }}
 											</b-button>
 										</b-col>
 										<b-col align-self="end" />
@@ -167,6 +167,7 @@
 								titlevalue="accountinfo_param"
 								adddvalueroute="accountinfo/value"
 								reconciliationname="accountinfo_config"
+								translationkey="accountinfo."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -215,9 +216,9 @@ export default {
 			errored: false,
 			successed: false,
 			datatargetoptions: [
-				{ value: 'ASSET', text: i18n.t("assets") },
-				{ value: 'IPDISCOVER', text: i18n.t("ipdiscover") },
-				{ value: 'SNMP', text: i18n.t("snmp") }
+				{ value: 'ASSET', text: i18n.t("title.assets") },
+				{ value: 'IPDISCOVER', text: i18n.t("title.ipdiscover") },
+				{ value: 'SNMP', text: i18n.t("title.snmp") }
 			],
 			datatypeoptions: [
 				{ value: 'TEXT', text: 'TEXT' },

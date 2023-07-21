@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -31,7 +31,7 @@
 								<Breadcrumb />
 							</div>
 							<h2 class="page-title">
-								{{ $t(pageTitle) }}
+								{{ $t('title.'+pageTitle) }}
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
@@ -39,26 +39,26 @@
 							<b-button
 								v-if="canadd"
 								v-b-modal.add-netgroup
-								:title="$t('addnetgroup')"
+								:title="$t('network.addnetgroup')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('addnetgroup') }}
+								{{ $t('network.addnetgroup') }}
 							</b-button>
 
 							<!-- Modal to add netgroup -->
 							<b-modal 
 								id="add-netgroup" 
-								:title="$t('addnetgroup')"
+								:title="$t('network.addnetgroup')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('addnetgroup') }}
+										{{ $t('network.addnetgroup') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,7 +77,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('name')" 
+												:label="$t('user.name')" 
 												label-for="name"
 											>
 												<b-form-input
@@ -91,7 +91,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('description')" 
+												:label="$t('generic.description')" 
 												label-for="description"
 											>
 												<b-form-input
@@ -112,7 +112,7 @@
 												type="submit"
 												variant="success"
 											>
-												{{ $t('add') }}
+												{{ $t('generic.add') }}
 											</b-button>
 										</b-col>
 										<b-col align-self="end" />
@@ -133,6 +133,7 @@
 								:candelete="candelete"
 								editcomponent="EditNetworkGroupModal"
 								title="netgroups"
+								translationkey="network."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>

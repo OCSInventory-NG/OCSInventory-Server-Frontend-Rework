@@ -2,7 +2,7 @@
 	<div id="import-template-modal">
 		<b-button 
 			v-b-modal.import-template
-			:title="$t('import_template')"
+			:title="$t('template.import_template')"
 			class="form-control btn"
 		>
 			<font-awesome-icon 
@@ -12,14 +12,14 @@
 
 		<b-modal 
 			id="import-template" 
-			:title="$t('import_template')"
+			:title="$t('template.import_template')"
 			hide-footer
 			size="md"
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('import_template') }}
+					{{ $t('template.import_template') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -38,7 +38,7 @@
 				<b-row>
 					<b-col>
 						<b-form-file
-							:placeholder="$t('select_template_file')"
+							:placeholder="$t('template.select_template_file')"
 							accept=".json"
 							@change="processFile($event)"
 						/>
@@ -54,7 +54,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('send') }}
+							{{ $t('generic.send') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
