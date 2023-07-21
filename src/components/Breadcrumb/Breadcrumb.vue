@@ -29,7 +29,7 @@ export default {
 						if(i18n.te('title.' + word)) {
 							return i18n.t('title.' + word)
 						}
-						return i18n.t(word)
+						return word
 					})
 					.join(' ')
 				);

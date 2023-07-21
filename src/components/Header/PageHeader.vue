@@ -15,7 +15,7 @@
 					v-else
 					class="page-title"
 				>
-					{{ $t(pageTitle) }}
+					{{ pageTitle }}
 				</h2>
 			</div>
 			<div class="col-auto ms-auto" />
