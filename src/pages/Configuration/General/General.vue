@@ -6,7 +6,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -43,6 +43,7 @@
 								:caneditconfig="caneditconfig"
 								editcomponent="EditConfigModal"
 								title="config"
+								translationkey="configuration."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -87,7 +88,7 @@ export default {
 			}
 			this.getConfig()
 		} else {
-			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}	
@@ -106,7 +107,7 @@ export default {
 						var tmpArray = [];
 						tmpArray = {
 							name: element.name,
-							description: i18n.t(element.name),
+							description: i18n.t('configuration.'+element.name),
 							value: element.value
 						}
 						this.rowdata.push(tmpArray)

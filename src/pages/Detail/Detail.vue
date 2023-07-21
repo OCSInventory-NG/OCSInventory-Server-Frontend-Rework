@@ -43,7 +43,7 @@
 									class="datagrid-item"
 								>
 									<div class="datagrid-title">
-										{{ $t(key) }}
+										{{ $t(translationkey+key) }}
 									</div>
 									<div class="datagrid-content">
 										{{ value }}
@@ -57,7 +57,7 @@
 									fill
 								>
 									<b-tab
-										:title="$t('accountinfo')"
+										:title="$t('title.accountinfo')"
 										active
 									>
 										<fieldset class="form-fieldset">
@@ -69,7 +69,7 @@
 											/>
 										</fieldset>
 									</b-tab>
-									<b-tab title="Inventory sections">
+									<b-tab :title="$t('title.inventory')">
 										<p>I'm the second tab</p>
 									</b-tab>
 								</b-tabs>
@@ -84,9 +84,7 @@
 
 <script>
 import Axios from 'axios'
-//import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
-//import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Accountinfo from '@/components/Accountinfo/Accountinfo'
@@ -103,6 +101,7 @@ export default {
 			canedit: true,
 			type: null,
 			slug: null,
+			translationkey: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -115,11 +114,13 @@ export default {
 			extendedRoute = "asset/bases/"+this.$route.params.id
 			this.type = "ASSET"
 			this.slug = "base.base"
+			this.translationkey = "inventory."
 		}
 		if(this.$route.params.type == 'netdevice') {
 			extendedRoute = "netdevices/"+this.$route.params.id
 			this.type = "IPDISCOVER"
 			this.slug = "netdevice.netdevice"
+			this.translationkey = "network."
 		}
 
 		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })

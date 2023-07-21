@@ -6,7 +6,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -43,7 +43,7 @@
 									<b-col>
 										<!-- USERNAME -->
 										<b-form-group
-											:label="$t('username')" 
+											:label="$t('user.username')" 
 											label-for="username"
 										>
 											<b-form-input
@@ -59,7 +59,7 @@
 									<b-col>
 										<!-- PASSWORD -->
 										<b-form-group
-											:label="$t('password')" 
+											:label="$t('user.password')" 
 											label-for="password"
 										>
 											<b-form-input
@@ -75,7 +75,7 @@
 									<b-col>
 										<!-- EMAIL -->
 										<b-form-group
-											:label="$t('email')" 
+											:label="$t('user.email')" 
 											label-for="email"
 										>
 											<b-form-input
@@ -92,7 +92,7 @@
 									<b-col>
 										<!-- FIRSTNAME -->
 										<b-form-group 
-											:label="$t('first_name')" 
+											:label="$t('user.first_name')" 
 											label-for="first_name"
 										>
 											<b-form-input
@@ -107,7 +107,7 @@
 									<b-col>
 										<!-- LASTNAME -->
 										<b-form-group
-											:label="$t('last_name')" 
+											:label="$t('user.last_name')" 
 											label-for="last_name"
 										>
 											<b-form-input
@@ -130,7 +130,7 @@
 											type="submit"
 											variant="success"
 										>
-											{{ $t('save') }}
+											{{ $t('generic.save') }}
 										</b-button>
 									</b-col>
 									<b-col align-self="end" />

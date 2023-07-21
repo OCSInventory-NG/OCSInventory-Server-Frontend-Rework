@@ -86,7 +86,7 @@ export default {
 			}
 			this.getNetworks()
 		} else {
-			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
@@ -128,7 +128,7 @@ export default {
 			// Create UNKNOWN group
 			this.rowdata.push({
 				id: null,
-				name: i18n.t("unknown_network"),
+				name: i18n.t("network.unknown_network"),
 				description: "",
 				networks: []
 			})
