@@ -11,7 +11,7 @@
 			/>
 		</section>
 
-		<!-- Datatable -->
+		<!-- Add group modal -->
 		<section v-else>
 			<div v-if="loading">
 				<Loader />
@@ -61,7 +61,7 @@ export default {
 			}
 			this.loading = false
 		} else {
-			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}

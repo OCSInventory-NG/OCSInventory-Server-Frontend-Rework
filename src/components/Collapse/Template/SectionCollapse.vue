@@ -33,10 +33,19 @@
 					<b-card-body>
 						<b-card-text>
 							<b-row class="text-center">
-								<b-col><b>{{ $t('name') }} :</b> {{ value.name }}</b-col>
-								<b-col><b>{{ $t('retrival_method') }} :</b> {{ $t(value.retrival_method) }}</b-col>
-								<b-col><b>{{ $t('retrival_output') }} :</b> {{ $t(value.retrival_output) }}</b-col>
-								<b-col><b>{{ $t('target') }} :</b> {{ value.target }}</b-col>
+								<b-col><b>{{ $t('user.name') }} :</b> {{ value.name }}</b-col>
+								<b-col>
+									<b>{{ $t('template.retrival_method') }} :</b> 
+									{{ $t('template.' + value.retrival_method) }}
+								</b-col>
+								<b-col>
+									<b>{{ $t('template.retrival_output') }} :</b> 
+									{{ $t('template.' + value.retrival_output) }}
+								</b-col>
+								<b-col>
+									<b>{{ $t('template.target') }} :</b> 
+									{{ value.target }}
+								</b-col>
 								<b-col>
 									<b-button-toolbar>
 										<b-button-group class="mr-1">
@@ -65,7 +74,7 @@
 							</b-row>
 							<div v-if="outputoptionoptions[value.retrival_output]">
 								<b-row class="text-center">
-									<b-col><b>{{ $t('retrieval_output_options') }}</b></b-col>
+									<b-col><b>{{ $t('template.retrieval_output_options') }}</b></b-col>
 								</b-row>
 								<b-row class="text-center">
 									<b-col
@@ -73,7 +82,7 @@
 										:key="optionname"
 									>
 										<p v-if="optionname in outputoptionoptions[value.retrival_output]">
-											<b>{{ $t(optionname) }} :</b> {{ option }}
+											<b>{{ $t('template.' + optionname) }} :</b> {{ option }}
 										</p>
 									</b-col>
 								</b-row>

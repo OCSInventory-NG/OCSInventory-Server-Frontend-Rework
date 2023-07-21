@@ -40,7 +40,7 @@
 							:icon="['fas', 'user']"
 							class="mr-3"
 						/>
-						<p>{{ $t('myaccount') }}</p>
+						<p>{{ $t('title.myaccount') }}</p>
 					</b-dropdown-item-button>
 					<b-dropdown-divider />
 					<b-dropdown-item-button @click="logout">
@@ -48,7 +48,7 @@
 							:icon="['fas', 'power-off']"
 							class="mr-3"
 						/>
-						<p>{{ $t('logout') }}</p>
+						<p>{{ $t('generic.logout') }}</p>
 					</b-dropdown-item-button>
 				</b-nav-item-dropdown>
 			</div>

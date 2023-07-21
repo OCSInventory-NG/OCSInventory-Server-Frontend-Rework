@@ -30,8 +30,8 @@
 							</b-row>
 							<b-row class="text-center">
 								<b-col>
-									<p>{{ $t('os') }} : {{ $t(rowtemplatedata.os) }}</p>
-									<p>{{ $t('last_update') }} : {{ rowtemplatedata.last_update }}</p>
+									<p>{{ $t('inventory.os') }} : {{ $t(rowtemplatedata.os) }}</p>
+									<p>{{ $t('inventory.last_update') }} : {{ rowtemplatedata.last_update }}</p>
 								</b-col>
 							</b-row>
 							<SectionCollapse

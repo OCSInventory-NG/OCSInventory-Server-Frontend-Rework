@@ -9,7 +9,7 @@
 				class="p-1 field-header"
 				role="tab"
 			>
-				{{ $t('fieldslist') }}
+				{{ $t('template.fieldslist') }}
 			</b-card-header>
 			<b-card-body
 				v-for="(value, key) in rowfielddata"
@@ -22,19 +22,19 @@
 							cols="3" 
 							align="left"
 						>
-							<b>{{ $t('name') }} :</b> {{ value.name }}
+							<b>{{ $t('user.name') }} :</b> {{ value.name }}
 						</b-col>
 						<b-col 
 							cols="3" 
 							align="left"
 						>
-							<b>{{ $t('retrival_value') }} :</b> {{ value.retrival_value }}
+							<b>{{ $t('template.retrival_value') }} :</b> {{ value.retrival_value }}
 						</b-col>
 						<b-col 
 							cols="2" 
 							align="left"
 						>
-							<b>{{ $t('override_target') }} :</b> {{ value.override_target }}
+							<b>{{ $t('template.override_target') }} :</b> {{ value.override_target }}
 						</b-col>
 						<b-col cols="2" />
 						<b-col>
@@ -61,19 +61,19 @@
 							cols="2" 
 							align="left"
 						>
-							<b>{{ $t('retrival_method') }} :</b> {{ $t(value.retrival_method) }}
+							<b>{{ $t('template.retrival_method') }} :</b> {{ $t('template.' + value.retrival_method) }}
 						</b-col>
 						<b-col
 							cols="2" 
 							align="left"
 						>
-							<b>{{ $t('new_target') }} :</b> {{ $t(value.new_target) }}
+							<b>{{ $t('template.new_target') }} :</b> {{ value.new_target }}
 						</b-col>
 						<b-col
 							cols="2" 
 							align="left"
 						>
-							<b>{{ $t('retrival_output') }} :</b> {{ $t(value.retrival_output) }}
+							<b>{{ $t('template.retrival_output') }} :</b> {{ $t('template.' + value.retrival_output) }}
 						</b-col>						
 						<b-col 
 							v-for="(option, optioname) in value.options"
@@ -81,7 +81,7 @@
 							cols="2" 
 							align="left"
 						>
-							<b>{{ $t(optioname) }} :</b> {{ option }}
+							<b>{{ $t('template.' + optioname) }} :</b> {{ option }}
 						</b-col>
 					</b-row>
 				</b-card-text>

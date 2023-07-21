@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -31,7 +31,7 @@
 								<Breadcrumb />
 							</div>
 							<h2 class="page-title">
-								{{ $t(pageTitle) }}
+								{{ $t('title.'+pageTitle) }}
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
@@ -46,20 +46,20 @@
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('adduser') }}
+								{{ $t('user.adduser') }}
 							</b-button>
 
 							<!-- Modal to add user -->
 							<b-modal 
 								id="add-user" 
-								:title="$t('adduser')"
+								:title="$t('user.adduser')"
 								size="xl"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('adduser') }}
+										{{ $t('user.adduser') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,13 +77,13 @@
 								>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('user_informations') }}</h4>
+											<h4>{{ $t('user.user_informations') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('username')" 
+												:label="$t('user.username')" 
 												label-for="username"
 											>
 												<b-form-input
@@ -95,7 +95,7 @@
 										</b-col>
 										<b-col>
 											<b-form-group
-												:label="$t('password')" 
+												:label="$t('user.password')" 
 												label-for="password"
 											>
 												<b-form-input
@@ -110,7 +110,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('email')" 
+												:label="$t('user.email')" 
 												label-for="email"
 											>
 												<b-form-input
@@ -124,7 +124,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group 
-												:label="$t('first_name')" 
+												:label="$t('user.first_name')" 
 												label-for="first_name"
 											>
 												<b-form-input
@@ -136,7 +136,7 @@
 										</b-col>
 										<b-col>
 											<b-form-group
-												:label="$t('last_name')" 
+												:label="$t('user.last_name')" 
 												label-for="last_name"
 											>
 												<b-form-input
@@ -156,13 +156,13 @@
 												value="true"
 												unchecked-value="false"
 											>
-												{{ $t('is_staff') }}
+												{{ $t('user.is_staff') }}
 											</b-form-checkbox>
 										</b-col>
 									</b-row>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('groups') }}</h4>
+											<h4>{{ $t('title.groups') }}</h4>
 										</b-col>
 									</b-row>
 									<b-row>
@@ -192,7 +192,7 @@
 												type="submit"
 												variant="success"
 											>
-												{{ $t('add') }}
+												{{ $t('generic.add') }}
 											</b-button>
 										</b-col>
 										<b-col align-self="end" />
@@ -213,6 +213,7 @@
 								:candelete="candelete"
 								editcomponent="EditUserModal"
 								title="users"
+								translationkey="user."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>

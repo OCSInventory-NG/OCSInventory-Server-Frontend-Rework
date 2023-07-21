@@ -2,7 +2,7 @@
 	<div id="edit-field-modal">
 		<button 
 			v-b-modal="'edit-field.'+idmodal"
-			:title="$t('editfield')"
+			:title="$t('template.editfield')"
 			class="btn btn-ghost-dark"
 		>
 			<font-awesome-icon 
@@ -12,13 +12,13 @@
 
 		<b-modal 
 			:id="'edit-field.'+idmodal"
-			:title="$t('editfield')"
+			:title="$t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('edituser') }}
+					{{ $t('template.editfield') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,7 +37,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -51,7 +51,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('retrival_value')" 
+							:label="$t('template.retrival_value')" 
 							label-for="retrival_value"
 						>
 							<b-form-input
@@ -71,7 +71,7 @@
 							value="true"
 							unchecked-value="false"
 						>
-							{{ $t('override_target') }}
+							{{ $t('template.override_target') }}
 						</b-form-checkbox>
 					</b-col>
 				</b-row>
@@ -79,7 +79,7 @@
 					<b-row>
 						<b-col>
 							<b-form-group
-								:label="$t('retrival_method')" 
+								:label="$t('template.retrival_method')" 
 								label-for="retrival_method"
 							>
 								<b-form-select
@@ -94,7 +94,7 @@
 					<b-row>
 						<b-col>
 							<b-form-group
-								:label="$t('new_target')" 
+								:label="$t('template.new_target')" 
 								label-for="new_target"
 							>
 								<b-form-input
@@ -107,7 +107,7 @@
 					<b-row>
 						<b-col>
 							<b-form-group
-								:label="$t('retrival_output')" 
+								:label="$t('template.retrival_output')" 
 								label-for="retrival_output"
 							>
 								<b-form-select
@@ -122,7 +122,7 @@
 					<div v-if="outputoptionoptions[row.retrival_output]">
 						<b-row>
 							<b-col>
-								<h4>{{ $t('retrieval_output_options') }}</h4>
+								<h4>{{ $t('template.retrieval_output_options') }}</h4>
 							</b-col>
 						</b-row>
 						<div
@@ -138,14 +138,14 @@
 										value="true"
 										unchecked-value="false"
 									>
-										{{ $t('use_index') }}
+										{{ $t('template.use_index') }}
 									</b-form-checkbox>
 								</b-col>
 							</b-row>
 							<b-row v-if="key == 'remove_line'">
 								<b-col>
 									<b-form-group
-										:label="$t('remove_line')" 
+										:label="$t('template.remove_line')" 
 										label-for="remove_line"
 									>
 										<b-form-input
@@ -158,7 +158,7 @@
 							<b-row v-if="key == 'override_line_used'">
 								<b-col>
 									<b-form-group
-										:label="$t('override_line_used')" 
+										:label="$t('template.override_line_used')" 
 										label-for="override_line_used"
 									>
 										<b-form-input
@@ -178,14 +178,14 @@
 										value="true"
 										unchecked-value="false"
 									>
-										{{ $t('need_format') }}
+										{{ $t('template.need_format') }}
 									</b-form-checkbox>
 								</b-col>
 							</b-row>
 							<b-row v-if="key == 'submap'">
 								<b-col>
 									<b-form-group
-										:label="$t('submap')" 
+										:label="$t('template.submap')" 
 										label-for="submap"
 									>
 										<b-form-input
@@ -204,7 +204,7 @@
 										value="true"
 										unchecked-value="false"
 									>
-										{{ $t('is_list') }}
+										{{ $t('template.is_list') }}
 									</b-form-checkbox>
 								</b-col>
 							</b-row>
@@ -217,14 +217,14 @@
 										:value="true"
 										:unchecked-value="false"
 									>
-										{{ $t('multiple') }}
+										{{ $t('template.multiple') }}
 									</b-form-checkbox>
 								</b-col>
 							</b-row>
 							<b-row v-if="key == 'separator'">
 								<b-col>
 									<b-form-group
-										:label="$t('separator')" 
+										:label="$t('template.separator')" 
 										label-for="separator"
 									>
 										<b-form-input
@@ -247,7 +247,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />

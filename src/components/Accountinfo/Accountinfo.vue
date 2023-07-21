@@ -3,7 +3,7 @@
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('success_saved')" 
+				:message="$t('message.success_saved')" 
 				variant="success"
 			/>
 		</section>
@@ -98,7 +98,7 @@
 								type="submit"
 								variant="success"
 							>
-								{{ $t('update') }}
+								{{ $t('generic.update') }}
 							</b-button>
 						</b-col>
 						<b-col align-self="end" />

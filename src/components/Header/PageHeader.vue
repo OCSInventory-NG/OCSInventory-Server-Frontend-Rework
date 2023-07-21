@@ -5,8 +5,17 @@
 				<div class="page-pretitle">
 					<Breadcrumb />
 				</div>
-				<h2 class="page-title">
-					{{ $t(pageTitle) }}
+				<h2 
+					v-if="$te('title.'+pageTitle)"
+					class="page-title"
+				>
+					{{ $t('title.'+pageTitle) }}
+				</h2>
+				<h2 
+					v-else
+					class="page-title"
+				>
+					{{ pageTitle }}
 				</h2>
 			</div>
 			<div class="col-auto ms-auto" />

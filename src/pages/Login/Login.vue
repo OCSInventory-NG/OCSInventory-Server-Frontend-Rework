@@ -45,7 +45,7 @@
 					<div class="form-group login-form-group">
 						<input 
 							ref="email" 
-							:placeholder="$t('username')" 
+							:placeholder="$t('user.username')" 
 							class="form-control no-border" 
 							required 
 							type="text" 
@@ -57,7 +57,7 @@
 					<div class="form-group login-form-group">
 						<input 
 							ref="password" 
-							:placeholder="$t('password')" 
+							:placeholder="$t('user.password')" 
 							class="form-control no-border" 
 							required 
 							type="password" 
@@ -71,7 +71,7 @@
 						class="auth-btn mb-3" 
 						variant="inverse"
 					>
-						{{ $t('login') }}
+						{{ $t('generic.login') }}
 					</b-button>
 				</form>
 			</div>
@@ -136,7 +136,7 @@ export default {
 						localStorage.setItem('permissions', tmpUser)
 						this.$router.push('/dashboard')
 					}
-					this.errorMessage = i18n.t("error_no_permissions")
+					this.errorMessage = i18n.t("message.error_no_permissions")
 				})
 				.catch(e => {
 					this.errorMessage = e

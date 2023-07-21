@@ -2,7 +2,7 @@
 	<div id="do-all-actions-item-modal">
 		<button 
 			v-b-modal="idModal"
-			:title="$t(titlevalue)"
+			:title="$t(translationkey+titlevalue)"
 			class="btn btn-ghost-warning"
 		>
 			<font-awesome-icon 
@@ -12,13 +12,13 @@
 
 		<b-modal 
 			:id="idModal"
-			:title="$t(titlevalue)"
+			:title="$t(translationkey+titlevalue)"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t(titlevalue) }}
+					{{ $t(translationkey+titlevalue) }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -53,7 +53,7 @@
 							<b-form-group>
 								<b-button 
 									v-b-modal="idModal"
-									:title="$t(titlevalue)"
+									:title="$t(translationkey+titlevalue)"
 									variant="primary"
 									class="d-none d-sm-inline-block form-control"
 									@click="addField(input, datavalues)"
@@ -71,7 +71,7 @@
 							<b-form-group>
 								<b-button 
 									v-b-modal="idModal"
-									:title="$t(titlevalue)"
+									:title="$t(translationkey+titlevalue)"
 									variant="danger"
 									class="d-none d-sm-inline-block form-control"
 									@click="removeField(index, datavalues)"
@@ -94,7 +94,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('save') }}
+							{{ $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -113,7 +113,8 @@ export default {
 		id: { type: Number, default: null },
 		route: { type: String, default: '' },
 		titlevalue: { type: String, default: '' },
-		reconciliationname: { type: String, default: '' }
+		reconciliationname: { type: String, default: '' },
+		translationkey: { type: String, default: '' }
 	},
 	data() {
 		return {

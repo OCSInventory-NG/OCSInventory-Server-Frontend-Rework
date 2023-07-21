@@ -33,6 +33,7 @@
 								:canaccessdetails="true"
 								editcomponent="EditNetdeviceModal"
 								title="netdevice"
+								translationkey="network."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -78,7 +79,7 @@ export default {
 			}
 			this.getNetdevice()
 		} else {
-			this.errorMsg = i18n.t("dont_have_right_to_see")
+			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
