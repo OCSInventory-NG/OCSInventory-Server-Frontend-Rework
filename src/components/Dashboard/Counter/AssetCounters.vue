@@ -30,7 +30,7 @@
 								<div class="d-flex mb-2">
 									<div>{{ $t("dashboard.contacted") }}</div>
 									<div class="ms-auto">
-										<span class="text-green d-inline-flex align-items-center lh-1">
+										<span class="badge bg-indigo-lt">
 											{{ contacted.total }}
 										</span>
 									</div>
@@ -53,7 +53,7 @@
 								<div class="d-flex mb-2">
 									<div>{{ $t("dashboard.contacted") }}</div>
 									<div class="ms-auto">
-										<span class="text-green d-inline-flex align-items-center lh-1">
+										<span class="badge bg-indigo-lt">
 											{{ contacted.windows }}
 										</span>
 									</div>
@@ -76,7 +76,7 @@
 								<div class="d-flex mb-2">
 									<div>{{ $t("dashboard.contacted") }}</div>
 									<div class="ms-auto">
-										<span class="text-green d-inline-flex align-items-center lh-1">
+										<span class="badge bg-indigo-lt">
 											{{ contacted.linux }}
 										</span>
 									</div>
@@ -99,7 +99,7 @@
 								<div class="d-flex mb-2">
 									<div>{{ $t("dashboard.contacted") }}</div>
 									<div class="ms-auto">
-										<span class="text-green d-inline-flex align-items-center lh-1">
+										<span class="badge bg-indigo-lt">
 											{{ contacted.macos }}
 										</span>
 									</div>
