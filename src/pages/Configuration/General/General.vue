@@ -36,6 +36,7 @@
 							<Datatable
 								id="generalDatatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:candelete="false"
 								:canedit="false"
 								:usecheckbox="false"
@@ -68,12 +69,17 @@ export default {
 	data() {
 		return {
 			rowdata: [],
+			rowheader: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
-			caneditconfig: false
+			caneditconfig: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -86,7 +92,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
 				this.caneditconfig = true
 			}
-			this.getConfig()
+			this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
@@ -94,14 +100,22 @@ export default {
 		}	
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"config/", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getConfig()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Get all config
 		getConfig() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
-			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					response.data.forEach(element => {
 						var tmpArray = [];
@@ -121,11 +135,6 @@ export default {
 				})
 		},
 		updateConfig() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
 			var config = []
 			this.rowdata.forEach(element => {
 				config.push({
@@ -133,7 +142,7 @@ export default {
 					value: element.value
 				})
 			})
-			Axios.put(process.env.VUE_APP_API_ROUTE+"config/", config, { headers: header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"config/", config, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

@@ -29,6 +29,7 @@
 								v-for="(value, key) in rowdata"
 								:key="key"
 								:rowdata="value.networks"
+								:rowheader="rowheader"
 								:groupname="value.name"
 								:groupdescription="value.description"
 								:groupid="value.id"
@@ -60,6 +61,15 @@ export default {
 		return {
 			errorMsg: null,
 			rowdata: [],
+			rowheader: {
+				id: "id",
+				name: "name",
+				description: "description",
+				netid: "netid",
+				nettag: "nettag",
+				mask: "mask",
+				netdevices: "netdevices",
+			},
 			networkdata: [],
 			netgroupdata: [],
 			loading: true,
@@ -157,6 +167,8 @@ export default {
 					}
 				})
 			})
+
+			console.log(this.rowdata)
 
 			this.loading = false
 		},
