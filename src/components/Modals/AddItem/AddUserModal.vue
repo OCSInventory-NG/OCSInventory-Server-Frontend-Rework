@@ -209,6 +209,7 @@
 							<Datatable
 								id="users-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								editcomponent="EditUserModal"
@@ -253,6 +254,7 @@ export default {
 				user_permissions: []
 			},
 			rowdata: [],
+			rowheader: [],
 			groups: [],
 			groupsLabel: [],
 			errorMsg: null,
@@ -260,6 +262,10 @@ export default {
 			errored: false,
 			successed: false,
 			loading: true,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -268,16 +274,25 @@ export default {
 		}
 	},
 	mounted() {
-		this.getGroups()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getGroups()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Get all users
 		getUsers() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -303,11 +318,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -321,12 +332,8 @@ export default {
 				.finally(() => this.getUsers())
 		},
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			Axios.post(process.env.VUE_APP_API_ROUTE+"users/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

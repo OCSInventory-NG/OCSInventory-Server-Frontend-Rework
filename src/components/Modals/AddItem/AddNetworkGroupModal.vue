@@ -129,6 +129,7 @@
 							<Datatable
 								id="netgroup-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								editcomponent="EditNetworkGroupModal"
@@ -167,6 +168,7 @@ export default {
 				description: null
 			},
 			rowdata: [],
+			rowheader: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -184,9 +186,22 @@ export default {
 		}
 	},
 	mounted() {
-		this.getNetgroup()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getNetgroup()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		getNetgroup() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {

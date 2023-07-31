@@ -130,6 +130,7 @@
 							<Datatable
 								id="templates-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedittemplate="canedit"
 								:candelete="candelete"
 								:canexport="false"
@@ -171,6 +172,7 @@ export default {
 				sections: []
 			},
 			rowdata: [],
+			rowheader: [],
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
@@ -180,7 +182,11 @@ export default {
 				{ value: 'WIN', text: 'Windows' },
 				{ value: 'LIN', text: 'Linux' },
 				{ value: 'MAC', text: 'MacOS' }
-			]
+			],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -189,15 +195,24 @@ export default {
 		}
 	},
 	mounted() {
-		this.getTemplates()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getTemplates()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		getTemplates() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -214,13 +229,9 @@ export default {
 		},
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

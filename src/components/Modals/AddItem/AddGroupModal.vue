@@ -134,6 +134,7 @@
 							<Datatable
 								id="groups-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								editcomponent="EditGroupModal"
@@ -174,6 +175,7 @@ export default {
 				permissions: []
 			},
 			rowdata: [],
+			rowheader: [],
 			permissions: [],
 			permissionslabel: [],
 			errorMsg: null,
@@ -193,16 +195,25 @@ export default {
 		}
 	},
 	mounted() {
-		this.getPermissions()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getPermissions()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Get all permissions
 		getPermissions() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -245,11 +256,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()

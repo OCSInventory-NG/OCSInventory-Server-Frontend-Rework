@@ -159,6 +159,7 @@
 							<Datatable
 								id="accountinfodatatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								:canaddvalue="canaddvalue"
@@ -210,6 +211,7 @@ export default {
 				datatarget: 'ASSET'
 			},
 			rowdata: [],
+			rowheader: [],
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
@@ -225,7 +227,11 @@ export default {
 				{ value: 'TEXTAREA', text: 'TEXTAREA' },
 				{ value: 'SELECT', text: 'SELECT' },
 				{ value: 'CHECKBOX', text: 'CHECKBOX' },
-			]
+			],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -234,15 +240,24 @@ export default {
 		}
 	},
 	mounted() {
-		this.getAccountinfoConfig()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+				.then(response => {
+					this.rowheader = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getAccountinfoConfig()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		getAccountinfoConfig() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.accountinfovaluesTreatment()
