@@ -44,7 +44,9 @@
     "config_elem_15": "I'm a description",
     "config_elem_17": "I'm a description",
     "config_elem_24": "I'm a description",
-    "save_config": "Save Configuration"
+    "name": "Name",
+    "save_config": "Save Configuration",
+    "value": "Value"
   },
   "message": {
     "delete_msg": "Do you really want to delete",
@@ -167,13 +169,16 @@
     "description": "Description",
     "editnetdevice": "Edit the network device",
     "editnetgroup": "Edit a Network Group",
+    "editnetwork": "Edit the network",
     "id": "ID",
     "ip": "IP Address",
     "mac": "MAC Address",
     "mask": "Mask",
     "name": "Name",
+    "netdevices": "Network Devices",
     "netid": "NetID",
     "netname": "Network Device Name",
+    "nettag": "NetTag",
     "network": "Networks",
     "unknown_network": "Unknown Networks"
   },
