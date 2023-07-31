@@ -29,6 +29,13 @@
     "user": "Utilisateur",
     "users": "Utilisateurs"
   },
+  "dashboard": {
+    "contacted": "Contactés aujourd'hui",
+    "linux": "Linux",
+    "macos": "MacOS",
+    "total": "Total",
+    "windows": "Windows"
+  },
   "accountinfo": {
     "accountinfo_values": "Valeurs",
     "accountinfo_param": "Gestion des valeurs de données administratives",
