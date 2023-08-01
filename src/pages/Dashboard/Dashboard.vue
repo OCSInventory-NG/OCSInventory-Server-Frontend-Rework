@@ -47,12 +47,22 @@
 									:secondcount="contacted.macos"
 								/>
 							</div>
-							
-							<DonutChart 
-								title="dashboard.osassets"
-								:options="oscount.options"
-								:series="oscount.series"
-							/>
+							<div class="row">
+								<div class="col-lg-6">
+									<DonutChart 
+										title="dashboard.osassets"
+										:options="oscount.options"
+										:series="oscount.series"
+									/>
+								</div>
+								<div class="col-lg-6">
+									<LineChart 
+										title="dashboard.lastcontacted"
+										:options="lastcontactedopt.options"
+										:series="lastcontactedopt.series"
+									/>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -62,6 +72,7 @@
 </template>
 
 <script>
+import i18n from '../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import Axios from 'axios'
@@ -69,10 +80,11 @@ import PageHeader from '@/components/Header/PageHeader'
 //import BarChart from '@/components/Dashboard/Chart/Bar'
 import AssetCounters from '@/components/Dashboard/Counter/AssetCounters'
 import DonutChart from '@/components/Dashboard/Chart/Donut'
+import LineChart from '@/components/Dashboard/Chart/Line'
 
 export default {
 	name: "Dashboard",
-	components: { PageHeader, /*BarChart,*/ AssetCounters, DonutChart, Loader, Alert },
+	components: { PageHeader, /*BarChart,*/ AssetCounters, DonutChart, Loader, Alert, LineChart },
 	data() {
 		return {
 			templates: {
@@ -98,6 +110,20 @@ export default {
 					labels: []
 				},
 				series: []
+			},
+			lastcontactedopt: {
+				options: {
+					chart: {
+						id: "last-contacted-chart"
+					},
+					xaxis: {
+						categories: []
+					}
+				},
+				series: [{
+					name: i18n.t('dashboard.nbassets'),
+					data: []
+				}]
 			},
 			errorMsg: null,
 			loading: true,
@@ -152,10 +178,30 @@ export default {
 						// Counter operating system
 						this.ostemp[asset.osname] = (this.ostemp[asset.osname]) ? this.ostemp[asset.osname]+1 : 1
 					})
+
 					Object.keys(this.ostemp).forEach(osname => {
 						this.oscount.options.labels.push(osname)
 						this.oscount.series.push(this.ostemp[osname])
 					})
+
+					// Last 7 days contact
+					var dateNow = new Date()
+					var date = new Date()
+					date = date.setDate(dateNow.getDate() - 7)
+					date = new Date(date)
+
+					for(let i = 0; date.toJSON().slice(0,10) != dateNow.toJSON().slice(0,10); i++) {
+						this.lastcontactedopt.options.xaxis.categories.push(date.toJSON().slice(0,10))
+						this.lastcontactedopt.series[0].data[i] = 0
+						date = date.setDate(date.getDate() + 1)
+						date = new Date(date)
+
+						response.data.forEach(asset => {
+							if(asset.last_update.slice(0,10) == date.toJSON().slice(0,10)) {
+								this.lastcontactedopt.series[0].data[i] += 1
+							}
+						})
+					}
 
 					this.errorMsg = null
 					this.errored = false
