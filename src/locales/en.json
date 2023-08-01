@@ -31,8 +31,10 @@
   },
   "dashboard": {
     "contacted": "Contacted today",
+    "lastcontacted": "Assets last contacted in the last 7 days",
     "linux": "Linux",
     "macos": "MacOS",
+    "nbassets": "Assets number",
     "osassets": "Available operating systems",
     "total": "Total",
     "windows": "Windows"

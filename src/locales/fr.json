@@ -31,8 +31,10 @@
   },
   "dashboard": {
     "contacted": "Contactés aujourd'hui",
+    "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
     "linux": "Linux",
     "macos": "MacOS",
+    "nbassets": "Nombre d'actifs",
     "osassets": "Systèmes d'exploitation disponibles",
     "total": "Total",
     "windows": "Windows"
