@@ -1,5 +1,5 @@
 <template>
-	<div class="col-sm-6 col-lg-3">
+	<div :class="classstyle">
 		<div class="card">
 			<div class="card-body">
 				<div class="d-flex align-items-center">
@@ -28,12 +28,13 @@
 
 <script>
 export default {
-	name: "AssetCounters",
+	name: "Counter",
 	props: {
 		firsttitle: { type: String, default: null },
 		firstcount: { type: Number, default: null },
 		secondtitle: { type: String, default: null },
-		secondcount: { type: Number, default: null }
+		secondcount: { type: Number, default: null },
+		classstyle: { type: String, default: "col-sm-6 col-lg-3" }
 	}
 }
 </script>
