@@ -9,38 +9,40 @@
 		</section>
 
 		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
+			<PageHeader 
+				page-title="dashboard"
+			/>
+			
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<h1>{{ $t("title.assets") }}</h1>
+						
+						<div v-if="loadingasset">
+							<Loader />
+						</div>
 
-			<div v-else>
-				<PageHeader 
-					page-title="dashboard"
-				/>
-
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+						<div v-else>
 							<div class="row row-deck row-cards">
-								<AssetCounters 
+								<Counter 
 									firsttitle="dashboard.total"
 									:firstcount="total.total"
 									secondtitle="dashboard.contacted"
 									:secondcount="contacted.total"
 								/>
-								<AssetCounters 
+								<Counter 
 									firsttitle="dashboard.windows"
 									:firstcount="total.windows"
 									secondtitle="dashboard.contacted"
 									:secondcount="contacted.windows"
 								/>
-								<AssetCounters 
+								<Counter 
 									firsttitle="dashboard.linux"
 									:firstcount="total.linux"
 									secondtitle="dashboard.contacted"
 									:secondcount="contacted.linux"
 								/>
-								<AssetCounters 
+								<Counter 
 									firsttitle="dashboard.macos"
 									:firstcount="total.macos"
 									secondtitle="dashboard.contacted"
@@ -64,6 +66,36 @@
 								</div>
 							</div>
 						</div>
+
+						<h1>{{ $t("title.network") }}</h1>
+
+						<div v-if="loadingnetwork">
+							<Loader />
+						</div>
+
+						<div v-else>
+							<div class="row row-deck row-cards">
+								<Counter 
+									firsttitle="dashboard.totalnetwork"
+									:firstcount="networks.total"
+									classstyle="col-sm-6 col-lg-6"
+								/>
+								<Counter 
+									firsttitle="dashboard.totalnetworkdevices"
+									:firstcount="networks.devices.total"
+									classstyle="col-sm-6 col-lg-6"
+								/>
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<BarChart 
+										title="dashboard.nbdevicebynetwork"
+										:options="networkopt.options"
+										:series="networkopt.series"
+									/>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -77,14 +109,14 @@ import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import Axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader'
-//import BarChart from '@/components/Dashboard/Chart/Bar'
-import AssetCounters from '@/components/Dashboard/Counter/AssetCounters'
+import BarChart from '@/components/Dashboard/Chart/Bar'
+import Counter from '@/components/Dashboard/Counter/Counter'
 import DonutChart from '@/components/Dashboard/Chart/Donut'
 import LineChart from '@/components/Dashboard/Chart/Line'
 
 export default {
 	name: "Dashboard",
-	components: { PageHeader, /*BarChart,*/ AssetCounters, DonutChart, Loader, Alert, LineChart },
+	components: { PageHeader, BarChart, Counter, DonutChart, Loader, Alert, LineChart },
 	data() {
 		return {
 			templates: {
@@ -125,8 +157,30 @@ export default {
 					data: []
 				}]
 			},
+			networks: {
+				total: 0,
+				names: [],
+				devices: {
+					total: 0
+				}
+			},
+			networkopt: {
+				options: {
+					chart: {
+						id: "network-chart"
+					},
+					xaxis: {
+						categories: []
+					}
+				},
+				series: [{
+					name: i18n.t('dashboard.nbnetwork'),
+					data: []
+				}]
+			},
 			errorMsg: null,
-			loading: true,
+			loadingasset: true,
+			loadingnetwork: true,
 			errored: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -135,9 +189,55 @@ export default {
 		}
 	},
 	mounted() {
+		// Get assets stats
 		this.getTemplates()
+		// Get networks stats
+		this.getNetworks()
 	},
 	methods: {
+		getNetworks() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+				.then(response => {
+					this.networks.total = response.data.length
+					response.data.forEach(network => {
+						this.networks.names[network.id] = {
+							name: network.name,
+							netid: network.netid,
+							nbdevices: 0
+						}
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getNetdevices()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		getNetdevices() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices/", { headers: this.header })
+				.then(response => {
+					console.log(response)
+					this.networks.devices.total = response.data.length
+					response.data.forEach(device => {
+						this.networks.names[device.network].nbdevices += 1
+					})
+					
+					this.networks.names.forEach(network => {
+						this.networkopt.options.xaxis.categories.push(network.name)
+						this.networkopt.series[0].data.push(network.nbdevices)
+					})
+
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loadingnetwork = false)
+		},
 		// Retrieve templates ID and sort by type
 		getTemplates() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
@@ -210,7 +310,7 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
+				.finally(() => this.loadingasset = false)
 		}
 	}
 }
