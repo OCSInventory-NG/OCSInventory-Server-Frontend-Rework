@@ -35,8 +35,12 @@
     "linux": "Linux",
     "macos": "MacOS",
     "nbassets": "Assets number",
+    "nbdevicebynetwork": "Devices number by network",
+    "nbnetwork": "Devices number",
     "osassets": "Available operating systems",
     "total": "Total",
+    "totalnetwork": "Networks number",
+    "totalnetworkdevices": "Network devices number",
     "windows": "Windows"
   },
   "accountinfo": {
