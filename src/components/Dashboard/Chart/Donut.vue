@@ -1,9 +1,6 @@
 <template>
 	<div id="donut">
-		<div
-			id="donut-card" 
-			class="card"
-		>
+		<div class="card donut-card">
 			<div class="card-body">
 				<h3 class="card-title">
 					{{ $t(title) }}

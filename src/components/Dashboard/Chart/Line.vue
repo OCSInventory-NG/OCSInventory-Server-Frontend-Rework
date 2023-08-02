@@ -1,9 +1,6 @@
 <template>
 	<div id="line">
-		<div
-			id="donut-card" 
-			class="card"
-		>
+		<div class="card donut-card">
 			<div class="card-body">
 				<h3 class="card-title">
 					{{ $t(title) }}
@@ -20,7 +17,7 @@
 
 <script>
 export default {
-	name: "Line",
+	name: "LineChart",
 	props: {
 		options: { type: Object, default: null },
 		series: { type: Array, default: null },
