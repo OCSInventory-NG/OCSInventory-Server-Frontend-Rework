@@ -35,8 +35,9 @@
 							name="export.xls"
 						>
 							<button 
+								id="export-row"
 								:title="$t('generic.download')"
-								class="form-control btn"
+								class="form-control btn datatable-btn"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'download']"
@@ -65,7 +66,7 @@
 						<b-button 
 							:title="$t('configuration.save_config')"
 							variant="success"
-							class="add-button"
+							class="add-button datatable-btn"
 							@click="onSave"
 						>
 							<font-awesome-icon 
@@ -76,9 +77,14 @@
 				</div>
 
 				<!-- Show/Hide columns -->
-				<div class="col">
-					<b-dropdown 
+				<div 
+					class="col" 
+					align="right"
+				>
+					<b-dropdown
 						:text="$t('generic.show_hide')"
+						variant="bg-light"
+						class="datatable-btn"
 					>
 						<b-dropdown-item
 							v-for="field in fields" 
@@ -159,7 +165,10 @@
 					v-if="canaccesschild"
 					#cell(netdevices)="row"
 				>
-					<a :href="'/ocsreports/inventory/netdevices/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.netdevices }}
 					</a>
 				</template>
@@ -169,7 +178,10 @@
 					v-if="canaccessdetails"
 					#cell(name)="row"
 				>
-					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.name }}
 					</a>
 				</template>
@@ -179,7 +191,10 @@
 					v-if="canaccessdetails"
 					#cell(netname)="row"
 				>
-					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.netname }}
 					</a>
 				</template>
@@ -249,7 +264,7 @@
 				<b-form-group
 					label="Per page"
 					label-for="per-page-select"
-					label-cols-sm="3"
+					label-cols-sm="2"
 					label-align-sm=""
 					label-size="sm"
 				>

@@ -3,7 +3,8 @@
 		<b-button 
 			v-b-modal.import-template
 			:title="$t('template.import_template')"
-			class="form-control btn"
+			variant="bg-light"
+			class="form-control btn datatable-btn datatable-btn-maxsize"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'upload']"

@@ -2,6 +2,10 @@
 //  BREADCRUMB COMPONENT
 // ===========================================
 
+.breadcrumb-item > a {
+  color: $ocs-purple;
+}
+
 .breadcrumb-item > a:hover {
   text-decoration: none;
 }
