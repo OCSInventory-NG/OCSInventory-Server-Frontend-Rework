@@ -221,7 +221,6 @@ export default {
 	created() {
 		this.row = this.rowsectiondata
 		this.options = this.row.options
-		this.row.options = {}
 		this.row.id = this.idmodal
 		this.row.template = this.template
 	},
@@ -231,6 +230,7 @@ export default {
 			event.preventDefault()
 
 			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.row.options = {}
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
 					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
 						this.options[element.id] : element.default
