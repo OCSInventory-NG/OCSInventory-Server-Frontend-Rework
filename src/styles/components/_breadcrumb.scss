@@ -3,9 +3,10 @@
 // ===========================================
 
 .breadcrumb-item > a {
-  color: $ocs-purple;
+  color: #667382;
 }
 
 .breadcrumb-item > a:hover {
+  cursor: unset;
   text-decoration: none;
 }

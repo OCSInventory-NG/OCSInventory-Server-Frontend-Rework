@@ -32,66 +32,67 @@
 				>
 					<b-card-body>
 						<b-card-text>
-							<b-row class="text-center">
-								<b-col><b>{{ $t('user.name') }} :</b> {{ value.name }}</b-col>
-								<b-col>
-									<b>{{ $t('template.retrival_method') }} :</b> 
-									{{ $t('template.' + value.retrival_method) }}
-								</b-col>
-								<b-col>
-									<b>{{ $t('template.retrival_output') }} :</b> 
-									{{ $t('template.' + value.retrival_output) }}
-								</b-col>
-								<b-col>
-									<b>{{ $t('template.target') }} :</b> 
-									{{ value.target }}
-								</b-col>
-								<b-col>
-									<b-button-toolbar>
-										<b-button-group class="mr-1">
-											<EditSectionModal
-												:rowsectiondata="value"
-												:target="value.target"
-												:idmodal="value.id"
-												:template="value.template"
-												@reloadTemplate="reloadTemplate"
-											/>
-											<delete-item-modal 
-												:id="value.id"
-												:name="value.name"
-												parameter="sections"
-												@reloadTemplate="reloadTemplate"
-											/>
-										</b-button-group>
-										<b-button-group class="mx-3">
-											<AddFieldModal
-												:section="value.id"
-												@reloadTemplate="reloadTemplate"
-											/>
-										</b-button-group>
-									</b-button-toolbar>
-								</b-col>
-							</b-row>
-							<div v-if="outputoptionoptions[value.retrival_output]">
-								<b-row class="text-center">
-									<b-col><b>{{ $t('template.retrieval_output_options') }}</b></b-col>
-								</b-row>
-								<b-row class="text-center">
-									<b-col
-										v-for="(option,optionname) in value.options"
-										:key="optionname"
-									>
-										<p v-if="optionname in outputoptionoptions[value.retrival_output]">
-											<b>{{ $t('template.' + optionname) }} :</b> {{ option }}
-										</p>
-									</b-col>
-								</b-row>
+							<div class="table-responsive">
+								<table class="table table-vcenter">
+									<thead>
+										<tr>
+											<th>{{ $t('user.name') }}</th>
+											<th>{{ $t('template.retrival_output') }}</th>
+											<th>{{ $t('template.retrival_output') }}</th>
+											<th>{{ $t('template.target') }}</th>
+											<th>{{ $t('template.retrieval_output_options') }}</th>
+											<th class="section-table-title">
+												{{ $t('generic.actions') }}
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>{{ value.name }}</td>
+											<td>{{ $t("template."+value.retrival_method) }}</td>
+											<td>{{ $t("template."+value.retrival_output) }}</td>
+											<td>{{ value.target }}</td>
+											<td>
+												<p
+													v-for="(option,optionname) in value.options"
+													:key="optionname"
+													class="section-table-options"
+												>
+													{{ $t('template.' + optionname) }} : {{ option }}
+												</p>
+											</td>
+											<td class="section-table-btn">
+												<b-button-toolbar>
+													<b-button-group class="mr-1">
+														<EditSectionModal
+															:rowsectiondata="value"
+															:target="value.target"
+															:idmodal="value.id"
+															:template="value.template"
+															@reloadTemplate="reloadTemplate"
+														/>
+														<delete-item-modal 
+															:id="value.id"
+															:name="value.name"
+															parameter="sections"
+															@reloadTemplate="reloadTemplate"
+														/>
+													</b-button-group>
+													<b-button-group class="mx-3">
+														<AddFieldModal
+															:section="value.id"
+															@reloadTemplate="reloadTemplate"
+														/>
+													</b-button-group>
+												</b-button-toolbar>
+											</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
 							<!--<br><br>-->
 							<b-row  
 								v-if="value.fields[0]"
-								align-h="center" 
-								class="text-center"
 							>
 								<b-col>
 									<FieldCollapse
@@ -124,26 +125,6 @@ export default {
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
-	},
-	data() {
-		return {
-			outputoptionoptions: {
-				"TBLE": {
-					"use_index": false,
-					"remove_line": [],
-					"override_line_used": null
-				},
-				"JSON": {
-					"need_format": false,
-					"submap": null,
-					"is_list": false
-				},
-				"REGX": {
-					"multiple": false,
-					"separator": null
-				}
-			}
-		}
 	},
 	methods: {
 		reloadTemplate() {
