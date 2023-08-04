@@ -6,10 +6,10 @@
   background-color: #182433;
   color: $white;
   width: 100%;
-}
 
-.section-btn.not-collapsed {
-  text-decoration: solid underline $ocs-purple .2rem;
+  .not-collapsed {
+    text-decoration: solid underline $ocs-purple .2rem;
+  }
 }
 
 .section-btn:hover {
@@ -28,9 +28,9 @@
   text-transform: uppercase;
 }
 
-#IpdiscoverCollapse > .accordion > .card, 
+#IpdiscoverCollapse > .accordion > .card,
 #IpdiscoverCollapse > .accordion > .card > .card-header,
-#SectionCollapse > .accordion > .card, 
+#SectionCollapse > .accordion > .card,
 #SectionCollapse > .accordion > .card > .card-header {
   border: 0;
 }
@@ -41,8 +41,8 @@
 
 .section-table-btn > .btn-toolbar {
   display: block;
-  text-align: center;
   margin: auto;
+  text-align: center;
 }
 
 .section-table-options {
