@@ -12,7 +12,8 @@
   }
 }
 
-.section-btn:hover {
+.section-btn:hover,
+.section-btn:active {
   background-color: #182433;
   color: $white;
   text-decoration: solid underline $ocs-purple .2rem;
