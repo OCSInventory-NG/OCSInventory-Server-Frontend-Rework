@@ -176,6 +176,10 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
 			options: [
 				{ value: 'WIN', text: 'Windows' },
 				{ value: 'LIN', text: 'Linux' },
@@ -193,11 +197,7 @@ export default {
 	},
 	methods: {
 		getTemplates() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -214,13 +214,9 @@ export default {
 		},
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

@@ -164,6 +164,10 @@ export default {
 			errored: false,
 			successed: false,
 			password: null,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -172,12 +176,7 @@ export default {
 		}
 	},
 	mounted() {
-		const header = {
-			"Content-Type": "application/json;charset=utf-8",
-			"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-		}
-
-		Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: header })
+		Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errorMsg = null
@@ -193,11 +192,6 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
 			var jsonReturn = {
 				"password": this.rowdata.password,
 				"email": this.rowdata.email,
@@ -205,7 +199,7 @@ export default {
 				"last_name": this.rowdata.last_name
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

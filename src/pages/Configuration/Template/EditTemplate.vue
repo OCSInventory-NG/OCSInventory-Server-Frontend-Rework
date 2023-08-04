@@ -68,7 +68,11 @@ export default {
 			succesMsg: null,
 			successed: false,
 			loading: true,
-			errored: false
+			errored: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
@@ -81,12 +85,7 @@ export default {
 	},
 	methods: {
 		getTemplate() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/"+this.id, { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections
