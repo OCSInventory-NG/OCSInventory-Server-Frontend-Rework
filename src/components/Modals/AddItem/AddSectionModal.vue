@@ -126,7 +126,7 @@
 											>
 												<b-form-input
 													:id="value.id"
-													v-model="row.options[value.id]"
+													v-model="options[value.id]"
 												/>
 											</b-form-group>
 										</b-col>
@@ -139,7 +139,7 @@
 											>
 												<b-form-input
 													:id="value.id"
-													v-model="row.options[value.id]"
+													v-model="options[value.id]"
 													type="number"
 												/>
 											</b-form-group>
@@ -149,7 +149,7 @@
 										<b-col>
 											<b-form-checkbox
 												:id="value.id"
-												v-model="row.options[value.id]"
+												v-model="options[value.id]"
 												:name="value.id"
 												value="true"
 												:unchecked-value="value.default"
@@ -206,12 +206,17 @@ export default {
 				template: null,
 				options: {}
 			},
+			options : {},
 			rowdata: [],
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
 			methodoptions: [
 				{ value: 'FILE', text: i18n.t('template.FILE') },
 				{ value: 'BASH', text: i18n.t('template.BASH') },
@@ -249,13 +254,16 @@ export default {
 	methods: {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
-			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"sections/", this.row, { headers: header })
+
+			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
+						this.options[element.id] : element.default
+				})
+			}
+
+			Axios.post(process.env.VUE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

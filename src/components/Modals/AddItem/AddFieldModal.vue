@@ -138,7 +138,7 @@
 									>
 										<b-form-input
 											:id="value.id"
-											v-model="row.options[value.id]"
+											v-model="options[value.id]"
 										/>
 									</b-form-group>
 								</b-col>
@@ -151,7 +151,7 @@
 									>
 										<b-form-input
 											:id="value.id"
-											v-model="row.options[value.id]"
+											v-model="options[value.id]"
 											type="number"
 										/>
 									</b-form-group>
@@ -161,7 +161,7 @@
 								<b-col>
 									<b-form-checkbox
 										:id="value.id"
-										v-model="row.options[value.id]"
+										v-model="options[value.id]"
 										:name="value.id"
 										value="true"
 										:unchecked-value="value.default"
@@ -215,6 +215,7 @@ export default {
 				options: {},
 				section: null
 			},
+			options: {},
 			rowdata: [],
 			errorMsg: null,
 			succesMsg: null,
@@ -263,6 +264,13 @@ export default {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+
+			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
+						this.options[element.id] : element.default
+				})
+			}
 			
 			Axios.post(process.env.VUE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
 				.then(() => {

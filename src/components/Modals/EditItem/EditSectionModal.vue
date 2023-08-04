@@ -110,7 +110,7 @@
 								>
 									<b-form-input
 										:id="value.id"
-										v-model="row.options[value.id]"
+										v-model="options[value.id]"
 									/>
 								</b-form-group>
 							</b-col>
@@ -123,7 +123,7 @@
 								>
 									<b-form-input
 										:id="value.id"
-										v-model="row.options[value.id]"
+										v-model="options[value.id]"
 										type="number"
 									/>
 								</b-form-group>
@@ -133,7 +133,7 @@
 							<b-col>
 								<b-form-checkbox
 									:id="value.id"
-									v-model="row.options[value.id]"
+									v-model="options[value.id]"
 									:name="value.id"
 									value="true"
 									:unchecked-value="value.default"
@@ -178,10 +178,15 @@ export default {
 	data() {
 		return {
 			row: null,
+			options: {},
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
 			methodoptions: [
 				{ value: 'FILE', text: i18n.t('template.FILE') },
 				{ value: 'BASH', text: i18n.t('template.BASH') },
@@ -195,10 +200,6 @@ export default {
 				{ value: 'REGX', text: i18n.t('template.REGX') },
 				{ value: 'GREP', text: i18n.t('template.GREP') }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			outputoptionoptions: {
 				"TBLE": [
 					{ id: "use_index", type: "checkbox", default: false },
@@ -219,6 +220,8 @@ export default {
 	},
 	created() {
 		this.row = this.rowsectiondata
+		this.options = this.row.options
+		this.row.options = {}
 		this.row.id = this.idmodal
 		this.row.template = this.template
 	},
@@ -226,6 +229,13 @@ export default {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+
+			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
+						this.options[element.id] : element.default
+				})
+			}
 			
 			Axios.put(process.env.VUE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
