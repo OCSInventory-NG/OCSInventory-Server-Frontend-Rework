@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import router from './routes'
 import App from './App'
+
 /***** BOOTSTRAP *****/
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
@@ -18,6 +19,11 @@ Vue.use(i18n)
 /***** JSON/EXCEL *****/
 import JsonExcel from "vue-json-excel"
 Vue.component('downloadExcel', JsonExcel)
+
+/***** APEX CHARTS *****/
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+Vue.component('apexchart', VueApexCharts)
 
 /***** ICONS *****/
 import { library } from '@fortawesome/fontawesome-svg-core'

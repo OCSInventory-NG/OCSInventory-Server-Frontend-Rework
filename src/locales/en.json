@@ -29,6 +29,20 @@
     "user": "User",
     "users": "Users"
   },
+  "dashboard": {
+    "contacted": "Contacted today",
+    "lastcontacted": "Assets last contacted in the last 7 days",
+    "linux": "Linux",
+    "macos": "MacOS",
+    "nbassets": "Assets number",
+    "nbdevicebynetwork": "Devices number by network",
+    "nbnetwork": "Devices number",
+    "osassets": "Available operating systems",
+    "total": "Total",
+    "totalnetwork": "Networks number",
+    "totalnetworkdevices": "Network devices number",
+    "windows": "Windows"
+  },
   "accountinfo": {
     "accountinfo_values": "Values",
     "accountinfo_param": "Administrative data Values Management",

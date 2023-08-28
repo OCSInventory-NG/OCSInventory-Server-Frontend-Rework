@@ -29,6 +29,20 @@
     "user": "Utilisateur",
     "users": "Utilisateurs"
   },
+  "dashboard": {
+    "contacted": "Contactés aujourd'hui",
+    "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
+    "linux": "Linux",
+    "macos": "MacOS",
+    "nbassets": "Nombre d'actifs",
+    "nbdevicebynetwork": "Nombre d'équipements par réseau",
+    "nbnetwork": "Nombre d'équipements",
+    "osassets": "Systèmes d'exploitation disponibles",
+    "total": "Total",
+    "totalnetwork": "Nombre de réseaux",
+    "totalnetworkdevices": "Nombre d'équipements réseau",
+    "windows": "Windows"
+  },
   "accountinfo": {
     "accountinfo_values": "Valeurs",
     "accountinfo_param": "Gestion des valeurs de données administratives",
