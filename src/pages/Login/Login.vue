@@ -117,6 +117,7 @@ export default {
 					this.errorMessage = null
 					localStorage.setItem('token_authentication', response.data.token)
 					localStorage.setItem('authenticated', true)
+					localStorage.setItem('lang', this.$root.$i18n.locale)
 					this.getPermissions()
 				})
 				.catch(e => {
