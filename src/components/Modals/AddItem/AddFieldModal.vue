@@ -130,109 +130,44 @@
 							v-for="(value, key) in outputoptionoptions[row.retrival_output]"
 							:key="key"
 						>
-							<b-row v-if="key == 'use_index'">
-								<b-col>
-									<b-form-checkbox
-										id="use_index"
-										v-model="row.options.use_index"
-										name="use_index"
-										value="true"
-										unchecked-value="false"
-									>
-										{{ $t('template.use_index') }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row v-if="key == 'remove_line'">
+							<b-row v-if="value.type == 'text'">
 								<b-col>
 									<b-form-group
-										:label="$t('template.remove_line')" 
-										label-for="remove_line"
+										:label="$t('template.'+value.id)" 
+										:label-for="value.id"
 									>
 										<b-form-input
-											id="remove_line"
-											v-model="row.options.remove_line"
+											:id="value.id"
+											v-model="options[value.id]"
 										/>
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row v-if="key == 'override_line_used'">
+							<b-row v-if="value.type == 'number'">
 								<b-col>
 									<b-form-group
-										:label="$t('template.override_line_used')" 
-										label-for="override_line_used"
+										:label="$t('template.'+value.id)" 
+										:label-for="value.id"
 									>
 										<b-form-input
-											id="override_line_used"
-											v-model="row.options.override_line_used"
+											:id="value.id"
+											v-model="options[value.id]"
 											type="number"
 										/>
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row v-if="key == 'need_format'">
+							<b-row v-if="value.type == 'checkbox'">
 								<b-col>
 									<b-form-checkbox
-										id="need_format"
-										v-model="row.options.need_format"
-										name="need_format"
+										:id="value.id"
+										v-model="options[value.id]"
+										:name="value.id"
 										value="true"
-										unchecked-value="false"
+										:unchecked-value="value.default"
 									>
-										{{ $t('template.need_format') }}
+										{{ $t('template.'+value.id) }}
 									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row v-if="key == 'submap'">
-								<b-col>
-									<b-form-group
-										:label="$t('template.submap')" 
-										label-for="submap"
-									>
-										<b-form-input
-											id="submap"
-											v-model="row.options.submap"
-										/>
-									</b-form-group>
-								</b-col>
-							</b-row>
-							<b-row v-if="key == 'is_list'">
-								<b-col>
-									<b-form-checkbox
-										id="is_list"
-										v-model="row.options.is_list"
-										name="is_list"
-										value="true"
-										unchecked-value="false"
-									>
-										{{ $t('template.is_list') }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row v-if="key == 'multiple'">
-								<b-col>
-									<b-form-checkbox
-										id="multiple"
-										v-model="row.options.multiple"
-										name="multiple"
-										:value="true"
-										:unchecked-value="false"
-									>
-										{{ $t('template.multiple') }}
-									</b-form-checkbox>
-								</b-col>
-							</b-row>
-							<b-row v-if="key == 'separator'">
-								<b-col>
-									<b-form-group
-										:label="$t('template.separator')" 
-										label-for="separator"
-									>
-										<b-form-input
-											id="separator"
-											v-model="row.options.separator"
-										/>
-									</b-form-group>
 								</b-col>
 							</b-row>
 						</div>
@@ -260,6 +195,7 @@
 
 <script>
 import Axios from 'axios'
+import i18n from '@/i18n'
 
 export default {
 	name: 'AddFieldModal',
@@ -276,18 +212,10 @@ export default {
 				new_target: null,
 				retrival_method: null,
 				retrival_output: null,
-				options: {
-					"use_index": false,
-					"remove_line": null,
-					"override_line_used": null,
-					"need_format": false,
-					"submap": null,
-					"is_list": false,
-					"multiple": false,
-					"separator": null
-				},
+				options: {},
 				section: null
 			},
+			options: {},
 			rowdata: [],
 			errorMsg: null,
 			succesMsg: null,
@@ -299,33 +227,33 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			methodoptions: [
-				{ value: 'FILE', text: 'Read file' },
-				{ value: 'BASH', text: 'Bash command' },
-				{ value: 'PW', text: 'Powershell command' },
-				{ value: 'CMD', text: 'Cmd command' }
+				{ value: 'FILE', text: i18n.t('template.FILE') },
+				{ value: 'BASH', text: i18n.t('template.BASH') },
+				{ value: 'PW', text: i18n.t('template.PW') },
+				{ value: 'CMD', text: i18n.t('template.CMD') }
 			],
 			outputoptions: [
-				{ value: 'PTXT', text: 'Plain text' },
-				{ value: 'JSON', text: 'JSON format' },
-				{ value: 'TBLE', text: 'Table format' },
-				{ value: 'REGX', text: 'Regex processing' },
-				{ value: 'GREP', text: 'Grep command output' }
+				{ value: 'PTXT', text: i18n.t('template.PTXT') },
+				{ value: 'JSON', text: i18n.t('template.JSON') },
+				{ value: 'TBLE', text: i18n.t('template.TBLE') },
+				{ value: 'REGX', text: i18n.t('template.REGX') },
+				{ value: 'GREP', text: i18n.t('template.GREP') }
 			],
 			outputoptionoptions: {
-				"TBLE": {
-					"use_index": false,
-					"remove_line": [],
-					"override_line_used": null
-				},
-				"JSON": {
-					"need_format": false,
-					"submap": null,
-					"is_list": false
-				},
-				"REGX": {
-					"multiple": false,
-					"separator": null
-				}
+				"TBLE": [
+					{ id: "use_index", type: "checkbox", default: false },
+					{ id: "remove_line", type: "text", default: null },
+					{ id: "override_line_used", type: "number", default: null }
+				],
+				"JSON": [
+					{ id: "need_format", type: "checkbox", default: false },
+					{ id: "submap", type: "text", default: null },
+					{ id: "is_list", type: "checkbox", default: false }
+				],
+				"REGX": [
+					{ id: "multiple", type: "checkbox", default: false },
+					{ id: "separator", type: "text", default: null },
+				]
 			}
 		}
 	},
@@ -336,6 +264,13 @@ export default {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+
+			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
+						this.options[element.id] : element.default
+				})
+			}
 			
 			Axios.post(process.env.VUE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
 				.then(() => {

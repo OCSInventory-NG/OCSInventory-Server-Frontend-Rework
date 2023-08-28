@@ -2,6 +2,11 @@
 //  BREADCRUMB COMPONENT
 // ===========================================
 
+.breadcrumb-item > a {
+  color: #667382;
+}
+
 .breadcrumb-item > a:hover {
+  cursor: unset;
   text-decoration: none;
 }

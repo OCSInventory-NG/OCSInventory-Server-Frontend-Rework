@@ -215,6 +215,10 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
 			datatargetoptions: [
 				{ value: 'ASSET', text: i18n.t("title.assets") },
 				{ value: 'IPDISCOVER', text: i18n.t("title.ipdiscover") },
@@ -238,11 +242,7 @@ export default {
 	},
 	methods: {
 		getAccountinfoConfig() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: header })
+			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.accountinfovaluesTreatment()
@@ -269,13 +269,9 @@ export default {
 		},
 		// Submit template creation and call getAccountinfoConfig to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

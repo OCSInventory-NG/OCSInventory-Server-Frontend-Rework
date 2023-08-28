@@ -31,12 +31,13 @@
 						<download-excel
 							:data="json_data"
 							:fields="json_fields"
-							type="csv"
-							name="export.xls"
+							type="xlsx"
+							:name="title+'_export.xlsx'"
 						>
 							<button 
+								id="export-row"
 								:title="$t('generic.download')"
-								class="form-control btn"
+								class="form-control btn datatable-btn"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'download']"
@@ -65,7 +66,7 @@
 						<b-button 
 							:title="$t('configuration.save_config')"
 							variant="success"
-							class="add-button"
+							class="add-button datatable-btn"
 							@click="onSave"
 						>
 							<font-awesome-icon 
@@ -76,9 +77,14 @@
 				</div>
 
 				<!-- Show/Hide columns -->
-				<div class="col">
-					<b-dropdown 
+				<div 
+					class="col" 
+					align="right"
+				>
+					<b-dropdown
 						:text="$t('generic.show_hide')"
+						variant="bg-light"
+						class="datatable-btn"
 					>
 						<b-dropdown-item
 							v-for="field in fields" 
@@ -91,6 +97,19 @@
 							<label v-else>{{ $t('generic.'+field.key) }}</label>
 						</b-dropdown-item>
 					</b-dropdown>
+				</div>
+
+				<!-- Number per page-->
+				<div 
+					class="col-1" 
+					align="right"
+				>
+					<b-form-select
+						id="per-page-select"
+						v-model="perPage"
+						:options="pageOptions"
+						class="form-select datatable-btn"
+					/>
 				</div>
 			</div>
 		</div>
@@ -159,7 +178,10 @@
 					v-if="canaccesschild"
 					#cell(netdevices)="row"
 				>
-					<a :href="'/ocsreports/inventory/netdevices/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.netdevices }}
 					</a>
 				</template>
@@ -169,7 +191,10 @@
 					v-if="canaccessdetails"
 					#cell(name)="row"
 				>
-					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.name }}
 					</a>
 				</template>
@@ -179,7 +204,10 @@
 					v-if="canaccessdetails"
 					#cell(netname)="row"
 				>
-					<a :href="'/ocsreports/inventory/'+title+'/details/'+row.item.id">
+					<a 
+						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.netname }}
 					</a>
 				</template>
@@ -246,24 +274,6 @@
 		<!-- Pagination -->
 		<b-row class="pagination-align">
 			<b-col>
-				<b-form-group
-					label="Per page"
-					label-for="per-page-select"
-					label-cols-sm="3"
-					label-align-sm=""
-					label-size="sm"
-				>
-					<b-form-select
-						id="per-page-select"
-						v-model="perPage"
-						:options="pageOptions"
-						class="form-select"
-						size="sm"
-					/>
-				</b-form-group>
-			</b-col>
-
-			<b-col>
 				<b-pagination
 					v-model="currentPage"
 					:total-rows="totalRows"
@@ -324,9 +334,9 @@ export default {
 	data() {
 		return {
 			// Pagination parameters
-			perPage: 5,
+			perPage: 10,
 			currentPage: 1,
-			pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
+			pageOptions: [10, 25, 100, 250, 500, 1000],
 			totalRows: 1,
 			// Datatable datas
 			fields: [],
@@ -435,6 +445,7 @@ export default {
 		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
 			this.totalRows = filteredItems.length
+			this.json_data = filteredItems
 			this.currentPage = 1
 		},
 		// Trigger selection rows

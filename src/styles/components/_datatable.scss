@@ -9,3 +9,36 @@ tbody, td, tfoot, th, thead, tr {
 .my-pagination {
   float: right;
 }
+
+.input-icon-addon:last-child {
+  right: 7px;
+}
+
+.ocs-link {
+  color: $ocs-purple;
+  font-weight: 500;
+}
+
+.active>.page-link, .page-link.active {
+  background-color: $ocs-purple;
+  border-color: $ocs-purple;
+}
+
+#show-hide {
+  margin-bottom: 7px;
+  margin-top: 7px;
+}
+
+.datatable-btn {
+  height: 36px;
+  margin-bottom: 7px;
+  margin-top: 7px;
+}
+
+.datatable-btn-maxsize {
+  max-width: 48px;
+}
+
+#per-page-select {
+  max-width: 100px;
+}

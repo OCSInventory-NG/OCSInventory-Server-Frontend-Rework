@@ -3,7 +3,8 @@
 		<b-button 
 			v-b-modal.import-template
 			:title="$t('template.import_template')"
-			class="form-control btn"
+			variant="bg-light"
+			class="form-control btn datatable-btn datatable-btn-maxsize"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'upload']"
@@ -77,6 +78,10 @@ export default {
 			successed: false,
 			file: null,
 			jsonToSend: null,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	methods: {
@@ -93,12 +98,7 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit() {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
