@@ -32,7 +32,7 @@
 								:candelete="candelete"
 								:canaccessdetails="true"
 								editcomponent="EditNetdeviceModal"
-								title="netdevice"
+								title="netdevices"
 								translationkey="network."
 								@reloadDatatable="reloadDatatable"
 							/>
