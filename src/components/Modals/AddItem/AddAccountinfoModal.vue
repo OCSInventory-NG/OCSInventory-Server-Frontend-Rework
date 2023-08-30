@@ -247,7 +247,7 @@ export default {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader[field] = field
+						this.rowheader.push(field)
 					})
 					this.errorMsg = null
 					this.errored = false
@@ -286,13 +286,9 @@ export default {
 		},
 		// Submit template creation and call getAccountinfoConfig to reload datatable datas
 		onSubmit(event) {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

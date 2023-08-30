@@ -281,7 +281,7 @@ export default {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader[field] = field
+						this.rowheader.push(field)
 					})
 					this.errorMsg = null
 					this.errored = false
