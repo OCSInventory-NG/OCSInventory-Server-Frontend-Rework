@@ -61,7 +61,7 @@ export default {
 		groupdescription: { type: String, default: '' },
 		groupid: { type: Number, default: null },
 		rowdata: { type: Array, default: null },
-		rowheader: { type: Object, default: null },
+		rowheader: { type: Array, default: null },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		canaccesschild: { type: Boolean, default: false },

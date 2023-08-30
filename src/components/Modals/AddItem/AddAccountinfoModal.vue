@@ -246,7 +246,9 @@ export default {
 		getHeader() {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
 				.then(response => {
-					this.rowheader = response.data
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader[field] = field
+					})
 					this.errorMsg = null
 					this.errored = false
 					this.getAccountinfoConfig()

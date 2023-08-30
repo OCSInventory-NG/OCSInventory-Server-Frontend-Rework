@@ -168,7 +168,7 @@ export default {
 				})
 			})
 
-			console.log(this.rowdata)
+			this.rowheader = Object.values(this.rowheader)
 
 			this.loading = false
 		},

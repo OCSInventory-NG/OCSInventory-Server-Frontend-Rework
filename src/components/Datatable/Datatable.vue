@@ -304,7 +304,7 @@ export default {
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
-		rowheader: { type: Object, default: null },
+		rowheader: { type: Array, default: null },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: false },
@@ -391,7 +391,7 @@ export default {
 				}
 			})
 		} else {
-			Object.keys(this.rowheader).forEach( data => {
+			Object.values(this.rowheader).forEach( data => {
 				var visible = true
 				if(data == "sections") {
 					visible = false
