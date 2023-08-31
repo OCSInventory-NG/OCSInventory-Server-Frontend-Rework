@@ -36,6 +36,7 @@
 							<Datatable
 								id="generalDatatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:candelete="false"
 								:canedit="false"
 								:usecheckbox="false"
@@ -68,6 +69,7 @@ export default {
 	data() {
 		return {
 			rowdata: [],
+			rowheader: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
@@ -90,7 +92,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
 				this.caneditconfig = true
 			}
-			this.getConfig()
+			this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
@@ -98,6 +100,21 @@ export default {
 		}	
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"config/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getConfig()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Get all config
 		getConfig() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: this.header })

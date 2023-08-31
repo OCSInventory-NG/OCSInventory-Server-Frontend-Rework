@@ -3,7 +3,7 @@
     "accountinfo": "Donnée administrative",
     "accountinfo/config": "Données administratives",
     "accountinfo/data": "Donnée administrative",
-    "assests": "Actifs",
+    "assets": "Actifs",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Tableau de bord",
@@ -58,7 +58,9 @@
     "config_elem_15": "I'm a description",
     "config_elem_17": "I'm a description",
     "config_elem_24": "I'm a description",
-    "save_config": "Sauvegarder la configuration"
+    "name": "Nom",
+    "save_config": "Sauvegarder la configuration",
+    "value": "Valeur"
   },
   "message": {
     "delete_msg": "Souhaitez-vous vraiment supprimer",
@@ -184,13 +186,16 @@
     "description": "Description",
     "editnetdevice": "Modifier le périphérique réseau",
     "editnetgroup": "Editer un groupe Réseaux",
+    "editnetwork": "Editer le réseau",
     "id": "ID",
     "ip": "Adresse IP",
     "mac": "Adresse MAC",
     "mask": "Mask",
     "name": "Nom",
+    "netdevices": "Périphériques réseau",
     "netid": "NetID",
     "netname": "Nom du périphérique réseau",
+    "nettag": "NetTag",
     "network": "Réseaux",
     "unknown_network": "Réseaux inconnus"
   },

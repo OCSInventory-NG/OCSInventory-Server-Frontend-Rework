@@ -209,6 +209,7 @@
 							<Datatable
 								id="users-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								editcomponent="EditUserModal"
@@ -253,6 +254,7 @@ export default {
 				user_permissions: []
 			},
 			rowdata: [],
+			rowheader: [],
 			groups: [],
 			groupsLabel: [],
 			errorMsg: null,
@@ -272,9 +274,24 @@ export default {
 		}
 	},
 	mounted() {
-		this.getGroups()
+		this.getHeader()
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getGroups()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Get all users
 		getUsers() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })

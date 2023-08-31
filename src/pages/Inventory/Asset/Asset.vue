@@ -30,6 +30,7 @@
 								:rowdata="rowdata"
 								:usecheckbox="false"
 								:canaccessdetails="true"
+								:rowheader="rowheader"
 								title="assets"
 								translationkey="inventory."
 							/>
@@ -56,6 +57,7 @@ export default {
 		return {
 			errorMsg: null,
 			rowdata: [],
+			rowheader: [],
 			loading: true,
 			errored: false,
 			header: {
@@ -66,6 +68,30 @@ export default {
 	},
 	mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
+			this.getHeader()
+		} else {
+			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+		}
+	},
+	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getAssets()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		getAssets() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
@@ -77,10 +103,6 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
-		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
-			this.errored = true
-			this.loading = false
 		}
 	}
 }

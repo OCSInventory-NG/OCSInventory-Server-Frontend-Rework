@@ -314,6 +314,7 @@ export default {
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
+		rowheader: { type: Array, default: null },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: false },
@@ -369,7 +370,7 @@ export default {
 		// Initialize visible fields
 		visibleFields() {
 			localStorage.removeItem(this.title)
-			localStorage.setItem(this.title, JSON.stringify(this.fields))
+			//localStorage.setItem(this.title, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
 		}
 	},
@@ -400,27 +401,25 @@ export default {
 				}
 			})
 		} else {
-			this.rowdata.forEach(details => {
-				Object.keys(details).forEach( data => {
-					var visible = true
-					if(data == "sections") {
-						visible = false
-					}
+			Object.values(this.rowheader).forEach( data => {
+				var visible = true
+				if(data == "sections") {
+					visible = false
+				}
 
-					var array = {
-						key: data,
-						label: i18n.t(this.translationkey+data),
-						sortable: true,
-						visible: visible,
-					}
-					
-					// Initialize CSV export header
-					this.json_fields[data] = data
-					
-					// Initialize datatable header
-					var index = this.fields.findIndex(x => x.key==data);
-					index === -1 ? this.fields.push(array) : null
-				})
+				var array = {
+					key: data,
+					label: i18n.t(this.translationkey+data),
+					sortable: true,
+					visible: visible,
+				}
+				
+				// Initialize CSV export header
+				this.json_fields[data] = data
+				
+				// Initialize datatable header
+				var index = this.fields.findIndex(x => x.key==data);
+				index === -1 ? this.fields.push(array) : null
 			})
 		}
 

@@ -28,6 +28,7 @@
 							<Datatable
 								id="netdevice-datatable"
 								:rowdata="rowdata"
+								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
 								:canaccessdetails="true"
@@ -59,6 +60,7 @@ export default {
 		return {
 			errorMsg: null,
 			rowdata: [],
+			rowheader: [],
 			loading: true,
 			errored: false,
 			canedit: false,
@@ -77,7 +79,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("delete_netdevice")) {
 				this.candelete = true
 			}
-			this.getNetdevice()
+			this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
@@ -85,6 +87,21 @@ export default {
 		}
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"netdevices", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getNetdevice()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
 		// Retrieve netdevice
 		getNetdevice() {
 			var extendedRoute = "/"
