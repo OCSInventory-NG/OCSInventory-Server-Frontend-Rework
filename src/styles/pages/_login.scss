@@ -15,3 +15,15 @@
     color: $white;
   }
 }
+
+@media (max-width: 767.98px) {
+  .auth-page > .row {
+    display: block;
+    text-align: center;
+  }
+
+  .auth-page > .row > .col-4 {
+    margin: auto;
+    width: 50%;
+  }
+}

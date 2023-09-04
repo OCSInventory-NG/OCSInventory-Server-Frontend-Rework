@@ -7,8 +7,12 @@
 			<button 
 				class="navbar-toggler" 
 				type="button" 
-				data-bs-toggle="collapse" 
-				data-bs-target="#navbar-menu"
+				data-toggle="collapse" 
+				data-target="#navbarMenu" 
+				aria-controls="navbarMenu" 
+				aria-expanded="false" 
+				aria-label="Toggle navigation"
+				@click="showMenu()"
 			>
 				<span class="navbar-toggler-icon" />
 			</button>
@@ -53,7 +57,9 @@
 				</b-nav-item-dropdown>
 			</div>
 
-			<Sidebar />
+			<Sidebar 
+				:showmobilemenu="showmobilemenu"
+			/>
 		</div>
 	</header>
 </template>
@@ -64,6 +70,11 @@ import Sidebar from '@/components/Sidebar/Sidebar'
 export default {
 	name: 'Header',
 	components: { Sidebar },
+	data() {
+		return {
+			showmobilemenu: false,
+		}
+	},
 	methods: {
 		logout() {
 			localStorage.setItem('authenticated', false);
@@ -73,6 +84,9 @@ export default {
 		},
 		account() {
 			this.$router.push('/myaccount');
+		},
+		showMenu() {
+			this.showmobilemenu = !this.showmobilemenu;
 		},
 	}
 }

@@ -5,7 +5,7 @@
 	>
 		<!-- Header datatable -->
 		<div class="header-table">
-			<div class="row">
+			<div class="row responsive">
 				<!-- Search bar -->
 				<div class="input-icon col">
 					<b-form-input 

@@ -231,11 +231,7 @@ export default {
 				{ value: 'TEXTAREA', text: 'TEXTAREA' },
 				{ value: 'SELECT', text: 'SELECT' },
 				{ value: 'CHECKBOX', text: 'CHECKBOX' },
-			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			]
 		}
 	},
 	watch: {

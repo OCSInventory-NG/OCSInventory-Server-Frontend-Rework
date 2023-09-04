@@ -2,10 +2,6 @@
 //  NAVLINK COMPONENT
 // ===========================================
 
-.active > a {
-  //color: #972081 !important;
-}
-
 .navbar-expand-md .nav-item.active::after {
   border-color: #972081;
 }
@@ -30,4 +26,18 @@
 
 .dropdown-divider {
   margin: 0;
+}
+
+@media (max-width: 767.98px) {
+  .navbar-expand-md .navbar-collapse .dropdown-menu {
+    background: 0 0;
+    border: 0;
+    box-shadow: none;
+    color: inherit;
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+    position: static !important;
+    transform: none !important;
+  }
 }

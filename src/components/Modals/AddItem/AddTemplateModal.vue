@@ -186,11 +186,7 @@ export default {
 				{ value: 'WIN', text: 'Windows' },
 				{ value: 'LIN', text: 'Linux' },
 				{ value: 'MAC', text: 'MacOS' }
-			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			]
 		}
 	},
 	watch: {

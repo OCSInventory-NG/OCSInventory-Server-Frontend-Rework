@@ -21,7 +21,7 @@ export default {
 		|| localStorage.getItem("authenticated") === "false"
 		|| localStorage.getItem('token_authentication') === null 
 		|| localStorage.getItem('permissions') === null) {
-			this.$router.push("/login");
+			this.$router.push("/login").catch(() => {});
 		}
 	},
 }
