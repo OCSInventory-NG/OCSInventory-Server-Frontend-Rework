@@ -1,7 +1,8 @@
 <template>
 	<div 
-		id="navbar-menu" 
+		id="navbarMenu" 
 		class="collapse navbar-collapse"
+		:class="showmobilemenu ? 'show' : ''"
 	>
 		<div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
 			<b-nav class="navbar-nav">
@@ -99,6 +100,9 @@ import NavLink from './NavLink/NavLink';
 export default {
 	name: 'Sidebar',
 	components: { NavLink },
+	props: {
+		showmobilemenu: { type: Boolean, default: false }
+	},
 	data() {
 		return {
 			activeItem: this.$route.name
