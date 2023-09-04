@@ -34,14 +34,14 @@
 
 @media (max-width: 767.98px) {
   .navbar-expand-md .navbar-collapse .dropdown-menu {
-    padding: 0;
     background: 0 0;
-    position: static !important;
-    color: inherit;
+    border: 0;
     box-shadow: none;
-    border: none;
-    min-width: 0;
+    color: inherit;
     margin: 0;
+    min-width: 0;
+    padding: 0;
+    position: static !important;
     transform: none !important;
   }
 }
