@@ -42,3 +42,26 @@ tbody, td, tfoot, th, thead, tr {
 #per-page-select {
   max-width: 100px;
 }
+
+@media (max-width: 767.98px) {
+  .responsive {
+    display: block;
+
+    > .col {
+      display: grid;
+    }
+
+    > .col-1, > .col-2, .mr-1 {
+      width: 100%;
+    }
+  }
+
+  .datatable-btn-maxsize, .mr-1 > div {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  #per-page-select {
+    max-width: 100%;
+  }
+}
