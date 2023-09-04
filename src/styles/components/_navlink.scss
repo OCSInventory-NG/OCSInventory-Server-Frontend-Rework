@@ -2,10 +2,6 @@
 //  NAVLINK COMPONENT
 // ===========================================
 
-.active > a {
-  //color: #972081 !important;
-}
-
 .navbar-expand-md .nav-item.active::after {
   border-color: #972081;
 }
@@ -45,5 +41,3 @@
     transform: none !important;
   }
 }
-
-
