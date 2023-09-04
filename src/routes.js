@@ -23,6 +23,10 @@ import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
 import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
 // Detail
 import Detail from '@/pages/Detail/Detail'
+// Deployment
+import Packages from '@/pages/Deployment/Package'
+import History from '@/pages/Deployment/History'
+import Report from '@/pages/Deployment/Report'
 
 Vue.use(Router)
 
@@ -103,6 +107,21 @@ export default new Router({
 			path: '/inventory/:type/details/:id',
 			name: 'Detail',
 			component: Detail
+		},
+		{
+			path: '/deployment/packages',
+			name: 'Packages',
+			component: Packages
+		},
+		{
+			path: '/deployment/history',
+			name: 'History',
+			component: History
+		},
+		{
+			path: '/deployment/report',
+			name: 'Report',
+			component: Report
 		}
 	],
 })

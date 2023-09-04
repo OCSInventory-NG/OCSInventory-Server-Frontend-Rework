@@ -41,6 +41,30 @@
 				/>
 				<NavLink
 					:is-active="activeItem"
+					:header="$t('title.deployment')"
+					:column-dividers="[
+						{ header: $t('title.management'), identifier: 'management' }
+					]"
+					:children-links="[
+						{ 
+							header: $t('title.packages'), link: '/ocsreports/deployment/packages', 
+							route:'Packages', column: 'management' 
+						},
+						{ 
+							header: $t('title.history'), link: '/ocsreports/deployment/history', 
+							route:'History', column: 'management' 
+						},
+						{ 
+							header: $t('title.report'), link: '/ocsreports/deployment/report', 
+							route:'Report', column: 'management' 
+						}
+					]"
+					link="/ocsreports/deployment"
+					icon-name="users-cog"
+					index="deployment"
+				/>
+				<NavLink
+					:is-active="activeItem"
 					:header="$t('title.usermanagement')"
 					:column-dividers="[
 						{ header: $t('title.management'), identifier: 'management' }
