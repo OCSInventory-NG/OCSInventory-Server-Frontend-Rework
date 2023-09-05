@@ -240,6 +240,16 @@
 									:icon="['fas', 'pencil']"
 								/>
 							</button>
+							<button 
+								v-if="caneditpackage"
+								:title="$t('deployment.editpackage')"
+								class="btn btn-ghost-dark"
+								@click="goToEditPackage(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'pencil']"
+								/>
+							</button>
 							<!-- Do all actions button -->
 							<DoAllActionsItemModal 
 								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
@@ -324,6 +334,7 @@ export default {
 		caneditconfig: { type: Boolean, default: false },
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
+		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: true },
 		canaccesschild: { type: Boolean, default: false },
 		canaccessdetails: { type: Boolean, default: false },
@@ -470,6 +481,9 @@ export default {
 		},
 		goToEditTemplate(id){
 			this.$router.push('/configurations/templates/edittemplate/'+id); 
+		},
+		goToEditPackage(id){
+			this.$router.push('/deployment/packages/editpackage/'+id); 
 		},
 		goToNetdevices(id) {
 			this.$router.push('/inventory/netdevice/'+id); 
