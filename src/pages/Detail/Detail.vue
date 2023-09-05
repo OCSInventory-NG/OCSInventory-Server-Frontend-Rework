@@ -72,6 +72,14 @@
 									<b-tab :title="$t('title.inventory')">
 										<p>I'm the second tab</p>
 									</b-tab>
+									<b-tab 
+										v-if="type == 'ASSET'"
+										:title="$t('title.deployment')"
+									>
+										<ResultDetail
+											:id="$route.params.id"
+										/>
+									</b-tab>
 								</b-tabs>
 							</div>
 						</div>
@@ -88,10 +96,11 @@ import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Accountinfo from '@/components/Accountinfo/Accountinfo'
+import ResultDetail from '@/components/Deployment/ResultDetail'
 
 export default {
 	name: 'Detail',
-	components: { Loader, Alert, PageHeader, Accountinfo },
+	components: { Loader, Alert, PageHeader, Accountinfo, ResultDetail },
 	data() {
 		return {
 			errorMsg: null,
