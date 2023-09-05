@@ -203,6 +203,28 @@
     "network": "Réseaux",
     "unknown_network": "Réseaux inconnus"
   },
+  "deployment": {
+    "actions_list": "Actions de déploiement",
+    "action_type": "Type d'action",
+    "addaction": "Ajouter une action",
+    "addpackage": "Ajouter un paquet",
+    "command": "Commande",
+    "date_created": "Date de création",
+    "description": "Description",
+    "editpackage": "Editer le paquet",
+    "EXEC": "Exécuter une commande",
+    "file": "Fichier/Archive compressée",
+    "id": "ID",
+    "LAUNCH": "Exécuter un fichier/script",
+    "name": "Nom",
+    "path": "Chemin",
+    "priority": "Priorité d'exécution",
+    "result": "Résultat",
+    "select_launch_file": "Sélectionner le fichier/script à exécuter",
+    "select_store_file": "Sélectionner le fichier/archive compressée à sauvegarder",
+    "STORE": "Sauvegarder un fichier/dossier",
+    "target_os": "Système d'exploitation ciblé"
+  },
   "permission": {
     "accountinfoconfig": "Configuration des données administratives",
     "accountinfodata": "Données des données administratives",
