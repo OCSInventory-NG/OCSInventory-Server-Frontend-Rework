@@ -77,7 +77,7 @@ export default {
 		getResult() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/results?asset="+this.id, { headers: this.header })
 				.then(response => {
-					console.log(response)
+					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
 				})
