@@ -18,7 +18,12 @@
 			</div>
 
 			<div v-else>
-				bonjour
+				<AddPackageModal
+					:canadd="canadd"
+					:canedit="canedit"
+					:candelete="candelete"
+					page-title="packages"
+				/>
 			</div>
 		</section>
 	</div>
@@ -28,10 +33,11 @@
 import i18n from '@/i18n'
 import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
+import AddPackageModal from '@/components/Modals/AddItem/AddPackageModal'
 
 export default {
 	name: 'Packages',
-	components: { Loader, Alert },
+	components: { Loader, Alert, AddPackageModal },
 	data() {
 		return {
 			errorMsg: null,
