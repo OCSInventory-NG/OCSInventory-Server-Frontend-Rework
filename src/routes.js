@@ -27,6 +27,7 @@ import Detail from '@/pages/Detail/Detail'
 import Packages from '@/pages/Deployment/Package'
 import History from '@/pages/Deployment/History'
 import Report from '@/pages/Deployment/Report'
+import EditPackage from '@/pages/Deployment/EditPackage'
 
 Vue.use(Router)
 
@@ -112,6 +113,12 @@ export default new Router({
 			path: '/deployment/packages',
 			name: 'Packages',
 			component: Packages
+		},
+		{
+			path: '/deployment/packages/editpackage/:id',
+			name: 'EditPackage',
+			component: EditPackage,
+			props: true
 		},
 		{
 			path: '/deployment/history',
