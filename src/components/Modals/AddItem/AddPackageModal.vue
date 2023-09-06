@@ -142,12 +142,14 @@
 					<div class="card">
 						<div class="card-body">
 							<Datatable
-								id="pckages-datatable"
+								id="packages-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:candelete="candelete"
-								:caneditpackage="canedit"
-								title="packages"
+								:canedit="canedit"
+								:canviewaction="canviewaction"
+								editcomponent="EditPackageModal"
+								title="deployment/packages"
 								translationkey="deployment."
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -161,6 +163,7 @@
 
 <script>
 import Axios from 'axios'
+import i18n from '@/i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
@@ -173,6 +176,7 @@ export default {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		canviewaction: { type: Boolean, default: false },
 		pageTitle: { type: String, default: "" }
 	},
 	data() {
@@ -194,9 +198,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			options: [
-				{ value: 'WIN', text: 'Windows' },
-				{ value: 'LIN', text: 'Linux' },
-				{ value: 'MAC', text: 'MacOS' }
+				{ value: 'WIN', text: i18n.t('template.WIN') },
+				{ value: 'LIN', text: i18n.t('template.LIN') },
+				{ value: 'MAC', text: i18n.t('template.MAC') }
 			]
 		}
 	},
@@ -213,7 +217,7 @@ export default {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if(field != "result") this.rowheader.push(field)
 					})
 					this.errorMsg = null
 					this.errored = false
@@ -227,6 +231,9 @@ export default {
 		getPackages() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
+					response.data.forEach(packages => {
+						packages.actions_list = packages.actions_list.length
+					})
 					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
