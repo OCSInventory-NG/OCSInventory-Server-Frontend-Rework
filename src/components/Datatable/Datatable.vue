@@ -241,13 +241,13 @@
 								/>
 							</button>
 							<button 
-								v-if="caneditpackage"
-								:title="$t('deployment.editpackage')"
+								v-if="canviewaction"
+								:title="$t('deployment.manageaction')"
 								class="btn btn-ghost-dark"
 								@click="goToEditPackage(row.item.id)"
 							>
 								<font-awesome-icon 
-									:icon="['fas', 'pencil']"
+									:icon="['fas', 'gear']"
 								/>
 							</button>
 							<!-- Do all actions button -->
@@ -304,6 +304,8 @@ import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoMo
 import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
 import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
 import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
+import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
+import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -317,6 +319,8 @@ export default {
 		EditNetworkGroupModal,
 		EditNetworkModal,
 		EditNetdeviceModal,
+		EditPackageModal,
+		EditActionListModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -335,7 +339,8 @@ export default {
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
-		canaddvalue: { type: Boolean, default: true },
+		canaddvalue: { type: Boolean, default: false },
+		canviewaction: { type: Boolean, default: false },
 		canaccesschild: { type: Boolean, default: false },
 		canaccessdetails: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
