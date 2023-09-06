@@ -204,6 +204,7 @@
     "unknown_network": "Unknown Networks"
   },
   "deployment": {
+    "actions": "Actions",
     "actions_list": "Deployment actions",
     "action_type": "Action type",
     "addaction": "Add an action",
@@ -213,11 +214,13 @@
     "comment": "Comment",
     "date_created": "Creation date",
     "description": "Description",
+    "editacion": "Edit the action",
     "editpackage": "Edit the package",
     "EXEC": "Execute a command",
     "file": "File/Compressed folder",
     "id": "ID",
     "LAUNCH": "Execute a file/script",
+    "manageacion": "Manage actions",
     "name": "Name",
     "package": "Package",
     "path": "Path",
