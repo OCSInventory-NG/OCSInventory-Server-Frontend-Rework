@@ -19,6 +19,7 @@
 			<div v-else>
 				<AddActionListModal
 					:package="rowpackagedata.id"
+					:canaddaction="canaddaction"
 					@reloadPackage="reloadPackage"
 				/>
 
@@ -34,10 +35,20 @@
 									<p>{{ $t('deployment.target_os') }} : {{ $t('template.'+rowpackagedata.target_os) }}</p>
 									<p>{{ $t('deployment.date_created') }} : {{ rowpackagedata.date_created }}</p>
 								</b-col>
+							</b-row><br>
+							<b-row class="text-center">
+								<h3>{{ $t('deployment.actions') }}</h3>
 							</b-row>
-							<ActionListCollapse
-								:rowactiondata="rowactiondata"
-								@reloadPackage="reloadPackage"
+							<Datatable
+								id="actions-datatable"
+								:rowdata="rowactiondata"
+								:rowheader="rowheader"
+								:candelete="candeleteaction"
+								:canedit="caneditaction"
+								editcomponent="EditActionListModal"
+								title="deployment/actions"
+								translationkey="deployment."
+								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
@@ -52,23 +63,27 @@ import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal'
-import ActionListCollapse from '@/components/Collapse/Deployment/ActionListCollapse'
+import Datatable from '@/components/Datatable/Datatable'
 
 export default {
 	name: 'EditPackage',
-	components: { Loader, Alert, AddActionListModal, ActionListCollapse	},
+	components: { Loader, Alert, AddActionListModal, Datatable	},
 	props: {
-		id: { type: String, required: true },
+		id: { type: String, required: true }
 	},
 	data() {
 		return {
 			errorMsg: null,
 			rowpackagedata: [],
 			rowactiondata: [],
+			rowheader: [],
 			succesMsg: null,
 			successed: false,
 			loading: true,
 			errored: false,
+			canaddaction: false,
+			caneditaction: false,
+			candeleteaction: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -81,9 +96,36 @@ export default {
 		}
 	},
 	mounted() {
-		this.getPackage()
+		this.getHeader()
+		if(localStorage.getItem('permissions').split(",").includes("add_action")) {
+			this.canaddaction = true
+		}
+		if(localStorage.getItem('permissions').split(",").includes("change_action")) {
+			this.caneditaction = true
+		}
+		if(localStorage.getItem('permissions').split(",").includes("delete_action")) {
+			this.candeleteaction = true
+		}
 	},
 	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getPackage()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		reloadDatatable() {
+			this.getPackage()
+		},
 		getPackage() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
 				.then(response => {

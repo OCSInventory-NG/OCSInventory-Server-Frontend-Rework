@@ -22,6 +22,7 @@
 					:canadd="canadd"
 					:canedit="canedit"
 					:candelete="candelete"
+					:canviewaction="canviewaction"
 					page-title="packages"
 				/>
 			</div>
@@ -45,7 +46,8 @@ export default {
 			errored: false,
 			canadd: false,
 			canedit: false,
-			candelete: false
+			candelete: false,
+			canviewaction: false,
 		}
 	},
 	mounted() {
@@ -58,6 +60,9 @@ export default {
 			}
 			if(localStorage.getItem('permissions').split(",").includes("delete_package")) {
 				this.candelete = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("view_action")) {
+				this.canviewaction = true
 			}
 			this.loading = false
 		} else {
