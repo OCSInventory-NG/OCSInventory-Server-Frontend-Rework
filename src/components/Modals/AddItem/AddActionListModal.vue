@@ -10,11 +10,12 @@
 						<Breadcrumb />
 					</div>
 					<h2 class="page-title">
-						{{ $t('deployment.editpackage') }}
+						{{ $t('deployment.manageaction') }}
 					</h2>
 				</div>
 				<div class="col-auto ms-auto">
 					<b-button
+						v-if="canaddaction"
 						v-b-modal.add-action
 						:title="$t('deployment.addaction')"
 						variant="primary"
@@ -154,6 +155,7 @@ export default {
 	components: { Breadcrumb },
 	props: {
 		package: { type: Number, required: true },
+		canaddaction: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -163,7 +165,7 @@ export default {
 				priority: 1,
 				action_type: "EXEC",
 				command: null,
-				file: null
+				file: ''
 			},
 			rowdata: [],
 			loading: true,
@@ -172,7 +174,7 @@ export default {
 			errored: false,
 			successed: false,
 			header: {
-				"Content-Type": "application/json;charset=utf-8",
+				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			actionoptions: [
@@ -186,14 +188,20 @@ export default {
 		this.row.package = this.package
 	},
 	methods: {
-		processFile(event) {
-			this.row.file = event.target.files[0]
+		processFile(event){
+			this.row.file = event.target.files[0];
 		},
 		// Submit package action creation and call getPackage to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"deployment/actions/", this.row, { headers: this.header })
+			let formdata = new FormData()
+
+			Object.keys(this.row).forEach(key => {
+				formdata.append(key, this.row[key])
+			})
+
+			Axios.post(process.env.VUE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
