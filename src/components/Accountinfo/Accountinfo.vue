@@ -105,7 +105,9 @@
 						<b-col align-self="end" />
 					</b-row>
 				</b-form>
-				<p v-else>{{ $t('generic.no_data') }}</p>
+				<p v-else>
+					{{ $t('generic.no_data') }}
+				</p>
 			</div>
 		</section>
 	</div>
