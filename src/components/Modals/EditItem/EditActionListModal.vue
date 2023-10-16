@@ -52,21 +52,6 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.priority')" 
-							label-for="priority"
-						>
-							<b-form-input
-								id="priority"
-								v-model="row.priority"
-								type="number"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
 							:label="$t('deployment.action_type')" 
 							label-for="action_type"
 						>
@@ -140,7 +125,6 @@ export default {
 			row: {
 				id: null,
 				name: null,
-				priority: 1,
 				action_type: "EXEC",
 				command: null,
 				file: ''
