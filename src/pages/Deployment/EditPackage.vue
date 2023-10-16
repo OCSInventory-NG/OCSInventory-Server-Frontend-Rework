@@ -39,16 +39,9 @@
 							<b-row class="text-center">
 								<h3>{{ $t('deployment.actions') }}</h3>
 							</b-row>
-							<Datatable
-								id="actions-datatable"
+							<Draggable 
 								:rowdata="rowactiondata"
 								:rowheader="rowheader"
-								:candelete="candeleteaction"
-								:canedit="caneditaction"
-								editcomponent="EditActionListModal"
-								title="deployment/actions"
-								translationkey="deployment."
-								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
@@ -63,11 +56,11 @@ import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal'
-import Datatable from '@/components/Datatable/Datatable'
+import Draggable from '@/components/Draggable/Draggable'
 
 export default {
 	name: 'EditPackage',
-	components: { Loader, Alert, AddActionListModal, Datatable	},
+	components: { Loader, Alert, AddActionListModal, Draggable	},
 	props: {
 		id: { type: String, required: true }
 	},
