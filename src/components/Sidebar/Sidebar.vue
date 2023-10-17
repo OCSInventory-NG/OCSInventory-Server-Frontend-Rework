@@ -9,7 +9,7 @@
 				<NavLink
 					:is-active="activeItem"
 					:header="$t('title.dashboard')"
-					link="/ocsreports/dashboard"
+					link="/dashboard"
 					icon-name="home"
 					index="dashboard"
 					is-header
@@ -23,19 +23,19 @@
 					]"
 					:children-links="[
 						{ 
-							header: $t('title.assets'), link: '/ocsreports/inventory/assets', 
+							header: $t('title.assets'), link: '/inventory/assets', 
 							route:'Assets', column: 'general' 
 						},
 						{ 
-							header: $t('title.ipdiscover'), link: '/ocsreports/inventory/ipdiscover', 
+							header: $t('title.ipdiscover'), link: '/inventory/ipdiscover', 
 							route:'Ipdiscover', column: 'network' 
 						},
 						{ 
-							header: $t('title.netdevices'), link: '/ocsreports/inventory/netdevices', 
+							header: $t('title.netdevices'), link: '/inventory/netdevices', 
 							route:'Netdevice', column: 'network' 
 						},
 					]"
-					link="/ocsreports/inventory"
+					link="/inventory"
 					icon-name="desktop"
 					index="inventory"
 				/>
@@ -47,15 +47,15 @@
 					]"
 					:children-links="[
 						{ 
-							header: $t('title.users'), link: '/ocsreports/usermanagement/users', 
+							header: $t('title.users'), link: '/usermanagement/users', 
 							route:'User', column: 'management' 
 						},
 						{ 
-							header: $t('title.groups'), link: '/ocsreports/usermanagement/groups', 
+							header: $t('title.groups'), link: '/usermanagement/groups', 
 							route:'Group', column: 'management' 
 						},
 					]"
-					link="/ocsreports/usermanagement"
+					link="/usermanagement"
 					icon-name="users-cog"
 					index="usermanagement"
 				/>
@@ -69,23 +69,23 @@
 					]"
 					:children-links="[
 						{ 
-							header: $t('title.general_configuration'), link: '/ocsreports/configurations/general', 
+							header: $t('title.general_configuration'), link: '/configurations/general', 
 							route:'General', column: 'general' 
 						},
 						{ 
-							header: $t('title.templates'), link: '/ocsreports/configurations/templates', 
+							header: $t('title.templates'), link: '/configurations/templates', 
 							route:'Template', column: 'inventory' 
 						},
 						{ 
-							header: $t('title.accountinfo'), link: '/ocsreports/configurations/accountinfo', 
+							header: $t('title.accountinfo'), link: '/configurations/accountinfo', 
 							route:'Accountinfo', column: 'inventory' 
 						},
 						{ 
-							header: $t('title.netgroup'), link: '/ocsreports/configurations/netgroup', 
+							header: $t('title.netgroup'), link: '/configurations/netgroup', 
 							route:'NetworkGroup', column: 'network' 
 						},
 					]"
-					link="/ocsreports/configurations"
+					link="/configurations"
 					icon-name="wrench"
 					index="configurations"
 				/>
