@@ -196,7 +196,7 @@
 						class="ocs-link"
 					>
 						{{ row.item.name }}
-					</router-link >
+					</router-link>
 				</template>
 
 				<!-- Netdevices redirection -->
@@ -209,7 +209,7 @@
 						class="ocs-link"
 					>
 						{{ row.item.netname }}
-					</router-link >
+					</router-link>
 				</template>
 
 				<!-- Edit row for configuration -->
