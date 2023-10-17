@@ -13,13 +13,13 @@ a.nav-link-title.router-link-exact-active.router-link-active {
 }
 
 .nav-link-title {
+  color: #ffffff;
   padding-top: 5px;
-  color: white;
 }
 
 .nav-link-title:hover, .nav-item:hover {
-  text-decoration: none;
   color: #972081;
+  text-decoration: none;
 }
 
 .dropdown-header {
