@@ -184,7 +184,7 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.put(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
