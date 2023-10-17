@@ -178,12 +178,12 @@
 					v-if="canaccesschild"
 					#cell(netdevices)="row"
 				>
-					<a 
-						:href="'/ocsreports/inventory/netdevices/'+row.item.id"
+					<router-link 
+						:to="'/inventory/netdevices/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.netdevices }}
-					</a>
+					</router-link>
 				</template>
 
 				<!-- Assets redirection -->
@@ -191,12 +191,12 @@
 					v-if="canaccessdetails"
 					#cell(name)="row"
 				>
-					<a 
-						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+					<router-link  
+						:to="'/inventory/'+title+'/details/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
-					</a>
+					</router-link >
 				</template>
 
 				<!-- Netdevices redirection -->
@@ -204,12 +204,12 @@
 					v-if="canaccessdetails"
 					#cell(netname)="row"
 				>
-					<a 
-						:href="'/ocsreports/inventory/'+title+'/details/'+row.item.id"
+					<router-link  
+						:to="'/inventory/'+title+'/details/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.netname }}
-					</a>
+					</router-link >
 				</template>
 
 				<!-- Edit row for configuration -->
