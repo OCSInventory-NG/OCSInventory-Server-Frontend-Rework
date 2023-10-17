@@ -214,19 +214,22 @@ export default {
 				})
 		},
 		onUpdate(json) {
-			Axios.put(process.env.VUE_APP_API_ROUTE+this.route+"/", json, { headers: this.header })
-				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-				})
+			json.forEach(dataToUpdate => {
+				Axios.patch(process.env.VUE_APP_API_ROUTE+this.route+"/"+dataToUpdate["id"]+"/", dataToUpdate, 
+					{ headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			})	
 		},
 		onDelete(id) {
 			Axios.delete(process.env.VUE_APP_API_ROUTE+this.route+"/"+id, { headers: this.header })
