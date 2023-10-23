@@ -60,18 +60,11 @@
 						</b-col>
 
 						<b-col v-if="value.type=='SELECT'">
-							<b-form-group
-								:label="value.name" 
-								:label-for="'field_'+value.id"
-								class="form-label"
-							>
-								<b-form-select
-									:id="'field_'+value.id"
-									v-model="value.value"
-									:options="value.values"
-									class="mb-3 form-select"
-								/>
-							</b-form-group>
+							<v-select 
+								v-model="value.value"
+								:options="value.values"
+								label="text"
+							/>
 						</b-col>
 
 						<b-col v-if="value.type=='CHECKBOX'">
