@@ -66,11 +66,10 @@
 								:label-for="'field_'+value.id"
 								class="form-label"
 							>
-								<b-form-select
-									:id="'field_'+value.id"
+								<v-select 
 									v-model="value.value"
 									:options="value.values"
-									class="mb-3 form-select"
+									label="text"
 								/>
 							</b-form-group>
 						</b-col>

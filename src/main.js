@@ -7,6 +7,11 @@ import App from './App'
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 
+/***** VUE-SELECT *****/
+import vSelect from "vue-select";
+Vue.component("v-select", vSelect);
+import "vue-select/dist/vue-select.css";
+
 /***** AXIOS *****/
 import axios from 'axios'
 import VueAxios from 'vue-axios'
