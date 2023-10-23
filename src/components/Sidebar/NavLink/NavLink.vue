@@ -1,8 +1,8 @@
 <template>
 	<!-- Menu without children item -->
-	<b-nav-item 
+	<router-link
 		v-if="!childrenLinks && isHeader"
-		:href="link" 
+		:to="link" 
 		class="nav-item"
 		:class="{ active: isActive == header }"
 	>
@@ -26,7 +26,7 @@
 		<span class="nav-link-title">
 			{{ header }} 
 		</span>
-	</b-nav-item>
+	</router-link>
 
 	<!-- Menu with children items -->
 	<b-nav-item-dropdown 
@@ -71,13 +71,14 @@
 					v-for="childLink in childrenLinks"
 					:key="childLink.link"
 				>
-					<b-dropdown-item
+					<router-link
 						v-if="childLink.column == columnDivider.identifier"
-						:href="childLink.link"
+						:to="childLink.link"
+						class="nav-link-title"
 						:class="{ active: isActive == childLink.route }"
 					>
 						{{ childLink.header }}
-					</b-dropdown-item>
+					</router-link>
 				</div>
 			</div>
 		</div>

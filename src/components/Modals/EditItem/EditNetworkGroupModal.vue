@@ -170,7 +170,7 @@ export default {
 					group: this.row.id
 				}
 
-				Axios.put(process.env.VUE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -192,7 +192,7 @@ export default {
 				this.updateNetworks()
 			}
 
-			Axios.put(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

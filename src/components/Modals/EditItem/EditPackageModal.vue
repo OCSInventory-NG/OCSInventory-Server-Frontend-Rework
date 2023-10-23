@@ -1,7 +1,8 @@
 <template>
-	<div id="edit-network-modal">
+	<div id="edit-package-modal">
 		<button 
-			:title="$t('network.editnetwork')"
+			v-b-modal="idmodal"
+			:title="$t('deployment.editpackage')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,13 +13,13 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('network.editnetwork')"
+			:title="$t('deployment.editpackage')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ row.netid }} - {{ row.mask }}
+					{{ $t('deployment.editpackage') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,7 +38,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
+							:label="$t('deployment.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -51,12 +52,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('generic.description')" 
-							label-for="description"
+							:label="$t('deployment.description')" 
+							label-for="name"
 						>
 							<b-form-input
 								id="description"
 								v-model="row.description"
+								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -64,29 +66,19 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.netgroup')" 
-							label-for="netgroup"
+							:label="$t('deployment.target_os')" 
+							label-for="target_os"
 						>
 							<b-form-select
-								id="netgroup"
-								v-model="row.group" 
-								:options="netgroup" 
+								id="target_os"
+								v-model="row.target_os" 
+								:options="options" 
 								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-form-input
-						id="netid"
-						v-model="row.netid"
-						hidden
-					/>
-					<b-form-input
-						id="mask"
-						v-model="row.mask"
-						hidden
-					/>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -108,10 +100,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
+import i18n from '@/i18n'
 
 export default {
-	name: 'EditNetworkModal',
+	name: 'EditPackageModal',
 	props: {
 		id: { type: Number, default: null }
 	},
@@ -120,73 +112,56 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				netid: null,
-				mask: null,
-				group: null
+				target_os: null
 			},
-			netgroup: [],
+			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idmodal: 'edit-network'+this.id,
+			idmodal: 'edit-package.'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			options: [
+				{ value: 'WIN', text: i18n.t('template.WIN') },
+				{ value: 'LIN', text: i18n.t('template.LIN') },
+				{ value: 'MAC', text: i18n.t('template.MAC') }
+			]
 		}
 	},
 	methods: {
 		loadData(id) {
-			this.getNetworks(id)
+			this.getPackages(id)
 		},
-		// Retrieve networks info by id
-		getNetworks(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
+		getPackages(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.getNetGroup(id)
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
-		getNetGroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
-				.then(response => {
-					this.netgroup.push({
-						value: null,
-						text: i18n.t("network.unknown_network")
-					})
-					response.data.forEach(element => {
-						this.netgroup.push({
-							value: element.id,
-							text: element.name
-						})
-					});
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.show('edit-network'+id)
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-				})
-		},
-		// Submit edit network creation and call refresh datatable to reload
+		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+
+			delete this.row.actions_list
+			console.log(this.row)
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-network'+this.row.id)
+					this.$bvModal.hide('edit-package.'+this.row.id)
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
@@ -194,7 +169,7 @@ export default {
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-network'+this.row.id)
+					this.$bvModal.hide('edit-package.'+this.row.id)
 				})
 		},
 	}

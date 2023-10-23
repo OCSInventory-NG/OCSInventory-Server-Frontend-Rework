@@ -24,6 +24,7 @@
 
 			<div v-else>
 				<b-form
+					v-if="rowdata.length != 0"
 					@submit="onSubmit"
 				>
 					<b-row
@@ -103,6 +104,9 @@
 						<b-col align-self="end" />
 					</b-row>
 				</b-form>
+				<p v-else>
+					{{ $t('generic.no_data') }}
+				</p>
 			</div>
 		</section>
 	</div>
@@ -230,7 +234,8 @@ export default {
 						this.successed = false
 					})
 			} else {
-				Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, { headers: this.header })
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+					{ headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

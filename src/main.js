@@ -36,7 +36,7 @@ import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome
 import { 
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
-	faXmark, faDesktop, faWrench, faCheck, faUpload
+	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck
@@ -46,7 +46,7 @@ Vue.component('font-awesome-layers', FontAwesomeLayers)
 library.add({ 
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
-	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload
+	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking
 })
 
 Vue.config.productionTip = false

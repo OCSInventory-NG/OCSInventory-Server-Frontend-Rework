@@ -1,7 +1,8 @@
 <template>
-	<div id="edit-network-modal">
+	<div id="edit-action-list-modal">
 		<button 
-			:title="$t('network.editnetwork')"
+			v-b-modal="idmodal"
+			:title="$t('deployment.editaction')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,13 +13,13 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('network.editnetwork')"
+			:title="$t('deployment.editaction')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ row.netid }} - {{ row.mask }}
+					{{ $t('deployment.editaction') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -37,7 +38,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
+							:label="$t('deployment.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -51,12 +52,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('generic.description')" 
-							label-for="description"
+							:label="$t('deployment.action_type')" 
+							label-for="action_type"
 						>
-							<b-form-input
-								id="description"
-								v-model="row.description"
+							<b-form-select
+								id="action_type"
+								v-model="row.action_type" 
+								:options="actionoptions" 
+								class="mb-3 form-select"
 							/>
 						</b-form-group>
 					</b-col>
@@ -64,29 +67,31 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.netgroup')" 
-							label-for="netgroup"
+							:label="row.action_type == 'STORE' ? 
+								$t('deployment.path') : $t('deployment.command')" 
+							label-for="command"
 						>
-							<b-form-select
-								id="netgroup"
-								v-model="row.group" 
-								:options="netgroup" 
-								class="mb-3 form-select"
+							<b-form-input
+								id="command"
+								v-model="row.command"
+								required
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
+				<b-row
+					v-if="row.action_type == 'STORE' || row.action_type == 'LAUNCH'"
+				>
+					<b-col>
+						<b-form-file
+							id="file"
+							:placeholder="row.action_type == 'LAUNCH' ? 
+								$t('deployment.select_launch_file') : $t('deployment.select_store_file')"
+							@change="processFile($event)"
+						/>
+					</b-col>
+				</b-row>
 				<b-row>
-					<b-form-input
-						id="netid"
-						v-model="row.netid"
-						hidden
-					/>
-					<b-form-input
-						id="mask"
-						v-model="row.mask"
-						hidden
-					/>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -108,85 +113,77 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
+import i18n from '@/i18n'
 
 export default {
-	name: 'EditNetworkModal',
+	name: 'EditPackageModal',
 	props: {
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
+				id: null,
 				name: null,
-				description: null,
-				netid: null,
-				mask: null,
-				group: null
+				action_type: "EXEC",
+				command: null,
+				file: ''
 			},
-			netgroup: [],
+			rowdata: [],
+			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idmodal: 'edit-network'+this.id,
 			header: {
-				"Content-Type": "application/json;charset=utf-8",
+				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			actionoptions: [
+				{ value: 'EXEC', text: i18n.t('deployment.EXEC') },
+				{ value: 'LAUNCH', text: i18n.t('deployment.LAUNCH') },
+				{ value: 'STORE', text: i18n.t('deployment.STORE') }
+			],
+			idmodal: 'edit-action.'+this.id
 		}
 	},
 	methods: {
 		loadData(id) {
-			this.getNetworks(id)
+			this.getAction(id)
 		},
-		// Retrieve networks info by id
-		getNetworks(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
+		processFile(event){
+			this.row.file = event.target.files[0];
+		},
+		getAction(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.getNetGroup(id)
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
-		getNetGroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
-				.then(response => {
-					this.netgroup.push({
-						value: null,
-						text: i18n.t("network.unknown_network")
-					})
-					response.data.forEach(element => {
-						this.netgroup.push({
-							value: element.id,
-							text: element.name
-						})
-					});
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.show('edit-network'+id)
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-				})
-		},
-		// Submit edit network creation and call refresh datatable to reload
+		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+
+			let formdata = new FormData()
+
+			Object.keys(this.row).forEach(key => {
+				formdata.append(key, this.row[key])
+			})
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-network'+this.row.id)
+					this.$bvModal.hide('edit-action.'+this.row.id)
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
@@ -194,7 +191,7 @@ export default {
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-network'+this.row.id)
+					this.$bvModal.hide('edit-action.'+this.row.id)
 				})
 		},
 	}

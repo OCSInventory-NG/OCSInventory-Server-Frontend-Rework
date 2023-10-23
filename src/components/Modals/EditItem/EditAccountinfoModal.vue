@@ -134,7 +134,7 @@ export default {
 				description: this.row.description
 			}
 
-			Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
