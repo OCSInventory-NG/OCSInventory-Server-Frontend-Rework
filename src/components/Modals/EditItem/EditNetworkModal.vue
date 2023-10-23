@@ -180,7 +180,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

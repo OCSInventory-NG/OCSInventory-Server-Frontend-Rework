@@ -235,7 +235,8 @@ export default {
 						this.successed = false
 					})
 			} else {
-				Axios.put(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, { headers: this.header })
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+					{ headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

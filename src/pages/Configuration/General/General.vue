@@ -144,19 +144,23 @@ export default {
 					value: element.value
 				})
 			})
-			Axios.put(process.env.VUE_APP_API_ROUTE+"config/", config, { headers: this.header })
-				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-				})
+			
+			config.forEach(updateJson => {
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"config/"+updateJson["name"]+"/", updateJson, 
+					{ headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			})
 		},
 		reloadDatatable() {
 			this.updateConfig()
