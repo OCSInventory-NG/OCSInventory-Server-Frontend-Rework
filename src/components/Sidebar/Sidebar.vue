@@ -47,19 +47,19 @@
 					]"
 					:children-links="[
 						{ 
-							header: $t('title.packages'), link: '/ocsreports/deployment/packages', 
+							header: $t('title.packages'), link: '/deployment/packages', 
 							route:'Packages', column: 'general' 
 						},
 						{ 
-							header: $t('title.history'), link: '/ocsreports/deployment/history', 
+							header: $t('title.history'), link: '/deployment/history', 
 							route:'History', column: 'general' 
 						},
 						{ 
-							header: $t('title.report'), link: '/ocsreports/deployment/report', 
+							header: $t('title.report'), link: '/deployment/report', 
 							route:'Report', column: 'general' 
 						}
 					]"
-					link="/ocsreports/deployment"
+					link="/deployment"
 					icon-name="boxes-packing"
 					index="deployment"
 				/>
