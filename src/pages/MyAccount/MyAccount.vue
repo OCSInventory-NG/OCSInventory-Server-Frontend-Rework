@@ -66,7 +66,6 @@
 												id="password"
 												v-model="rowdata.password"
 												type="password"
-												required
 											/>
 										</b-form-group>
 									</b-col>
@@ -157,9 +156,7 @@ export default {
 		return {
 			errorMsg: null,
 			succesMsg: null,
-			rowdata: [{
-				password: '',
-			}],
+			rowdata: [{}],
 			loading: true,
 			errored: false,
 			successed: false,
@@ -192,11 +189,21 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			var jsonReturn = {
-				"password": this.rowdata.password,
-				"email": this.rowdata.email,
-				"first_name": this.rowdata.first_name,
-				"last_name": this.rowdata.last_name
+			var jsonReturn = {}
+
+			if(this.rowdata.password != '') {
+				jsonReturn = {
+					"password": this.rowdata.password,
+					"email": this.rowdata.email,
+					"first_name": this.rowdata.first_name,
+					"last_name": this.rowdata.last_name
+				}
+			} else {
+				jsonReturn = {
+					"email": this.rowdata.email,
+					"first_name": this.rowdata.first_name,
+					"last_name": this.rowdata.last_name
+				}
 			}
 
 			Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: this.header })
