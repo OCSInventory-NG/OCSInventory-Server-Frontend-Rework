@@ -1,13 +1,25 @@
 // ===========================================
 //  NAVLINK COMPONENT
 // ===========================================
+.navbar-nav .nav-item {
+  display: flex;
+  flex-direction: inherit;
+  justify-content: center;
+}
 
-.navbar-expand-md .nav-item.active::after {
-  border-color: #972081;
+a.nav-item.router-link-exact-active.router-link-active,
+a.nav-link-title.router-link-exact-active.router-link-active {
+  text-decoration: solid underline #972081 .2rem;
 }
 
 .nav-link-title {
+  color: #fff;
   padding-top: 5px;
+}
+
+.nav-link-title:hover, .nav-item:hover {
+  color: #972081;
+  text-decoration: none;
 }
 
 .dropdown-header {
