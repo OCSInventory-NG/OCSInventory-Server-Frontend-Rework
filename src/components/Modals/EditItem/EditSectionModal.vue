@@ -223,6 +223,13 @@ export default {
 		this.options = this.row.options
 		this.row.id = this.idmodal
 		this.row.template = this.template
+
+		if(this.options == null && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+			this.options = {}
+			this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+				this.options[element.id] = element.default
+			})
+		}
 	},
 	methods: {
 		// Submit edit section creation and call refresh edit template to reload
