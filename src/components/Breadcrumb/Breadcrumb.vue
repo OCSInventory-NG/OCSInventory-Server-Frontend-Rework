@@ -20,19 +20,54 @@ export default {
 			return this.exclude.indexOf(this.$route.path.split('/').pop()) > -1;
 		},
 		tree() {
-			return this.$route.path
+			var breadcrumb = []
+
+			var items = this.$route.path
 				.split('/')
 				.slice(1)
 				.map(route => route
 					.split('_')
 					.map(word => {
-						if(i18n.te('title.' + word)) {
-							return i18n.t('title.' + word)
-						}
 						return word
 					})
 					.join(' ')
-				);
+				)
+
+			var path = "/"
+
+			items.forEach(item => {
+				if(path == "/") {
+					path = path + item
+				} else {
+					path = path + "/" + item
+				}
+				
+				var routeExists = false
+
+				this.$router.getRoutes().every(route => {
+					if(path == route.path) {
+						routeExists = true
+						return false
+					}
+					return true
+				})
+
+				if(routeExists) {
+					breadcrumb.push({
+						text: (i18n.te("title." + item)) ? i18n.t("title." + item) : item,
+						to: path,
+						append: true,
+						replace: true
+					})
+				} else {
+					breadcrumb.push({
+						text: (i18n.te("title." + item)) ? i18n.t("title." + item) : item,
+						disabled: true
+					})
+				}
+			})
+
+			return breadcrumb
 		}
 	}
 }
