@@ -18,8 +18,12 @@ a.nav-link-title.router-link-exact-active.router-link-active {
 }
 
 .nav-link-title:hover, .nav-item:hover {
-  color: #972081;
+  color: #ffffffcc;
   text-decoration: none;
+}
+
+.dropdown-menu-column > div {
+  margin: 3px 0 0 10px;
 }
 
 .dropdown-header {
