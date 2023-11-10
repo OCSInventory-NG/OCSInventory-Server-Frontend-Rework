@@ -2,10 +2,10 @@
 //  NAVLINK COMPONENT
 // ===========================================
 .navbar-nav .nav-item {
+  --tblr-navbar-active-border-color: transparent;
   display: flex;
   flex-direction: inherit;
   justify-content: center;
-  --tblr-navbar-active-border-color: transparent;
 }
 
 a.nav-item.router-link-exact-active.router-link-active,
