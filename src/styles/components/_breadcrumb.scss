@@ -2,11 +2,19 @@
 //  BREADCRUMB COMPONENT
 // ===========================================
 
-.breadcrumb-item > a {
-  color: #667382;
+.breadcrumb {
+  font-size: 12px;
 }
 
-.breadcrumb-item > a:hover {
-  cursor: unset;
-  text-decoration: none;
+.breadcrumb-item > a {
+  color: #667382;
+
+  &.disabled {
+    cursor: unset;
+    text-decoration: none;
+  }
+}
+
+.breadcrumb-item.active > span {
+  color: #972081;
 }
