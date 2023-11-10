@@ -28,6 +28,8 @@
 
 			<!-- USER SETTING / LOGOUT -->
 			<div class="navbar-nav flex-row order-md-last">
+				<Localeswitcher />
+
 				<b-nav-item-dropdown
 					id="setting-dropdown"
 					no-caret 
@@ -66,10 +68,11 @@
 
 <script>
 import Sidebar from '@/components/Sidebar/Sidebar'
+import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher'
 
 export default {
 	name: 'Header',
-	components: { Sidebar },
+	components: { Sidebar, Localeswitcher },
 	data() {
 		return {
 			showmobilemenu: false,

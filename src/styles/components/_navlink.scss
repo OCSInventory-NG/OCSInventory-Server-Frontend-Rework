@@ -2,6 +2,7 @@
 //  NAVLINK COMPONENT
 // ===========================================
 .navbar-nav .nav-item {
+  --tblr-navbar-active-border-color: transparent;
   display: flex;
   flex-direction: inherit;
   justify-content: center;
@@ -42,6 +43,10 @@ a.nav-link-title.router-link-exact-active.router-link-active {
 
 .dropdown-divider {
   margin: 0;
+}
+
+.locale-switcher {
+  padding-top: 5px;
 }
 
 @media (max-width: 767.98px) {
