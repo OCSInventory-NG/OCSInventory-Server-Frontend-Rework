@@ -4,6 +4,7 @@
     "accountinfo/config": "Données administratives",
     "accountinfo/data": "Donnée administrative",
     "assets": "Actifs",
+    "authentication": "Authentification",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Tableau de bord",
@@ -33,6 +34,17 @@
     "usermanagement": "Gestion des utilisateurs",
     "user": "Utilisateur",
     "users": "Utilisateurs"
+  },
+  "authentication": {
+    "global": "Globale",
+    "LOCAL": "LOCALE",
+    "LDAP": "LDAP",
+    "CAS": "CAS",
+    "OIDC": "OIDC",
+    "enable_LOCAL": "Activer la connexion locale",
+    "enable_LDAP": "Activer la connexion LDAP",
+    "enable_CAS": "Activer la connexion CAS",
+    "enable_OIDC": "Activer la connexion OIDC"
   },
   "dashboard": {
     "contacted": "Contactés aujourd'hui",
