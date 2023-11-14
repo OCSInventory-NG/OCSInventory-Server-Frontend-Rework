@@ -153,7 +153,6 @@ export default {
 			event.preventDefault()
 
 			delete this.row.actions_list
-			console.log(this.row)
 			
 			Axios.put(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
