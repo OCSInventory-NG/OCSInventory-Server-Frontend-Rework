@@ -97,6 +97,10 @@
 							route:'General', column: 'general' 
 						},
 						{ 
+							header: $t('title.authentication'), link: '/configurations/authentication', 
+							route:'Authentication', column: 'general' 
+						},
+						{ 
 							header: $t('title.templates'), link: '/configurations/templates', 
 							route:'Template', column: 'inventory' 
 						},
