@@ -97,6 +97,10 @@
 							route:'General', column: 'general' 
 						},
 						{ 
+							header: $t('title.automaticactions'), link: '/configurations/automaticactions', 
+							route:'AutomaticAction', column: 'general' 
+						},
+						{ 
 							header: $t('title.templates'), link: '/configurations/templates', 
 							route:'Template', column: 'inventory' 
 						},
