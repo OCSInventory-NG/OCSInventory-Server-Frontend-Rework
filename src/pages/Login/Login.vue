@@ -121,7 +121,11 @@ export default {
 					this.getPermissions()
 				})
 				.catch(e => {
-					this.errorMessage = e
+					if(e.response.data.non_field_errors) {
+						this.errorMessage = e.response.data.non_field_errors[0]
+					} else {
+						this.errorMessage = e.message
+					}
 				})
 		},
 		getPermissions() {
@@ -140,7 +144,7 @@ export default {
 					this.errorMessage = i18n.t("message.error_no_permissions")
 				})
 				.catch(e => {
-					this.errorMessage = e
+					this.errorMessage = e.message
 				})
 		}
 	},
