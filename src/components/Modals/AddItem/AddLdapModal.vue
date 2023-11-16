@@ -195,6 +195,7 @@
 						:rowheader="rowheader"
 						:canedit="canedit"
 						:candelete="candelete"
+						:canaddmapping="canaddmapping"
 						editcomponent="EditLdapModal"
 						translationkey="authentication"
 						apiroute="auth_config"
@@ -260,6 +261,7 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
+			canaddmapping: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -273,6 +275,9 @@ export default {
 	},
 	mounted() {
 		this.getLdapConfig()
+		if(localStorage.getItem('permissions').split(",").includes("add_authmapping")) {
+			this.canaddmapping = true
+		}
 	},
 	methods: {
 		reloadDatatable() {
