@@ -9,7 +9,7 @@
 		</div>
 
 		<!-- Display error box message -->
-		<div v-if="successed">
+		<div v-if="errored">
 			<Alert 
 				:message="errorMsg.message" 
 				variant="danger"
