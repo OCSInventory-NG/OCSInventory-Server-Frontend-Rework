@@ -88,6 +88,10 @@
 									<div v-if="authmenu.value == 'LDAP'">
 										<Ldap />
 									</div>
+									<!-- CAS -->
+									<div v-if="authmenu.value == 'CAS'">
+										<Cas />
+									</div>
 								</b-tab>
 							</b-tabs>
 						</div>
@@ -105,10 +109,11 @@ import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Ldap from '@/components/Authentication/Ldap'
+import Cas from '@/components/Authentication/Cas'
 
 export default {
 	name: 'Assets',
-	components: { Loader, Alert, PageHeader, Ldap },
+	components: { Loader, Alert, PageHeader, Ldap, Cas },
 	data() {
 		return {
 			errorMsg: null,
