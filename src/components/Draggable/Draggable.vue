@@ -46,6 +46,9 @@
 					>
 						<b-button-toolbar>
 							<b-button-group class="mr-1">
+								<EditMappingModal 
+									:id="value.id"
+								/>
 								<!-- Edit button -->
 								<component 
 									:is="editcomponent"
@@ -74,6 +77,7 @@ import draggable from 'vuedraggable'
 import Axios from 'axios'
 import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
 import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal'
+import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 
 export default {
@@ -82,6 +86,7 @@ export default {
 		draggable,
 		EditActionListModal,
 		EditLdapModal,
+		EditMappingModal,
 		DeleteItemModal
 	},
 	props: {
@@ -91,7 +96,8 @@ export default {
 		apiroute: { type: String, default: "deployment/actions" },
 		editcomponent: { type: String, default: "EditActionListModal" },
 		canedit: { type: Boolean, default: false },
-		candelete: { type: Boolean, default: false }
+		candelete: { type: Boolean, default: false },
+		canaddmapping: { type: Boolean, default: false }
 	},
 	data() {
 		return {
