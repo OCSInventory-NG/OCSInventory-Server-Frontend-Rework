@@ -20,7 +20,7 @@
 					</section>
 
 					<!-- Display error box message -->
-					<section v-if="errored">
+					<section v-if="errored && errorCode == null">
 						<Alert 
 							:message="errorMsg.message" 
 							variant="danger"
@@ -33,17 +33,23 @@
 						</div>
 
 						<div v-else>
+							<!-- Display error box message -->
+							<div v-if="errored && errorCode != null">
+								<Alert 
+									:message="errorMsg" 
+									variant="danger"
+								/>
+							</div>
+
 							<b-tabs 
-								pills
-								vertical
-								nav-wrapper-class="w-25"
+								content-class="mt-3"
+								fill
 							>
 								<b-tab
 									v-for="authmenu in authmenus"
 									:key="authmenu.value"
 									:title="authmenu.text"
 									:disabled="!authmenu.enabled"
-									lazy
 								>
 									<div v-if="authmenu.value == 'global'">
 										<b-list-group 
@@ -68,6 +74,7 @@
 															v-model="authmethod.enabled"
 															class="form-check-input"
 															type="checkbox"
+															:disabled="!canedit"
 															@change="enableAuthentication(
 																authmethod.id, authmethod.name, authmethod.enabled
 															)"
@@ -76,6 +83,10 @@
 												</div>
 											</b-list-group-item>
 										</b-list-group>
+									</div>
+									<!-- LDAP -->
+									<div v-if="authmenu.value == 'LDAP'">
+										<Ldap />
 									</div>
 								</b-tab>
 							</b-tabs>
@@ -92,14 +103,16 @@ import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader' 
+import PageHeader from '@/components/Header/PageHeader'
+import Ldap from '@/components/Authentication/Ldap'
 
 export default {
 	name: 'Assets',
-	components: { Loader, Alert, PageHeader },
+	components: { Loader, Alert, PageHeader, Ldap },
 	data() {
 		return {
 			errorMsg: null,
+			errorCode: null,
 			loading: true,
 			errored: false,
 			canview: false,
@@ -127,6 +140,9 @@ export default {
 	mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("view_authmethod")) {
 			this.canview = true
+			if(localStorage.getItem('permissions').split(",").includes("change_authmethod")) {
+				this.canedit = true
+			}
 			this.getAuthMethod()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
@@ -174,7 +190,22 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					if(e.response.data) {
+						this.errorCode = e.response.status
+						this.errorMsg = e.response.data[0]
+					} else {
+						this.errorMsg = e
+					}
+
+					this.authmethods.forEach(authmethod => {
+						this.authmenus.forEach(authmenu => {
+							if(authmethod.name == authmenu.value && authmethod.id == authid) {
+								authmenu.enabled = false
+								authmethod.enabled = false
+							}
+						})
+					})
+					
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
