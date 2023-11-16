@@ -42,6 +42,10 @@
 							<Draggable 
 								:rowdata="rowactiondata"
 								:rowheader="rowheader"
+								:canedit="caneditaction"
+								:candelete="candeleteaction"
+								translationkey="deployment"
+								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
@@ -117,6 +121,7 @@ export default {
 				})
 		},
 		reloadDatatable() {
+			this.loading = true
 			this.getPackage()
 		},
 		getPackage() {
