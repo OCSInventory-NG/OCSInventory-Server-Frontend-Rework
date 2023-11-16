@@ -177,7 +177,8 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata, { headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
+				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
