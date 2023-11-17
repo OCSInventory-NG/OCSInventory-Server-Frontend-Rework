@@ -44,7 +44,6 @@
 								:rowheader="rowheader"
 								:canedit="caneditaction"
 								:candelete="candeleteaction"
-								translationkey="deployment"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>

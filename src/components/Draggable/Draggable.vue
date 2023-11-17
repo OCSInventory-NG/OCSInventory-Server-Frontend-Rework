@@ -11,7 +11,7 @@
 						v-for="theader in rowheader"
 						:key="theader"
 					>
-						{{ $t(translationkey+'.'+theader) }}
+						{{ $t(translationkey+theader) }}
 					</th>
 					<th v-if="canedit || candelete">
 						{{ $t('generic.actions') }}
@@ -92,7 +92,7 @@ export default {
 	props: {
 		rowdata: { type: Array, default: null },
 		rowheader: { type: Array, default: null },
-		translationkey: { type: String, default: "deployment" },
+		translationkey: { type: String, default: "deployment." },
 		apiroute: { type: String, default: "deployment/actions" },
 		editcomponent: { type: String, default: "EditActionListModal" },
 		canedit: { type: Boolean, default: false },
