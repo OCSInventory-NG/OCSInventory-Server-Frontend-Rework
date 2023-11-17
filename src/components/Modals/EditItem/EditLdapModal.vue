@@ -38,13 +38,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.SERVER_URI')" 
+							label="SERVER_URI" 
 							label-for="SERVER_URI"
 						>
 							<b-form-input
 								id="SERVER_URI"
 								v-model="row.config.SERVER_URI"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -52,13 +51,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.BIND_DN')" 
+							label="BIND_DN" 
 							label-for="BIND_DN"
 						>
 							<b-form-input
 								id="BIND_DN"
 								v-model="row.config.BIND_DN"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -66,13 +64,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.BIND_PASSWORD')" 
+							label="BIND_PASSWORD" 
 							label-for="BIND_PASSWORD"
 						>
 							<b-form-input
 								id="BIND_PASSWORD"
 								v-model="row.config.BIND_PASSWORD"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -80,13 +77,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.BASE_DN')" 
+							label="BASE_DN" 
 							label-for="BASE_DN"
 						>
 							<b-form-input
 								id="BASE_DN"
 								v-model="row.config.BASE_DN"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -94,13 +90,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.USER_LOGIN_FIELD')" 
+							label="USER_LOGIN_FIELD" 
 							label-for="USER_LOGIN_FIELD"
 						>
 							<b-form-input
 								id="USER_LOGIN_FIELD"
 								v-model="row.config.USER_LOGIN_FIELD"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -108,7 +103,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('authentication.PROTOCOL_VERSION')" 
+							label="PROTOCOL_VERSION" 
 							label-for="PROTOCOL_VERSION"
 						>
 							<b-form-select
