@@ -45,13 +45,13 @@
 					>
 						<div>
 							<h4 class="mb-1">
-								{{ $t("authentication."+index) }}
+								{{ index }}
 							</h4>
 							<p class="mb-1">
-								{{ $t("authentication.cas_"+index) }}
+								{{ $t("authentication.des_"+index) }}
 							</p>
 						</div>
-						<div>
+						<div class="col-6">
 							<b-form-input
 								v-if="index != 'VERSION' && index != 'AUTO_REDIRECT'"
 								:id="index"
@@ -68,7 +68,7 @@
 							/>
 							<label 
 								v-if="index == 'AUTO_REDIRECT'"
-								class="form-check form-switch"
+								class="form-check form-switch align-right"
 							>
 								<input 
 									:id="index"
@@ -111,7 +111,7 @@ import Loader from '@/components/Loader/Loader'
 import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
 
 export default {
-	name: "Ldap",
+	name: "Cas",
 	components: { Alert, Loader, EditMappingModal },
 	data() {
 		return {
