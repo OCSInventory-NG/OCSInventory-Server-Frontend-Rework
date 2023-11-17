@@ -92,6 +92,10 @@
 									<div v-if="authmenu.value == 'CAS'">
 										<Cas />
 									</div>
+									<!-- OIDC -->
+									<div v-if="authmenu.value == 'OIDC'">
+										<Oidc />
+									</div>
 								</b-tab>
 							</b-tabs>
 						</div>
@@ -110,10 +114,11 @@ import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Ldap from '@/components/Authentication/Ldap'
 import Cas from '@/components/Authentication/Cas'
+import Oidc from '@/components/Authentication/Oidc'
 
 export default {
 	name: 'Assets',
-	components: { Loader, Alert, PageHeader, Ldap, Cas },
+	components: { Loader, Alert, PageHeader, Ldap, Cas, Oidc },
 	data() {
 		return {
 			errorMsg: null,
