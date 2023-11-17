@@ -32,6 +32,8 @@ export default {
 					console.log(e.message)
 				})
 		} else {
+			const currentPath = this.$router.history.current.path;
+
 			if (localStorage.getItem("authenticated") === null
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
@@ -42,12 +44,6 @@ export default {
 							if(response.data.auto_redirect) {
 								window.location.href = response.data.redirect_url+window.location.origin
 							} else {
-								const currentPath = this.$router.history.current.path;
-
-								if (currentPath === "/" || currentPath === "/ocsreports") {
-									this.$router.push("/dashboard");
-								}
-
 								if (localStorage.getItem("authenticated") === null
 								|| localStorage.getItem("authenticated") === "false"
 								|| localStorage.getItem('token_authentication') === null 
@@ -60,6 +56,10 @@ export default {
 					.catch(e => {
 						console.log(e.message)
 					})
+			} else {
+				if (currentPath === "/" || currentPath === "/ocsreports") {
+					this.$router.push("/dashboard");
+				}
 			}
 		}
 	},
