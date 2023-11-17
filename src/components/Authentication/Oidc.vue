@@ -154,7 +154,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("add_authmapping")) {
 				this.canaddmapping = true
 			}
-			this.getCasConfiguration()
+			this.getOidcConfiguration()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
@@ -162,7 +162,7 @@ export default {
 		}
 	},
 	methods: {
-		getCasConfiguration() {
+		getOidcConfiguration() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
