@@ -131,6 +131,9 @@ export default {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
 
+					this.permissionslabel = []
+					this.permissions = []
+
 					response.data.forEach(permissionDetails => {
 						array.forEach(type => {
 							if(~permissionDetails.codename.indexOf(type)) {
