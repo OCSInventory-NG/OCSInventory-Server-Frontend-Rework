@@ -3,55 +3,37 @@
 		id="packages" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<AddPackageModal
+				:canadd="canadd"
+				:canedit="canedit"
+				:candelete="candelete"
+				:canviewaction="canviewaction"
+				:canview="canview"
+				page-title="packages"
 			/>
-		</section>
-
-		<!-- Add package modal -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddPackageModal
-					:canadd="canadd"
-					:canedit="canedit"
-					:candelete="candelete"
-					:canviewaction="canviewaction"
-					page-title="packages"
-				/>
-			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
 <script>
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
 import AddPackageModal from '@/components/Modals/AddItem/AddPackageModal'
 
 export default {
 	name: 'Packages',
-	components: { Loader, Alert, AddPackageModal },
+	components: { AddPackageModal },
 	data() {
 		return {
-			errorMsg: null,
-			loading: true,
-			errored: false,
 			canadd: false,
 			canedit: false,
 			candelete: false,
+			canview: false,
 			canviewaction: false,
 		}
 	},
-	mounted() {
+	created() {
 		if(localStorage.getItem('permissions').split(",").includes("view_package")) {
+			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("add_package")) {
 				this.canadd = true
 			}
@@ -64,11 +46,6 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("view_action")) {
 				this.canviewaction = true
 			}
-			this.loading = false
-		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
-			this.errored = true
-			this.loading = false
 		}
 	}
 }

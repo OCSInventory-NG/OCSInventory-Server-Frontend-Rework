@@ -3,39 +3,39 @@
 		id="my-account" 
 		class="container-xl"
 	>
-		<!-- Display success box message -->
-		<section v-if="successed">
-			<Alert 
-				:message="$t('message.success_saved')" 
-				variant="success"
+		<!-- Header page -->
+		<div>
+			<!-- Page header -->
+			<PageHeader 
+				page-title="myaccount"
 			/>
-		</section>
 
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
-			/>
-		</section>
+			<!-- Display my account form -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display success box message -->
+						<section v-if="successed">
+							<Alert 
+								:message="$t('message.success_saved')" 
+								variant="success"
+							/>
+						</section>
 
-		<!-- Display info if no error -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<!-- Header page -->
-			<div v-else>
-				<!-- Page header -->
-				<PageHeader 
-					page-title="myaccount"
-				/>
-
-				<!-- Display my account form -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<b-form
 								@submit="onSubmit"
 							>
@@ -139,7 +139,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -178,12 +178,12 @@ export default {
 				this.rowdata = response.data
 				this.errorMsg = null
 				this.errored = false
+				this.loading = false
 			})
 			.catch(e => {
-				this.errorMsg = e
+				this.errorMsg = e.message
 				this.errored = true
 			})
-			.finally(() => this.loading = false)
 	},
 	methods: {
 		onSubmit(event) {

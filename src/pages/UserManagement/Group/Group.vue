@@ -3,53 +3,35 @@
 		id="groups"
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg"
-				variant="danger"
+		<div>
+			<AddGroupModal
+				:canadd="canadd"
+				:canedit="canedit"
+				:candelete="candelete"
+				:canview="canview"
+				page-title="groups"
 			/>
-		</section>
-
-		<!-- Add group modal -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddGroupModal
-					:canadd="canadd"
-					:canedit="canedit"
-					:candelete="candelete"
-					page-title="groups"
-				/>
-			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
 <script>
 import AddGroupModal from '@/components/Modals/AddItem/AddGroupModal';
-import Loader from '@/components/Loader/Loader';
-import i18n from '../../../i18n'
-import Alert from '@/components/Alert/Alert.vue';
 
 export default {
 	name: "Group",
-	components: { Loader, AddGroupModal, Alert },
+	components: { AddGroupModal },
 	data() {
 		return {
-			errorMsg: null,
-			loading: true,
-			errored: false,
 			canadd: false,
 			canedit: false,
-			candelete: false
+			candelete: false,
+			canview: false
 		}
 	},
-	mounted() {
+	created() {
 		if(localStorage.getItem('permissions').split(",").includes("view_group")) {
+			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("add_group")) {
 				this.canadd = true
 			}
@@ -59,11 +41,6 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("delete_group")) {
 				this.candelete = true
 			}
-			this.loading = false
-		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
-			this.errored = true
-			this.loading = false
 		}
 	}
 }

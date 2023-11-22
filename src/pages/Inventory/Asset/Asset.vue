@@ -3,28 +3,31 @@
 		id="assets" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<!-- Page header -->
+			<PageHeader 
+				page-title="assets"
 			/>
-		</section>
+			<!-- Display Datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<div v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</div>
 
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
 
-			<div v-else>
-				<!-- Page header -->
-				<PageHeader 
-					page-title="assets"
-				/>
-				<!-- Display Datatable -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+						<div v-else>
 							<Datatable
 								id="assets-datatable"
 								:rowdata="rowdata"
@@ -38,7 +41,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 

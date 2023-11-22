@@ -3,29 +3,29 @@
 		id="history" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<!-- Header page -->
+		<div>
+			<PageHeader 
+				page-title="history"
 			/>
-		</section>
-
-		<!-- Package history -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<!-- Header page -->
-			<div v-else>
-				<PageHeader 
-					page-title="history"
-				/>
-				<!-- Display datatable -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<!-- Display datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<Datatable
 								id="deployment-history-datatable"
 								:rowdata="rowdata"
@@ -37,7 +37,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -71,7 +71,6 @@ export default {
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
-			this.loading = false
 		}
 	},
 	methods: {

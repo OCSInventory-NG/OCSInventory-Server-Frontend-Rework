@@ -3,55 +3,55 @@
 		id="general" 
 		class="container-xl"
 	>
-		<!-- Display success box message -->
-		<section v-if="successed">
-			<Alert 
-				:message="$t('message.success_saved')" 
-				variant="success"
+		<div>
+			<!-- Page header -->
+			<PageHeader 
+				page-title="config"
 			/>
-		</section>
 
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
-			/>
-		</section>
-
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<!-- Page header -->
-				<PageHeader 
-					page-title="config"
-				/>
-
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
-							<Datatable
-								id="generalDatatable"
-								:rowdata="rowdata"
-								:rowheader="rowheader"
-								:candelete="false"
-								:canedit="false"
-								:usecheckbox="false"
-								:canexport="false"
-								:caneditconfig="caneditconfig"
-								editcomponent="EditConfigModal"
-								title="config"
-								translationkey="configuration."
-								@reloadDatatable="reloadDatatable"
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display success box message -->
+						<section v-if="successed">
+							<Alert 
+								:message="$t('message.success_saved')" 
+								variant="success"
 							/>
+						</section>
+
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
 						</div>
+						<Datatable
+							v-if="!loading && canview"
+							id="generalDatatable"
+							:rowdata="rowdata"
+							:rowheader="rowheader"
+							:candelete="false"
+							:canedit="false"
+							:usecheckbox="false"
+							:canexport="false"
+							:caneditconfig="caneditconfig"
+							editcomponent="EditConfigModal"
+							title="config"
+							translationkey="configuration."
+							@reloadDatatable="reloadDatatable"
+						/>
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -76,6 +76,7 @@ export default {
 			successed: false,
 			loading: true,
 			caneditconfig: false,
+			canview: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -89,6 +90,7 @@ export default {
 	},
 	mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
+			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
 				this.caneditconfig = true
 			}
@@ -96,7 +98,6 @@ export default {
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
-			this.loading = false
 		}	
 	},
 	methods: {

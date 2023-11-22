@@ -3,41 +3,24 @@
 		id="template" 
 		class="container-xl"
 	>
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<AddTemplateModal
+				:canadd="canadd"
+				:canedit="canedit"
+				:candelete="candelete"
+				:canview="canview"
+				page-title="templates"
 			/>
-		</section>
-
-		<!-- Datatable -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddTemplateModal
-					:canadd="canadd"
-					:canedit="canedit"
-					:candelete="candelete"
-					page-title="templates"
-				/>
-			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
 <script>
-import i18n from '../../../i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
 import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal'
 
 export default {
 	name: 'Template',
-	components: { Alert, Loader, AddTemplateModal },
+	components: { AddTemplateModal },
 	data() {
 		return {
 			errorMsg: null,
@@ -46,11 +29,13 @@ export default {
 			canadd: false,
 			canedit: false,
 			candelete: false,
+			canview: false,
 			exportemplate: false,
 		}
 	},
-	mounted() {
+	created() {
 		if(localStorage.getItem('permissions').split(",").includes("view_template")) {
+			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("add_template")) {
 				this.canadd = true
 				this.exportemplate = true
@@ -64,10 +49,6 @@ export default {
 				this.exportemplate = true
 			}
 			this.loading = false			
-		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
-			this.errored = true
-			this.loading = false
 		}
 	}
 }

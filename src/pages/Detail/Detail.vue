@@ -3,36 +3,37 @@
 		id="detail" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<!-- Page header for asset -->
+			<PageHeader 
+				v-if="rowdata.name"
+				:page-title="rowdata.name"
 			/>
-		</section>
 
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
+			<!-- Page header for netdevice -->
+			<PageHeader 
+				v-if="rowdata.netname"
+				:page-title="rowdata.netname"
+			/>
 
-			<div v-else>
-				<!-- Page header for asset -->
-				<PageHeader 
-					v-if="rowdata.name"
-					:page-title="rowdata.name"
-				/>
-
-				<!-- Page header for netdevice -->
-				<PageHeader 
-					v-if="rowdata.netname"
-					:page-title="rowdata.netname"
-				/>
-
-				<!-- Display details -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<!-- Display details -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<div class="hr-text">
 								Informations
 							</div>
@@ -86,7 +87,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -137,12 +138,12 @@ export default {
 				this.rowdata = response.data
 				this.errorMsg = null
 				this.errored = false
+				this.loading = false
 			})
 			.catch(e => {
 				this.errorMsg = e.message
 				this.errored = true
 			})
-			.finally(() => this.loading = false)
 	}
 }
 </script>
