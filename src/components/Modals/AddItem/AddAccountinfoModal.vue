@@ -1,56 +1,80 @@
 <template>
 	<div id="add-accountinfo-modal">
-		<!-- Display success box message -->
-		<section v-if="successed">
-			<Alert 
-				:message="$t('message.success_saved')" 
-				variant="success"
-			/>
-		</section>
-
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
-			/>
-		</section>
-
-		<!-- Display info if no error -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<!-- Header page -->
-				<div class="page-header d-print-none text-white">
-					<div class="row align-items-center">
-						<div class="col">
-							<div class="page-pretitle">
-								<Breadcrumb />
-							</div>
-							<h2 class="page-title">
-								{{ $t('title.'+pageTitle) }}
-							</h2>
+		<div>
+			<!-- Header page -->
+			<div class="page-header d-print-none text-white">
+				<div class="row align-items-center">
+					<div class="col">
+						<div class="page-pretitle">
+							<Breadcrumb />
 						</div>
-						<div class="col-auto ms-auto">
-							<!-- Button to add accountinfo -->
-							<b-button
-								v-if="canadd"
-								v-b-modal.add-accountinfo
-								:title="$t('accountinfo.addaccountinfo')"
-								variant="primary"
-								class="d-none d-sm-inline-block"
-							>
-								<font-awesome-icon 
-									:icon="['fas', 'plus']"
-								/>
-								{{ $t('accountinfo.addaccountinfo') }}
-							</b-button>
+						<h2 class="page-title">
+							{{ $t('title.'+pageTitle) }}
+						</h2>
+					</div>
+					<div class="col-auto ms-auto">
+						<!-- Button to add accountinfo -->
+						<b-button
+							v-if="canadd"
+							v-b-modal.add-accountinfo
+							:title="$t('accountinfo.addaccountinfo')"
+							variant="primary"
+							class="d-none d-sm-inline-block"
+						>
+							<font-awesome-icon 
+								:icon="['fas', 'plus']"
+							/>
+							{{ $t('accountinfo.addaccountinfo') }}
+						</b-button>
+					</div>
+				</div>
+			</div>
+			<!-- Display datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display success box message -->
+						<section v-if="successed">
+							<Alert 
+								:message="$t('message.success_saved')" 
+								variant="success"
+							/>
+						</section>
+
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
+							<Datatable
+								id="accountinfodatatable"
+								:rowdata="rowdata"
+								:rowheader="rowheader"
+								:canedit="canedit"
+								:candelete="candelete"
+								:canaddvalue="canaddvalue"
+								editcomponent="EditAccountinfoModal"
+								title="accountinfo/config"
+								titlevalue="accountinfo_param"
+								adddvalueroute="accountinfo/value"
+								reconciliationname="accountinfo_config"
+								translationkey="accountinfo."
+								@reloadDatatable="reloadDatatable"
+							/>
 
 							<!-- Modal to add accountinfo -->
 							<b-modal 
+								v-if="canadd"
 								id="add-accountinfo" 
 								:title="$t('accountinfo.addaccountinfo')"
 								hide-footer
@@ -152,30 +176,8 @@
 						</div>
 					</div>
 				</div>
-				<!-- Display datatable -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
-							<Datatable
-								id="accountinfodatatable"
-								:rowdata="rowdata"
-								:rowheader="rowheader"
-								:canedit="canedit"
-								:candelete="candelete"
-								:canaddvalue="canaddvalue"
-								editcomponent="EditAccountinfoModal"
-								title="accountinfo/config"
-								titlevalue="accountinfo_param"
-								adddvalueroute="accountinfo/value"
-								reconciliationname="accountinfo_config"
-								translationkey="accountinfo."
-								@reloadDatatable="reloadDatatable"
-							/>
-						</div>
-					</div>
-				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -200,6 +202,7 @@ export default {
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
+		canview: { type: Boolean, default: false },
 		pageTitle: { type: String, default: "" }
 	},
 	data() {
@@ -244,19 +247,24 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+			if(this.canview) {
+				Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+					.then(response => {
+						Object.keys(response.data.actions.POST).forEach(field => {
+							this.rowheader.push(field)
+						})
+						this.errorMsg = null
+						this.errored = false
+						this.getAccountinfoConfig()
 					})
-					this.errorMsg = null
-					this.errored = false
-					this.getAccountinfoConfig()
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-				})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+					})
+			} else {
+				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errored = true
+			}	
 		},
 		getAccountinfoConfig() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
@@ -267,7 +275,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -297,7 +305,7 @@ export default {
 					this.$bvModal.hide('add-accountinfo')
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

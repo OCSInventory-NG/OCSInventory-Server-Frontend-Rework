@@ -1,56 +1,76 @@
 <template>
 	<div id="add-package-modal">
-		<!-- Display success box message -->
-		<section v-if="successed">
-			<Alert 
-				:message="$t('message.success_saved')" 
-				variant="success"
-			/>
-		</section>
-
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
-			/>
-		</section>
-
-		<!-- Display info if no error -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<!-- Header page -->
-			<div v-else>
-				<div class="page-header d-print-none text-white">
-					<div class="row align-items-center">
-						<div class="col">
-							<div class="page-pretitle">
-								<Breadcrumb />
-							</div>
-							<h2 class="page-title">
-								{{ $t('title.'+pageTitle) }}
-							</h2>
+		<!-- Header page -->
+		<div>
+			<div class="page-header d-print-none text-white">
+				<div class="row align-items-center">
+					<div class="col">
+						<div class="page-pretitle">
+							<Breadcrumb />
 						</div>
-						<div class="col-auto ms-auto">
-							<!-- Button to add package -->
-							<b-button
-								v-if="canadd"
-								v-b-modal.add-package
-								:title="$t('deployment.addpackage')"
-								variant="primary"
-								class="d-none d-sm-inline-block"
-							>
-								<font-awesome-icon 
-									:icon="['fas', 'plus']"
-								/>
-								{{ $t('deployment.addpackage') }}
-							</b-button>
+						<h2 class="page-title">
+							{{ $t('title.'+pageTitle) }}
+						</h2>
+					</div>
+					<div class="col-auto ms-auto">
+						<!-- Button to add package -->
+						<b-button
+							v-if="canadd"
+							v-b-modal.add-package
+							:title="$t('deployment.addpackage')"
+							variant="primary"
+							class="d-none d-sm-inline-block"
+						>
+							<font-awesome-icon 
+								:icon="['fas', 'plus']"
+							/>
+							{{ $t('deployment.addpackage') }}
+						</b-button>
+					</div>
+				</div>
+			</div>
+			<!-- Display datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display success box message -->
+						<section v-if="successed">
+							<Alert 
+								:message="$t('message.success_saved')" 
+								variant="success"
+							/>
+						</section>
+
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
+							<Datatable
+								id="packages-datatable"
+								:rowdata="rowdata"
+								:rowheader="rowheader"
+								:candelete="candelete"
+								:canedit="canedit"
+								:canviewaction="canviewaction"
+								editcomponent="EditPackageModal"
+								title="deployment/packages"
+								translationkey="deployment."
+								@reloadDatatable="reloadDatatable"
+							/>
 
 							<!-- Modal to add package -->
 							<b-modal 
+								v-if="canadd"
 								id="add-package" 
 								:title="$t('deployment.addpackage')"
 								hide-footer
@@ -137,27 +157,8 @@
 						</div>
 					</div>
 				</div>
-				<!-- Display datatable -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
-							<Datatable
-								id="packages-datatable"
-								:rowdata="rowdata"
-								:rowheader="rowheader"
-								:candelete="candelete"
-								:canedit="canedit"
-								:canviewaction="canviewaction"
-								editcomponent="EditPackageModal"
-								title="deployment/packages"
-								translationkey="deployment."
-								@reloadDatatable="reloadDatatable"
-							/>
-						</div>
-					</div>
-				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -176,6 +177,7 @@ export default {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		canview: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
 		pageTitle: { type: String, default: "" }
 	},
@@ -214,19 +216,24 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "result") this.rowheader.push(field)
+			if(this.canview) {
+				Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+					.then(response => {
+						Object.keys(response.data.actions.POST).forEach(field => {
+							if(field != "result") this.rowheader.push(field)
+						})
+						this.errorMsg = null
+						this.errored = false
+						this.getPackages()
 					})
-					this.errorMsg = null
-					this.errored = false
-					this.getPackages()
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-				})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+					})
+			} else {
+				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errored = true
+			}
 		},
 		getPackages() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
