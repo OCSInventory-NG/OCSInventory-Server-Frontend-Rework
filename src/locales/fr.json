@@ -194,6 +194,7 @@
     "editnetwork": "Éditer le réseau",
     "id": "ID",
     "ip": "Adresse IP",
+    "last_seen": "Dernière mise à jour",
     "mac": "Adresse MAC",
     "mask": "Mask",
     "name": "Nom",
