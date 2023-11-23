@@ -1,8 +1,8 @@
 <template>
-	<div id="edit-package-modal">
+	<div id="edit-automatic-action-modal">
 		<button 
 			v-b-modal="idmodal"
-			:title="$t('deployment.editpackage')"
+			:title="$t('scheduler.editscheduler')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -13,13 +13,13 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('deployment.editpackage')"
+			:title="$t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('deployment.editpackage') }}
+					{{ $t('scheduler.editscheduler') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -38,7 +38,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.name')" 
+							:label="$t('scheduler.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -52,13 +52,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.description')" 
-							label-for="name"
+							:label="$t('scheduler.description')" 
+							label-for="description"
 						>
 							<b-form-input
 								id="description"
 								v-model="row.description"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -66,13 +65,28 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.target_os')" 
-							label-for="target_os"
+							:label="$t('scheduler.active')" 
+							label-for="active"
 						>
 							<b-form-select
-								id="target_os"
-								v-model="row.target_os" 
-								:options="options" 
+								id="active"
+								v-model="row.active" 
+								:options="active" 
+								class="mb-3 form-select"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('scheduler.recurence')" 
+							label-for="recurence"
+						>
+							<b-form-select
+								id="recurence"
+								v-model="row.recurence" 
+								:options="recurences" 
 								class="mb-3 form-select"
 							/>
 						</b-form-group>
@@ -103,7 +117,7 @@ import Axios from 'axios'
 import i18n from '@/i18n'
 
 export default {
-	name: 'EditPackageModal',
+	name: 'EditAutomaticActionModal',
 	props: {
 		id: { type: Number, default: null }
 	},
@@ -112,31 +126,38 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				target_os: null
+				active: false,
+				recurence: "hourly"
 			},
+			rowdata: [],
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idmodal: 'edit-package.'+this.id,
 			header: {
-				"Content-Type": "application/json;charset=utf-8",
+				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
-			options: [
-				{ value: 'WIN', text: i18n.t('template.WIN') },
-				{ value: 'LIN', text: i18n.t('template.LIN') },
-				{ value: 'MAC', text: i18n.t('template.MAC') }
-			]
+			active: [
+				{ value: true, text: i18n.t('generic.yes') },
+				{ value: false, text: i18n.t('generic.no') }
+			],
+			recurences: [
+				{ value: 'hourly', text: i18n.t('scheduler.hourly') },
+				{ value: 'daily', text: i18n.t('scheduler.daily') },
+				{ value: 'weekly', text: i18n.t('scheduler.weekly') },
+				{ value: 'monthly', text: i18n.t('scheduler.monthly') }
+			],
+			idmodal: 'edit-scheduler.'+this.id
 		}
 	},
 	methods: {
 		loadData(id) {
-			this.getPackages(id)
+			this.getScheduler(id)
 		},
-		getPackages(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+		getScheduler(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -152,15 +173,20 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			delete this.row.actions_list
+			let formdata = new FormData()
+
+			Object.keys(this.row).forEach(key => {
+				formdata.append(key, this.row[key])
+			})
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.put(process.env.VUE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
+				formdata, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-package.'+this.row.id)
+					this.$bvModal.hide('edit-scheduler.'+this.row.id)
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
@@ -168,7 +194,7 @@ export default {
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-package.'+this.row.id)
+					this.$bvModal.hide('edit-scheduler.'+this.row.id)
 				})
 		},
 	}

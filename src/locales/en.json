@@ -4,6 +4,7 @@
     "accountinfo/config": "Administrative data Configurations",
     "accountinfo/data": "Administrative data Data",
     "assets": "Assets",
+    "automaticactions": "Automatic actions",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Dashboard",
@@ -233,6 +234,20 @@
     "status": "Status",
     "STORE": "Save file/compressed folder",
     "target_os": "Targeted operating system"
+  },
+  "scheduler": {
+    "active": "Active",
+    "addscheduler": "Add an automatic action",
+    "daily": "Daily",
+    "description": "Description",
+    "editscheduler": "Edit the automatic action",
+    "hourly": "Hourly",
+    "id": "ID",
+    "last_execution": "Last execution",
+    "name": "Name",
+    "monthly": "Monthly",
+    "recurence": "Recurrence",
+    "weekly": "Weekly"
   },
   "permission": {
     "accountinfoconfig": "Administrative data Configuration",

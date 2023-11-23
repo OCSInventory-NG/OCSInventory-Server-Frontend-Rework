@@ -54,6 +54,7 @@
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<Datatable
 								id="users-datatable"
