@@ -218,7 +218,6 @@ export default {
 		getNetdevices() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices/", { headers: this.header })
 				.then(response => {
-					console.log(response)
 					this.networks.devices.total = response.data.length
 					response.data.forEach(device => {
 						this.networks.names[device.network].nbdevices += 1

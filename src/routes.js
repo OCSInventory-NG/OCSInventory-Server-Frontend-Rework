@@ -21,6 +21,7 @@ import Accountinfo from '@/pages/Configuration/Accountinfo/Accountinfo'
 import Template from '@/pages/Configuration/Template/Template'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
 import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
+import AutomaticAction from '@/pages/Configuration/AutomaticAction/AutomaticAction'
 // Detail
 import Detail from '@/pages/Detail/Detail'
 // Deployment
@@ -88,6 +89,11 @@ export default new Router({
 			path: '/configurations/netgroup',
 			name: 'NetworkGroup',
 			component: NetworkGroup
+		},
+		{
+			path: '/configurations/automaticactions',
+			name: 'AutomaticAction',
+			component: AutomaticAction
 		},
 		{
 			path: '/inventory/assets',

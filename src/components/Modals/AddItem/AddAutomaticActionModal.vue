@@ -1,5 +1,5 @@
 <template>
-	<div id="add-user-modal">
+	<div id="add-automaticaction-modal">
 		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
@@ -15,7 +15,7 @@
 				variant="danger"
 			/>
 		</section>
-		
+
 		<!-- Display info if no error -->
 		<section v-else>
 			<div v-if="loading">
@@ -35,31 +35,30 @@
 							</h2>
 						</div>
 						<div class="col-auto ms-auto">
-							<!-- Button to add user -->
+							<!-- Button to add scheduler -->
 							<b-button
 								v-if="canadd"
-								v-b-modal.add-user
-								:title="$t('user.adduser')"
+								v-b-modal.add-scheduler
+								:title="$t('scheduler.addscheduler')"
 								variant="primary"
 								class="d-none d-sm-inline-block"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
 								/>
-								{{ $t('user.adduser') }}
+								{{ $t('scheduler.addscheduler') }}
 							</b-button>
 
-							<!-- Modal to add user -->
+							<!-- Modal to add scheduler -->
 							<b-modal 
-								id="add-user" 
-								:title="$t('user.adduser')"
-								size="xl"
+								id="add-scheduler" 
+								:title="$t('scheduler.addscheduler')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('user.adduser') }}
+										{{ $t('scheduler.addscheduler') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -77,31 +76,13 @@
 								>
 									<b-row>
 										<b-col>
-											<h4>{{ $t('user.user_informations') }}</h4>
-										</b-col>
-									</b-row>
-									<b-row>
-										<b-col>
 											<b-form-group
-												:label="$t('user.username')" 
-												label-for="username"
+												:label="$t('scheduler.name')" 
+												label-for="name"
 											>
 												<b-form-input
-													id="username"
-													v-model="row.username"
-													required
-												/>
-											</b-form-group>
-										</b-col>
-										<b-col>
-											<b-form-group
-												:label="$t('user.password')" 
-												label-for="password"
-											>
-												<b-form-input
-													id="password"
-													v-model="row.password"
-													type="password"
+													id="name"
+													v-model="row.name"
 													required
 												/>
 											</b-form-group>
@@ -110,76 +91,45 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('user.email')" 
-												label-for="email"
+												:label="$t('scheduler.description')" 
+												label-for="description"
 											>
 												<b-form-input
-													id="email"
-													v-model="row.email"
+													id="description"
+													v-model="row.description"
 													required
 												/>
 											</b-form-group>
 										</b-col>
 									</b-row>
 									<b-row>
-										<b-col>
-											<b-form-group 
-												:label="$t('user.first_name')" 
-												label-for="first_name"
-											>
-												<b-form-input
-													id="first_name"
-													v-model="row.first_name"
-													required
-												/>
-											</b-form-group>
-										</b-col>
 										<b-col>
 											<b-form-group
-												:label="$t('user.last_name')" 
-												label-for="last_name"
+												:label="$t('scheduler.active')" 
+												label-for="active"
 											>
-												<b-form-input
-													id="last_name"
-													v-model="row.last_name"
-													required
+												<b-form-select
+													id="active"
+													v-model="row.active" 
+													:options="active" 
+													class="mb-3 form-select"
 												/>
 											</b-form-group>
 										</b-col>
 									</b-row>
 									<b-row>
 										<b-col>
-											<b-form-checkbox
-												id="is_staff"
-												v-model="row.is_staff"
-												name="is_staff"
-												value="true"
-												unchecked-value="false"
+											<b-form-group
+												:label="$t('scheduler.recurence')" 
+												label-for="recurence"
 											>
-												{{ $t('user.is_staff') }}
-											</b-form-checkbox>
-										</b-col>
-									</b-row>
-									<b-row>
-										<b-col>
-											<h4>{{ $t('title.groups') }}</h4>
-										</b-col>
-									</b-row>
-									<b-row>
-										<b-col
-											v-for="group in groups"
-											:key="group.id"
-											cols="4"
-										>
-											<b-form-checkbox
-												:id="group.code"
-												v-model="row.groups"
-												:name="group.code"
-												:value="group.id"
-												unchecked
-											>
-												{{ group.name }}
-											</b-form-checkbox>
+												<b-form-select
+													id="recurence"
+													v-model="row.recurence" 
+													:options="recurences" 
+													class="mb-3 form-select"
+												/>
+											</b-form-group>
 										</b-col>
 									</b-row>
 									<b-row>
@@ -207,14 +157,14 @@
 					<div class="card">
 						<div class="card-body">
 							<Datatable
-								id="users-datatable"
+								id="scheduler-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
-								:canedit="canedit"
 								:candelete="candelete"
-								editcomponent="EditUserModal"
-								title="users"
-								translationkey="user."
+								:canedit="canedit"
+								editcomponent="EditAutomaticActionModal"
+								title="automaticactions"
+								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -228,44 +178,50 @@
 <script>
 import Axios from 'axios'
 import Loader from '@/components/Loader/Loader'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import Alert from '@/components/Alert/Alert'
 import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import i18n from '@/i18n'
 
 export default {
-	name: 'AddUserModal',
-	components: { Loader, Breadcrumb, Alert, Datatable },
+	name: 'AddAutomaticActionModal',
+	components: { Datatable, Loader, Alert, Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: true },
 		pageTitle: { type: String, default: "" }
 	},
 	data() {
 		return {
 			row: {
-				username: null,
-				password: null,
-				email: null,
-				first_name: null,
-				last_name: null,
-				is_staff: false,
-				groups: [],
-				user_permissions: []
+				name: null,
+				description: null,
+				active: false,
+				recurence: "hourly"
 			},
 			rowdata: [],
 			rowheader: [],
-			groups: [],
-			groupsLabel: [],
+			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			loading: true,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			active: [
+				{ value: true, text: i18n.t('generic.yes') },
+				{ value: false, text: i18n.t('generic.no') }
+			],
+			recurences: [
+				{ value: 'hourly', text: i18n.t('scheduler.hourly') },
+				{ value: 'daily', text: i18n.t('scheduler.daily') },
+				{ value: 'weekly', text: i18n.t('scheduler.weekly') },
+				{ value: 'monthly', text: i18n.t('scheduler.monthly') }
+			]
 		}
 	},
 	watch: {
@@ -278,81 +234,56 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+			Axios.options(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
 					this.errorMsg = null
 					this.errored = false
-					this.getGroups()
+					this.getSchedulers()
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
 		},
-		// Get all users
-		getUsers() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+		getSchedulers() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
-				.finally(() => {
-					this.permissionsGroupsTreatment()
-					this.loading = false
-				})
+				.finally(() => this.loading = false)
 		},
-		permissionsGroupsTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpGroups = []
-				rowDetails.groups.forEach(groupsDetails => {
-					tmpGroups.push(this.groupsLabel[groupsDetails])
-				})
-				rowDetails.groups = tmpGroups.join('\n')
-			})
+		reloadDatatable() {
+			this.getSchedulers()
 		},
-		// Get groups
-		getGroups() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(groupDetails => {
-						this.groups.push({
-							id: groupDetails.id,
-							code: "group_"+groupDetails.id,
-							name: groupDetails.name
-						})
-						this.groupsLabel[groupDetails.id] = groupDetails.name
-					})
-				})
-				.finally(() => this.getUsers())
-		},
+		// Submit template creation and call getSchedulers to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.post(process.env.VUE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
+			
+			Axios.post(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('add-user')
+					this.$bvModal.hide('add-scheduler')
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
+					this.$bvModal.hide('add-scheduler')
 				})
-				.finally(() => this.getUsers())
-		},
-		reloadDatatable() {
-			this.getUsers()
+				.finally(() => this.getSchedulers())
 		}
 	}
 }

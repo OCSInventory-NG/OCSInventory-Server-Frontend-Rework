@@ -4,6 +4,7 @@
     "accountinfo/config": "Données administratives",
     "accountinfo/data": "Donnée administrative",
     "assets": "Actifs",
+    "automaticactions": "Actions automatiques",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Tableau de bord",
@@ -11,7 +12,7 @@
     "details": "Détails",
     "edittemplate": "Éditer un modèle",
     "general": "Général",
-    "general_configuration": "Configuration général",
+    "general_configuration": "Configuration générale",
     "group": "Groupe",
     "groups": "Groupes",
     "history": "Historique",
@@ -232,6 +233,20 @@
     "status": "Statut",
     "STORE": "Sauvegarder un fichier/dossier compressé",
     "target_os": "Système d'exploitation ciblé"
+  },
+  "scheduler": {
+    "active": "Active",
+    "addscheduler": "Ajouter une action automatique",
+    "daily": "Tous les jours",
+    "description": "Description",
+    "editscheduler": "Éditer l'action automatique",
+    "hourly": "Toutes les heures",
+    "id": "ID",
+    "last_execution": "Dernière exécution",
+    "name": "Nom",
+    "monthly": "Tous les mois",
+    "recurence": "Récurrence",
+    "weekly": "Toutes les semaines"
   },
   "permission": {
     "accountinfoconfig": "Configuration des données administratives",

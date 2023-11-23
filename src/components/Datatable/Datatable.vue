@@ -306,6 +306,7 @@ import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
 import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
 import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
 import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
+import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -321,6 +322,7 @@ export default {
 		EditNetdeviceModal,
 		EditPackageModal,
 		EditActionListModal,
+		EditAutomaticActionModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
