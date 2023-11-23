@@ -1,105 +1,114 @@
 <template>
 	<div class="container-xl">
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
-			/>
-		</section>
+		<PageHeader 
+			page-title="dashboard"
+		/>
+		
+		<div class="page-body">
+			<div class="card">
+				<div class="card-body">
+					<h1>{{ $t("title.assets") }}</h1>
+					<!-- Error box message -->
+					<section v-if="erroredasset">
+						<Alert 
+							:message="errorMsgAsset" 
+							variant="danger"
+						/>
+					</section>
+					
+					<div 
+						v-if="loadingasset"
+						class="ocs-loader"
+					>
+						<Loader />
+					</div>
 
-		<section v-else>
-			<PageHeader 
-				page-title="dashboard"
-			/>
-			
-			<div class="page-body">
-				<div class="card">
-					<div class="card-body">
-						<h1>{{ $t("title.assets") }}</h1>
-						
-						<div v-if="loadingasset">
-							<Loader />
+					<div v-else>
+						<div class="row row-deck row-cards">
+							<Counter 
+								firsttitle="dashboard.total"
+								:firstcount="total.total"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.total"
+							/>
+							<Counter 
+								firsttitle="dashboard.windows"
+								:firstcount="total.windows"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.windows"
+							/>
+							<Counter 
+								firsttitle="dashboard.linux"
+								:firstcount="total.linux"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.linux"
+							/>
+							<Counter 
+								firsttitle="dashboard.macos"
+								:firstcount="total.macos"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.macos"
+							/>
 						</div>
-
-						<div v-else>
-							<div class="row row-deck row-cards">
-								<Counter 
-									firsttitle="dashboard.total"
-									:firstcount="total.total"
-									secondtitle="dashboard.contacted"
-									:secondcount="contacted.total"
-								/>
-								<Counter 
-									firsttitle="dashboard.windows"
-									:firstcount="total.windows"
-									secondtitle="dashboard.contacted"
-									:secondcount="contacted.windows"
-								/>
-								<Counter 
-									firsttitle="dashboard.linux"
-									:firstcount="total.linux"
-									secondtitle="dashboard.contacted"
-									:secondcount="contacted.linux"
-								/>
-								<Counter 
-									firsttitle="dashboard.macos"
-									:firstcount="total.macos"
-									secondtitle="dashboard.contacted"
-									:secondcount="contacted.macos"
+						<div class="row">
+							<div class="col-lg-6">
+								<DonutChart 
+									title="dashboard.osassets"
+									:options="oscount.options"
+									:series="oscount.series"
 								/>
 							</div>
-							<div class="row">
-								<div class="col-lg-6">
-									<DonutChart 
-										title="dashboard.osassets"
-										:options="oscount.options"
-										:series="oscount.series"
-									/>
-								</div>
-								<div class="col-lg-6">
-									<LineChart 
-										title="dashboard.lastcontacted"
-										:options="lastcontactedopt.options"
-										:series="lastcontactedopt.series"
-									/>
-								</div>
-							</div>
-						</div>
-
-						<h1>{{ $t("title.network") }}</h1>
-
-						<div v-if="loadingnetwork">
-							<Loader />
-						</div>
-
-						<div v-else>
-							<div class="row row-deck row-cards">
-								<Counter 
-									firsttitle="dashboard.totalnetwork"
-									:firstcount="networks.total"
-									classstyle="col-sm-6 col-lg-6"
-								/>
-								<Counter 
-									firsttitle="dashboard.totalnetworkdevices"
-									:firstcount="networks.devices.total"
-									classstyle="col-sm-6 col-lg-6"
+							<div class="col-lg-6">
+								<LineChart 
+									title="dashboard.lastcontacted"
+									:options="lastcontactedopt.options"
+									:series="lastcontactedopt.series"
 								/>
 							</div>
-							<div class="row">
-								<div class="col-lg-12">
-									<BarChart 
-										title="dashboard.nbdevicebynetwork"
-										:options="networkopt.options"
-										:series="networkopt.series"
-									/>
-								</div>
+						</div>
+					</div>
+
+					<h1>{{ $t("title.network") }}</h1>
+					<!-- Error box message -->
+					<section v-if="errorednetwork">
+						<Alert 
+							:message="errorMsgNetwork" 
+							variant="danger"
+						/>
+					</section>
+					<div 
+						v-if="loadingnetwork"
+						class="ocs-loader"
+					>
+						<Loader />
+					</div>
+
+					<div v-else>
+						<div class="row row-deck row-cards">
+							<Counter 
+								firsttitle="dashboard.totalnetwork"
+								:firstcount="networks.total"
+								classstyle="col-sm-6 col-lg-6"
+							/>
+							<Counter 
+								firsttitle="dashboard.totalnetworkdevices"
+								:firstcount="networks.devices.total"
+								classstyle="col-sm-6 col-lg-6"
+							/>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<BarChart 
+									title="dashboard.nbdevicebynetwork"
+									:options="networkopt.options"
+									:series="networkopt.series"
+								/>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -178,10 +187,12 @@ export default {
 					data: []
 				}]
 			},
-			errorMsg: null,
+			errorMsgAsset: null,
+			errorMsgNetwork: null,
 			loadingasset: true,
 			loadingnetwork: true,
-			errored: false,
+			erroredasset: false,
+			errorednetwork: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -206,13 +217,13 @@ export default {
 							nbdevices: 0
 						}
 					})
-					this.errorMsg = null
-					this.errored = false
+					this.errorMsgNetwork = null
+					this.errorednetwork = false
 					this.getNetdevices()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
+					this.errorMsgNetwork = e.message
+					this.errorednetwork = true
 				})
 		},
 		getNetdevices() {
@@ -228,12 +239,12 @@ export default {
 						this.networkopt.series[0].data.push(network.nbdevices)
 					})
 
-					this.errorMsg = null
-					this.errored = false
+					this.errorMsgNetwork = null
+					this.errorednetwork = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
+					this.errorMsgNetwork = e.message
+					this.errorednetwork = true
 				})
 				.finally(() => this.loadingnetwork = false)
 		},
@@ -244,13 +255,13 @@ export default {
 					response.data.forEach(template => {
 						this.templates[template["os"]].push(template["id"])
 					})
-					this.errorMsg = null
-					this.errored = false
+					this.errorMsgAsset = null
+					this.erroredasset = false
 					this.getCount()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
+					this.errorMsgAsset = e.message
+					this.erroredasset = true
 				})
 		},
 		// Count assets and sort by template types
@@ -302,12 +313,12 @@ export default {
 						})
 					}
 
-					this.errorMsg = null
-					this.errored = false
+					this.errorMsgAsset = null
+					this.erroredasset = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
+					this.errorMsgAsset = e.message
+					this.erroredasset = true
 				})
 				.finally(() => this.loadingasset = false)
 		}

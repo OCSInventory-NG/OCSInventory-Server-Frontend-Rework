@@ -3,29 +3,30 @@
 		id="edit-package"
 		class="container-xl"
 	>
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<AddActionListModal
+				:package="id"
+				:canaddaction="canaddaction"
+				@reloadPackage="reloadPackage"
 			/>
-		</section>
 
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddActionListModal
-					:package="rowpackagedata.id"
-					:canaddaction="canaddaction"
-					@reloadPackage="reloadPackage"
-				/>
-
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<b-row class="text-center">
 								<h2>{{ rowpackagedata.name }}</h2>
 							</b-row>
@@ -47,7 +48,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 

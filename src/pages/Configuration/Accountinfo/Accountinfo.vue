@@ -3,43 +3,25 @@
 		id="Accountinfo"
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<AddAccountinfoModal
+				:canadd="canadd"
+				:canedit="canedit"
+				:candelete="candelete"
+				:canaddvalue="canaddvalue"
+				:canview="canview"
+				page-title="accountinfo"
 			/>
-		</section>
-
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddAccountinfoModal
-					:canadd="canadd"
-					:canedit="canedit"
-					:candelete="candelete"
-					:canaddvalue="canaddvalue"
-					page-title="accountinfo"
-				/>
-			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
 <script>
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
 import AddAccountinfoModal from '@/components/Modals/AddItem/AddAccountinfoModal'
 
 export default {
 	name: "Accountinfo",
 	components: {
-		Loader,
-		Alert,
 		AddAccountinfoModal
 	},
 	data() {
@@ -48,13 +30,12 @@ export default {
 			canedit: false,
 			candelete: false,
 			canaddvalue: false,
-			errorMsg: null,
-			loading: true,
-			errored: false,
+			canview: false
 		}
 	},
-	mounted() {
+	created() {
 		if(localStorage.getItem('permissions').split(",").includes("view_accountinfoconfig")) {
+			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("add_accountinfoconfig")) {
 				this.canadd = true
 			}
@@ -66,12 +47,7 @@ export default {
 			}
 			if(localStorage.getItem('permissions').split(",").includes("add_accountinfovalue")) {
 				this.canaddvalue = true
-			}
-			this.loading = false			
-		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
-			this.errored = true
-			this.loading = false
+			}		
 		}
 	},
 }

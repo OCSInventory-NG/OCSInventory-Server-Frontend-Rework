@@ -18,7 +18,10 @@
 
 		<!-- Accountinf form -->
 		<section v-else>
-			<div v-if="loading">
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
 				<Loader />
 			</div>
 
