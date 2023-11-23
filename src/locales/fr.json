@@ -27,6 +27,7 @@
     "ocsreports": "OCS Inventory",
     "packages": "Paquets",
     "report": "Rapport",
+    "result": "Résultats",
     "snmp": "Snmp",
     "system": "Système",
     "template": "Modèle",
@@ -212,6 +213,7 @@
     "action_type": "Type d'action",
     "addaction": "Ajouter une action",
     "addpackage": "Ajouter un paquet",
+    "all": "Tous les résultats",
     "asset": "Actif",
     "command": "Commande",
     "comment": "Commentaire",
@@ -219,6 +221,7 @@
     "description": "Description",
     "editaction": "Éditer l'action",
     "editpackage": "Éditer le paquet",
+    "error": "En erreur",
     "EXEC": "Exécuter une commande",
     "file": "Fichier/Dossier compressé",
     "id": "ID",
@@ -233,7 +236,10 @@
     "select_store_file": "Sélectionner le fichier/dossier compressé à sauvegarder",
     "status": "Statut",
     "STORE": "Sauvegarder un fichier/dossier compressé",
-    "target_os": "Système d'exploitation ciblé"
+    "success": "Succès",
+    "target_os": "Système d'exploitation ciblé",
+    "viewhistory": "Voir l'historique des résultats",
+    "waiting": "En attente"
   },
   "scheduler": {
     "active": "Active",

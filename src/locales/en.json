@@ -27,6 +27,7 @@
     "ocsreports": "OCS Inventory",
     "packages": "Packages",
     "report": "Report",
+    "result": "Results",
     "snmp": "Snmp",
     "system": "System",
     "template": "Template",
@@ -212,6 +213,7 @@
     "action_type": "Action type",
     "addaction": "Add an action",
     "addpackage": "Add a package",
+    "all": "All results",
     "asset": "Asset",
     "command": "Command",
     "comment": "Comment",
@@ -219,6 +221,7 @@
     "description": "Description",
     "editacion": "Edit the action",
     "editpackage": "Edit the package",
+    "error": "In error",
     "EXEC": "Execute a command",
     "file": "File/Compressed folder",
     "id": "ID",
@@ -233,7 +236,10 @@
     "select_store_file": "Select a file/compressed folder to store",
     "status": "Status",
     "STORE": "Save file/compressed folder",
-    "target_os": "Targeted operating system"
+    "success": "Success",
+    "target_os": "Targeted operating system",
+    "viewhistory": "View results history",
+    "waiting": "In waiting"
   },
   "scheduler": {
     "active": "Active",
