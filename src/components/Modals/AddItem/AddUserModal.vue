@@ -17,7 +17,7 @@
 						<b-button
 							v-if="canadd"
 							v-b-modal.add-user
-							:title="$t('adduser')"
+							:title="$t('user.adduser')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
 						>
