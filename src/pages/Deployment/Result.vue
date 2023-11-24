@@ -43,12 +43,23 @@
 									classstyle="col-sm-6 col-lg-4"
 								/>
 							</div>
-							<div class="col-lg-6">
-								<DonutChart 
-									:options="resultcount.options"
-									:series="resultcount.series"
-								/>
+							<div class="row">
+								<div class="col-lg-6">
+									<DonutChart 
+										title="deployment.statistics"
+										:options="resultcount.options"
+										:series="resultcount.series"
+									/>
+								</div>
+								<div class="col-lg-6">
+									<BarChart 
+										title="deployment.toperror"
+										:options="toperroropt.options"
+										:series="toperroropt.series"
+									/>
+								</div>
 							</div>
+							<br><br>
 							<div>
 								<b-tabs
 									content-class="mt-4"
@@ -112,11 +123,12 @@ import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Counter from '@/components/Dashboard/Counter/Counter'
 import DonutChart from '@/components/Dashboard/Chart/Donut'
+import BarChart from '@/components/Dashboard/Chart/Bar'
 import Datatable from '@/components/Datatable/Datatable'
 
 export default {
 	name: "Result",
-	components: { Loader, Alert, PageHeader, Counter, DonutChart, Datatable },
+	components: { Loader, Alert, PageHeader, Counter, DonutChart, Datatable, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},
@@ -136,6 +148,26 @@ export default {
 					labels: []
 				},
 				series: []
+			},
+			toperroropt: {
+				options: {
+					chart: {
+						id: "error-chart"
+					},
+					plotOptions: {
+						bar: {
+							borderRadius: 4,
+							horizontal: true,
+						}
+					},
+					xaxis: {
+						categories: []
+					}
+				},
+				series: [{
+					name: i18n.t('deployment.nb'),
+					data: []
+				}]
 			},
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -172,10 +204,18 @@ export default {
 					this.count.waiting = 0
 					this.count.success = 0
 
+					var tmpError = []
+
 					response.data.forEach(result => {
 						if(result.status == 2) {
 							this.count.error += 1
 							this.rowdataerror.push(result)
+
+							if(tmpError[result.comment]) {
+								tmpError[result.comment] += 1
+							} else {
+								tmpError[result.comment] = 1
+							}
 						} else if(result.status == 1) {
 							this.count.success += 1
 							this.rowdatasuccess.push(result)
@@ -183,6 +223,29 @@ export default {
 							this.count.waiting += 1
 							this.rowdatawaiting.push(result)
 						}
+					})
+
+					var errorArray = []
+
+					Object.keys(tmpError).forEach(error => {
+						errorArray.push({
+							error: error,
+							value: tmpError[error]
+						})
+					})
+
+					errorArray.sort(function(a, b) {
+						return b.value - a.value;
+					});
+
+					var index = 0
+
+					errorArray.forEach(error => {
+						if(index <= 5) {
+							this.toperroropt.options.xaxis.categories.push(error.error)
+							this.toperroropt.series[0].data.push(error.value)
+						}
+						index += 1
 					})
 
 					this.resultcount.options.labels.push(i18n.t("deployment.waiting"))
