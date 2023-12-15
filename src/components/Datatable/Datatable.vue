@@ -128,6 +128,7 @@
 				selectable
 				striped
 				hover
+				outlined
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"

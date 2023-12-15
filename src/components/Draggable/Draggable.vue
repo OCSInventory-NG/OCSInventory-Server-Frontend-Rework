@@ -3,7 +3,7 @@
 		id="draggable-component"
 		class="table-responsive"
 	>
-		<table class="table table-vcenter table-striped table-hover">
+		<table class="table table-vcenter table-striped table-hover border">
 			<thead>
 				<tr>
 					<th 

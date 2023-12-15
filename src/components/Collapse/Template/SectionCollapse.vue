@@ -33,7 +33,7 @@
 					<b-card-body>
 						<b-card-text>
 							<div class="table-responsive">
-								<table class="table table-vcenter">
+								<table class="table table-vcenter border">
 									<thead>
 										<tr>
 											<th>{{ $t('user.name') }}</th>
