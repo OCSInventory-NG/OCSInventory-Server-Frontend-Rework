@@ -12,6 +12,7 @@ import Dashboard from '@/pages/Dashboard/Dashboard'
 import Assets from '@/pages/Inventory/Asset/Asset'
 import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover'
 import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
+import Multisearch from '@/pages/Inventory/Tools/Multisearch'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -115,6 +116,11 @@ export default new Router({
 			path: '/inventory/:type/:id',
 			name: 'Detail',
 			component: Detail
+		},
+		{
+			path: '/inventory/multisearch',
+			name: 'Multisearch',
+			component: Multisearch
 		},
 		{
 			path: '/deployment/packages',
