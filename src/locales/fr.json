@@ -261,7 +261,9 @@
     "weekly": "Toutes les semaines"
   },
   "search": {
-    "equal": "Est"
+    "and": "ET",
+    "equal": "est",
+    "or": "OU"
   },
   "permission": {
     "accountinfoconfig": "Configuration des données administratives",

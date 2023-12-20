@@ -260,6 +260,11 @@
     "recurence": "Recurrence",
     "weekly": "Weekly"
   },
+  "search": {
+    "and": "AND",
+    "equal": "is",
+    "or": "OR"
+  },
   "permission": {
     "accountinfoconfig": "Administrative data Configuration",
     "accountinfodata": "Administrative data Data",
