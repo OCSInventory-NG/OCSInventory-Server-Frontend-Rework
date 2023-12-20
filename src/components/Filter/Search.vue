@@ -9,6 +9,19 @@
 				class="modal-allactions"
 			>
 				<b-row>
+					<b-col
+						v-if="index > 0"
+						cols="1"
+					>
+						<b-form-group>
+							<b-form-select
+								:id="'link'+index"
+								v-model="input.link"
+								:options="linkopt"
+								class="mb-3 form-select form-control"
+							/>
+						</b-form-group>
+					</b-col>
 					<b-col>
 						<b-form-group>
 							<b-form-select
@@ -39,7 +52,7 @@
 							/>
 						</b-form-group>
 					</b-col>
-					<b-col>
+					<b-col cols="2">
 						<b-form-group>
 							<b-form-select
 								:id="'operator'+index"
@@ -49,7 +62,7 @@
 							/>
 						</b-form-group>
 					</b-col>
-					<b-col>
+					<b-col cols="3">
 						<b-form-group>
 							<b-form-input
 								:id="'value'+index"
@@ -64,7 +77,7 @@
 								v-b-modal="1"
 								variant="primary"
 								class="d-none d-sm-inline-block form-control"
-								@click="addField(input, datavalues)"
+								@click="addField(index, datavalues)"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'plus']"
@@ -125,7 +138,7 @@ export default {
 			text: null,
 			loading: true,
 			datavalues: [
-				{ route: "asset/bases", field: "", operator: "EQUAL", value: "" }
+				{ route: "asset/bases", field: "", operator: "EQUAL", value: "", link: "" }
 			],
 			routeopt: [
 				{ value: "asset/bases", text: i18n.t("title.assets") },
@@ -135,6 +148,10 @@ export default {
 			fieldopt: [],
 			operatoropt: [
 				{ value: "EQUAL", text: i18n.t("search.equal") }
+			],
+			linkopt: [
+				{ value: "AND", text: i18n.t("search.and") },
+				{ value: "OR", text: i18n.t("search.or") }
 			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -159,6 +176,12 @@ export default {
 					var component = route.split("/")[0]
 					this.fieldopt[index] = []
 
+					this.fieldopt[index].push({
+						value: "",
+						text: "----",
+						disabled: true
+					})
+
 					if(component == "asset") {
 						component = "inventory"
 					}
@@ -179,8 +202,9 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		addField(value, fieldType) {
-			fieldType.push({ route: "asset/bases", field: "", operator: "EQUAL", value: "" })
+		addField(index, fieldType) {
+			fieldType.push({ route: "asset/bases", field: "", operator: "EQUAL", value: "", link: "AND" })
+			this.getFields("asset/bases", index+1)
 		},
 		removeField(index, fieldType) {
 			fieldType.splice(index, 1)
