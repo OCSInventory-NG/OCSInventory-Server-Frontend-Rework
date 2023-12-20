@@ -19,6 +19,7 @@
     "inventory": "Inventaire",
     "ipdiscover": "IpDiscover",
     "management": "Gestion",
+    "multisearch": "Recherche multicritères",
     "myaccount": "Mon compte",
     "netdevice": "Périphériques réseau",
     "netdevices": "Périphériques réseau",
@@ -32,6 +33,7 @@
     "system": "Système",
     "template": "Modèle",
     "templates": "Modèle",
+    "tools": "Outils",
     "usermanagement": "Gestion des utilisateurs",
     "user": "Utilisateur",
     "users": "Utilisateurs"
@@ -257,6 +259,9 @@
     "monthly": "Tous les mois",
     "recurence": "Récurrence",
     "weekly": "Toutes les semaines"
+  },
+  "search": {
+    "equal": "Est"
   },
   "permission": {
     "accountinfoconfig": "Configuration des données administratives",

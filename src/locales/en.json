@@ -19,6 +19,7 @@
     "inventory": "Inventory",
     "ipdiscover": "IpDiscover",
     "management": "Management",
+    "multisearch": "Multi-criteria search",
     "myaccount": "My Account",
     "netdevice": "Network Devices",
     "netdevices": "Network Devices",
@@ -32,6 +33,7 @@
     "system": "System",
     "template": "Template",
     "templates": "Templates",
+    "tools": "Tools",
     "usermanagement": "User Management",
     "user": "User",
     "users": "Users"
