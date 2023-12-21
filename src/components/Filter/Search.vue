@@ -135,7 +135,6 @@ export default {
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			text: null,
 			loading: true,
 			datavalues: [
 				{ route: "asset/bases", field: "", operator: "EQUAL", value: "", link: "" }
@@ -160,13 +159,23 @@ export default {
 		}
 	},
 	mounted() {
-		this.getFields("asset/bases", 0)
+		this.datavalues = JSON.parse(localStorage.getItem('multisearch')) ?? [
+			{ route: "asset/bases", field: "", operator: "EQUAL", value: "", link: "" }
+		]
+
+		Object.keys(this.datavalues).forEach(search => {
+			this.getFields(this.datavalues[search].route, search)
+		})
 	},
 	methods: {
 		// Submit dynamic datas
 		onSubmit(event) {
 			event.preventDefault()
-			this.$emit('reloadDatatable')
+
+			// Save param in local storage
+			localStorage.setItem('multisearch', JSON.stringify(this.datavalues))
+
+			this.$emit('reloadDatatable', this.datavalues)
 		},
 		getFields(route, index) {
 			Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
