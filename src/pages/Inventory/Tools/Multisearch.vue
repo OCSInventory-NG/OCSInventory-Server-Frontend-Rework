@@ -28,7 +28,9 @@
 						</div>
 
 						<div v-else>
-							<Search />
+							<Search
+								@reloadDatatable="reloadDatatable"
+							/>
 						</div>
 					</div>
 				</div>
@@ -54,6 +56,7 @@ export default {
 			errorMsg: null,
 			rowdata: [],
 			rowheader: [],
+			rowsearch: [],
 			loading: false,
 			errored: false,
 			header: {
@@ -71,5 +74,10 @@ export default {
 			this.loading = false
 		}
 	},
+	methods: {
+		reloadDatatable(search) {
+			this.rowsearch = search
+		}
+	}
 }
 </script>
