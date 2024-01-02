@@ -99,8 +99,8 @@
 						{
 							header: $t('title.authentication'), link: '/configurations/authentication', 
 							route:'Authentication', column: 'general'
-            },
-            {
+						},
+						{
 							header: $t('title.automaticactions'), link: '/configurations/automaticactions', 
 							route:'AutomaticAction', column: 'general'
 						},

@@ -96,8 +96,8 @@ export default new Router({
 			path: '/configurations/authentication',
 			name: 'Authentication',
 			component: Authentication
-    },
-    {
+		},
+		{
 			path: '/configurations/automaticactions',
 			name: 'AutomaticAction',
 			component: AutomaticAction
