@@ -101,9 +101,13 @@
 							header: $t('title.general_configuration'), link: '/configurations/general', 
 							route:'General', column: 'general' 
 						},
-						{ 
+						{
+							header: $t('title.authentication'), link: '/configurations/authentication', 
+							route:'Authentication', column: 'general'
+						},
+						{
 							header: $t('title.automaticactions'), link: '/configurations/automaticactions', 
-							route:'AutomaticAction', column: 'general' 
+							route:'AutomaticAction', column: 'general'
 						},
 						{ 
 							header: $t('title.templates'), link: '/configurations/templates', 

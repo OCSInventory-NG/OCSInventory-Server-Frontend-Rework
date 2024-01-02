@@ -43,6 +43,9 @@
 							<Draggable 
 								:rowdata="rowactiondata"
 								:rowheader="rowheader"
+								:canedit="caneditaction"
+								:candelete="candeleteaction"
+								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
@@ -118,6 +121,7 @@ export default {
 				})
 		},
 		reloadDatatable() {
+			this.loading = true
 			this.getPackage()
 		},
 		getPackage() {
