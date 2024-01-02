@@ -1,8 +1,8 @@
 <template>
-	<div id="edit-package-modal">
+	<div id="edit-ldap-modal">
 		<button 
 			v-b-modal="idmodal"
-			:title="$t('deployment.editpackage')"
+			:title="$t('authentication.editldap')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -13,13 +13,13 @@
 
 		<b-modal 
 			:id="idmodal"
-			:title="$t('deployment.editpackage')"
+			:title="$t('authentication.editldap')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #modal-header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('deployment.editpackage') }}
+					{{ $t('authentication.editldap') }}
 				</h5>
 				<b-button 
 					size="sm" 
@@ -38,13 +38,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.name')" 
-							label-for="name"
+							label="SERVER_URI" 
+							label-for="SERVER_URI"
 						>
 							<b-form-input
-								id="name"
-								v-model="row.name"
-								required
+								id="SERVER_URI"
+								v-model="row.config.SERVER_URI"
 							/>
 						</b-form-group>
 					</b-col>
@@ -52,13 +51,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.description')" 
-							label-for="name"
+							label="BIND_DN" 
+							label-for="BIND_DN"
 						>
 							<b-form-input
-								id="description"
-								v-model="row.description"
-								required
+								id="BIND_DN"
+								v-model="row.config.BIND_DN"
 							/>
 						</b-form-group>
 					</b-col>
@@ -66,16 +64,68 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.target_os')" 
-							label-for="target_os"
+							label="BIND_PASSWORD" 
+							label-for="BIND_PASSWORD"
+						>
+							<b-form-input
+								id="BIND_PASSWORD"
+								v-model="row.config.BIND_PASSWORD"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							label="BASE_DN" 
+							label-for="BASE_DN"
+						>
+							<b-form-input
+								id="BASE_DN"
+								v-model="row.config.BASE_DN"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							label="USER_LOGIN_FIELD" 
+							label-for="USER_LOGIN_FIELD"
+						>
+							<b-form-input
+								id="USER_LOGIN_FIELD"
+								v-model="row.config.USER_LOGIN_FIELD"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							label="PROTOCOL_VERSION" 
+							label-for="PROTOCOL_VERSION"
 						>
 							<b-form-select
-								id="target_os"
-								v-model="row.target_os" 
+								id="PROTOCOL_VERSION"
+								v-model="row.config.PROTOCOL_VERSION" 
 								:options="options" 
 								class="mb-3 form-select"
 							/>
 						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-checkbox
+							id="enabled"
+							v-model="row.enabled"
+							name="enabled"
+							:value="true"
+							unchecked
+						>
+							{{ $t('authentication.enabled') }}
+						</b-form-checkbox>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -100,43 +150,50 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
+//import i18n from '@/i18n'
 
 export default {
-	name: 'EditPackageModal',
+	name: 'EditLdapModal',
 	props: {
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
-				name: null,
-				description: null,
-				target_os: null
+				enabled: true,
+				priority: 1,
+				config: {
+					SERVER_URI: null,
+					BIND_DN: null,
+					BIND_PASSWORD: null,
+					BASE_DN: null,
+					USER_LOGIN_FIELD: null,
+					MIRROR_GROUPS: false,
+					PROTOCOL_VERSION: 3
+				}
 			},
 			loading: true,
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
-			idmodal: 'edit-package.'+this.id,
+			idmodal: 'edit-ldap.'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			options: [
-				{ value: 'WIN', text: i18n.t('template.WIN') },
-				{ value: 'LIN', text: i18n.t('template.LIN') },
-				{ value: 'MAC', text: i18n.t('template.MAC') }
+				{ value: 2, text: "v2" },
+				{ value: 3, text: "v3" }
 			]
 		}
 	},
 	methods: {
 		loadData(id) {
-			this.getPackages(id)
+			this.getLdapConfig(id)
 		},
-		getPackages(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+		getLdapConfig(id) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -148,20 +205,19 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit section creation and call refresh edit template to reload
+		// Submit edit ldap config and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
 
-			delete this.row.actions_list
+			delete this.row.mappings
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
-				{ headers: this.header })
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('edit-package.'+this.row.id)
+					this.$bvModal.hide('edit-ldap.'+this.row.id)
 					this.$emit('reloadDatatable')
 				})
 				.catch(e => {
@@ -169,7 +225,7 @@ export default {
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('edit-package.'+this.row.id)
+					this.$bvModal.hide('edit-ldap.'+this.row.id)
 				})
 		},
 	}

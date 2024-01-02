@@ -66,13 +66,27 @@
 					</div>
 					
 					<!-- Submit button -->
-					<b-button 
-						type="submit"
-						class="auth-btn mb-3" 
-						variant="inverse"
-					>
-						{{ $t('generic.login') }}
-					</b-button>
+					<b-row>
+						<b-col>
+							<b-button 
+								type="submit"
+								class="auth-btn mb-3" 
+								variant="inverse"
+							>
+								{{ $t('generic.login') }}
+							</b-button>
+						</b-col>
+						<b-col>
+							<b-button 
+								v-if="sso"
+								:href="redirect_url"
+								class="auth-btn mb-3" 
+								variant="inverse"
+							>
+								SSO
+							</b-button>
+						</b-col>
+					</b-row>
 				</form>
 			</div>
 		</div>
@@ -90,11 +104,28 @@ export default {
 	data() {
 		return {
 			errorMessage: null,
+			sso: false,
+			redirect_url: null,
 			langs: {
 				'fr': 'Français',
 				'en': 'English'
 			}
 		};
+	},
+	beforeCreate() {
+		const header = {
+			"Content-Type": "application/json;charset=utf-8"
+		}
+		Axios.get(process.env.VUE_APP_API_ROUTE+"login/", { headers: header })
+			.then(response => {
+				if(response.data) {
+					this.sso = response.data.SSO
+					this.redirect_url = response.data.redirect_url+window.location.origin
+				}
+			})
+			.catch(e => {
+				this.errorMessage = e.message
+			})
 	},
 	methods: {
 		login() {
@@ -121,7 +152,11 @@ export default {
 					this.getPermissions()
 				})
 				.catch(e => {
-					this.errorMessage = e
+					if(e.response.data.non_field_errors) {
+						this.errorMessage = e.response.data.non_field_errors[0]
+					} else {
+						this.errorMessage = e.message
+					}
 				})
 		},
 		getPermissions() {
@@ -140,7 +175,7 @@ export default {
 					this.errorMessage = i18n.t("message.error_no_permissions")
 				})
 				.catch(e => {
-					this.errorMessage = e
+					this.errorMessage = e.message
 				})
 		}
 	},

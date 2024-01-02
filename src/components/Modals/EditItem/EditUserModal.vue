@@ -64,7 +64,6 @@
 								id="password"
 								v-model="row.password"
 								type="password"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -78,7 +77,6 @@
 							<b-form-input
 								id="email"
 								v-model="row.email"
-								required
 							>
 								{{ row.email }}
 							</b-form-input>
@@ -94,7 +92,6 @@
 							<b-form-input
 								id="first_name"
 								v-model="row.first_name"
-								required
 							>
 								{{ row.first_name }}
 							</b-form-input>
@@ -108,7 +105,6 @@
 							<b-form-input
 								id="last_name"
 								v-model="row.last_name"
-								required
 							>
 								{{ row.last_name }}
 							</b-form-input>
@@ -236,6 +232,11 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+
+			if(this.row.password == "") {
+				delete this.row.password
+			}
+
 			Axios.patch(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
