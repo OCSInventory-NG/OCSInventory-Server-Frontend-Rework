@@ -6,7 +6,18 @@ APPLY_FIXES: all # all, none, or list of linter keys
 DEFAULT_BRANCH: dev # Usually master or main
 # ENABLE: # If you use ENABLE variable, all other languages/formats/tooling-formats will be disabled by default
 # ENABLE_LINTERS: # If you use ENABLE_LINTERS variable, all other linters will be disabled by default
-DISABLE_LINTERS: [YAML_YAMLLINT,SPELL_CSPELL,COPYPASTE_JSCPD,CSS_STYLELINT,HTML_HTMLHINT,JAVASCRIPT_STANDARD,REPOSITORY_GITLEAKS,REPOSITORY_DEVSKIM,HTML_DJLINT] # Disable CSpell and CP linter
+DISABLE_LINTERS: [
+    YAML_YAMLLINT,
+    SPELL_CSPELL,
+    COPYPASTE_JSCPD,
+    CSS_STYLELINT,
+    HTML_HTMLHINT,
+    JAVASCRIPT_STANDARD,
+    REPOSITORY_GITLEAKS,
+    REPOSITORY_DEVSKIM,
+    REPOSITORY_KICS,
+    HTML_DJLINT,
+  ] # Disable CSpell and CP linter
 DISABLE:
   - COPYPASTE # Comment to disable checks of abusive copy-pastes
   - SPELL # Comment to disable checks of spelling mistakes # - SPELL # Uncomment to disable checks of spelling mistakes

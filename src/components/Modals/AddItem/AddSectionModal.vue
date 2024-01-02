@@ -192,7 +192,7 @@ export default {
 	name: 'AddSectionModal',
 	components: { Breadcrumb },
 	props: {
-		template: { type: Number, required: true },
+		template: { type: String, required: true },
 	},
 	data() {
 		return {

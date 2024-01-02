@@ -128,6 +128,7 @@
 				selectable
 				striped
 				hover
+				outlined
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
@@ -192,7 +193,7 @@
 					#cell(name)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/details/'+row.item.id"
+						:to="'/inventory/'+title+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
@@ -205,11 +206,29 @@
 					#cell(netname)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/details/'+row.item.id"
+						:to="'/inventory/'+title+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.netname }}
 					</router-link>
+				</template>
+
+				<template #cell(error)="row">
+					<span style="color:#ff0000">
+						{{ row.item.error }}
+					</span>
+				</template>
+
+				<template #cell(waiting)="row">
+					<span style="color:#c8d3e1">
+						{{ row.item.waiting }}
+					</span>
+				</template>
+
+				<template #cell(success)="row">
+					<span style="color:#2fb344">
+						{{ row.item.success }}
+					</span>
 				</template>
 
 				<!-- Edit row for configuration -->
@@ -248,6 +267,16 @@
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'gear']"
+								/>
+							</button>
+							<button 
+								v-if="canviewhistory"
+								:title="$t('deployment.viewhistory')"
+								class="btn btn-ghost-info"
+								@click="goToPackageHistory(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'chart-simple']"
 								/>
 							</button>
 							<!-- Do all actions button -->
@@ -306,6 +335,7 @@ import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
 import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
 import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
 import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
+import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -321,6 +351,7 @@ export default {
 		EditNetdeviceModal,
 		EditPackageModal,
 		EditActionListModal,
+		EditAutomaticActionModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -347,6 +378,7 @@ export default {
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
 		translationkey: { type: String, default: '' },
+		canviewhistory: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -446,7 +478,7 @@ export default {
 			visible: true,
 		}
 
-		if(this.canedit == true || this.candelete == true) {
+		if(this.canedit == true || this.candelete == true || this.canviewhistory) {
 			this.fields.push(actions)
 		}
 	},
@@ -485,14 +517,17 @@ export default {
 			this.$emit('reloadDatatable', this.rowdata)
 		},
 		goToEditTemplate(id){
-			this.$router.push('/configurations/templates/edittemplate/'+id); 
+			this.$router.push('/configurations/templates/'+id); 
 		},
 		goToEditPackage(id){
-			this.$router.push('/deployment/packages/editpackage/'+id); 
+			this.$router.push('/deployment/packages/'+id); 
 		},
 		goToNetdevices(id) {
 			this.$router.push('/inventory/netdevice/'+id); 
-		}
+		},
+		goToPackageHistory(id){
+			this.$router.push('/deployment/history/'+id); 
+		},
 	}
 }
 </script>

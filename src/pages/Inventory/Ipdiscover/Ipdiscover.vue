@@ -3,28 +3,29 @@
 		id="ipdiscover" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<!-- Page header -->
+			<PageHeader 
+				page-title="ipdiscover"
 			/>
-		</section>
-
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<!-- Page header -->
-				<PageHeader 
-					page-title="ipdiscover"
-				/>
-				<!-- Display Collapse -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<!-- Display Collapse -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<IpdiscoverCollapse 
 								v-for="(value, key) in rowdata"
 								:key="key"
@@ -42,7 +43,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -98,7 +99,6 @@ export default {
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
-			this.loading = false
 		}
 	},
 	methods: {

@@ -3,34 +3,35 @@
 		id="edit-template"
 		class="container-xl"
 	>
-		<!-- Display error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<div>
+			<AddSectionModal
+				:template="id"
+				@reloadTemplate="reloadTemplate"
 			/>
-		</section>
 
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<div v-else>
-				<AddSectionModal
-					:template="rowtemplatedata.id"
-					@reloadTemplate="reloadTemplate"
-				/>
-
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Display error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<b-row class="text-center">
 								<h2>{{ rowtemplatedata.name }}</h2>
 							</b-row>
 							<b-row class="text-center">
 								<b-col>
-									<p>{{ $t('inventory.os') }} : {{ $t(rowtemplatedata.os) }}</p>
+									<p>{{ $t('inventory.os') }} : {{ $t("template." + rowtemplatedata.os) }}</p>
 									<p>{{ $t('inventory.last_update') }} : {{ rowtemplatedata.last_update }}</p>
 								</b-col>
 							</b-row>
@@ -42,7 +43,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -55,8 +56,7 @@ import Alert from '@/components/Alert/Alert'
 
 export default {
 	name: 'EditTemplate',
-	components: {
-		Loader, AddSectionModal, Alert, SectionCollapse	},
+	components: { Loader, AddSectionModal, Alert, SectionCollapse	},
 	props: {
 		id: { type: String, required: true },
 	},
@@ -91,12 +91,12 @@ export default {
 					this.rowsectiondata = response.data.sections
 					this.errorMsg = null
 					this.errored = false
+					this.loading = false
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
 		},
 		reloadTemplate() {
 			this.loading = true

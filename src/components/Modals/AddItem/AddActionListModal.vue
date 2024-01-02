@@ -154,7 +154,7 @@ export default {
 	name: 'AddActionListModal',
 	components: { Breadcrumb },
 	props: {
-		package: { type: Number, required: true },
+		package: { type: String, required: true },
 		canaddaction: { type: Boolean, default: false }
 	},
 	data() {

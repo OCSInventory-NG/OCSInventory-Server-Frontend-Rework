@@ -1,7 +1,7 @@
 <template>
-	<div id="add-accountinfo-modal">
+	<div id="add-automaticaction-modal">
+		<!-- Header page -->
 		<div>
-			<!-- Header page -->
 			<div class="page-header d-print-none text-white">
 				<div class="row align-items-center">
 					<div class="col">
@@ -13,18 +13,18 @@
 						</h2>
 					</div>
 					<div class="col-auto ms-auto">
-						<!-- Button to add accountinfo -->
+						<!-- Button to add scheduler -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-accountinfo
-							:title="$t('accountinfo.addaccountinfo')"
+							v-b-modal.add-scheduler
+							:title="$t('scheduler.addscheduler')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
 							/>
-							{{ $t('accountinfo.addaccountinfo') }}
+							{{ $t('scheduler.addscheduler') }}
 						</b-button>
 					</div>
 				</div>
@@ -48,7 +48,6 @@
 								variant="danger"
 							/>
 						</section>
-
 						<div 
 							v-if="loading"
 							class="ocs-loader"
@@ -57,32 +56,27 @@
 						</div>
 						<div v-else>
 							<Datatable
-								id="accountinfodatatable"
+								id="scheduler-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
-								:canedit="canedit"
 								:candelete="candelete"
-								:canaddvalue="canaddvalue"
-								editcomponent="EditAccountinfoModal"
-								title="accountinfo/config"
-								titlevalue="accountinfo_param"
-								adddvalueroute="accountinfo/value"
-								reconciliationname="accountinfo_config"
-								translationkey="accountinfo."
+								:canedit="canedit"
+								editcomponent="EditAutomaticActionModal"
+								title="automaticactions"
+								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
 							/>
-
-							<!-- Modal to add accountinfo -->
+							<!-- Modal to add scheduler -->
 							<b-modal 
 								v-if="canadd"
-								id="add-accountinfo" 
-								:title="$t('accountinfo.addaccountinfo')"
+								id="add-scheduler" 
+								:title="$t('scheduler.addscheduler')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
 								<template #modal-header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('accountinfo.addaccountinfo') }}
+										{{ $t('scheduler.addscheduler') }}
 									</h5>
 									<b-button 
 										size="sm" 
@@ -101,7 +95,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('user.name')" 
+												:label="$t('scheduler.name')" 
 												label-for="name"
 											>
 												<b-form-input
@@ -115,7 +109,7 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('generic.description')" 
+												:label="$t('scheduler.description')" 
 												label-for="description"
 											>
 												<b-form-input
@@ -129,13 +123,13 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('accountinfo.datatype')" 
-												label-for="datatype"
+												:label="$t('scheduler.active')" 
+												label-for="active"
 											>
 												<b-form-select
-													id="datatype"
-													v-model="row.datatype" 
-													:options="datatypeoptions" 
+													id="active"
+													v-model="row.active" 
+													:options="active" 
 													class="mb-3 form-select"
 												/>
 											</b-form-group>
@@ -144,13 +138,13 @@
 									<b-row>
 										<b-col>
 											<b-form-group
-												:label="$t('accountinfo.datatarget')" 
-												label-for="datatarget"
+												:label="$t('scheduler.recurence')" 
+												label-for="recurence"
 											>
 												<b-form-select
-													id="datatarget"
-													v-model="row.datatarget" 
-													:options="datatargetoptions" 
+													id="recurence"
+													v-model="row.recurence" 
+													:options="recurences" 
 													class="mb-3 form-select"
 												/>
 											</b-form-group>
@@ -183,26 +177,21 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
 import Alert from '@/components/Alert/Alert'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import i18n from '@/i18n'
 
 export default {
-	name: "AddAccountinfoModal",
-	components: {
-		Datatable,
-		Loader,
-		Alert,
-		Breadcrumb
-	},
+	name: 'AddAutomaticActionModal',
+	components: { Datatable, Loader, Alert, Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		canaddvalue: { type: Boolean, default: false },
 		canview: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: true },
 		pageTitle: { type: String, default: "" }
 	},
 	data() {
@@ -210,8 +199,8 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				datatype: 'TEXT',
-				datatarget: 'ASSET'
+				active: false,
+				recurence: "hourly"
 			},
 			rowdata: [],
 			rowheader: [],
@@ -224,16 +213,15 @@ export default {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
-			datatargetoptions: [
-				{ value: 'ASSET', text: i18n.t("title.assets") },
-				{ value: 'IPDISCOVER', text: i18n.t("title.ipdiscover") },
-				{ value: 'SNMP', text: i18n.t("title.snmp") }
+			active: [
+				{ value: true, text: i18n.t('generic.yes') },
+				{ value: false, text: i18n.t('generic.no') }
 			],
-			datatypeoptions: [
-				{ value: 'TEXT', text: 'TEXT' },
-				{ value: 'TEXTAREA', text: 'TEXTAREA' },
-				{ value: 'SELECT', text: 'SELECT' },
-				{ value: 'CHECKBOX', text: 'CHECKBOX' },
+			recurences: [
+				{ value: 'hourly', text: i18n.t('scheduler.hourly') },
+				{ value: 'daily', text: i18n.t('scheduler.daily') },
+				{ value: 'weekly', text: i18n.t('scheduler.weekly') },
+				{ value: 'monthly', text: i18n.t('scheduler.monthly') }
 			]
 		}
 	},
@@ -248,14 +236,14 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+				Axios.options(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
 						})
 						this.errorMsg = null
 						this.errored = false
-						this.getAccountinfoConfig()
+						this.getSchedulers()
 					})
 					.catch(e => {
 						this.errorMsg = e.message
@@ -264,13 +252,12 @@ export default {
 			} else {
 				this.errorMsg = i18n.t("message.dont_have_right_to_see")
 				this.errored = true
-			}	
+			}
 		},
-		getAccountinfoConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
+		getSchedulers() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.accountinfovaluesTreatment()
 					this.errorMsg = null
 					this.errored = false
 				})
@@ -280,38 +267,29 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		accountinfovaluesTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpValues = []
-				rowDetails.accountinfo_values.forEach(valuesDetails => {
-					tmpValues.push(valuesDetails.value)
-				})
-				rowDetails.accountinfo_values = tmpValues.join('\n')
-			})
-		},
 		reloadDatatable() {
-			this.getAccountinfoConfig()
+			this.getSchedulers()
 		},
-		// Submit template creation and call getAccountinfoConfig to reload datatable datas
+		// Submit template creation and call getSchedulers to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
+			Axios.post(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('add-accountinfo')
+					this.$bvModal.hide('add-scheduler')
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
-					this.$bvModal.hide('add-accountinfo')
+					this.$bvModal.hide('add-scheduler')
 				})
-				.finally(() => this.getAccountinfoConfig())
+				.finally(() => this.getSchedulers())
 		}
 	}
 }

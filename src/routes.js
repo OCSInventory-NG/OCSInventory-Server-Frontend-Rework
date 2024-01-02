@@ -22,6 +22,7 @@ import Template from '@/pages/Configuration/Template/Template'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate'
 import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
 import Authentication from '@/pages/Configuration/Authentication/Authentication'
+import AutomaticAction from '@/pages/Configuration/AutomaticAction/AutomaticAction'
 // Detail
 import Detail from '@/pages/Detail/Detail'
 // Deployment
@@ -29,6 +30,7 @@ import Packages from '@/pages/Deployment/Package'
 import History from '@/pages/Deployment/History'
 import Report from '@/pages/Deployment/Report'
 import EditPackage from '@/pages/Deployment/EditPackage'
+import Result from '@/pages/Deployment/Result'
 
 Vue.use(Router)
 
@@ -80,7 +82,7 @@ export default new Router({
 			component: Template
 		},
 		{
-			path: '/configurations/templates/edittemplate/:id',
+			path: '/configurations/templates/:id',
 			name: 'EditTemplate',
 			component: EditTemplate,
 			props: true
@@ -94,6 +96,11 @@ export default new Router({
 			path: '/configurations/authentication',
 			name: 'Authentication',
 			component: Authentication
+    },
+    {
+			path: '/configurations/automaticactions',
+			name: 'AutomaticAction',
+			component: AutomaticAction
 		},
 		{
 			path: '/inventory/assets',
@@ -111,7 +118,7 @@ export default new Router({
 			component: Netdevice
 		},
 		{
-			path: '/inventory/:type/details/:id',
+			path: '/inventory/:type/:id',
 			name: 'Detail',
 			component: Detail
 		},
@@ -121,7 +128,7 @@ export default new Router({
 			component: Packages
 		},
 		{
-			path: '/deployment/packages/editpackage/:id',
+			path: '/deployment/packages/:id',
 			name: 'EditPackage',
 			component: EditPackage,
 			props: true
@@ -130,6 +137,12 @@ export default new Router({
 			path: '/deployment/history',
 			name: 'History',
 			component: History
+		},
+		{
+			path: '/deployment/history/:id',
+			name: 'Result',
+			component: Result,
+			props: true
 		},
 		{
 			path: '/deployment/report',

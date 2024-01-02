@@ -43,6 +43,10 @@ tbody, td, tfoot, th, thead, tr {
   max-width: 100px;
 }
 
+.btn-group, .btn-group-vertical {
+  box-shadow: none;
+}
+
 @media (max-width: 767.98px) {
   .responsive {
     display: block;

@@ -3,33 +3,34 @@
 		id="history" 
 		class="container-xl"
 	>
-		<!-- Error box message -->
-		<section v-if="errored">
-			<Alert 
-				:message="errorMsg" 
-				variant="danger"
+		<!-- Header page -->
+		<div>
+			<PageHeader 
+				page-title="history"
 			/>
-		</section>
-
-		<!-- Package history -->
-		<section v-else>
-			<div v-if="loading">
-				<Loader />
-			</div>
-
-			<!-- Header page -->
-			<div v-else>
-				<PageHeader 
-					page-title="history"
-				/>
-				<!-- Display datatable -->
-				<div class="page-body">
-					<div class="card">
-						<div class="card-body">
+			<!-- Display datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
 							<Datatable
 								id="deployment-history-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
+								:canviewhistory="canviewhistory"
 								title="history"
 								translationkey="deployment."
 							/>
@@ -37,7 +38,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
@@ -59,19 +60,22 @@ export default {
 			errorMsg: null,
 			loading: true,
 			errored: false,
+			canviewhistory: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
-	mounted() {
+	created() {
 		if(localStorage.getItem('permissions').split(",").includes("view_history")) {
+			if(localStorage.getItem('permissions').split(",").includes("view_result")) {
+				this.canviewhistory = true
+			}
 			this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
-			this.loading = false
 		}
 	},
 	methods: {
@@ -79,8 +83,14 @@ export default {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if(field != "result") {
+							this.rowheader.push(field)
+						}
 					})
+					this.rowheader.push("waiting")
+					this.rowheader.push("success")
+					this.rowheader.push("error")
+
 					this.errorMsg = null
 					this.errored = false
 					this.getPackages()
@@ -95,8 +105,27 @@ export default {
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length
+
+						packages.waiting = 0
+						packages.success = 0
+						packages.error = 0
+
+						if(packages.result) {
+							packages.result.forEach(result => {
+								if(result.status == 2) {
+									packages.error += 1
+								} else if(result.status == 1) {
+									packages.success += 1
+								} else {
+									packages.waiting += 1
+								}
+							})
+						}
+
+						delete packages.result
 					})
 					this.rowdata = response.data
+
 					this.errorMsg = null
 					this.errored = false
 				})
