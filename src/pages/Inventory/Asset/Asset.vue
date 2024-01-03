@@ -70,7 +70,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
 			this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
