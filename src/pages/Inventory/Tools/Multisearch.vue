@@ -40,7 +40,7 @@
 </template>
 
 <script>
-//import Axios from 'axios'
+import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 //import Datatable from '@/components/Datatable/Datatable'
@@ -66,7 +66,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_base")) {
+		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
 			//this.getHeader()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
@@ -77,6 +77,20 @@ export default {
 	methods: {
 		reloadDatatable(search) {
 			this.rowsearch = search
+			
+			Axios.post(process.env.VUE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
 		}
 	}
 }
