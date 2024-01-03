@@ -134,6 +134,7 @@
 				<b-col 
 					align-self="center"
 					align="center"
+					class="multisearch-btns"
 				>
 					<b-button 
 						type="button"
