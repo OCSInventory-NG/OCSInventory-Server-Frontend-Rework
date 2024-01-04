@@ -127,7 +127,7 @@ export default {
 		type: { type: String, default: '' },
 		id: { type: Number, default: null },
 		canedit: { type: Boolean, default: false },
-		slug: { type: String, default: 'base.base' }
+		slug: { type: String, default: 'inventory_base.inventorybase' }
 	},
 	data() {
 		return {
