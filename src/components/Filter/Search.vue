@@ -3,6 +3,7 @@
 		<b-form
 			@submit="onSubmit"
 		>
+			{{ datavalues }}
 			<div
 				v-for="(masterinput, masterindex) in datavalues"
 				:key="masterindex"
@@ -62,6 +63,7 @@
 									v-model="input.field" 
 									:options="fieldopt[masterindex][index]" 
 									class="mb-3 form-select form-control"
+									@input="setFieldType(input, masterindex, index)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -79,7 +81,7 @@
 								<b-form-select
 									:id="'operator'+masterindex+index"
 									v-model="input.operator" 
-									:options="operatoropt" 
+									:options="operatoropt[input.fieldtype]" 
 									class="mb-3 form-select form-control"
 								/>
 							</b-form-group>
@@ -87,9 +89,18 @@
 						<b-col cols="3">
 							<b-form-group>
 								<b-form-input
+									v-if="input.fieldtype != 'dropdown'"
 									:id="'value'+masterindex+index"
 									v-model="input.value"
+									:type="inputype[input.fieldtype]"
 									class="mb-3"
+								/>
+								<b-form-select
+									v-else
+									:id="'value'+masterindex+index"
+									v-model="input.value"
+									:options="adminopt" 
+									class="mb-3 form-select form-control"
 								/>
 							</b-form-group>
 						</b-col>
@@ -176,6 +187,7 @@ export default {
 						object: "InventoryBase",
 						route: "asset/bases",
 						field: "",
+						fieldtype: "string",
 						operator: "iexact",
 						value: "",
 						link: ""
@@ -184,29 +196,57 @@ export default {
 			],
 			routeopt: [
 				{ value: "asset/bases", text: i18n.t("title.assets") },
-				{ value: "accountinfo/config", text: i18n.t("title.accountinfo") },
-				{ value: "deployment/packages", text: i18n.t("title.deployment") },
+				//{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
+				{ value: "deployment/results", text: i18n.t("title.deployment") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
-				"accountinfo/config": "AccountinfoConfig",
-				"deployment/packages": "Package"
+				//"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
+				"deployment/results": "asset"
 			},
 			fieldopt: [],
-			operatoropt: [
-				{ value: "iexact", text: i18n.t("search.iexact") },
-				{ value: "icontains", text: i18n.t("search.icontains") },
-				{ value: "istartswith", text: i18n.t("search.istartswith") },
-				{ value: "iendswith", text: i18n.t("search.iendswith") },
-				{ value: "gt", text: i18n.t("search.gt") },
-				{ value: "gte", text: i18n.t("search.gte") },
-				{ value: "lt", text: i18n.t("search.lt") },
-				{ value: "lte", text: i18n.t("search.lte") }
-			],
+			operatoropt: {
+				"string": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "icontains", text: i18n.t("search.icontains") },
+					{ value: "istartswith", text: i18n.t("search.istartswith") },
+					{ value: "iendswith", text: i18n.t("search.iendswith") },
+				],
+				"integer": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "gt", text: i18n.t("search.gt") },
+					{ value: "gte", text: i18n.t("search.gte") },
+					{ value: "lt", text: i18n.t("search.lt") },
+					{ value: "lte", text: i18n.t("search.lte") }
+				],
+				"datetime": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "gt", text: i18n.t("search.gt") },
+					{ value: "gte", text: i18n.t("search.gte") },
+					{ value: "lt", text: i18n.t("search.lt") },
+					{ value: "lte", text: i18n.t("search.lte") }
+				],
+				"dropdown": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
+				]
+			},
+			linktype: {
+				"TEXT": "string",
+				"TEXTAREA": "string",
+				"SELECT": "dropdown",
+				"CHECKBOX": "dropdown"
+			},
 			linkopt: [
 				{ value: "AND", text: i18n.t("search.and") },
 				{ value: "OR", text: i18n.t("search.or") }
 			],
+			adminopt: [],
+			inputype: {
+				"string": "text",
+				"integer": "number",
+				"datetime": "datetime-local"
+			},
+			excludefield: ["id", "asset", "package"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -220,6 +260,7 @@ export default {
 					object: "InventoryBase",
 					route: "asset/bases",
 					field: "",
+					fieldtype: "string",
 					operator: "iexact",
 					value: "",
 					link: ""
@@ -244,43 +285,68 @@ export default {
 			this.$emit('reloadDatatable', this.datavalues)
 		},
 		getFields(route, masterindex, index) {
-			Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
-				.then(response => {
-					this.loading = true
+			var component = route.split("/")[0]
 
-					var component = route.split("/")[0]
+			if(!Array.isArray(this.fieldopt[masterindex])) {
+				this.fieldopt[masterindex] = []
+			}
 
-					if(!Array.isArray(this.fieldopt[masterindex])) {
-						this.fieldopt[masterindex] = []
-					}
+			this.fieldopt[masterindex][index] = []
 
-					this.fieldopt[masterindex][index] = []
+			this.fieldopt[masterindex][index].push({
+				value: "",
+				text: "----",
+				fieldtype: "string",
+				disabled: true
+			})
 
-					this.fieldopt[masterindex][index].push({
-						value: "",
-						text: "----",
-						disabled: true
-					})
+			if(component == "asset") {
+				component = "inventory"
+			}
 
-					if(component == "asset") {
-						component = "inventory"
-					}
+			this.datavalues[masterindex][index].object = this.obj[route]
 
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.fieldopt[masterindex][index].push({
-							value: field,
-							text: i18n.t(component+"."+field)
+			if(route == "accountinfo/config?datatarget=ASSET") {
+				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+					.then(response => {
+						response.data.forEach(field => {
+							this.fieldopt[masterindex][index].push({
+								value: field.id,
+								text: field.name,
+								fieldtype: this.linktype[field.datatype]
+							})
 						})
 					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+					})
+					.finally(() => this.loading = false)
+			} else {
+				Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
+					.then(response => {
+						this.loading = true
+						Object.keys(response.data.actions.POST).forEach(field => {
+							if(!this.excludefield.includes(field) &&
+								response.data.actions.POST[field]["type"] != "field") {
+								this.fieldopt[masterindex][index].push({
+									value: field,
+									text: i18n.t(component+"."+field),
+									fieldtype: response.data.actions.POST[field]["type"]
+								})
+							}
+						})
 
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+					})
+					.finally(() => this.loading = false)
+			}
+			
 		},
 		addField(masterindex, index, fieldType) {
 			fieldType[masterindex].push(
@@ -288,6 +354,7 @@ export default {
 					object: "InventoryBase",
 					route: "asset/bases",
 					field: "",
+					fieldtype: "string",
 					operator: "iexact",
 					value: "",
 					link: "AND"
@@ -296,6 +363,7 @@ export default {
 			this.getFields("asset/bases", masterindex, index+1)
 		},
 		removeField(masterindex, index, fieldType) {
+			console.log(index)
 			fieldType[masterindex].splice(index, 1)
 			this.fieldopt[masterindex].splice(index, 1)
 		},
@@ -308,6 +376,7 @@ export default {
 					object: "InventoryBase",
 					route: "asset/bases",
 					field: "",
+					fieldtype: "string",
 					operator: "iexact",
 					value: "",
 					link: "AND"
@@ -320,6 +389,13 @@ export default {
 			fieldType.splice(masterindex, 1)
 			this.fieldopt.splice(masterindex, 1)
 		},
+		setFieldType(input, masterindex, index) {
+			this.fieldopt[masterindex][index].forEach(element => {
+				if(element.value == input.field) {
+					input.fieldtype = element.fieldtype
+				}
+			})
+		}
 	}
 }
 </script>
