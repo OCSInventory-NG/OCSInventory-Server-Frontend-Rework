@@ -115,7 +115,6 @@ export default {
 						this.rowdata.push(element.fields)
 					})
 
-					console.log(this.rowdata)
 					this.succesMsg = "success"
 					this.successed = true
 					this.errorMsg = null
