@@ -3,7 +3,6 @@
 		<b-form
 			@submit="onSubmit"
 		>
-			{{ datavalues }}
 			<div
 				v-for="(masterinput, masterindex) in datavalues"
 				:key="masterindex"
