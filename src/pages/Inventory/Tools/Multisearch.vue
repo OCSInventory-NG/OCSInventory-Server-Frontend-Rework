@@ -92,7 +92,9 @@ export default {
 			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if(field != "inventory_sections") {
+							this.rowheader.push(field)
+						}
 					})
 					this.errorMsg = null
 					this.errored = false
@@ -112,6 +114,7 @@ export default {
 					this.rowdata = []
 
 					response.data.forEach(element => {
+						delete element.fields.inventory_sections
 						this.rowdata.push(element.fields)
 					})
 
