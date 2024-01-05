@@ -18,7 +18,6 @@
 					<b-button
 						v-b-toggle="'template-'+value.id"
 						block
-						variant="info"
 						class="section-btn"
 					>
 						{{ value.name }}
