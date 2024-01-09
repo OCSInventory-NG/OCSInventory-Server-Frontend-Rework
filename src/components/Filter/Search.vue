@@ -195,12 +195,12 @@ export default {
 			],
 			routeopt: [
 				{ value: "asset/bases", text: i18n.t("title.assets") },
-				//{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
+				{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
 				{ value: "deployment/results", text: i18n.t("title.deployment") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
-				//"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
+				"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
 				"deployment/results": "asset"
 			},
 			fieldopt: [],
@@ -308,6 +308,7 @@ export default {
 			if(route == "accountinfo/config?datatarget=ASSET") {
 				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
+						this.loading = true
 						response.data.forEach(field => {
 							this.fieldopt[masterindex][index].push({
 								value: field.id,
@@ -362,7 +363,6 @@ export default {
 			this.getFields("asset/bases", masterindex, index+1)
 		},
 		removeField(masterindex, index, fieldType) {
-			console.log(index)
 			fieldType[masterindex].splice(index, 1)
 			this.fieldopt[masterindex].splice(index, 1)
 		},
