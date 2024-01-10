@@ -55,23 +55,22 @@
 								/>
 							</b-form-group>
 						</b-col>
-						<b-col v-if="!loading">
+						<b-col>
 							<b-form-group>
 								<b-form-select
+									v-if="loading"
+									:id="'field'+masterindex+index"
+									v-model="input.field"
+									class="mb-3 form-select form-control"
+									:disabled="true"
+								/>
+								<b-form-select
+									v-else
 									:id="'field'+masterindex+index"
 									v-model="input.field" 
 									:options="fieldopt[masterindex][index]" 
 									class="mb-3 form-select form-control"
 									@input="setFieldType(input, masterindex, index)"
-								/>
-							</b-form-group>
-						</b-col>
-						<b-col v-else>
-							<b-form-group>
-								<b-form-select
-									:id="'field'+masterindex+index"
-									v-model="input.field"
-									class="mb-3 form-select form-control"
 								/>
 							</b-form-group>
 						</b-col>
@@ -88,19 +87,28 @@
 						<b-col cols="3">
 							<b-form-group>
 								<b-form-input
-									v-if="input.fieldtype != 'dropdown'"
+									v-if="input.fieldtype != 'select' && input.fieldtype != 'checkbox'"
 									:id="'value'+masterindex+index"
 									v-model="input.value"
 									:type="inputype[input.fieldtype]"
 									class="mb-3"
 								/>
-								<b-form-select
-									v-else
-									:id="'value'+masterindex+index"
-									v-model="input.value"
-									:options="adminopt" 
-									class="mb-3 form-select form-control"
-								/>
+								<div v-else>
+									<b-form-select
+										v-if="loadingadmin"
+										:id="'field'+masterindex+index"
+										v-model="input.value"
+										class="mb-3 form-select form-control"
+										:disabled="true"
+									/>
+									<b-form-select
+										v-else
+										:id="'value'+masterindex+index"
+										v-model="input.value"
+										:options="adminopt[masterindex][index]" 
+										class="mb-3 form-select form-control"
+									/>
+								</div>
 							</b-form-group>
 						</b-col>
 						<b-col cols="1">
@@ -180,6 +188,7 @@ export default {
 			errored: false,
 			successed: false,
 			loading: true,
+			loadingadmin: true,
 			datavalues: [
 				[
 					{
@@ -225,15 +234,18 @@ export default {
 					{ value: "lt", text: i18n.t("search.lt") },
 					{ value: "lte", text: i18n.t("search.lte") }
 				],
-				"dropdown": [
+				"select": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
+				],
+				"checkbox": [
 					{ value: "iexact", text: i18n.t("search.iexact") },
 				]
 			},
 			linktype: {
 				"TEXT": "string",
 				"TEXTAREA": "string",
-				"SELECT": "dropdown",
-				"CHECKBOX": "dropdown"
+				"SELECT": "select",
+				"CHECKBOX": "checkbox"
 			},
 			linkopt: [
 				{ value: "AND", text: i18n.t("search.and") },
@@ -270,6 +282,7 @@ export default {
 		Object.keys(this.datavalues).forEach(index => {
 			Object.keys(this.datavalues[index]).forEach(search => {
 				this.getFields(this.datavalues[index][search].route, index, search)
+				this.setFieldType(this.datavalues[index][search], index, search)
 			})
 		})
 	},
@@ -394,6 +407,39 @@ export default {
 					input.fieldtype = element.fieldtype
 				}
 			})
+
+			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
+				Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+					{ headers: this.header })
+					.then(response => {
+						this.loadingadmin = true
+
+						if(!Array.isArray(this.adminopt[masterindex])) {
+							this.adminopt[masterindex] = []
+						}
+
+						this.adminopt[masterindex][index] = []
+
+						this.adminopt[masterindex][index].push({
+							value: "",
+							text: "----",
+							disabled: true
+						})
+
+						response.data.forEach(element => {
+							this.adminopt[masterindex][index].push({
+								value: element.id,
+								text: element.value
+							})
+						})
+
+						this.loadingadmin = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+					})
+			}
 		}
 	}
 }
