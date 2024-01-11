@@ -329,6 +329,15 @@ export default {
 				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
+						this.fieldopt[masterindex][index] = []
+
+						this.fieldopt[masterindex][index].push({
+							value: "",
+							text: "----",
+							fieldtype: "string",
+							disabled: true
+						})
+
 						response.data.forEach(field => {
 							this.fieldopt[masterindex][index].push({
 								value: field.id,
