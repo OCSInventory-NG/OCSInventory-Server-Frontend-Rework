@@ -402,6 +402,7 @@ export default {
 				}
 			)
 
+			this.datavalues = JSON.parse(JSON.stringify(fieldType))
 			this.getFields("asset/bases", masterindex, 0)
 		},
 		removeGroup(masterindex, fieldType) {
