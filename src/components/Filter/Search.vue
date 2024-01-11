@@ -41,6 +41,7 @@
 									v-model="datavalues[masterindex][index].link"
 									:options="linkopt"
 									class="mb-3 form-select form-control"
+									:required="true"
 								/>
 							</b-form-group>
 						</b-col>
@@ -51,6 +52,7 @@
 									v-model="input.route" 
 									:options="routeopt" 
 									class="mb-3 form-select form-control"
+									:required="true"
 									@input="getFields(input.route, masterindex, index)"
 								/>
 							</b-form-group>
@@ -70,6 +72,7 @@
 									v-model="input.field" 
 									:options="fieldopt[masterindex][index]" 
 									class="mb-3 form-select form-control"
+									:required="true"
 									@input="setFieldType(input, masterindex, index)"
 								/>
 							</b-form-group>
@@ -78,9 +81,10 @@
 							<b-form-group>
 								<b-form-select
 									:id="'operator'+masterindex+index"
-									v-model="input.operator" 
-									:options="operatoropt[input.fieldtype]" 
+									v-model="input.operator"
+									:options="operatoropt[input.fieldtype]"
 									class="mb-3 form-select form-control"
+									:required="true"
 								/>
 							</b-form-group>
 						</b-col>
@@ -107,6 +111,7 @@
 										v-model="input.value"
 										:options="adminopt[masterindex][index]" 
 										class="mb-3 form-select form-control"
+										:required="true"
 									/>
 								</div>
 							</b-form-group>
@@ -114,6 +119,7 @@
 						<b-col cols="1">
 							<b-form-group>
 								<b-button 
+									:id="'addfield'+masterindex+index"
 									v-b-modal="1"
 									variant="primary"
 									class="d-none d-sm-inline-block form-control"
@@ -132,6 +138,7 @@
 						>
 							<b-form-group>
 								<b-button 
+									:id="'removefield'+masterindex+index"
 									v-b-modal="1"
 									variant="danger"
 									class="d-none d-sm-inline-block form-control"
