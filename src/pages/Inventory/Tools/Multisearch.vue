@@ -137,7 +137,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errorMsg = e.response.data.error
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false
