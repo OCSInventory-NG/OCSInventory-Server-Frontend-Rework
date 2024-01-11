@@ -36,6 +36,12 @@
 						</div>
 
 						<div v-else>
+							<Alert 
+								v-if="noresult != null"
+								:message="noresult" 
+								variant="info"
+							/>
+
 							<Datatable
 								id="search-datatable"
 								:rowdata="rowdata"
@@ -72,6 +78,7 @@ export default {
 			rowsearch: [],
 			loading: true,
 			errored: false,
+			noresult: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -96,6 +103,7 @@ export default {
 							this.rowheader.push(field)
 						}
 					})
+
 					this.errorMsg = null
 					this.errored = false
 
@@ -112,11 +120,16 @@ export default {
 			Axios.post(process.env.VUE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
+					this.noresult = null
 
 					response.data.forEach(element => {
 						delete element.fields.inventory_sections
 						this.rowdata.push(element.fields)
 					})
+
+					if(this.rowdata.length == 0) {
+						this.noresult = i18n.t("search.no_result")
+					}
 
 					this.succesMsg = "success"
 					this.successed = true

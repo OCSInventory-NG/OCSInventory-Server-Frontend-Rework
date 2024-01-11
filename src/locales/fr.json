@@ -314,6 +314,7 @@
     "istartswith": "commence par",
     "lt": "est inférieur à",
     "lte": "est inférieur ou égal à",
+    "no_result": "La recherche n'a retourné aucun résultat",
     "or": "OU",
     "removegroup": "Supprimer une recherche globale",
     "removequeryfromgroup": "Supprimer la recherche du groupe"
