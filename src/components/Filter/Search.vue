@@ -320,13 +320,6 @@ export default {
 
 			this.fieldopt[masterindex][index] = []
 
-			this.fieldopt[masterindex][index].push({
-				value: "",
-				text: "----",
-				fieldtype: "string",
-				disabled: true
-			})
-
 			if(component == "asset") {
 				component = "inventory"
 			}
@@ -338,13 +331,6 @@ export default {
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
-
-						this.fieldopt[masterindex][index].push({
-							value: "",
-							text: "----",
-							fieldtype: "string",
-							disabled: true
-						})
 
 						response.data.forEach(field => {
 							this.fieldopt[masterindex][index].push({
@@ -366,6 +352,9 @@ export default {
 				Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
+
+						this.fieldopt[masterindex][index] = []
+
 						Object.keys(response.data.actions.POST).forEach(field => {
 							if(!this.excludefield.includes(field) &&
 								response.data.actions.POST[field]["type"] != "field") {
