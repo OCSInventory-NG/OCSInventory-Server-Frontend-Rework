@@ -91,7 +91,7 @@
 						<b-col cols="3">
 							<b-form-group>
 								<b-form-input
-									v-if="input.fieldtype != 'select' && input.fieldtype != 'checkbox'"
+									v-if="!selectfield.includes(input.fieldtype)"
 									:id="'value'+masterindex+index"
 									v-model="input.value"
 									:type="inputype[input.fieldtype]"
@@ -109,7 +109,8 @@
 										v-else
 										:id="'value'+masterindex+index"
 										v-model="input.value"
-										:options="adminopt[masterindex][index]" 
+										:options="(input.fieldtype == 'choice') ?
+											scope : adminopt[masterindex][index]"
 										class="mb-3 form-select form-control"
 										:required="true"
 									/>
@@ -213,11 +214,13 @@ export default {
 				{ value: "asset/bases", text: i18n.t("title.assets") },
 				{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
 				{ value: "deployment/results", text: i18n.t("title.deployment") },
+				{ value: "asset/logs", text: i18n.t("title.inventory_logs") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
 				"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
-				"deployment/results": "asset"
+				"deployment/results": "results",
+				"asset/logs": "logs"
 			},
 			fieldopt: [],
 			operatoropt: {
@@ -246,6 +249,9 @@ export default {
 				],
 				"checkbox": [
 					{ value: "iexact", text: i18n.t("search.iexact") },
+				],
+				"choice": [
+					{ value: "iexact", text: i18n.t("search.iexact") },
 				]
 			},
 			linktype: {
@@ -264,7 +270,9 @@ export default {
 				"integer": "number",
 				"datetime": "datetime-local"
 			},
+			selectfield: ["select", "checkbox", "choice"],
 			excludefield: ["id", "asset", "package"],
+			scope: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -345,6 +353,9 @@ export default {
 								fieldtype: this.linktype[field.datatype]
 							})
 						})
+
+						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
+							1 : ((b.text > a.text) ? -1 : 0))
 					})
 					.catch(e => {
 						this.errorMsg = e
@@ -363,8 +374,25 @@ export default {
 									text: i18n.t(component+"."+field),
 									fieldtype: response.data.actions.POST[field]["type"]
 								})
+								if(response.data.actions.POST[field]["type"] == "choice") {
+									this.scope = []
+									response.data.actions.POST[field]["choices"].forEach(choice => {
+										this.scope.push({
+											value: choice.value,
+											text: i18n.t("inventory."+choice.value)
+										})
+									})
+
+									this.scope.sort((a,b) => (a.text > b.text) ?
+										1 : ((b.text > a.text) ? -1 : 0))
+
+									this.loadingadmin = false
+								}
 							}
 						})
+
+						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
+							1 : ((b.text > a.text) ? -1 : 0))
 
 						this.errorMsg = null
 						this.errored = false
