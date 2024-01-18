@@ -129,7 +129,7 @@ export default {
 		if(this.$route.params.type == 'assets') {
 			extendedRoute = "asset/bases/"+this.$route.params.id
 			this.type = "ASSET"
-			this.slug = "base.base"
+			this.slug = "inventory_base.inventorybase"
 			this.translationkey = "inventory."
 		}
 		if(this.$route.params.type == 'netdevice') {

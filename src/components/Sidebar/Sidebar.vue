@@ -20,6 +20,7 @@
 					:column-dividers="[
 						{ header: $t('title.general'), identifier: 'general' },
 						{ header: $t('title.network'), identifier: 'network' },
+						{ header: $t('title.tools'), identifier: 'tools' },
 					]"
 					:children-links="[
 						{ 
@@ -33,6 +34,10 @@
 						{ 
 							header: $t('title.netdevices'), link: '/inventory/netdevices', 
 							route:'Netdevice', column: 'network' 
+						},
+						{ 
+							header: $t('title.multisearch'), link: '/inventory/multisearch', 
+							route:'Multisearch', column: 'tools' 
 						},
 					]"
 					link="/inventory"

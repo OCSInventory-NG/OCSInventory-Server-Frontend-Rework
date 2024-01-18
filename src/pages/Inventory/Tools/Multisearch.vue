@@ -1,12 +1,12 @@
 <template>
 	<div 
-		id="assets" 
+		id="multisearch" 
 		class="container-xl"
 	>
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="assets"
+				page-title="multisearch"
 			/>
 			<!-- Display Datatable -->
 			<div class="page-body">
@@ -20,6 +20,14 @@
 							/>
 						</div>
 
+						<div>
+							<Search
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+
+						<hr>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
@@ -28,13 +36,18 @@
 						</div>
 
 						<div v-else>
+							<Alert 
+								v-if="noresult != null"
+								:message="noresult" 
+								variant="info"
+							/>
+
 							<Datatable
-								id="assets-datatable"
+								id="search-datatable"
 								:rowdata="rowdata"
 								:usecheckbox="false"
-								:canaccessdetails="true"
 								:rowheader="rowheader"
-								title="assets"
+								title="search"
 								translationkey="inventory."
 							/>
 						</div>
@@ -51,18 +64,21 @@ import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
 import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader' 
+import PageHeader from '@/components/Header/PageHeader'
+import Search from '@/components/Filter/Search'
 
 export default {
-	name: 'Assets',
-	components: { Loader, Datatable, Alert, PageHeader },
+	name: "Multisearch",
+	components: { Loader, Datatable, Alert, PageHeader, Search },
 	data() {
 		return {
 			errorMsg: null,
 			rowdata: [],
 			rowheader: [],
+			rowsearch: [],
 			loading: true,
 			errored: false,
+			noresult: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -87,27 +103,45 @@ export default {
 							this.rowheader.push(field)
 						}
 					})
+
 					this.errorMsg = null
 					this.errored = false
-					this.getAssets()
+
+					this.loading = false
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
 				})
 		},
-		getAssets() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+		reloadDatatable(search) {
+			this.rowsearch = search
+			
+			Axios.post(process.env.VUE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					this.rowdata = []
+					this.noresult = null
+
+					response.data.forEach(element => {
+						delete element.fields.inventory_sections
+						this.rowdata.push(element.fields)
+					})
+
+					if(this.rowdata.length == 0) {
+						this.noresult = i18n.t("search.no_result")
+					}
+
+					this.succesMsg = "success"
+					this.successed = true
 					this.errorMsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errorMsg = e.response.data.error
 					this.errored = true
+					this.succesMsg = null
+					this.successed = false
 				})
-				.finally(() => this.loading = false)
 		}
 	}
 }
