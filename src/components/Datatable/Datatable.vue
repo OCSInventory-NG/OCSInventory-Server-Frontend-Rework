@@ -94,7 +94,8 @@
 							@click="field.visible = !field.visible"
 						>
 							<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
-							<label v-else>{{ $t('generic.'+field.key) }}</label>
+							<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
+							<label v-else>{{ field.key }}</label>
 						</b-dropdown-item>
 					</b-dropdown>
 				</div>
@@ -383,9 +384,9 @@ export default {
 	data() {
 		return {
 			// Pagination parameters
-			perPage: 10,
+			perPage: 5,
 			currentPage: 1,
-			pageOptions: [10, 25, 100, 250, 500, 1000],
+			pageOptions: [5, 10, 25, 100, 250, 500, 1000],
 			totalRows: 1,
 			// Datatable datas
 			fields: [],
@@ -457,7 +458,7 @@ export default {
 
 				var array = {
 					key: data,
-					label: i18n.t(this.translationkey+data),
+					label: (i18n.te(this.translationkey+data)) ? i18n.t(this.translationkey+data) : data,
 					sortable: true,
 					visible: visible,
 				}

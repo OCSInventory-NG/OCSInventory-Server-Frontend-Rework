@@ -16,7 +16,6 @@
 					<b-button
 						v-b-toggle="'netgroup-'+groupid"
 						block
-						variant="info"
 						class="section-btn"
 					>
 						{{ groupname }}

@@ -59,7 +59,6 @@
 								>
 									<b-tab
 										:title="$t('title.accountinfo')"
-										active
 									>
 										<fieldset class="form-fieldset">
 											<Accountinfo
@@ -70,8 +69,14 @@
 											/>
 										</fieldset>
 									</b-tab>
-									<b-tab :title="$t('title.inventory')">
-										<p>I'm the second tab</p>
+									<b-tab
+										v-if="type == 'ASSET'"
+										:title="$t('title.inventory')"
+										active
+									>
+										<Inventory
+											:id="$route.params.id"
+										/>
 									</b-tab>
 									<b-tab 
 										v-if="type == 'ASSET'"
@@ -98,10 +103,11 @@ import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Accountinfo from '@/components/Accountinfo/Accountinfo'
 import ResultDetail from '@/components/Deployment/ResultDetail'
+import Inventory from '@/components/Inventory/Inventory'
 
 export default {
 	name: 'Detail',
-	components: { Loader, Alert, PageHeader, Accountinfo, ResultDetail },
+	components: { Loader, Alert, PageHeader, Accountinfo, ResultDetail, Inventory },
 	data() {
 		return {
 			errorMsg: null,
@@ -135,6 +141,7 @@ export default {
 
 		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
+				delete response.data.inventory_sections
 				this.rowdata = response.data
 				this.errorMsg = null
 				this.errored = false
