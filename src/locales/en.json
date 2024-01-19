@@ -195,6 +195,7 @@
     "osname": "OS Name",
     "osversion": "OS Version",
     "scope": "Scope",
+    "see_logs": "View agent inventory logs",
     "serial": "Serial Number",
     "srcip": "IP Address",
     "srcmac": "MAC Address",
