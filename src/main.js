@@ -39,7 +39,7 @@ import {
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple
 } from '@fortawesome/free-solid-svg-icons'
 import {
-	faSquare, faSquareCheck
+	faSquare, faSquareCheck, faFileLines
 } from '@fortawesome/free-regular-svg-icons'
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
@@ -47,7 +47,7 @@ library.add({
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-	faBars, faChartSimple
+	faBars, faChartSimple, faFileLines
 })
 
 Vue.config.productionTip = false
