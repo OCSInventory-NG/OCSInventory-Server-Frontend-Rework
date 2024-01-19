@@ -13,6 +13,7 @@ import Assets from '@/pages/Inventory/Asset/Asset'
 import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover'
 import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
 import Multisearch from '@/pages/Inventory/Tools/Multisearch'
+import InventoryLog from '@/pages/Inventory/Tools/InventoryLog'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -117,6 +118,11 @@ export default new Router({
 			path: '/inventory/netdevices/:id?',
 			name: 'Netdevice',
 			component: Netdevice
+		},
+		{
+			path: '/inventory/inventory_logs/:id?',
+			name: 'InventoryLog',
+			component: InventoryLog
 		},
 		{
 			path: '/inventory/:type/:id',
