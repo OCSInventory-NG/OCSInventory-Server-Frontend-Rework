@@ -54,14 +54,14 @@ export default {
 
 				if(routeExists) {
 					breadcrumb.push({
-						text: (i18n.te("title." + item)) ? i18n.t("title." + item) : item,
+						text: (i18n.te("title." + item.replace(/ /g,"_"))) ? i18n.t("title." + item.replace(/ /g,"_")) : item,
 						to: path,
 						append: true,
 						replace: true
 					})
 				} else {
 					breadcrumb.push({
-						text: (i18n.te("title." + item)) ? i18n.t("title." + item) : item,
+						text: (i18n.te("title." + item.replace(/ /g,"_"))) ? i18n.t("title." + item.replace(/ /g,"_")) : item,
 						disabled: true
 					})
 				}
