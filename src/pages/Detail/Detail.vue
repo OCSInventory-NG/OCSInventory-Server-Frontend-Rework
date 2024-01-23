@@ -34,6 +34,21 @@
 							<Loader />
 						</div>
 						<div v-else>
+							<div
+								v-if="type == 'ASSET'"
+								align="right"
+							>
+								<router-link 
+									:to="'/inventory/inventory_logs/'+$route.params.id"
+									:title="$t('inventory.see_logs')"
+									class="btn"
+								>
+									<font-awesome-icon 
+										:icon="['far', 'file-lines']"
+									/>
+								</router-link>
+							</div>
+
 							<div class="hr-text">
 								Informations
 							</div>
@@ -118,6 +133,7 @@ export default {
 			type: null,
 			slug: null,
 			translationkey: null,
+			id: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -131,6 +147,7 @@ export default {
 			this.type = "ASSET"
 			this.slug = "inventory_base.inventorybase"
 			this.translationkey = "inventory."
+			if(this.$route.params.id) this.id = this.$route.params.id
 		}
 		if(this.$route.params.type == 'netdevice') {
 			extendedRoute = "netdevices/"+this.$route.params.id

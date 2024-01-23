@@ -39,6 +39,10 @@
 							header: $t('title.multisearch'), link: '/inventory/multisearch', 
 							route:'Multisearch', column: 'tools' 
 						},
+						{ 
+							header: $t('title.inventory_logs'), link: '/inventory/inventory_logs', 
+							route:'InventoryLog', column: 'tools' 
+						},
 					]"
 					link="/inventory"
 					icon-name="desktop"

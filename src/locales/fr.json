@@ -195,6 +195,7 @@
     "osname": "Nom OS",
     "osversion": "Version OS",
     "scope": "Évènement",
+    "see_logs": "Voir les logs d'inventaire de l'agent",
     "serial": "Numéro de série",
     "srcip": "Adresse IP",
     "srcmac": "Adresse MAC",
