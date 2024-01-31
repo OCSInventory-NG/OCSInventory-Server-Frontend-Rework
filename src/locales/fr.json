@@ -1,6 +1,6 @@
 {
   "title": {
-    "accountinfo": "Donnée administrative",
+    "accountinfo": "Données administratives",
     "accountinfo/config": "Données administratives",
     "accountinfo/data": "Donnée administrative",
     "assets": "Actifs",
@@ -29,12 +29,13 @@
     "network": "Réseaux",
     "ocsreports": "OCS Inventory",
     "packages": "Paquets",
-    "report": "Rapport",
+    "report": "Rapports",
     "result": "Résultats",
+    "rules": "Règles",
     "snmp": "Snmp",
     "system": "Système",
     "template": "Modèle",
-    "templates": "Modèle",
+    "templates": "Modèles",
     "tools": "Outils",
     "usermanagement": "Gestion des utilisateurs",
     "user": "Utilisateur",
