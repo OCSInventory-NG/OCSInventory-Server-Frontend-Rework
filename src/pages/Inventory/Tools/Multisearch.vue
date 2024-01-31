@@ -47,7 +47,8 @@
 								:rowdata="rowdata"
 								:usecheckbox="false"
 								:rowheader="rowheader"
-								title="search"
+								:canaccessdetails="true"
+								title="assets"
 								translationkey="inventory."
 							/>
 						</div>
@@ -124,6 +125,7 @@ export default {
 
 					response.data.forEach(element => {
 						delete element.fields.inventory_sections
+						element.fields["id"] = element.pk
 						this.rowdata.push(element.fields)
 					})
 
