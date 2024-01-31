@@ -314,6 +314,16 @@
     "view_tokenproxy": "Peut voir les tokens proxy",
     "view_user": "Peut voir les utilisateurs"
   },
+  "rule": {
+    "addrule": "Ajouter une règle",
+    "description": "Nom/Description",
+    "editrule": "Éditer la règle",
+    "enabled": "Active",
+    "inventory_received": "Réception de l'inventaire base",
+    "netdevice_received": "Réception de l'inventaire équipement réseau",
+    "trigger": "Déclencheur",
+    "user_login": "Connexion utilisateur"
+  },
   "scheduler": {
     "active": "Active",
     "addscheduler": "Ajouter une action automatique",

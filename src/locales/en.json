@@ -302,6 +302,16 @@
     "view_tokenproxy": "Can view token proxies",
     "view_user": "Can view users"
   },
+  "rule": {
+    "addrule": "Add a rule",
+    "description": "Name/Description",
+    "editrule": "Edit the rule",
+    "enabled": "Enabled",
+    "inventory_received": "Base inventory received",
+    "netdevice_received": "Network equipment inventory received",
+    "trigger": "Trigger",
+    "user_login": "User login"
+  },
   "scheduler": {
     "active": "Active",
     "addscheduler": "Add an automatic action",
