@@ -26,6 +26,7 @@ import NetworkGroup from '@/pages/Configuration/NetworkGroup/NetworkGroup'
 import Authentication from '@/pages/Configuration/Authentication/Authentication'
 import AutomaticAction from '@/pages/Configuration/AutomaticAction/AutomaticAction'
 import Rule from '@/pages/Configuration/Rule/Rule'
+import EditRule from '@/pages/Configuration/Rule/EditRule'
 // Detail
 import Detail from '@/pages/Detail/Detail'
 // Deployment
@@ -109,6 +110,12 @@ export default new Router({
 			path: '/configurations/rules',
 			name: 'Rule',
 			component: Rule
+		},
+		{
+			path: '/configurations/rules/:id',
+			name: 'EditRule',
+			component: EditRule,
+			props: true
 		},
 		{
 			path: '/inventory/assets',
