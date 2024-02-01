@@ -61,7 +61,7 @@
 								:rowheader="rowheader"
 								:candelete="candelete"
 								:canedit="canedit"
-								:canviewaction="canviewaction"
+								:canviewruleaction="canviewaction"
 								editcomponent="EditRuleModal"
 								title="automation/rule"
 								translationkey="rule."

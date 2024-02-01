@@ -271,6 +271,16 @@
 								/>
 							</button>
 							<button 
+								v-if="canviewruleaction"
+								:title="$t('rule.managerule')"
+								class="btn btn-ghost-dark"
+								@click="goToEditRule(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'gear']"
+								/>
+							</button>
+							<button 
 								v-if="canviewhistory"
 								:title="$t('deployment.viewhistory')"
 								class="btn btn-ghost-info"
@@ -381,7 +391,8 @@ export default {
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
 		translationkey: { type: String, default: '' },
-		canviewhistory: { type: Boolean, default: false }
+		canviewhistory: { type: Boolean, default: false },
+		canviewruleaction: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -530,6 +541,9 @@ export default {
 		},
 		goToPackageHistory(id){
 			this.$router.push('/deployment/history/'+id); 
+		},
+		goToEditRule(id){
+			this.$router.push('/configurations/rules/'+id); 
 		},
 	}
 }
