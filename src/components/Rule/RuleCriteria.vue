@@ -1,5 +1,20 @@
 <template lang="">
 	<div id="rule-criteria">
+		<!-- Display success box message -->
+		<section v-if="successed">
+			<Alert 
+				:message="$t('message.success_saved')" 
+				variant="success"
+			/>
+		</section>
+
+		<!-- Display error box message -->
+		<section v-if="errored && errorCode == null">
+			<Alert 
+				:message="errorMsg.message" 
+				variant="danger"
+			/>
+		</section>
 		<div 
 			v-if="loading"
 			class="ocs-loader"
@@ -83,7 +98,7 @@
 									/>
 								</b-form-group>
 							</b-col>
-							<b-col cols="2">
+							<b-col cols="3">
 								<b-form-group>
 									<b-form-select
 										id="operator"
@@ -100,6 +115,7 @@
 										id="value"
 										v-model="input.value"
 										class="mb-3"
+										:disabled="(disabledvalue.includes(input.operator)) ? true : false"
 									/>
 								</b-form-group>
 							</b-col>
@@ -174,11 +190,13 @@
 import Axios from 'axios'
 import i18n from '@/i18n'
 import Loader from '@/components/Loader/Loader'
+import Alert from '@/components/Alert/Alert'
 
 export default {
 	name: "RuleCriteria",
-	components: { Loader },
+	components: { Loader, Alert },
 	props: {
+		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
 		logic: { type: Object, default: null }
 	},
@@ -190,6 +208,9 @@ export default {
 			errored: false,
 			successed: false,
 			succesMsg: null,
+			logicupdate: {
+				logic: {}
+			},
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -242,7 +263,14 @@ export default {
 						value: null,
 					}
 				]
-			]
+			],
+			links: [ "and", "or" ],
+			disabledvalue: ["!!", "!"]
+		}
+	},
+	watch: {
+		successed: function() {
+			setTimeout(() => this.successed = false, 5000)
 		}
 	},
 	mounted() {
@@ -272,6 +300,65 @@ export default {
 				.finally(() => { this.loading = false })
 		},
 		getLogicRow() {
+			if(this.logic.lenth > 0) {
+				this.datavalues = []
+			}
+
+			var masterindex = 0
+
+			Object.keys(this.logic).forEach(key => {
+				if(!this.links.includes(key)) {
+					this.datavalues = [
+						[
+							{
+								field: this.logic[key][0].var,
+								operator: key,
+								value: this.logic[key][1] ?? null
+							}
+						]
+					]
+				} else if(key == "and") {
+					this.datavalues[masterindex] = []
+					Object.keys(this.logic[key]).forEach(and => {
+						Object.keys(this.logic[key][and]).forEach(operator => {
+							this.datavalues[masterindex].push({
+								field: this.logic[key][and][operator][0].var,
+								operator: operator,
+								value: this.logic[key][and][operator][1] ?? null
+							})
+						})
+					})
+				} else if(key == "or") {
+					Object.keys(this.logic[key]).forEach(or => {
+						this.datavalues[masterindex] = []
+
+						Object.keys(this.logic[key][or]).forEach(key2 => {
+							if(key2 == "and") {
+								Object.keys(this.logic[key][or][key2]).forEach(and => {
+									Object.keys(this.logic[key][or][key2][and]).forEach(operator => {
+										this.datavalues[masterindex].push({
+											field: this.logic[key][or][key2][and][operator][0].var,
+											operator: operator,
+											value: this.logic[key][or][key2][and][operator][1] ?? null
+										})
+									})
+								})
+							} else {
+								this.datavalues[masterindex].push({
+									field: this.logic[key][or][key2][0].var,
+									operator: key2,
+									value: this.logic[key][or][key2][1] ?? null
+								})
+							}
+
+							masterindex++
+						})
+					})
+				}
+			})
+
+			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
+
 			this.getModelField()
 		},
 		addAndCondition(masterindex, index, fieldType) {
@@ -303,8 +390,106 @@ export default {
 		removeOrCondition(masterindex, fieldType) {
 			fieldType.splice(masterindex, 1)
 		},
-		onSubmit() {
+		pushInLogicComplexe(object, key, logics) {
+			if(this.disabledvalue.includes(logics[key].operator)) {
+				object.push({
+					[logics[key].operator]: [
+						{ var: logics[key].field }
+					]
+				})
+			} else if(logics[key].operator == "in") {
+				object.push({
+					[logics[key].operator]: [
+						logics[key].value,
+						{ var: logics[key].field }
+					]
+				})
+			} else {
+				object.push({
+					[logics[key].operator]: [
+						{ var: logics[key].field },
+						logics[key].value
+					]
+				})
+			}
 
+			return object
+		},
+		pushInLogicSimple(object, key, logics) {
+			if(this.disabledvalue.includes(logics[key].operator)) {
+				object[logics[key].operator] = [
+					{ var: logics[key].field }
+				]
+			} else if(logics[key].operator == "in") {
+				object[logics[key].operator] = [
+					logics[key].value,
+					{ var: logics[key].field }
+				]
+			} else {
+				object[logics[key].operator] = [
+					{ var: logics[key].field },
+					logics[key].value
+				]
+			}
+
+			return object
+		},
+		onSubmit(event) {
+			event.preventDefault()
+			var logicTmp = {}
+			var firstKey = null
+
+			if(this.datavalues.length > 1) {
+				logicTmp.or = []
+				firstKey = "or"
+			}
+
+			this.datavalues.forEach(logics => {
+				if(logics.length > 1) {
+					if(firstKey == null) {
+						logicTmp.and = []
+						firstKey = "and"
+					}
+
+					var tmpAnd = {}
+					tmpAnd.and = []
+
+					Object.keys(logics).forEach(key => {
+						if(firstKey == "and") {
+							logicTmp.and = this.pushInLogicComplexe(logicTmp.and, key, logics)
+						} else {
+							tmpAnd.and = this.pushInLogicComplexe(tmpAnd.and, key, logics)
+						}
+					})
+					
+					if(tmpAnd.and.length > 0) {
+						logicTmp.or.push(tmpAnd)
+					}
+				} else if(firstKey == null) {
+					logicTmp = this.pushInLogicSimple(logicTmp, 0, logics)
+				} else {
+					Object.keys(logics).forEach(key => {
+						logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
+					})
+				}
+			})
+
+			this.logicupdate.logic = logicTmp
+
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
+				{ headers: this.header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
 		}
 	}
 }
