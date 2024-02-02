@@ -117,7 +117,7 @@ import Cas from '@/components/Authentication/Cas'
 import Oidc from '@/components/Authentication/Oidc'
 
 export default {
-	name: 'Assets',
+	name: 'Authentication',
 	components: { Loader, Alert, PageHeader, Ldap, Cas, Oidc },
 	data() {
 		return {
