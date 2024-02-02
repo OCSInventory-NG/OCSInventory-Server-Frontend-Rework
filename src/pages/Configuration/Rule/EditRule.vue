@@ -52,6 +52,7 @@
 								>
 									<RuleCriteria 
 										v-if="rulemenu.value == 'logic'"
+										:id="id"
 										:trigger="trigger"
 										:logic="logic"
 									/>
