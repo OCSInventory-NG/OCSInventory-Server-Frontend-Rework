@@ -28,7 +28,10 @@
 					</section>
 
 					<section v-else>
-						<div v-if="loading">
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
 							<Loader />
 						</div>
 
@@ -40,6 +43,16 @@
 									variant="danger"
 								/>
 							</div>
+
+							<b-row class="text-center">
+								<h2>{{ rule.description }}</h2>
+							</b-row>
+							<b-row class="text-center">
+								<b-col>
+									<p>{{ $t('rule.trigger') }} : {{ $t("rule." + rule.trigger) }}</p>
+									<p>{{ $t('rule.enabled') }} : {{ $t("generic." + rule.enabled) }}</p>
+								</b-col>
+							</b-row>
 
 							<b-tabs 
 								content-class="mt-3"
@@ -55,6 +68,12 @@
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
+									/>
+									<RuleAction
+										v-if="rulemenu.value == 'actions'"
+										:id="id"
+										:trigger="trigger"
+										:actions="actions"
 									/>
 								</b-tab>
 							</b-tabs>
@@ -73,10 +92,11 @@ import Loader from '@/components/Loader/Loader'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import RuleCriteria from '@/components/Rule/RuleCriteria'
+import RuleAction from '@/components/Rule/RuleAction'
 
 export default {
 	name: "EditRule",
-	components: { Loader, Alert, PageHeader, RuleCriteria },
+	components: { Loader, Alert, PageHeader, RuleCriteria, RuleAction },
 	props: {
 		id: { type: String, required: true },
 	},
@@ -90,6 +110,8 @@ export default {
 			succesMsg: null,
 			trigger: null,
 			logic: {},
+			actions: [],
+			rule: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -112,8 +134,10 @@ export default {
 		getRuleInfo() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
+					this.rule = response.data
 					this.trigger = response.data.trigger
 					this.logic = response.data.logic
+					this.actions = response.data.actions
 					this.errorMsg = null
 					this.errored = false
 					this.loading = false
