@@ -57,6 +57,30 @@
 								/>
 							</b-form-group>
 						</b-col>
+						<b-col v-if="input.object == 'inventory_sections'">
+							<b-form-select
+								:id="'template'+masterindex+index"
+								v-model="input.template" 
+								:options="(loadingtemplate || templateopt[masterindex] == undefined) ? 
+									[] : templateopt[masterindex][index]" 
+								class="mb-3 form-select form-control"
+								:required="true"
+								:disabled="(loadingtemplate) ? true : false"
+								@input="getSections(input.template, masterindex, index)"
+							/>
+						</b-col>
+						<b-col v-if="input.object == 'inventory_sections'">
+							<b-form-select
+								:id="'section'+masterindex+index"
+								v-model="input.section" 
+								:options="(loadingsection || sectionopt[masterindex] == undefined) ? 
+									[] : sectionopt[masterindex][index]" 
+								class="mb-3 form-select form-control"
+								:required="true"
+								:disabled="(loadingsection) ? true : false"
+								@input="getFields(input.section, masterindex, index, true)"
+							/>
+						</b-col>
 						<b-col>
 							<b-form-group>
 								<b-form-select
@@ -197,6 +221,8 @@ export default {
 			successed: false,
 			loading: true,
 			loadingadmin: true,
+			loadingtemplate: true,
+			loadingsection: true,
 			datavalues: [
 				[
 					{
@@ -215,12 +241,14 @@ export default {
 				{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
 				{ value: "deployment/results", text: i18n.t("title.deployment") },
 				{ value: "asset/logs", text: i18n.t("title.inventory_logs") },
+				{ value: "templates", text: i18n.t("title.inventory") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
 				"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
 				"deployment/results": "results",
-				"asset/logs": "logs"
+				"asset/logs": "logs",
+				"templates": "inventory_sections"
 			},
 			fieldopt: [],
 			operatoropt: {
@@ -265,6 +293,8 @@ export default {
 				{ value: "OR", text: i18n.t("search.or") }
 			],
 			adminopt: [],
+			templateopt: [],
+			sectionopt: [],
 			inputype: {
 				"string": "text",
 				"integer": "number",
@@ -280,6 +310,8 @@ export default {
 		}
 	},
 	mounted() {
+		this.routeopt.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+
 		this.datavalues = JSON.parse(localStorage.getItem('multisearch')) ?? [
 			[
 				{
@@ -297,6 +329,14 @@ export default {
 		Object.keys(this.datavalues).forEach(index => {
 			Object.keys(this.datavalues[index]).forEach(search => {
 				this.getFields(this.datavalues[index][search].route, index, search)
+				if(
+					this.datavalues[index][search].route == "templates"
+					&& this.datavalues[index][search].template != null
+					&& this.datavalues[index][search].section != null
+				) {
+					this.getSections(this.datavalues[index][search].template, index, search)
+					this.getFields(this.datavalues[index][search].section, index, search, true)
+				}
 				this.setFieldType(this.datavalues[index][search], index, search)
 			})
 		})
@@ -311,8 +351,17 @@ export default {
 
 			this.$emit('reloadDatatable', this.datavalues)
 		},
-		getFields(route, masterindex, index) {
-			var component = route.split("/")[0]
+		getFields(route, masterindex, index, section = false) {
+
+			if(!section) {
+				var component = route.split("/")[0]
+
+				if(component == "asset") {
+					component = "inventory"
+				}
+
+				this.datavalues[masterindex][index].object = this.obj[route]
+			}
 
 			if(!Array.isArray(this.fieldopt[masterindex])) {
 				this.fieldopt[masterindex] = []
@@ -320,17 +369,14 @@ export default {
 
 			this.fieldopt[masterindex][index] = []
 
-			if(component == "asset") {
-				component = "inventory"
-			}
-
-			this.datavalues[masterindex][index].object = this.obj[route]
-
 			if(route == "accountinfo/config?datatarget=ASSET") {
 				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
+
+						delete this.datavalues[masterindex][index].template
+						delete this.datavalues[masterindex][index].section
 
 						response.data.forEach(field => {
 							this.fieldopt[masterindex][index].push({
@@ -348,12 +394,64 @@ export default {
 						this.errored = true
 					})
 					.finally(() => this.loading = false)
+			} else if(route == "templates") {
+				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+					.then(response => {
+						this.loadingtemplate = true
+						if(!Array.isArray(this.templateopt[masterindex])) {
+							this.templateopt[masterindex] = []
+						}
+
+						this.templateopt[masterindex][index] = []
+
+						response.data.forEach(field => {
+							this.templateopt[masterindex][index].push({
+								value: field.id,
+								text: field.name
+							})
+						})
+
+						this.templateopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
+							1 : ((b.text > a.text) ? -1 : 0))
+
+						this.loadingtemplate = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+					})
+			} else if (section) {
+				Axios.get(process.env.VUE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
+					.then(response => {
+						this.loading = true
+
+						this.fieldopt[masterindex][index] = []
+
+						response.data.forEach(field => {
+							this.fieldopt[masterindex][index].push({
+								value: field.id,
+								text: field.name,
+								fieldtype: "string"
+							})
+						})
+
+						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
+							1 : ((b.text > a.text) ? -1 : 0))
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+					})
+					.finally(() => this.loading = false)
 			} else {
 				Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
 
 						this.fieldopt[masterindex][index] = []
+
+						delete this.datavalues[masterindex][index].template
+						delete this.datavalues[masterindex][index].section
 
 						Object.keys(response.data.actions.POST).forEach(field => {
 							if(!this.excludefield.includes(field) &&
@@ -393,6 +491,32 @@ export default {
 					.finally(() => this.loading = false)
 			}
 			
+		},
+		getSections(templateId, masterindex, index) {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+				.then(response => {
+					this.loadingsection = true
+					if(!Array.isArray(this.sectionopt[masterindex])) {
+						this.sectionopt[masterindex] = []
+					}
+
+					this.sectionopt[masterindex][index] = []
+
+					response.data.forEach(field => {
+						this.sectionopt[masterindex][index].push({
+							value: field.id,
+							text: field.name
+						})
+					})
+
+					this.sectionopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
+						1 : ((b.text > a.text) ? -1 : 0))
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+				.finally(() => this.loadingsection = false)
 		},
 		addField(masterindex, index, fieldType) {
 			fieldType[masterindex].push(
@@ -453,12 +577,6 @@ export default {
 						}
 
 						this.adminopt[masterindex][index] = []
-
-						this.adminopt[masterindex][index].push({
-							value: "",
-							text: "----",
-							disabled: true
-						})
 
 						response.data.forEach(element => {
 							this.adminopt[masterindex][index].push({
