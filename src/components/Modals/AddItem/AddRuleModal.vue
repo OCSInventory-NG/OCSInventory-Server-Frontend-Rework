@@ -189,7 +189,8 @@ export default {
 				description: null,
 				trigger: 'inventory_received',
 				enabled: false,
-				logic: {}
+				logic: {},
+				actions: []
 			},
 			rowdata: [],
 			rowheader: [],
