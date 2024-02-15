@@ -252,6 +252,16 @@
 								/>
 							</button>
 							<button 
+								v-if="canviewruleaction"
+								:title="$t('rule.managerule')"
+								class="btn btn-ghost-dark"
+								@click="goToEditRule(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'gear']"
+								/>
+							</button>
+							<button 
 								v-if="canviewhistory"
 								:title="$t('deployment.viewhistory')"
 								class="btn btn-ghost-info"
@@ -318,6 +328,7 @@ import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
 import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
 import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
 import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
+import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -334,6 +345,7 @@ export default {
 		EditPackageModal,
 		EditActionListModal,
 		EditAutomaticActionModal,
+		EditRuleModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -359,7 +371,8 @@ export default {
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
 		translationkey: { type: String, default: '' },
-		canviewhistory: { type: Boolean, default: false }
+		canviewhistory: { type: Boolean, default: false },
+		canviewruleaction: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -508,6 +521,9 @@ export default {
 		},
 		goToPackageHistory(id){
 			this.$router.push('/deployment/history/'+id); 
+		},
+		goToEditRule(id){
+			this.$router.push('/configurations/rules/'+id); 
 		},
 	}
 }

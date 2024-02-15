@@ -125,6 +125,10 @@
 							header: $t('title.netgroup'), link: '/configurations/netgroup', 
 							route:'NetworkGroup', column: 'network' 
 						},
+						{ 
+							header: $t('title.rules'), link: '/configurations/rules', 
+							route:'Rule', column: 'inventory' 
+						},
 					]"
 					link="/configurations"
 					icon-name="wrench"
