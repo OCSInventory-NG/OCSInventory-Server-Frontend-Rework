@@ -236,11 +236,11 @@ export default {
 				},
 				"user_login": {
 					route: "users/",
-					key: "user"
+					key: "user."
 				},
 				"netdevice_received": {
 					route: "netdevices/",
-					key: "network"
+					key: "network."
 				}
 			},
 			operatortargets: {
@@ -311,9 +311,12 @@ export default {
 					this.datavalues = [
 						[
 							{
-								field: this.logic[key][0].var,
+								field: this.logic[key][0].var 
+									?? this.logic[key][1].var,
 								operator: key,
-								value: this.logic[key][1] ?? null
+								value: (this.logic[key][1] && this.logic[key][1].var) ? 
+									this.logic[key][0] : ((this.logic[key][1]) ?
+										this.logic[key][1] : null)
 							}
 						]
 					]
@@ -322,9 +325,12 @@ export default {
 					Object.keys(this.logic[key]).forEach(and => {
 						Object.keys(this.logic[key][and]).forEach(operator => {
 							this.datavalues[masterindex].push({
-								field: this.logic[key][and][operator][0].var,
+								field: this.logic[key][and][operator][0].var
+									?? this.logic[key][and][operator][1].var,
 								operator: operator,
-								value: this.logic[key][and][operator][1] ?? null
+								value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var) ? 
+									this.logic[key][and][operator][0]  : ((this.logic[key][and][operator][1]) ?
+										this.logic[key][and][operator][1] : null)
 							})
 						})
 					})
@@ -337,17 +343,25 @@ export default {
 								Object.keys(this.logic[key][or][key2]).forEach(and => {
 									Object.keys(this.logic[key][or][key2][and]).forEach(operator => {
 										this.datavalues[masterindex].push({
-											field: this.logic[key][or][key2][and][operator][0].var,
+											field: this.logic[key][or][key2][and][operator][0].var
+												?? this.logic[key][or][key2][and][operator][1].var,
 											operator: operator,
-											value: this.logic[key][or][key2][and][operator][1] ?? null
+											value: (this.logic[key][or][key2][and][operator][1] 
+											&& this.logic[key][or][key2][and][operator][1].var) ? 
+												this.logic[key][or][key2][and][operator][0]  : 
+												((this.logic[key][or][key2][and][operator][1]) ?
+													this.logic[key][or][key2][and][operator][1] : null)
 										})
 									})
 								})
 							} else {
 								this.datavalues[masterindex].push({
-									field: this.logic[key][or][key2][0].var,
+									field: this.logic[key][or][key2][0].var
+										?? this.logic[key][or][key2][1].var,
 									operator: key2,
-									value: this.logic[key][or][key2][1] ?? null
+									value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var) ? 
+										this.logic[key][or][key2][0] : ((this.logic[key][or][key2][1]) ?
+											this.logic[key][or][key2][1] : null)
 								})
 							}
 
@@ -483,6 +497,7 @@ export default {
 					this.successed = true
 					this.errorMsg = null
 					this.errored = false
+					this.$emit('reloadRule')
 				})
 				.catch(e => {
 					this.errorMsg = e.message

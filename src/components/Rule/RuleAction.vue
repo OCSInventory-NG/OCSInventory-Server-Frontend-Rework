@@ -159,6 +159,7 @@ export default {
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
+		triggers: { type: Array, default: null },
 		actions: { type: Array, default: null }
 	},
 	data() {
@@ -202,7 +203,7 @@ export default {
 					}
 				},
 				"user_login": {
-					"auth.User": {
+					"auth.user": {
 						route: "users/",
 						key: "user"
 					},
@@ -224,7 +225,7 @@ export default {
 			},
 			defaultrouteopt: {
 				"inventory_received": "inventory_base.inventorybase",
-				"user_login": "auth.User",
+				"user_login": "auth.user",
 				"netdevice_received": "accountinfo.accountinfoconfig",
 			},
 			linktype: {
@@ -242,7 +243,11 @@ export default {
 		}
 	},
 	mounted() {
-		this.getActionTrigger()
+		for (const trigger of this.triggers) {
+			if(trigger.trigger == this.trigger) {
+				this.actionstrigger = trigger.action_targets
+			}
+		}
 
 		if(this.actions.length == 0) {
 			this.datavalues = [
@@ -302,14 +307,10 @@ export default {
 		},
 		getFields(index, model) {
 			var route = this.routetargets[this.trigger][model].route
-			var component = route.split("/")[0]
+			var component = this.routetargets[this.trigger][model].key
 
 			if(!Array.isArray(this.fieldopt[index])) {
 				this.fieldopt[index] = []
-			}
-
-			if(component == "asset") {
-				component = "inventory"
 			}
 
 			if(model == "accountinfo.accountinfoconfig") {
@@ -390,7 +391,13 @@ export default {
 			})
 
 			if(input.fieldtype == "field") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"templates", { headers: this.header })
+				var route = input.field
+
+				if(route == "template") {
+					route = "templates"
+				}
+
+				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
@@ -432,8 +439,15 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault();
+
+			var actionremove = []
+			var actionupdateids = []
 			
 			this.datavalues.forEach(action => {
+				if(action.id != null) {
+					actionupdateids.push(action.id)
+				}
+				
 				if(action.model == "accountinfo.accountinfoconfig") {
 					if(action.fieldtype == "checkbox") {
 						this.actionupdate.push({
@@ -483,6 +497,12 @@ export default {
 				}
 			})
 
+			for (const action of this.actions) {
+				if(!actionupdateids.includes(action.id)) {
+					actionremove.push(action.id)
+				}
+			}
+
 			this.actionupdate.forEach(action => {
 				if(action.id != null) {
 					Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
@@ -501,6 +521,8 @@ export default {
 						})
 				} else {
 					delete action.id
+					delete action.object_id
+					delete action.object_slug
 
 					Axios.post(process.env.VUE_APP_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
@@ -518,6 +540,25 @@ export default {
 						})
 				}
 			})
+
+			actionremove.forEach(id => {
+				Axios.delete(process.env.VUE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			})
+
+
+			this.$emit('reloadRule')
 		}
 	}
 }
