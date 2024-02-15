@@ -33,21 +33,184 @@
 						>
 							<Loader />
 						</div>
-						<Datatable
-							v-if="!loading && canview"
-							id="generalDatatable"
-							:rowdata="rowdata"
-							:rowheader="rowheader"
-							:candelete="false"
-							:canedit="false"
-							:usecheckbox="false"
-							:canexport="false"
-							:caneditconfig="caneditconfig"
-							editcomponent="EditConfigModal"
-							title="config"
-							translationkey="configuration."
-							@reloadDatatable="reloadDatatable"
-						/>
+						<b-form
+							v-else
+							@submit="onSubmit"
+						>
+							<b-tabs 
+								content-class="mt-3"
+								fill
+							>
+								<b-tab
+									v-for="config in configs"
+									:key="config.name"
+									:title="$t('configuration.' + config.name)"
+								>
+									<b-list-group 
+										v-for="parameter in config.value"
+										:key="parameter.name"
+										flush
+									>
+										<div v-if="parameter.length">
+											<div
+												v-for="subparameter in parameter"
+												:key="subparameter.name"
+											>
+												<b-list-group-item 
+													class="d-flex justify-content-between align-items-center"
+												>
+													<div>
+														<h4 class="mb-1">
+															{{ $t("configuration."+subparameter.name) }}
+														</h4>
+														<p class="mb-1">
+															{{ $t("configuration."+subparameter.description) }}
+														</p>
+													</div>
+													<div 
+														v-if="subparameter.type == 'switch'"
+													>
+														<label class="form-check form-switch">
+															<input 
+																:id="subparameter.name"
+																v-model="subparameter.value"
+																class="form-check-input"
+																type="checkbox"
+																:disabled="!canedit"
+															>
+														</label>
+													</div>
+													<div 
+														v-if="subparameter.type in inputtype"
+														class="ocs-config-form"
+													>
+														<b-input-group>
+															<template 
+																v-if="subparameter.unit != ''"
+																#append
+															>
+																<b-input-group-text class="form-control">
+																	{{ $t("configuration."+subparameter.unit) }}
+																</b-input-group-text>
+															</template>
+															<b-form-input
+																:id="subparameter.name"
+																v-model="subparameter.value"
+																:type="inputtype[subparameter.type]"
+																:disabled="!canedit"
+															/>
+														</b-input-group>
+													</div>
+													<div 
+														v-if="subparameter.type == 'select'"
+														class="ocs-config-form"
+													>
+														<b-form-select 
+															v-model="subparameter.value" 
+															class="form-select mb-3"
+														>
+															<b-form-select-option value="">
+																{{ $t("configuration.none") }}
+															</b-form-select-option>
+															<b-form-select-option 
+																v-for="option in subparameter.options"
+																:key="option"
+																:value="option"
+															>
+																{{ $t("configuration."+option) }}
+															</b-form-select-option>
+														</b-form-select>
+													</div>
+												</b-list-group-item>
+											</div>
+										</div>
+										<b-list-group-item 
+											v-else
+											class="d-flex justify-content-between align-items-center"
+										>
+											<div>
+												<h4 class="mb-1">
+													{{ $t("configuration."+parameter.name) }}
+												</h4>
+												<p class="mb-1">
+													{{ $t("configuration."+parameter.description) }}
+												</p>
+											</div>
+											<div 
+												v-if="parameter.type == 'switch'"
+											>
+												<label class="form-check form-switch">
+													<input 
+														:id="parameter.name"
+														v-model="parameter.value"
+														class="form-check-input"
+														type="checkbox"
+														:disabled="!canedit"
+													>
+												</label>
+											</div>
+											<div 
+												v-if="parameter.type in inputtype"
+												class="ocs-config-form"
+											>
+												<b-input-group>
+													<template 
+														v-if="parameter.unit != ''"
+														#append
+													>
+														<b-input-group-text class="form-control">
+															{{ $t("configuration."+parameter.unit) }}
+														</b-input-group-text>
+													</template>
+													<b-form-input
+														:id="parameter.name"
+														v-model="parameter.value"
+														:type="inputtype[parameter.type]"
+														:disabled="!canedit"
+													/>
+												</b-input-group>
+											</div>
+											<div 
+												v-if="parameter.type == 'select'"
+												class="ocs-config-form"
+											>
+												<b-form-select 
+													v-model="parameter.value" 
+													class="form-select mb-3"
+												>
+													<b-form-select-option value="">
+														{{ $t("configuration.none") }}
+													</b-form-select-option>
+													<b-form-select-option 
+														v-for="option in parameter.options"
+														:key="option"
+														:value="option"
+													>
+														{{ $t("configuration."+option) }}
+													</b-form-select-option>
+												</b-form-select>
+											</div>
+										</b-list-group-item>
+									</b-list-group>
+								</b-tab>
+							</b-tabs>
+							<b-row>
+								<b-col align-self="start" />
+								<b-col 
+									align-self="center"
+									align="center"
+									class="multisearch-btns"
+								>
+									<b-button 
+										type="submit"
+										variant="success"
+									>
+										{{ $t('generic.save') }}
+									</b-button>
+								</b-col>
+								<b-col align-self="end" />
+							</b-row>
+						</b-form>
 					</div>
 				</div>
 			</div>
@@ -59,27 +222,29 @@
 import Axios from 'axios'
 import i18n from '../../../i18n'
 import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 
 export default {
 	name: 'General',
-	components: { Datatable, Alert, Loader, PageHeader },
+	components: { Alert, Loader, PageHeader },
 	data() {
 		return {
-			rowdata: [],
-			rowheader: [],
+			configs: [],
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
-			caneditconfig: false,
+			canedit: false,
 			canview: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			},
+			inputtype: {
+				"number input": "number",
+				"text input": "text"
 			}
 		}
 	},
@@ -92,43 +257,20 @@ export default {
 		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
-				this.caneditconfig = true
+				this.canedit = true
 			}
-			this.getHeader()
+			this.getConfig()
 		} else {
 			this.errorMsg = i18n.t("message.dont_have_right_to_see")
 			this.errored = true
 		}	
 	},
 	methods: {
-		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"config/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errorMsg = null
-					this.errored = false
-					this.getConfig()
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-				})
-		},
 		// Get all config
 		getConfig() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
-					response.data.forEach(element => {
-						var tmpArray = [];
-						tmpArray = {
-							name: element.name,
-							description: i18n.t('configuration.'+element.name),
-							value: element.value
-						}
-						this.rowdata.push(tmpArray)
-					});
+					this.configs = response.data
 					this.loading = false
 				})
 				.catch(e => {
@@ -137,34 +279,22 @@ export default {
 					this.loading = false
 				})
 		},
-		updateConfig() {
-			var config = []
-			this.rowdata.forEach(element => {
-				config.push({
-					name: element.name,
-					value: element.value
+		onSubmit(event) {
+			event.preventDefault()
+
+			Axios.patch(process.env.VUE_APP_API_ROUTE+"config/", this.configs, { headers: this.header })
+				.then(() => {
+					this.succesMsg = "success"
+					this.successed = true
+					this.errorMsg = null
+					this.errored = false
 				})
-			})
-			
-			config.forEach(updateJson => {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"config/"+updateJson["name"]+"/", updateJson, 
-					{ headers: this.header })
-					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
-						this.errorMsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errorMsg = e.message
-						this.errored = true
-						this.succesMsg = null
-						this.successed = false
-					})
-			})
-		},
-		reloadDatatable() {
-			this.updateConfig()
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+					this.succesMsg = null
+					this.successed = false
+				})
 		}
 	}
 }

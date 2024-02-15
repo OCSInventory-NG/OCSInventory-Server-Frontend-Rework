@@ -88,6 +88,8 @@ export default {
 			sections: [],
 			sectionsheader: [],
 			sectionstitle: [],
+			allsections: [],
+			allfields: [],
 			loading: true,
 			errored: false,
 			errorMsg: null,
@@ -104,43 +106,48 @@ export default {
 		}
 	},
 	created() {
+		this.getSection()
 		this.getInventory()
 	},
 	methods: {
 		getInventory() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
 				.then(response => {
-					response.data.forEach(section => {
-						if(!this.sectionstitle.includes(section.section_name)) {
-							this.sectionstitle.push(section.section_name)
+					for (const inventory of response.data) {
+						var sectionName = this.allsections[inventory.template_section].name
+
+						if(!this.sectionstitle.includes(sectionName)) {
+							this.sectionstitle.push(sectionName)
 						}
 
-						if(!this.sections[section.section_name]) {
-							this.sections[section.section_name] = []
+						if(!this.sections[sectionName]) {
+							this.sections[sectionName] = []
 						}
 
-						if(!this.sectionsheader[section.section_name]) {
-							this.sectionsheader[section.section_name] = []
+						if(!this.sectionsheader[sectionName]) {
+							this.sectionsheader[sectionName] = []
 						}
 
 						var tmpRow = {}
 
-						section.fields.forEach(row => {
+						for (const field of inventory.fields) {
+							var fieldName = this.allfields[field.template_field]
+
 							Object.assign(tmpRow, {
-								[row.field_name]: row.value
+								[fieldName]: field.value
 							})
 
-							if(!this.sectionsheader[section.section_name].includes(row.field_name)) {
-								this.sectionsheader[section.section_name].push(row.field_name)
+							if(!this.sectionsheader[sectionName].includes(fieldName)) {
+								this.sectionsheader[sectionName].push(fieldName)
 							}
-						})
+						}
 
 						const isEmpty = Object.values(tmpRow).every(x => x === null || x === '')
 
 						if(!isEmpty) {
-							this.sections[section.section_name].push(tmpRow)
+							this.sections[sectionName].push(tmpRow)
 						}
-					})
+					}
 
 					this.errorMsg = null
 					this.errored = false
@@ -150,6 +157,21 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
+		},
+		getSection() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"sections", { headers: this.header })
+				.then(response => {
+					for (const section of response.data) {
+						this.allsections[section.id] = section
+						for (const field of section.fields) {
+							this.allfields[field.id] = field.name
+						}
+					}
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
 		}
 	}
 }
