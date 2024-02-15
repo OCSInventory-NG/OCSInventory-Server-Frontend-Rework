@@ -57,25 +57,6 @@
 					/>
 				</div>
 
-				<!-- Save configuration -->
-				<div
-					v-if="caneditconfig"
-					class="col"
-				>
-					<b-button-group class="mr-1">
-						<b-button 
-							:title="$t('configuration.save_config')"
-							variant="success"
-							class="add-button datatable-btn"
-							@click="onSave"
-						>
-							<font-awesome-icon 
-								:icon="['fas', 'check']"
-							/>
-						</b-button>
-					</b-button-group>
-				</div>
-
 				<!-- Show/Hide columns -->
 				<div 
 					class="col" 
@@ -379,7 +360,6 @@ export default {
 		candelete: { type: Boolean, default: false },
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
-		caneditconfig: { type: Boolean, default: false },
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
