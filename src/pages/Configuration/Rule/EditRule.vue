@@ -68,12 +68,15 @@
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
+										@reloadRule="reloadRule"
 									/>
 									<RuleAction
 										v-if="rulemenu.value == 'actions'"
 										:id="id"
 										:trigger="trigger"
 										:actions="actions"
+										:triggers="triggers"
+										@reloadRule="reloadRule"
 									/>
 								</b-tab>
 							</b-tabs>
@@ -109,6 +112,7 @@ export default {
 			successed: false,
 			succesMsg: null,
 			trigger: null,
+			triggers: {},
 			logic: {},
 			actions: [],
 			rule: [],
@@ -128,9 +132,20 @@ export default {
 		}
 	},
 	mounted() {
-		this.getRuleInfo()
+		this.getTriggerModels()
 	},
 	methods: {
+		getTriggerModels() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
+				.then(response => {
+					this.triggers = response.data
+					this.getRuleInfo()
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+		},
 		getRuleInfo() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
@@ -147,6 +162,9 @@ export default {
 					this.errored = true
 				})
 		},
+		reloadRule() {
+			this.getRuleInfo()
+		}
 	}
 }
 </script>
