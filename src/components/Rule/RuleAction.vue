@@ -291,20 +291,6 @@ export default {
 		})
 	},
 	methods: {
-		getActionTrigger() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(trigger => {
-						if(trigger.trigger == this.trigger) {
-							this.actionstrigger = trigger.action_targets
-						}
-					})
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-				})
-		},
 		getFields(index, model) {
 			var route = this.routetargets[this.trigger][model].route
 			var component = this.routetargets[this.trigger][model].key
