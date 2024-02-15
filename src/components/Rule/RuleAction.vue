@@ -242,10 +242,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.actionstrigger = {
-			"accountinfo.accountinfoconfig": [],
-			"inventory_base.inventorybase": ["template"]
-		}
+		this.getActionTrigger()
 
 		if(this.actions.length == 0) {
 			this.datavalues = [
@@ -289,6 +286,20 @@ export default {
 		})
 	},
 	methods: {
+		getActionTrigger() {
+			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
+				.then(response => {
+					response.data.forEach(trigger => {
+						if(trigger.trigger == this.trigger) {
+							this.actionstrigger = trigger.action_targets
+						}
+					})
+				})
+				.catch(e => {
+					this.errorMsg = e
+					this.errored = true
+				})
+		},
 		getFields(index, model) {
 			var route = this.routetargets[this.trigger][model].route
 			var component = route.split("/")[0]
@@ -465,7 +476,9 @@ export default {
 						action: "set",
 						field: action.field,
 						value: action.value,
-						rule: parseInt(this.id)
+						rule: parseInt(this.id),
+						object_id: null,
+						object_slug: null
 					})
 				}
 			})
