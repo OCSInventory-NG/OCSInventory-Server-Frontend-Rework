@@ -203,10 +203,10 @@
 </template>
 
 <script>
-import Axios from 'axios';
-import i18n from '@/i18n';
-import Datatable from '@/components/Datatable/Datatable';
-import Alert from '@/components/Alert/Alert';
+import Axios from 'axios'
+import i18n from '@/i18n'
+import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
 
 export default {
 	name: "AddSaveSearchModal",
