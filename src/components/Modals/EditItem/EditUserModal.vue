@@ -219,6 +219,7 @@ export default {
 		getGroups(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
+					this.groups = []
 					response.data.forEach(groupDetails => {
 						this.groups.push({
 							id: groupDetails.id,
