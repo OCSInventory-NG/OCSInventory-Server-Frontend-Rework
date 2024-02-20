@@ -338,12 +338,15 @@
     "weekly": "Toutes les semaines"
   },
   "search": {
+    "action": "Action",
     "addgroup": "Ajouter une recherche globale",
     "addquerytogroup": "Ajouter une recherche au groupe",
     "allow_group_modification": "Autoriser les groupes à modifier",
     "and": "ET",
+    "create": "Créer une nouvelle recherche",
     "description": "Description",
     "editsavesearch": "Éditer la recherche sauvegardée",
+    "gotosavedsearches": "Gérer les recherches sauvegardées",
     "gt": "est supérieur à",
     "gte": "est supérieur ou égal à",
     "groups": "Groupes",
@@ -364,6 +367,8 @@
     "removequeryfromgroup": "Supprimer la recherche du groupe",
     "savemysearch": "Sauvegarder ma recherche",
     "searchname": "Nom",
+    "selectsavedsearch": "Sélectionnez la recherche à mettre à jour",
+    "update": "Mettre à jour une recherche existante",
     "user": "Utilisateur",
     "usesavedsearch": "Utiliser une recherche sauvegardée",
     "visibility": "Visibilité"

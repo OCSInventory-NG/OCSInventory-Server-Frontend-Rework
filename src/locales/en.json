@@ -332,12 +332,15 @@
     "weekly": "Weekly"
   },
   "search": {
+    "action": "Action",
     "addgroup": "Add a global search",
     "addquerytogroup": "Add a search to the group",
     "allow_group_modification": "Allow groups modification",
     "and": "AND",
+    "create": "Create a new search",
     "description": "Description",
     "editsavesearch": "Edit the saved search",
+    "gotosavedsearches": "Manage saved searches",
     "gt": "is greater than",
     "gte": "is greater than or equal to",
     "groups": "Groups",
@@ -345,6 +348,7 @@
     "iendswith": "ends with",
     "iexact": "is",
     "istartswith": "starts with",
+    "last_updated": "Last updated",
     "lt": "is less than",
     "lte": "is less than or equal to",
     "name": "Name",
@@ -357,6 +361,9 @@
     "removequeryfromgroup": "Remove search from group",
     "savemysearch": "Save my search",
     "searchname": "Name",
+    "selectsavedsearch": "Select the search to update",
+    "update": "Update an existing search",
+    "user": "User",
     "usesavedsearch": "Use a saved search",
     "visibility": "Visibility"
   },
