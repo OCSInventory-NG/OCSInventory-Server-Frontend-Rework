@@ -39,6 +39,16 @@
 					{{ $t('search.usesavedsearch') }}
 				</h5>
 				<b-button 
+					:title="$t('search.gotosavedsearches')"
+					class="btn btn-ghost-yellow ocs-auto"
+					@click="goToSavedSearches()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'gear']"
+						size="1x"
+					/>
+				</b-button>
+				<b-button 
 					size="sm" 
 					variant="outline-danger" 
 					@click="close()"
@@ -107,6 +117,40 @@
 					:message="createerrormsg" 
 					variant="danger"
 				/>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('search.action')" 
+							label-for="action"
+						>
+							<b-form-select
+								id="action"
+								v-model="searchaction"
+								:options="optactions"
+								class="mb-3 form-select form-control"
+								required
+								@input="getMySearches(true)"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row v-if="searchaction == 'update'">
+					<b-col>
+						<b-form-group
+							:label="$t('search.selectsavedsearch')" 
+							label-for="savedsearch"
+						>
+							<b-form-select
+								id="savedsearch"
+								v-model="updatesearchid"
+								:options="optsearch"
+								class="mb-3 form-select form-control"
+								required
+								@input="setSearchInfo(updatesearchid)"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -225,11 +269,17 @@ export default {
 				user: null,
 				groups: []
 			},
+			searchaction: "create",
 			optvisibility: [
 				{ value: "public", text: i18n.t("search.public") },
 				{ value: "private_personal", text: i18n.t("search.private_personal") },
 				{ value: "private_group", text: i18n.t("search.private_group") }
 			],
+			optactions : [
+				{ value: "create", text: i18n.t("search.create") },
+				{ value: "update", text: i18n.t("search.update") }
+			],
+			optsearch: [],
 			groups : [],
 			rowuser : [],
 			savedsearches: [],
@@ -240,6 +290,8 @@ export default {
 			createwithsuccess: false,
 			createerror: false,
 			createerrormsg: null,
+			updatesearchid: null,
+			updatesearch: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -255,22 +307,34 @@ export default {
 		}
 	},
 	methods: {
-		getMySearches() {
+		getMySearches(update = false) {
 			this.loading = true
 			this.rowsavesearch = []
 			Axios.get(process.env.VUE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
-					this.rowsavesearchheader = [
-						"searchname", "description"
-					]
-					for (const savedsearch of response.data) {
-						this.savedsearches[savedsearch.id] = savedsearch.search
-						this.rowsavesearch.push({
-							id: savedsearch.id,
-							searchname: savedsearch.name,
-							description: savedsearch.description
-						})
+					if(!update) {
+						this.rowsavesearchheader = [
+							"searchname", "description"
+						]
+						for (const savedsearch of response.data) {
+							this.savedsearches[savedsearch.id] = savedsearch.search
+							this.rowsavesearch.push({
+								id: savedsearch.id,
+								searchname: savedsearch.name,
+								description: savedsearch.description
+							})
+						}
+					} else {
+						for (const savedsearch of response.data) {
+							this.optsearch.push({
+								value: savedsearch.id,
+								text: savedsearch.name
+							})
+
+							this.updatesearch[savedsearch.id] = savedsearch
+						}
 					}
+					
 					this.errorMsg = null
 					this.errored = false
 					this.loading = false
@@ -279,6 +343,11 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
+		},
+		setSearchInfo(id) {
+			this.loading = true
+			this.savesearch = this.updatesearch[id]
+			this.loading = false 
 		},
 		getMyInfo() {
 			this.loading = true
@@ -326,23 +395,43 @@ export default {
 				this.savesearch.allow_group_modification = false
 			}
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => { this.loadingcreate = false })
+			if(this.searchaction == "create") {
+				Axios.post(process.env.VUE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => { this.loadingcreate = false })
+			} else {
+				Axios.patch(process.env.VUE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+					{ headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => { this.loadingcreate = false })
+			}
+			
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', this.savedsearches[id])
 			this.$bvModal.hide('use-savesearch')
-		}
+		},
+		goToSavedSearches(){
+			this.$router.push('/inventory/savedsearch'); 
+		},
 	}
 }
 </script>
