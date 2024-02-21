@@ -10,6 +10,23 @@
     "id": "ID",
     "name": "Nom"
   },
+  "assetgroup": {
+    "action": "Action",
+    "allow_group_modification": "Autoriser les groupes à modifier",
+    "create": "Créer un nouveau groupe",
+    "description": "Description",
+    "group": "Groupe",
+    "groups": "Groupes",
+    "is_dynamic": "Est dynamique",
+    "name": "Nom",
+    "private_group": "Mes groupes",
+    "private_personal": "Privée",
+    "public": "Publique",
+    "saveasgroup": "Enregistrer en tant que groupe",
+    "selectassetgroup": "Sélectionnez le groupe à mettre à jour",
+    "update": "Mettre à jour un groupe existant",
+    "visibility": "Visibilité"
+  },
   "authentication": {
     "addldap": "Ajouter un annuaire LDAP",
     "CAS": "CAS",

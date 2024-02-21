@@ -10,6 +10,23 @@
     "id": "ID",
     "name": "Name"
   },
+  "assetgroup": {
+    "action": "Action",
+    "allow_group_modification": "Allow groups modification",
+    "create": "Create a new group",
+    "description": "Description",
+    "group": "Group",
+    "groups": "Groups",
+    "is_dynamic": "Is dynamic",
+    "name": "Name",
+    "private_group": "My groups",
+    "private_personal": "Private",
+    "public": "Public",
+    "saveasgroup": "Save as group",
+    "selectassetgroup": "Select the group to update",
+    "update": "Update an existing group",
+    "visibility": "Visibility"
+  },
   "authentication": {
     "addldap": "Add LDAP directory",
     "CAS": "CAS",
