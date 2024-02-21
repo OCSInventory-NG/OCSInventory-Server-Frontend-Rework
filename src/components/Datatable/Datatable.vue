@@ -59,6 +59,7 @@
 
 				<!-- Show/Hide columns -->
 				<div 
+					v-if="canshowhide"
 					class="col" 
 					align="right"
 				>
@@ -83,7 +84,7 @@
 
 				<!-- Number per page-->
 				<div 
-					class="col-1" 
+					:class="(canshowhide) ? 'col-1' : 'col-2'" 
 					align="right"
 				>
 					<b-form-select
@@ -193,6 +194,19 @@
 					>
 						{{ row.item.netname }}
 					</router-link>
+				</template>
+
+				<!-- Netdevices redirection -->
+				<template 
+					v-if="title == 'usesavesearch'"
+					#cell(searchname)="row"
+				>
+					<a
+						class="ocs-link"
+						@click="useSaveSearch(row.item.id)"
+					>
+						{{ row.item.searchname }}
+					</a>
 				</template>
 
 				<template #cell(error)="row">
@@ -329,6 +343,7 @@ import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
 import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
 import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
 import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal'
+import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -346,6 +361,7 @@ export default {
 		EditActionListModal,
 		EditAutomaticActionModal,
 		EditRuleModal,
+		EditSaveSearchModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal
@@ -373,6 +389,7 @@ export default {
 		translationkey: { type: String, default: '' },
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
+		canshowhide: { type: Boolean, default: true },
 	},
 	data() {
 		return {
@@ -525,6 +542,9 @@ export default {
 		goToEditRule(id){
 			this.$router.push('/configurations/rules/'+id); 
 		},
+		useSaveSearch(id) {
+			this.$emit('useSaveSearch', id)
+		}
 	}
 }
 </script>

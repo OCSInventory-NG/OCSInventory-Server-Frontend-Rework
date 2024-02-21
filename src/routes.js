@@ -14,6 +14,7 @@ import Ipdiscover from '@/pages/Inventory/Ipdiscover/Ipdiscover'
 import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
 import Multisearch from '@/pages/Inventory/Tools/Multisearch'
 import InventoryLog from '@/pages/Inventory/Tools/InventoryLog'
+import SavedSearch from '@/pages/Inventory/Tools/SavedSearch'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -146,6 +147,11 @@ export default new Router({
 			path: '/inventory/multisearch',
 			name: 'Multisearch',
 			component: Multisearch
+		},
+		{
+			path: '/inventory/savedsearch',
+			name: 'SavedSearch',
+			component: SavedSearch
 		},
 		{
 			path: '/deployment/packages',

@@ -1,0 +1,172 @@
+<template>
+	<div
+		id="saved-search"
+		class="container-xl"
+	>
+		<div>
+			<!-- Page header -->
+			<PageHeader 
+				page-title="savedsearch"
+			/>
+			<!-- Display Collapse -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<section v-if="errored">
+							<Alert 
+								:message="errorMsg" 
+								variant="danger"
+							/>
+						</section>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+						<div v-else>
+							<Datatable
+								id="savedsearch-datatable"
+								:rowdata="rowdata"
+								:rowheader="rowheader"
+								:canedit="canedit"
+								:candelete="candelete"
+								title="search/save"
+								translationkey="search."
+								editcomponent="EditSaveSearchModal"
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+import Axios from 'axios'
+import i18n from '@/i18n'
+import Datatable from '@/components/Datatable/Datatable'
+import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader'
+import PageHeader from '@/components/Header/PageHeader'
+
+export default {
+	name: "SavedSearch",
+	components: { Datatable, Alert, Loader, PageHeader },
+	data() {
+		return {
+			rowdata: [],
+			rowheader: [],
+			canedit: false,
+			candelete: false,
+			loading: true,
+			errored: false,
+			errorMsg: null,
+			user: null,
+			groups: [],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+		}
+	},
+	mounted() {
+		if(localStorage.getItem('permissions').split(",").includes("change_search")) {
+			this.canedit = true
+		}
+		if(localStorage.getItem('permissions').split(",").includes("delete_search")) {
+			this.candelete = true
+		}
+
+		this.getHeader()
+	},
+	methods: {
+		getHeader() {
+			Axios.options(process.env.VUE_APP_API_ROUTE+"search/save/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						if(field != "search" && field != "last_updated") {
+							this.rowheader.push(field)
+						}
+					})
+					this.errorMsg = null
+					this.errored = false
+					this.getSavedSearches()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		getSavedSearches() {
+			this.rowdata = []
+			this.loading = true
+			Axios.get(process.env.VUE_APP_API_ROUTE+"search/save/", { headers: this.header })
+				.then(response => {
+					for (const search of response.data) {
+						delete search.search
+						delete search.last_updated
+						search.visibility = i18n.t("search."+search.visibility)
+						search.allow_group_modification = i18n.t("generic."+search.allow_group_modification)
+						this.rowdata.push(search)
+					}
+
+					this.rowdata = response.data
+					this.errorMsg = null
+					this.errored = false
+					this.getUserName()
+				})
+				.catch(e => {
+					this.errorMsg = e.message
+					this.errored = true
+				})
+		},
+		getUserName() {
+			for (const search of this.rowdata) {
+				Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+search.user, { headers: this.header })
+					.then(response => {
+						if(response.data.first_name != "") {
+							search.user = response.data.last_name.concat(" ", response.data.first_name)
+						} else {
+							search.user = response.data.username
+						}
+					})
+					.catch(e => {
+						this.errorMsg = e.message
+						this.errored = true
+					})
+			}
+			this.getGroups()
+		},
+		getGroups() {
+			for (const [key, search] of Object.entries(this.rowdata)) {
+				this.groups[key] = []
+				if(search.groups) {
+					for (const group of search.groups) {
+						this.loading = true
+						Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+							.then(response => {
+								this.loading = true
+								this.groups[key].push(response.data.name)
+								this.rowdata[key].groups = this.groups[key].join(", ")
+							})
+							.catch(e => {
+								this.errorMsg = e.message
+								this.errored = true
+							})
+							.finally(() => { this.loading = false })
+					}
+				}
+			}
+
+			this.loading = false
+		},
+		reloadDatatable() {
+			this.getSavedSearches()
+		}
+	}
+}
+</script>

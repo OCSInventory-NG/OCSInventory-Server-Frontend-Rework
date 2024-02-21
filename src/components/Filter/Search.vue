@@ -1,5 +1,10 @@
 <template>
 	<div id="search">
+		<AddSaveSearchModal 
+			v-if="cansave"
+			:rowsearch="datavalues"
+			@useSaveSearch="useSaveSearch"
+		/>
 		<b-form
 			@submit="onSubmit"
 		>
@@ -210,9 +215,11 @@
 <script>
 import Axios from 'axios'
 import i18n from '../../i18n'
+import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal'
 
 export default {
 	name: 'Search',
+	components: { AddSaveSearchModal },
 	data() {
 		return {
 			errorMsg: null,
@@ -306,10 +313,15 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			cansave: false
 		}
 	},
 	mounted() {
+		if(localStorage.getItem('permissions').split(",").includes("add_search")) {
+			this.cansave = true
+		}
+
 		this.routeopt.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 
 		this.datavalues = JSON.parse(localStorage.getItem('multisearch')) ?? [
@@ -592,6 +604,29 @@ export default {
 						this.errored = true
 					})
 			}
+		},
+		useSaveSearch(search) {
+			this.datavalues = JSON.parse(JSON.stringify(search))
+
+			Object.keys(this.datavalues).forEach(index => {
+				Object.keys(this.datavalues[index]).forEach(search => {
+					this.getFields(this.datavalues[index][search].route, index, search)
+					if(
+						this.datavalues[index][search].route == "templates"
+						&& this.datavalues[index][search].template != null
+						&& this.datavalues[index][search].section != null
+					) {
+						this.getSections(this.datavalues[index][search].template, index, search)
+						this.getFields(this.datavalues[index][search].section, index, search, true)
+					}
+					this.setFieldType(this.datavalues[index][search], index, search)
+				})
+			})
+
+			// Save param in local storage
+			localStorage.setItem('multisearch', JSON.stringify(this.datavalues))
+
+			this.$emit('reloadDatatable', this.datavalues)
 		}
 	}
 }

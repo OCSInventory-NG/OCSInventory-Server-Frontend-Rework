@@ -40,6 +40,10 @@
 							route:'Multisearch', column: 'tools' 
 						},
 						{ 
+							header: $t('title.savedsearch'), link: '/inventory/savedsearch', 
+							route:'SavedSearch', column: 'tools' 
+						},
+						{ 
 							header: $t('title.inventory_logs'), link: '/inventory/inventory_logs', 
 							route:'InventoryLog', column: 'tools' 
 						},
