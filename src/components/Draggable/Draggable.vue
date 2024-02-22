@@ -11,7 +11,7 @@
 						v-for="theader in rowheader"
 						:key="theader"
 					>
-						{{ $t(translationkey+theader) }}
+						{{ ($te(translationkey+theader)) ? $t(translationkey+theader) : theader }}
 					</th>
 					<th v-if="canedit || candelete">
 						{{ $t('generic.actions') }}
