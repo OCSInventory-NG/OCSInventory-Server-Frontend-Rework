@@ -28,6 +28,10 @@
 							route:'Assets', column: 'general' 
 						},
 						{ 
+							header: $t('title.assetgroups'), link: '/inventory/assetgroups', 
+							route:'AssetGroup', column: 'general' 
+						},
+						{ 
 							header: $t('title.ipdiscover'), link: '/inventory/ipdiscover', 
 							route:'Ipdiscover', column: 'network' 
 						},
