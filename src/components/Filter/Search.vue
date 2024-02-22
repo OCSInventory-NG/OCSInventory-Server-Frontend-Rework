@@ -1,7 +1,7 @@
 <template>
 	<div id="search">
 		<AddSaveSearchModal 
-			v-if="cansave"
+			v-if="cansave && !disableforgroup"
 			:rowsearch="datavalues"
 			@useSaveSearch="useSaveSearch"
 		/>
@@ -14,6 +14,7 @@
 				class="modal-allactions multisearch-card"
 			>
 				<div
+					v-if="!disableforgroup"
 					v-show="datavalues.length > 1"
 					align="right"
 				>
@@ -47,6 +48,7 @@
 									:options="linkopt"
 									class="mb-3 form-select form-control"
 									:required="true"
+									:disabled="disableforgroup"
 								/>
 							</b-form-group>
 						</b-col>
@@ -58,6 +60,7 @@
 									:options="routeopt" 
 									class="mb-3 form-select form-control"
 									:required="true"
+									:disabled="disableforgroup"
 									@input="getFields(input.route, masterindex, index)"
 								/>
 							</b-form-group>
@@ -70,7 +73,7 @@
 									[] : templateopt[masterindex][index]" 
 								class="mb-3 form-select form-control"
 								:required="true"
-								:disabled="(loadingtemplate) ? true : false"
+								:disabled="(loadingtemplate || disableforgroup) ? true : false"
 								@input="getSections(input.template, masterindex, index)"
 							/>
 						</b-col>
@@ -82,7 +85,7 @@
 									[] : sectionopt[masterindex][index]" 
 								class="mb-3 form-select form-control"
 								:required="true"
-								:disabled="(loadingsection) ? true : false"
+								:disabled="(loadingsection || disableforgroup) ? true : false"
 								@input="getFields(input.section, masterindex, index, true)"
 							/>
 						</b-col>
@@ -102,6 +105,7 @@
 									:options="fieldopt[masterindex][index]" 
 									class="mb-3 form-select form-control"
 									:required="true"
+									:disabled="disableforgroup"
 									@input="setFieldType(input, masterindex, index)"
 								/>
 							</b-form-group>
@@ -114,6 +118,7 @@
 									:options="operatoropt[input.fieldtype]"
 									class="mb-3 form-select form-control"
 									:required="true"
+									:disabled="disableforgroup"
 								/>
 							</b-form-group>
 						</b-col>
@@ -125,6 +130,7 @@
 									v-model="input.value"
 									:type="inputype[input.fieldtype]"
 									class="mb-3"
+									:disabled="disableforgroup"
 								/>
 								<div v-else>
 									<b-form-select
@@ -142,11 +148,15 @@
 											scope : adminopt[masterindex][index]"
 										class="mb-3 form-select form-control"
 										:required="true"
+										:disabled="disableforgroup"
 									/>
 								</div>
 							</b-form-group>
 						</b-col>
-						<b-col cols="1">
+						<b-col 
+							v-if="!disableforgroup"
+							cols="1"
+						>
 							<b-form-group>
 								<b-button 
 									:id="'addfield'+masterindex+index"
@@ -163,6 +173,7 @@
 							</b-form-group>
 						</b-col>
 						<b-col 
+							v-if="!disableforgroup"
 							v-show="datavalues[masterindex].length > 1"
 							cols="1"
 						>
@@ -184,7 +195,7 @@
 					</b-row>
 				</div>
 			</div>
-			<b-row>
+			<b-row v-if="!disableforgroup">
 				<b-col align-self="start" />
 				<b-col 
 					align-self="center"
@@ -220,6 +231,10 @@ import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal'
 export default {
 	name: 'Search',
 	components: { AddSaveSearchModal },
+	props: {
+		searchgroup: { type: Array, default: null },
+		disableforgroup: { type: Boolean, default: false }
+	},
 	data() {
 		return {
 			errorMsg: null,
@@ -337,6 +352,10 @@ export default {
 				}
 			]
 		]
+
+		if(this.searchgroup) {
+			this.datavalues = this.searchgroup
+		}
 
 		Object.keys(this.datavalues).forEach(index => {
 			Object.keys(this.datavalues[index]).forEach(search => {
