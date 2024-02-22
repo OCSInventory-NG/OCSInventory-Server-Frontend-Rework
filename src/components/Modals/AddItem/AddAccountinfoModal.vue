@@ -214,6 +214,7 @@ export default {
 				datatarget: 'ASSET'
 			},
 			rowdata: [],
+			config: [],
 			rowheader: [],
 			loading: true,
 			errorMsg: null,
@@ -269,7 +270,7 @@ export default {
 		getAccountinfoConfig() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					this.config = response.data
 					this.accountinfovaluesTreatment()
 					this.errorMsg = null
 					this.errored = false
@@ -278,18 +279,21 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
 		},
 		accountinfovaluesTreatment() {
-			this.rowdata.forEach(rowDetails => {
+			Object.keys(this.config).forEach(key => {
 				var tmpValues = []
-				rowDetails.accountinfo_values.forEach(valuesDetails => {
-					tmpValues.push(valuesDetails.value)
-				})
-				rowDetails.accountinfo_values = tmpValues.join('\n')
+				for (const accountvalue of this.config[key].accountinfo_values) {
+					tmpValues.push(accountvalue.value)
+				}
+				this.config[key].accountinfo_values = tmpValues.join('\n')
 			})
+
+			this.rowdata = this.config
+			this.loading = false
 		},
 		reloadDatatable() {
+			this.loading = true
 			this.getAccountinfoConfig()
 		},
 		// Submit template creation and call getAccountinfoConfig to reload datatable datas

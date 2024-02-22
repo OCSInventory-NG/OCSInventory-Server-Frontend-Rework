@@ -46,6 +46,7 @@
 									:id="'value'+index"
 									v-model="input.value"
 									required
+									@change="onUpdate(input)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -128,7 +129,6 @@ export default {
 			idModal: 'manage-item'+this.id,
 			text: null,
 			datavalues: [{value: ""}],
-			dataToRemove: [],
 			get: this.reconciliationname+"="+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -144,17 +144,10 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			var jsonUpdate = []
 			var jsonAdd = []
 
 			this.datavalues.forEach(data => {
-				if(typeof data.id !== 'undefined') {
-					jsonUpdate.push({
-						id: data.id,
-						[this.reconciliationname]: this.id,
-						value: data.value
-					})
-				} else {
+				if(!data.id) {
 					jsonAdd.push({
 						[this.reconciliationname]: this.id,
 						value: data.value
@@ -162,24 +155,44 @@ export default {
 				}
 			})
 
-			if(this.dataToRemove.length > 0) {
-				this.dataToRemove.forEach(data => {
-					this.onDelete(data.id)
-				})
-			}
-
-			this.dataToRemove = []
-
-			if(jsonUpdate.length > 0) {
-				this.onUpdate(jsonUpdate)
-			}
-
 			if(jsonAdd.length > 0) {
-				this.onAdd(jsonAdd)
+				Axios.post(process.env.VUE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+					.finally(() => this.$emit("reloadDatatable"))
+			} else {
+				this.$emit("reloadDatatable")
 			}
 
 			this.$bvModal.hide('manage-item'+this.row.id)
-			this.$emit('reloadDatatable')
+		},
+		onUpdate(input) {
+			if(input.id) {
+				Axios.patch(process.env.VUE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
+					{ headers: this.header })
+					.then(() => {
+						this.succesMsg = "success"
+						this.successed = true
+						this.errorMsg = null
+						this.errored = false
+					})
+					.catch(e => {
+						this.errorMsg = e
+						this.errored = true
+						this.succesMsg = null
+						this.successed = false
+					})
+			}
 		},
 		getData() {
 			Axios.get(process.env.VUE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
@@ -198,25 +211,12 @@ export default {
 					this.errored = true
 				})
 		},
-		onAdd(json) {
-			Axios.post(process.env.VUE_APP_API_ROUTE+this.route+"/", json, { headers: this.header })
-				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-				})
+		addField(value, fieldType) {
+			fieldType.push({ value: "" })
 		},
-		onUpdate(json) {
-			json.forEach(dataToUpdate => {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+this.route+"/"+dataToUpdate["id"]+"/", dataToUpdate, 
-					{ headers: this.header })
+		removeField(index, fieldType) {
+			if(typeof fieldType[index].id !== 'undefined') {
+				Axios.delete(process.env.VUE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -229,29 +229,6 @@ export default {
 						this.succesMsg = null
 						this.successed = false
 					})
-			})	
-		},
-		onDelete(id) {
-			Axios.delete(process.env.VUE_APP_API_ROUTE+this.route+"/"+id, { headers: this.header })
-				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-				})
-		},
-		addField(value, fieldType) {
-			fieldType.push({ value: "" })
-		},
-		removeField(index, fieldType) {
-			if(typeof fieldType[index].id !== 'undefined') {
-				this.dataToRemove.push(fieldType[index])
 			}
 			fieldType.splice(index, 1)
 		},
