@@ -72,11 +72,13 @@
 							:label="$t('title.network')" 
 							label-for="network"
 						>
-							<b-form-select
+							<v-select
 								id="network"
-								v-model="netid" 
-								:options="networks" 
-								class="mb-3 form-select"
+								v-model="netid"
+								:options="networks"
+								:reduce="text => text.value"
+								label="text"
+								class="mb-3"
 								multiple
 							/>
 						</b-form-group>
@@ -149,6 +151,7 @@ export default {
 		getNetworks(id) {
 			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
+					this.networks = []
 					response.data.forEach(network => {
 						this.networks.push({
 							value: network.id,
