@@ -17,13 +17,13 @@
 				<span class="navbar-toggler-icon" />
 			</button>
 			<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-				<a href="/ocsreports/dashboard">
+				<router-link to="/dashboard">
 					<img 
 						src="../../assets/logo-white.png"
 						alt="OCS Inventory" 
 						class="navbar-brand-image logo-size"
 					>
-				</a>
+				</router-link>
 			</h1>
 
 			<!-- USER SETTING / LOGOUT -->
