@@ -142,7 +142,7 @@ export default {
 	},
 	mounted() {
 		var extendedRoute = null
-		if(this.$route.params.type == 'assets') {
+		if(this.$route.params.type == 'asset') {
 			extendedRoute = "asset/bases/"+this.$route.params.id
 			this.type = "ASSET"
 			this.slug = "inventory_base.inventorybase"

@@ -34,7 +34,7 @@
 								:usecheckbox="false"
 								:canaccessdetails="true"
 								:rowheader="rowheader"
-								title="assets"
+								title="asset"
 								translationkey="inventory."
 							/>
 						</div>
