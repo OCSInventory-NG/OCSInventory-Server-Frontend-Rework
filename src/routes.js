@@ -15,6 +15,8 @@ import Netdevice from '@/pages/Inventory/Ipdiscover/Netdevice'
 import Multisearch from '@/pages/Inventory/Tools/Multisearch'
 import InventoryLog from '@/pages/Inventory/Tools/InventoryLog'
 import SavedSearch from '@/pages/Inventory/Tools/SavedSearch'
+import AssetGroup from '@/pages/Inventory/Asset/AssetGroup'
+import AssetGroupDetail from '@/pages/Inventory/Asset/AssetGroupDetail'
 // Usermanagement
 import User from '@/pages/UserManagement/User/User'
 import Group from '@/pages/UserManagement/Group/Group'
@@ -122,6 +124,16 @@ export default new Router({
 			path: '/inventory/assets',
 			name: 'Assets',
 			component: Assets
+		},
+		{
+			path: '/inventory/assetgroups',
+			name: 'AssetGroup',
+			component: AssetGroup
+		},
+		{
+			path: '/inventory/assetgroups/:id',
+			name: 'AssetGroupDetail',
+			component: AssetGroupDetail
 		},
 		{
 			path: '/inventory/ipdiscover',

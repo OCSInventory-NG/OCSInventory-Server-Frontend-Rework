@@ -50,7 +50,7 @@
 							</div>
 
 							<div class="hr-text">
-								Informations
+								{{ $t("generic.information") }}
 							</div>
 							<div class="datagrid">
 								<div 

@@ -344,6 +344,7 @@ import EditActionListModal from '@/components/Modals/EditItem/EditActionListModa
 import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
 import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal'
 import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal'
+import EditAssetGroupModal from '../Modals/EditItem/EditAssetGroupModal'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
@@ -361,6 +362,7 @@ export default {
 		EditActionListModal,
 		EditAutomaticActionModal,
 		EditRuleModal,
+		EditAssetGroupModal,
 		EditSaveSearchModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,

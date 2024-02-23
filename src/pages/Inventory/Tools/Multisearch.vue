@@ -51,6 +51,10 @@
 								title="assets"
 								translationkey="inventory."
 							/>
+							<AddAssetGroupModal 
+								:assetrow="assetids"
+								:search="rowsearch"
+							/>
 						</div>
 					</div>
 				</div>
@@ -67,16 +71,18 @@ import Datatable from '@/components/Datatable/Datatable'
 import Alert from '@/components/Alert/Alert'
 import PageHeader from '@/components/Header/PageHeader'
 import Search from '@/components/Filter/Search'
+import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal'
 
 export default {
 	name: "Multisearch",
-	components: { Loader, Datatable, Alert, PageHeader, Search },
+	components: { Loader, Datatable, Alert, PageHeader, Search, AddAssetGroupModal },
 	data() {
 		return {
 			errorMsg: null,
 			rowdata: [],
 			rowheader: [],
 			rowsearch: [],
+			assetids: [],
 			loading: true,
 			errored: false,
 			noresult: null,
@@ -121,12 +127,14 @@ export default {
 			Axios.post(process.env.VUE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
+					this.assetids = []
 					this.noresult = null
 
 					response.data.forEach(element => {
 						delete element.fields.inventory_sections
 						element.fields["id"] = element.pk
 						this.rowdata.push(element.fields)
+						this.assetids.push(element.pk)
 					})
 
 					if(this.rowdata.length == 0) {
