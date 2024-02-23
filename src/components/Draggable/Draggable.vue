@@ -19,6 +19,7 @@
 				</tr>
 			</thead>
 			<draggable 
+				v-if="rowdatas.length > 0"
 				v-model="rowdatas" 
 				:disabled="!canedit"
 				tag="tbody"
@@ -68,6 +69,13 @@
 					</td>
 				</tr>
 			</draggable>
+			<tbody v-else>
+				<tr>
+					<td>
+						{{ $t("generic.no_data") }}
+					</td>
+				</tr>
+			</tbody>
 		</table>
 	</div>
 </template>
