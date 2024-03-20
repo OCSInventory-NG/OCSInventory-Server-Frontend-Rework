@@ -225,8 +225,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../i18n'
-import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal'
+import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal.vue'
 
 export default {
 	name: 'Search',
@@ -259,11 +258,11 @@ export default {
 				]
 			],
 			routeopt: [
-				{ value: "asset/bases", text: i18n.t("title.assets") },
-				{ value: "accountinfo/config?datatarget=ASSET", text: i18n.t("title.accountinfo") },
-				{ value: "deployment/results", text: i18n.t("title.deployment") },
-				{ value: "asset/logs", text: i18n.t("title.inventory_logs") },
-				{ value: "templates", text: i18n.t("title.inventory") },
+				{ value: "asset/bases", text: this.$t("title.assets") },
+				{ value: "accountinfo/config?datatarget=ASSET", text: this.$t("title.accountinfo") },
+				{ value: "deployment/results", text: this.$t("title.deployment") },
+				{ value: "asset/logs", text: this.$t("title.inventory_logs") },
+				{ value: "templates", text: this.$t("title.inventory") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
@@ -275,33 +274,33 @@ export default {
 			fieldopt: [],
 			operatoropt: {
 				"string": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
-					{ value: "icontains", text: i18n.t("search.icontains") },
-					{ value: "istartswith", text: i18n.t("search.istartswith") },
-					{ value: "iendswith", text: i18n.t("search.iendswith") },
+					{ value: "iexact", text: this.$t("search.iexact") },
+					{ value: "icontains", text: this.$t("search.icontains") },
+					{ value: "istartswith", text: this.$t("search.istartswith") },
+					{ value: "iendswith", text: this.$t("search.iendswith") },
 				],
 				"integer": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
-					{ value: "gt", text: i18n.t("search.gt") },
-					{ value: "gte", text: i18n.t("search.gte") },
-					{ value: "lt", text: i18n.t("search.lt") },
-					{ value: "lte", text: i18n.t("search.lte") }
+					{ value: "iexact", text: this.$t("search.iexact") },
+					{ value: "gt", text: this.$t("search.gt") },
+					{ value: "gte", text: this.$t("search.gte") },
+					{ value: "lt", text: this.$t("search.lt") },
+					{ value: "lte", text: this.$t("search.lte") }
 				],
 				"datetime": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
-					{ value: "gt", text: i18n.t("search.gt") },
-					{ value: "gte", text: i18n.t("search.gte") },
-					{ value: "lt", text: i18n.t("search.lt") },
-					{ value: "lte", text: i18n.t("search.lte") }
+					{ value: "iexact", text: this.$t("search.iexact") },
+					{ value: "gt", text: this.$t("search.gt") },
+					{ value: "gte", text: this.$t("search.gte") },
+					{ value: "lt", text: this.$t("search.lt") },
+					{ value: "lte", text: this.$t("search.lte") }
 				],
 				"select": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "iexact", text: this.$t("search.iexact") },
 				],
 				"checkbox": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "iexact", text: this.$t("search.iexact") },
 				],
 				"choice": [
-					{ value: "iexact", text: i18n.t("search.iexact") },
+					{ value: "iexact", text: this.$t("search.iexact") },
 				]
 			},
 			linktype: {
@@ -311,8 +310,8 @@ export default {
 				"CHECKBOX": "checkbox"
 			},
 			linkopt: [
-				{ value: "AND", text: i18n.t("search.and") },
-				{ value: "OR", text: i18n.t("search.or") }
+				{ value: "AND", text: this.$t("search.and") },
+				{ value: "OR", text: this.$t("search.or") }
 			],
 			adminopt: [],
 			templateopt: [],
@@ -401,7 +400,7 @@ export default {
 			this.fieldopt[masterindex][index] = []
 
 			if(route == "accountinfo/config?datatarget=ASSET") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
@@ -426,7 +425,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else if(route == "templates") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingtemplate = true
 						if(!Array.isArray(this.templateopt[masterindex])) {
@@ -452,7 +451,7 @@ export default {
 						this.errored = true
 					})
 			} else if (section) {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -475,7 +474,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else {
-				Axios.options(process.env.VUE_APP_API_ROUTE+route+"/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -489,7 +488,7 @@ export default {
 								response.data.actions.POST[field]["type"] != "field") {
 								this.fieldopt[masterindex][index].push({
 									value: field,
-									text: i18n.t(component+"."+field),
+									text: this.$t(component+"."+field),
 									fieldtype: response.data.actions.POST[field]["type"]
 								})
 								if(response.data.actions.POST[field]["type"] == "choice") {
@@ -497,7 +496,7 @@ export default {
 									response.data.actions.POST[field]["choices"].forEach(choice => {
 										this.scope.push({
 											value: choice.value,
-											text: i18n.t("inventory."+choice.value)
+											text: this.$t("inventory."+choice.value)
 										})
 									})
 
@@ -524,7 +523,7 @@ export default {
 			
 		},
 		getSections(templateId, masterindex, index) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
 					if(!Array.isArray(this.sectionopt[masterindex])) {
@@ -598,7 +597,7 @@ export default {
 			})
 
 			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingadmin = true

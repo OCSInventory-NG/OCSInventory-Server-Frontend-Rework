@@ -183,11 +183,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "AddAccountinfoModal",
@@ -226,9 +225,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			datatargetoptions: [
-				{ value: 'ASSET', text: i18n.t("title.assets") },
-				{ value: 'IPDISCOVER', text: i18n.t("title.ipdiscover") },
-				{ value: 'SNMP', text: i18n.t("title.snmp") }
+				{ value: 'ASSET', text: this.$t("title.assets") },
+				{ value: 'IPDISCOVER', text: this.$t("title.ipdiscover") },
+				{ value: 'SNMP', text: this.$t("title.snmp") }
 			],
 			datatypeoptions: [
 				{ value: 'TEXT', text: 'TEXT' },
@@ -249,7 +248,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -263,12 +262,12 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}	
 		},
 		getAccountinfoConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
 					this.config = response.data
 					this.accountinfovaluesTreatment()
@@ -300,7 +299,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

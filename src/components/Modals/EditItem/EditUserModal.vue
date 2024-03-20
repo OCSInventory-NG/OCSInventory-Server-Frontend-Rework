@@ -203,7 +203,7 @@ export default {
 		},
 		// Get user
 		getUser(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -217,7 +217,7 @@ export default {
 		},
 		// Get groups
 		getGroups(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.groups = []
 					response.data.forEach(groupDetails => {
@@ -238,7 +238,7 @@ export default {
 				delete this.row.password
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

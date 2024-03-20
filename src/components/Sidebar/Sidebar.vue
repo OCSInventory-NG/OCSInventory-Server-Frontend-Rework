@@ -5,7 +5,7 @@
 		:class="showmobilemenu ? 'show' : ''"
 	>
 		<div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
-			<b-nav class="navbar-nav">
+			<BNav class="navbar-nav">
 				<NavLink
 					:is-active="activeItem"
 					:header="$t('title.dashboard')"
@@ -142,13 +142,13 @@
 					icon-name="wrench"
 					index="configurations"
 				/>
-			</b-nav>
+			</BNav>
 		</div>
 	</div>
 </template>
 
 <script>
-import NavLink from './NavLink/NavLink';
+import NavLink from './NavLink/NavLink.vue';
 
 export default {
 	name: 'Sidebar',

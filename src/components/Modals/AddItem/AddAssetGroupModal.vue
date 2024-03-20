@@ -221,9 +221,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
+import Alert from '@/components/Alert/Alert.vue'
+import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: "AddAssetGroupModal",
@@ -251,13 +250,13 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			optvisibility: [
-				{ value: "public", text: i18n.t("assetgroup.public") },
-				{ value: "private_personal", text: i18n.t("assetgroup.private_personal") },
-				{ value: "private_group", text: i18n.t("assetgroup.private_group") }
+				{ value: "public", text: this.$t("assetgroup.public") },
+				{ value: "private_personal", text: this.$t("assetgroup.private_personal") },
+				{ value: "private_group", text: this.$t("assetgroup.private_group") }
 			],
 			optactions : [
-				{ value: "create", text: i18n.t("assetgroup.create") },
-				{ value: "update", text: i18n.t("assetgroup.update") }
+				{ value: "create", text: this.$t("assetgroup.create") },
+				{ value: "update", text: this.$t("assetgroup.update") }
 			],
 			optgroup: [],
 			user: [],
@@ -283,7 +282,7 @@ export default {
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					this.createerrormsg = null
@@ -301,7 +300,7 @@ export default {
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -316,7 +315,7 @@ export default {
 			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 		},
 		getMyAssetGroups() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
@@ -353,7 +352,7 @@ export default {
 			}
 
 			if(this.groupaction == "create") {
-				Axios.post(process.env.VUE_APP_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -366,7 +365,7 @@ export default {
 					})
 					.finally(() => { this.loadingcreate = false })
 			} else {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

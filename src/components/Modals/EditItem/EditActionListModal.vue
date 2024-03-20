@@ -113,7 +113,6 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
 
 export default {
 	name: 'EditPackageModal',
@@ -140,9 +139,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			actionoptions: [
-				{ value: 'EXEC', text: i18n.t('deployment.EXEC') },
-				{ value: 'LAUNCH', text: i18n.t('deployment.LAUNCH') },
-				{ value: 'STORE', text: i18n.t('deployment.STORE') }
+				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
+				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
+				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			],
 			idmodal: 'edit-action.'+this.id
 		}
@@ -155,7 +154,7 @@ export default {
 			this.row.file = event.target.files[0];
 		},
 		getAction(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -177,7 +176,7 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

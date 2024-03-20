@@ -156,7 +156,7 @@ export default {
 			})
 
 			if(jsonAdd.length > 0) {
-				Axios.post(process.env.VUE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -178,7 +178,7 @@ export default {
 		},
 		onUpdate(input) {
 			if(input.id) {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
 					{ headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
@@ -195,7 +195,7 @@ export default {
 			}
 		},
 		getData() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
 					if(response.data.length > 0) {
 						this.datavalues = []
@@ -216,7 +216,7 @@ export default {
 		},
 		removeField(index, fieldType) {
 			if(typeof fieldType[index].id !== 'undefined') {
-				Axios.delete(process.env.VUE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
+				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

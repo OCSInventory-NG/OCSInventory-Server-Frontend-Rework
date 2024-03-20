@@ -204,9 +204,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Draggable from '@/components/Draggable/Draggable'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import Draggable from '@/components/Draggable/Draggable.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'AddTemplateModal',
@@ -281,7 +281,7 @@ export default {
 			this.getLdapConfig()
 		},
 		getLdapConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
 				.then(response => {
 					var tmpLdap = response.data
 
@@ -313,7 +313,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"auth_config/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_config/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

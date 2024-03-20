@@ -177,11 +177,10 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import i18n from '@/i18n'
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddAutomaticActionModal',
@@ -214,14 +213,14 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			active: [
-				{ value: true, text: i18n.t('generic.yes') },
-				{ value: false, text: i18n.t('generic.no') }
+				{ value: true, text: this.$t('generic.yes') },
+				{ value: false, text: this.$t('generic.no') }
 			],
 			recurences: [
-				{ value: 'hourly', text: i18n.t('scheduler.hourly') },
-				{ value: 'daily', text: i18n.t('scheduler.daily') },
-				{ value: 'weekly', text: i18n.t('scheduler.weekly') },
-				{ value: 'monthly', text: i18n.t('scheduler.monthly') }
+				{ value: 'hourly', text: this.$t('scheduler.hourly') },
+				{ value: 'daily', text: this.$t('scheduler.daily') },
+				{ value: 'weekly', text: this.$t('scheduler.weekly') },
+				{ value: 'monthly', text: this.$t('scheduler.monthly') }
 			]
 		}
 	},
@@ -236,7 +235,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -250,12 +249,12 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}
 		},
 		getSchedulers() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -274,7 +273,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

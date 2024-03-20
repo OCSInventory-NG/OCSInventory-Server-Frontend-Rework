@@ -105,10 +105,9 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
+import Alert from '@/components/Alert/Alert.vue'
+import Loader from '@/components/Loader/Loader.vue'
+import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
 
 export default {
 	name: "Cas",
@@ -151,14 +150,14 @@ export default {
 			}
 			this.getCasConfiguration()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getCasConfiguration() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
 					this.errorMsg = null
@@ -176,7 +175,7 @@ export default {
 
 			delete this.casdata.mappings
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

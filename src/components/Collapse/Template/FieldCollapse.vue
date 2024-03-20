@@ -77,8 +77,8 @@
 </template>
 
 <script>
-import EditFieldModal from '@/components/Modals/EditItem/EditFieldModal'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
+import EditFieldModal from '@/components/Modals/EditItem/EditFieldModal.vue'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 
 export default {
 	name: "FieldCollapse",

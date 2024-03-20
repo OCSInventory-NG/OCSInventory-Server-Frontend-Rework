@@ -100,7 +100,6 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
 
 export default {
 	name: 'EditPackageModal',
@@ -125,9 +124,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			options: [
-				{ value: 'WIN', text: i18n.t('template.WIN') },
-				{ value: 'LIN', text: i18n.t('template.LIN') },
-				{ value: 'MAC', text: i18n.t('template.MAC') }
+				{ value: 'WIN', text: this.$t('template.WIN') },
+				{ value: 'LIN', text: this.$t('template.LIN') },
+				{ value: 'MAC', text: this.$t('template.MAC') }
 			]
 		}
 	},
@@ -136,7 +135,7 @@ export default {
 			this.getPackages(id)
 		},
 		getPackages(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -154,7 +153,7 @@ export default {
 
 			delete this.row.actions_list
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

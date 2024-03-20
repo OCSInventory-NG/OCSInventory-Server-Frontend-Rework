@@ -98,7 +98,7 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.delete(process.env.VUE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+			Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

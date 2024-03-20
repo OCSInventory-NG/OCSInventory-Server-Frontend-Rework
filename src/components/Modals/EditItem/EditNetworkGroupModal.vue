@@ -136,7 +136,7 @@ export default {
 			this.getNetgroup(id)
 		},
 		getNetgroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -149,7 +149,7 @@ export default {
 				})
 		},
 		getNetworks(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks = []
 					response.data.forEach(network => {
@@ -173,7 +173,7 @@ export default {
 					group: this.row.id
 				}
 
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -195,7 +195,7 @@ export default {
 				this.updateNetworks()
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

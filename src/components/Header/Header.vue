@@ -19,7 +19,7 @@
 			<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
 				<router-link to="/dashboard">
 					<img 
-						src="../../assets/logo-white.png"
+						src="../../assets/img/logo-white.png"
 						alt="OCS Inventory" 
 						class="navbar-brand-image logo-size"
 					>
@@ -30,11 +30,11 @@
 			<div class="navbar-nav flex-row order-md-last">
 				<Localeswitcher />
 
-				<b-nav-item-dropdown
+				<BNavItemDropdown
 					id="setting-dropdown"
 					no-caret 
 				>
-					<template slot="button-content">
+					<template #button-content>
 						<font-awesome-icon 
 							icon="gear"
 							transform="shrink-6"
@@ -56,7 +56,7 @@
 						/>
 						<p>{{ $t('generic.logout') }}</p>
 					</b-dropdown-item-button>
-				</b-nav-item-dropdown>
+				</BNavItemDropdown>
 			</div>
 
 			<Sidebar 
@@ -67,8 +67,8 @@
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar/Sidebar'
-import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher'
+import Sidebar from '@/components/Sidebar/Sidebar.vue'
+import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher.vue'
 
 export default {
 	name: 'Header',

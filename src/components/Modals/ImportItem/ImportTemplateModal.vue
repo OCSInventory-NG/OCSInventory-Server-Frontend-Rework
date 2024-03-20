@@ -98,7 +98,7 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit() {
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

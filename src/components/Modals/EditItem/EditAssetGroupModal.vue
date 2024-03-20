@@ -175,9 +175,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
+import Alert from '@/components/Alert/Alert.vue'
+import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: 'EditAssetGroupModal',
@@ -202,9 +201,9 @@ export default {
 				groups: []
 			},
 			optvisibility: [
-				{ value: "public", text: i18n.t("assetgroup.public") },
-				{ value: "private_personal", text: i18n.t("assetgroup.private_personal") },
-				{ value: "private_group", text: i18n.t("assetgroup.private_group") }
+				{ value: "public", text: this.$t("assetgroup.public") },
+				{ value: "private_personal", text: this.$t("assetgroup.private_personal") },
+				{ value: "private_group", text: this.$t("assetgroup.private_group") }
 			],
 			user: [],
 			groups: [],
@@ -225,7 +224,7 @@ export default {
 	},
 	methods: {
 		getAssetGroupInfo() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
 				.then(response => {
 					delete response.data.search
 					delete response.data.assets
@@ -242,7 +241,7 @@ export default {
 				})
 		},
 		getUserName() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					if(response.data.first_name != "") {
@@ -262,7 +261,7 @@ export default {
 			if(this.groupinfo.groups) {
 				for (const group of this.groupinfo.groups) {
 					this.loading = true
-					Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+					Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 						.then(response => {
 							this.groups.push({
 								value: response.data.id,
@@ -289,7 +288,7 @@ export default {
 				this.groupinfo.allow_group_modification = false
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"asset/groups/"+this.groupinfo.id+"/", this.groupinfo, 
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.groupinfo.id+"/", this.groupinfo, 
 				{ headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true

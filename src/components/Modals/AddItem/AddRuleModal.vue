@@ -166,11 +166,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: "AddRuleModal",
@@ -204,9 +203,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			options: [
-				{ value: 'inventory_received', text: i18n.t('rule.inventory_received') },
-				{ value: 'user_login', text: i18n.t('rule.user_login') },
-				{ value: 'netdevice_received', text: i18n.t('rule.netdevice_received') }
+				{ value: 'inventory_received', text: this.$t('rule.inventory_received') },
+				{ value: 'user_login', text: this.$t('rule.user_login') },
+				{ value: 'netdevice_received', text: this.$t('rule.netdevice_received') }
 			],
 			excludefields: ["logic", "actions"]
 		}
@@ -224,7 +223,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							if(!this.excludefields.includes(field)) {
@@ -240,15 +239,15 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}
 		},
 		getRules() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(element => {
-						element.trigger = i18n.t("rule." + element.trigger)
+						element.trigger = this.$t("rule." + element.trigger)
 					})
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -267,7 +266,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

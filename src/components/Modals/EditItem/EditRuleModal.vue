@@ -115,7 +115,7 @@ export default {
 			this.getRules(id)
 		},
 		getRules(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -134,7 +134,7 @@ export default {
 			delete this.row.logic
 			delete this.row.actions
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

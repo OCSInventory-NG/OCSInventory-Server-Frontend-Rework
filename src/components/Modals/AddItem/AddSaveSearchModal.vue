@@ -248,9 +248,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "AddSaveSearchModal",
@@ -271,13 +270,13 @@ export default {
 			},
 			searchaction: "create",
 			optvisibility: [
-				{ value: "public", text: i18n.t("search.public") },
-				{ value: "private_personal", text: i18n.t("search.private_personal") },
-				{ value: "private_group", text: i18n.t("search.private_group") }
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") }
 			],
 			optactions : [
-				{ value: "create", text: i18n.t("search.create") },
-				{ value: "update", text: i18n.t("search.update") }
+				{ value: "create", text: this.$t("search.create") },
+				{ value: "update", text: this.$t("search.update") }
 			],
 			optsearch: [],
 			groups : [],
@@ -310,7 +309,7 @@ export default {
 		getMySearches(update = false) {
 			this.loading = true
 			this.rowsavesearch = []
-			Axios.get(process.env.VUE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					if(!update) {
 						this.rowsavesearchheader = [
@@ -352,7 +351,7 @@ export default {
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
 					this.errorMsg = null
@@ -370,7 +369,7 @@ export default {
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -396,7 +395,7 @@ export default {
 			}
 
 			if(this.searchaction == "create") {
-				Axios.post(process.env.VUE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -409,7 +408,7 @@ export default {
 					})
 					.finally(() => { this.loadingcreate = false })
 			} else {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

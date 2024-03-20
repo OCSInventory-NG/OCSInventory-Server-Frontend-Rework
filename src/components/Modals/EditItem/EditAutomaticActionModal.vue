@@ -114,7 +114,6 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
 
 export default {
 	name: 'EditAutomaticActionModal',
@@ -140,14 +139,14 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			active: [
-				{ value: true, text: i18n.t('generic.yes') },
-				{ value: false, text: i18n.t('generic.no') }
+				{ value: true, text: this.$t('generic.yes') },
+				{ value: false, text: this.$t('generic.no') }
 			],
 			recurences: [
-				{ value: 'hourly', text: i18n.t('scheduler.hourly') },
-				{ value: 'daily', text: i18n.t('scheduler.daily') },
-				{ value: 'weekly', text: i18n.t('scheduler.weekly') },
-				{ value: 'monthly', text: i18n.t('scheduler.monthly') }
+				{ value: 'hourly', text: this.$t('scheduler.hourly') },
+				{ value: 'daily', text: this.$t('scheduler.daily') },
+				{ value: 'weekly', text: this.$t('scheduler.weekly') },
+				{ value: 'monthly', text: this.$t('scheduler.monthly') }
 			],
 			idmodal: 'edit-scheduler.'+this.id
 		}
@@ -157,7 +156,7 @@ export default {
 			this.getScheduler(id)
 		},
 		getScheduler(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -179,7 +178,7 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 			
-			Axios.put(process.env.VUE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
+			Axios.put(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
 				formdata, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

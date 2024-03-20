@@ -147,8 +147,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddActionListModal',
@@ -178,9 +177,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			actionoptions: [
-				{ value: 'EXEC', text: i18n.t('deployment.EXEC') },
-				{ value: 'LAUNCH', text: i18n.t('deployment.LAUNCH') },
-				{ value: 'STORE', text: i18n.t('deployment.STORE') }
+				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
+				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
+				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			]
 		}
 	},
@@ -201,7 +200,7 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

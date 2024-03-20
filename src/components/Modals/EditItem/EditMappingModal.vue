@@ -74,7 +74,6 @@
 
 <script>
 import Axios from 'axios'
-//import i18n from '@/i18n'
 
 export default {
 	name: 'EditMappingModal',
@@ -107,7 +106,7 @@ export default {
 			this.getMappingConfig(id)
 		},
 		getMappingConfig(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 
@@ -175,7 +174,7 @@ export default {
 
 			if(jsonToUpdate.length) {
 				jsonToUpdate.forEach(data => {
-					Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
+					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true
@@ -192,7 +191,7 @@ export default {
 			}
 
 			if(jsonToAdd.length) {
-				Axios.post(process.env.VUE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -209,7 +208,7 @@ export default {
 
 			if(jsonToDelete.length) {
 				jsonToDelete.forEach(data => {
-					Axios.delete(process.env.VUE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
+					Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true

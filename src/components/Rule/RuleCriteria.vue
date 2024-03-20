@@ -188,9 +188,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "RuleCriteria",
@@ -218,16 +217,16 @@ export default {
 			loadingfield: true,
 			fields: [],
 			operators: [
-				{ value: "==", text: i18n.t("rule.equal") },
-				{ value: "!=", text: i18n.t("rule.notequal") },
-				{ value: ">", text: i18n.t("rule.morethan") },
-				{ value: ">=", text: i18n.t("rule.morethanorequal") },
-				{ value: "<", text: i18n.t("rule.lessthan") },
-				{ value: "<=", text: i18n.t("rule.lessthanorequal") },
-				{ value: "!!", text: i18n.t("rule.boolean") },
-				{ value: "!", text: i18n.t("rule.not") },
-				{ value: "in", text: i18n.t("rule.contains") },
-				{ value: "regex", text: i18n.t("rule.regex") }
+				{ value: "==", text: this.$t("rule.equal") },
+				{ value: "!=", text: this.$t("rule.notequal") },
+				{ value: ">", text: this.$t("rule.morethan") },
+				{ value: ">=", text: this.$t("rule.morethanorequal") },
+				{ value: "<", text: this.$t("rule.lessthan") },
+				{ value: "<=", text: this.$t("rule.lessthanorequal") },
+				{ value: "!!", text: this.$t("rule.boolean") },
+				{ value: "!", text: this.$t("rule.not") },
+				{ value: "in", text: this.$t("rule.contains") },
+				{ value: "regex", text: this.$t("rule.regex") }
 			],
 			triggermodel: {
 				"inventory_received": {
@@ -244,16 +243,16 @@ export default {
 				}
 			},
 			operatortargets: {
-				"==": i18n.t("rule.equal"),
-				"!=": i18n.t("rule.notequal"),
-				">": i18n.t("rule.morethan"),
-				">=": i18n.t("rule.morethanorequal"),
-				"<": i18n.t("rule.lessthan"),
-				"<=": i18n.t("rule.lessthanorequal"),
-				"!!": i18n.t("rule.boolean"),
-				"!": i18n.t("rule.not"),
-				"in": i18n.t("rule.contains"),
-				"regex": i18n.t("rule.regex")
+				"==": this.$t("rule.equal"),
+				"!=": this.$t("rule.notequal"),
+				">": this.$t("rule.morethan"),
+				">=": this.$t("rule.morethanorequal"),
+				"<": this.$t("rule.lessthan"),
+				"<=": this.$t("rule.lessthanorequal"),
+				"!!": this.$t("rule.boolean"),
+				"!": this.$t("rule.not"),
+				"in": this.$t("rule.contains"),
+				"regex": this.$t("rule.regex")
 			},
 			datavalues: [
 				[
@@ -278,7 +277,7 @@ export default {
 	},
 	methods: {
 		getModelField() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
 					this.loadingfield = true
 
@@ -286,7 +285,7 @@ export default {
 						if(field != "inventory_sections") {
 							this.fields.push({
 								value: field,
-								text: i18n.t(this.triggermodel[this.trigger].key + field)
+								text: this.$t(this.triggermodel[this.trigger].key + field)
 							})
 						}
 					})
@@ -490,7 +489,7 @@ export default {
 
 			this.logicupdate.logic = logicTmp
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

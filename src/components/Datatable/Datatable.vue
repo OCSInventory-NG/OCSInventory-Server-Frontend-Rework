@@ -111,14 +111,14 @@
 				selectable
 				striped
 				hover
-				outlined
-				:select-mode="selectMode"
+				bordered
+				:selectMode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sort-by.sync="sortBy"
-				:sort-desc.sync="sortDesc"
-				:per-page="perPage"
-				:current-page="currentPage"
+				:sortBy="sortBy"
+				:sortDesc="sortDesc"
+				:perPage="perPage"
+				:currentPage="currentPage"
 				:filter="filter"
 				primary-key="id"
 				style="white-space: pre-line;"
@@ -332,22 +332,21 @@
 </template>
 
 <script>
-import i18n from '../../i18n'
-import EditUserModal from '@/components/Modals/EditItem/EditUserModal'
-import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal'
-import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal'
-import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal'
-import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal'
-import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal'
-import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
-import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal'
-import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal'
-import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal'
-import EditAssetGroupModal from '../Modals/EditItem/EditAssetGroupModal'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
-import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal'
-import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal'
+import EditUserModal from '@/components/Modals/EditItem/EditUserModal.vue'
+import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal.vue'
+import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal.vue'
+import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal.vue'
+import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal.vue'
+import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal.vue'
+import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal.vue'
+import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
+import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal.vue'
+import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal.vue'
+import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal.vue'
+import EditAssetGroupModal from '@/components/Modals/EditItem/EditAssetGroupModal.vue'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
+import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
+import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
 
 export default {
 	name: 'Datatable',
@@ -398,7 +397,15 @@ export default {
 			// Pagination parameters
 			perPage: 5,
 			currentPage: 1,
-			pageOptions: [5, 10, 25, 100, 250, 500, 1000],
+			pageOptions: [
+				{ value: 5, text: "5" },
+				{ value: 10, text: "10" },
+				{ value: 25, text: "25" },
+				{ value: 100, text: "100" },
+				{ value: 250, text: "250" },
+				{ value: 500, text: "500" },
+				{ value: 1000, text: "1000" },
+			],
 			totalRows: 1,
 			// Datatable datas
 			fields: [],
@@ -444,7 +451,7 @@ export default {
 		if(this.usecheckbox == true) {
 			this.fields.push({
 				key: "selected", 
-				label: i18n.t('generic.selected'), 
+				label: this.$t('generic.selected'), 
 				sortable: false ,
 				visible: true,
 			})
@@ -470,7 +477,7 @@ export default {
 
 				var array = {
 					key: data,
-					label: (i18n.te(this.translationkey+data)) ? i18n.t(this.translationkey+data) : data,
+					label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
 					sortable: true,
 					visible: visible,
 				}
@@ -486,7 +493,7 @@ export default {
 
 		var actions = {
 			key: "actions", 
-			label: i18n.t('generic.actions'), 
+			label: this.$t('generic.actions'), 
 			sortable: false ,
 			visible: true,
 		}

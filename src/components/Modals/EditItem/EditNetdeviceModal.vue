@@ -110,7 +110,7 @@ export default {
 		},
 		// Retrieve networks info by id
 		getNetdevice(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -126,7 +126,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

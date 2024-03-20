@@ -185,8 +185,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddSectionModal',
@@ -218,17 +217,17 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			methodoptions: [
-				{ value: 'FILE', text: i18n.t('template.FILE') },
-				{ value: 'BASH', text: i18n.t('template.BASH') },
-				{ value: 'PW', text: i18n.t('template.PW') },
-				{ value: 'CMD', text: i18n.t('template.CMD') }
+				{ value: 'FILE', text: this.$t('template.FILE') },
+				{ value: 'BASH', text: this.$t('template.BASH') },
+				{ value: 'PW', text: this.$t('template.PW') },
+				{ value: 'CMD', text: this.$t('template.CMD') }
 			],
 			outputoptions: [
-				{ value: 'PTXT', text: i18n.t('template.PTXT') },
-				{ value: 'JSON', text: i18n.t('template.JSON') },
-				{ value: 'TBLE', text: i18n.t('template.TBLE') },
-				{ value: 'REGX', text: i18n.t('template.REGX') },
-				{ value: 'GREP', text: i18n.t('template.GREP') }
+				{ value: 'PTXT', text: this.$t('template.PTXT') },
+				{ value: 'JSON', text: this.$t('template.JSON') },
+				{ value: 'TBLE', text: this.$t('template.TBLE') },
+				{ value: 'REGX', text: this.$t('template.REGX') },
+				{ value: 'GREP', text: this.$t('template.GREP') }
 			],
 			outputoptionoptions: {
 				"TBLE": [
@@ -263,7 +262,7 @@ export default {
 				})
 			}
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

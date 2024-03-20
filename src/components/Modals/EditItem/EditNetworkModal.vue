@@ -108,7 +108,6 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
 
 export default {
 	name: 'EditNetworkModal',
@@ -142,7 +141,7 @@ export default {
 		},
 		// Retrieve networks info by id
 		getNetworks(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -155,11 +154,11 @@ export default {
 				})
 		},
 		getNetGroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroup.push({
 						value: null,
-						text: i18n.t("network.unknown_network")
+						text: this.$t("network.unknown_network")
 					})
 					response.data.forEach(element => {
 						this.netgroup.push({
@@ -180,7 +179,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

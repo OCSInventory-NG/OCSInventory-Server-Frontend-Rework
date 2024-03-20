@@ -164,11 +164,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddPackageModal',
@@ -200,9 +199,9 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			options: [
-				{ value: 'WIN', text: i18n.t('template.WIN') },
-				{ value: 'LIN', text: i18n.t('template.LIN') },
-				{ value: 'MAC', text: i18n.t('template.MAC') }
+				{ value: 'WIN', text: this.$t('template.WIN') },
+				{ value: 'LIN', text: this.$t('template.LIN') },
+				{ value: 'MAC', text: this.$t('template.MAC') }
 			]
 		}
 	},
@@ -217,7 +216,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							if(field != "result") this.rowheader.push(field)
@@ -231,12 +230,12 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}
 		},
 		getPackages() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length
@@ -258,7 +257,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

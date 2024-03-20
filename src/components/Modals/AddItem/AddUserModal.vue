@@ -229,11 +229,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import Alert from '@/components/Alert/Alert'
-import Datatable from '@/components/Datatable/Datatable'
+import Loader from '@/components/Loader/Loader.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'AddUserModal',
@@ -283,7 +282,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -297,13 +296,13 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}	
 		},
 		// Get all users
 		getUsers() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -329,7 +328,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -348,7 +347,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.post(process.env.VUE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

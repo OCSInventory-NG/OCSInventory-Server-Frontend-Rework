@@ -113,7 +113,7 @@ export default {
 		},
 		// Get accountinfo
 		getAccountinfo(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -134,7 +134,7 @@ export default {
 				description: this.row.description
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

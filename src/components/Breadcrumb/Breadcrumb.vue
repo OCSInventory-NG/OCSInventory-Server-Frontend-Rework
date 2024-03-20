@@ -8,8 +8,6 @@
 </template>
 
 <script>
-import i18n from '../../i18n'
-
 export default {
 	name: 'BreadcrumbHistory',
 	props: {
@@ -54,14 +52,14 @@ export default {
 
 				if(routeExists) {
 					breadcrumb.push({
-						text: (i18n.te("title." + item.replace(/ /g,"_"))) ? i18n.t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
 						to: path,
 						append: true,
 						replace: true
 					})
 				} else {
 					breadcrumb.push({
-						text: (i18n.te("title." + item.replace(/ /g,"_"))) ? i18n.t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
 						disabled: true
 					})
 				}

@@ -149,9 +149,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "RuleAction",
@@ -181,14 +180,14 @@ export default {
 			actionstrigger: {},
 			routeopt: {
 				"inventory_received": [
-					{ value: "accountinfo.accountinfoconfig", text: i18n.t("title.accountinfo") },
-					{ value: "inventory_base.inventorybase", text: i18n.t("title.assets") }
+					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
+					{ value: "inventory_base.inventorybase", text: this.$t("title.assets") }
 				],
 				"user_login": [
-					{ value: "auth.user", text: i18n.t("title.users") }
+					{ value: "auth.user", text: this.$t("title.users") }
 				],
 				"netdevice_received": [
-					{ value: "accountinfo.accountinfoconfig", text: i18n.t("title.accountinfo") },
+					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
 				]
 			},
 			routetargets: {
@@ -300,7 +299,7 @@ export default {
 			}
 
 			if(model == "accountinfo.accountinfoconfig") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 						this.fieldopt[index] = []
@@ -322,7 +321,7 @@ export default {
 					})
 					.finally(() => this.loadingfield = false)
 			} else {
-				Axios.options(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 
@@ -332,7 +331,7 @@ export default {
 							if( this.actionstrigger[model].includes(field)) {
 								this.fieldopt[index].push({
 									value: field,
-									text: i18n.t(component+"."+field),
+									text: this.$t(component+"."+field),
 									fieldtype: response.data.actions.POST[field]["type"]
 								})
 							}
@@ -383,7 +382,7 @@ export default {
 					route = "templates"
 				}
 
-				Axios.get(process.env.VUE_APP_API_ROUTE+route, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
@@ -401,7 +400,7 @@ export default {
 						this.errored = true
 					})
 			} else if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingselect = true
@@ -491,7 +490,7 @@ export default {
 
 			this.actionupdate.forEach(action => {
 				if(action.id != null) {
-					Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
+					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
@@ -510,7 +509,7 @@ export default {
 					delete action.object_id
 					delete action.object_slug
 
-					Axios.post(process.env.VUE_APP_API_ROUTE+"automation/action/", action, 
+					Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
@@ -528,7 +527,7 @@ export default {
 			})
 
 			actionremove.forEach(id => {
-				Axios.delete(process.env.VUE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
+				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

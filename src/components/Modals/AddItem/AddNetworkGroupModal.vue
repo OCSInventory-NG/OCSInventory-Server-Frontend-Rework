@@ -147,11 +147,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import Alert from '@/components/Alert/Alert'
-import Datatable from '@/components/Datatable/Datatable'
+import Loader from '@/components/Loader/Loader.vue'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: "AddNetworkGroupModal",
@@ -193,7 +192,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -207,12 +206,12 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}	
 		},
 		getNetgroup() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -228,7 +227,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.post(process.env.VUE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

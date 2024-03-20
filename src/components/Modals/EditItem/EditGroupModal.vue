@@ -92,8 +92,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Matrix from '@/components/Matrix/Matrix'
+import Matrix from '@/components/Matrix/Matrix.vue'
 
 export default {
 	name: 'EditGroupModal',
@@ -126,7 +125,7 @@ export default {
 		},
 		// Get all permissions
 		getPermissions(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -164,7 +163,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t('permission.'+label)
+							trad: this.$t('permission.'+label)
 						})
 					})
 					this.getGroup(id)
@@ -172,7 +171,7 @@ export default {
 		},
 		// Get groups
 		getGroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -187,7 +186,7 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

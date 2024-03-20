@@ -83,10 +83,10 @@
 <script>
 import draggable from 'vuedraggable'
 import Axios from 'axios'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
-import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
+import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
+import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal.vue'
+import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 
 export default {
 	name: "DraggableComponent",
@@ -134,7 +134,7 @@ export default {
 					priority: priority
 				}
 
-				Axios.patch(process.env.VUE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
 					.catch(e => {
 						console.log(e)
 					})

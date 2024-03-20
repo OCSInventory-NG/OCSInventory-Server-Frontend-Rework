@@ -150,7 +150,6 @@
 
 <script>
 import Axios from 'axios'
-//import i18n from '@/i18n'
 
 export default {
 	name: 'EditLdapModal',
@@ -193,7 +192,7 @@ export default {
 			this.getLdapConfig(id)
 		},
 		getLdapConfig(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -211,7 +210,7 @@ export default {
 
 			delete this.row.mappings
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

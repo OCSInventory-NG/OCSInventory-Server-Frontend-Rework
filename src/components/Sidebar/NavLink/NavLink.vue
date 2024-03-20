@@ -34,7 +34,7 @@
 		id="my-nav-dropdown"
 		class="nav-item dropdown"
 	>
-		<template slot="button-content">
+		<template #button-content>
 			<span class="nav-link-icon d-md-none d-lg-inline-block">
 				<font-awesome-layers 
 					style="font-size: 1.7em;"

@@ -139,8 +139,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
+import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: "EditSaveSearchModal",
@@ -158,9 +157,9 @@ export default {
 			},
 			rowuser: [],
 			optvisibility: [
-				{ value: "public", text: i18n.t("search.public") },
-				{ value: "private_personal", text: i18n.t("search.private_personal") },
-				{ value: "private_group", text: i18n.t("search.private_group") }
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") }
 			],
 			loading: true,
 			errorMsg: null,
@@ -180,7 +179,7 @@ export default {
 			this.getSavedSearch(id)
 		},
 		getSavedSearch(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -195,7 +194,7 @@ export default {
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
 					this.errorMsg = null
@@ -214,7 +213,7 @@ export default {
 			this.groups = []
 			for (const group of groups) {
 				this.loading = true
-				Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -235,7 +234,7 @@ export default {
 			delete this.row.search
 			delete this.row.user
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
