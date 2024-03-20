@@ -57,10 +57,10 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal'
-import Draggable from '@/components/Draggable/Draggable'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal.vue'
+import Draggable from '@/components/Draggable/Draggable.vue'
 
 export default {
 	name: 'EditPackage',
@@ -106,7 +106,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -125,7 +125,7 @@ export default {
 			this.getPackage()
 		},
 		getPackage() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowpackagedata = response.data
 					this.rowactiondata = response.data.actions_list

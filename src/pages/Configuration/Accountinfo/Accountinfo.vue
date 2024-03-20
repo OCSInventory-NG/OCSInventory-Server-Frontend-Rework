@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import AddAccountinfoModal from '@/components/Modals/AddItem/AddAccountinfoModal'
+import AddAccountinfoModal from '@/components/Modals/AddItem/AddAccountinfoModal.vue'
 
 export default {
 	name: "Accountinfo",

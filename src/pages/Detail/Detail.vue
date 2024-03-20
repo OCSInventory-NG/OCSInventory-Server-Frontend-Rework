@@ -113,12 +113,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Accountinfo from '@/components/Accountinfo/Accountinfo'
-import ResultDetail from '@/components/Deployment/ResultDetail'
-import Inventory from '@/components/Inventory/Inventory'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
+import ResultDetail from '@/components/Deployment/ResultDetail.vue'
+import Inventory from '@/components/Inventory/Inventory.vue'
 
 export default {
 	name: 'Detail',
@@ -156,7 +156,7 @@ export default {
 			this.translationkey = "network."
 		}
 
-		Axios.get(process.env.VUE_APP_API_ROUTE+extendedRoute, { headers: this.header })
+		Axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data

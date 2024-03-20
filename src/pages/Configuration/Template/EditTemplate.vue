@@ -49,10 +49,10 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import SectionCollapse from '@/components/Collapse/Template/SectionCollapse'
-import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import SectionCollapse from '@/components/Collapse/Template/SectionCollapse.vue'
+import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal.vue'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'EditTemplate',
@@ -85,7 +85,7 @@ export default {
 	},
 	methods: {
 		getTemplate() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections

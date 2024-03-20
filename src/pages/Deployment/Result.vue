@@ -117,14 +117,13 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Counter from '@/components/Dashboard/Counter/Counter'
-import DonutChart from '@/components/Dashboard/Chart/Donut'
-import BarChart from '@/components/Dashboard/Chart/Bar'
-import Datatable from '@/components/Datatable/Datatable'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import Counter from '@/components/Dashboard/Counter/Counter.vue'
+import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
+import BarChart from '@/components/Dashboard/Chart/Bar.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: "Result",
@@ -165,7 +164,7 @@ export default {
 					}
 				},
 				series: [{
-					name: i18n.t('deployment.nb'),
+					name: this.$t('deployment.nb'),
 					data: []
 				}]
 			},
@@ -180,7 +179,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/results/", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -196,7 +195,7 @@ export default {
 				})
 		},
 		getPackageResult() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 
@@ -248,9 +247,9 @@ export default {
 						index += 1
 					})
 
-					this.resultcount.options.labels.push(i18n.t("deployment.waiting"))
-					this.resultcount.options.labels.push(i18n.t("deployment.success"))
-					this.resultcount.options.labels.push(i18n.t("deployment.error"))
+					this.resultcount.options.labels.push(this.$t("deployment.waiting"))
+					this.resultcount.options.labels.push(this.$t("deployment.success"))
+					this.resultcount.options.labels.push(this.$t("deployment.error"))
 
 					this.resultcount.series.push(this.count.waiting)
 					this.resultcount.series.push(this.count.success)

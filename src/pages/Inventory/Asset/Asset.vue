@@ -47,11 +47,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader' 
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue' 
 
 export default {
 	name: 'Assets',
@@ -73,14 +72,14 @@ export default {
 		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
 			this.getHeader()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -97,7 +96,7 @@ export default {
 				})
 		},
 		getAssets() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null

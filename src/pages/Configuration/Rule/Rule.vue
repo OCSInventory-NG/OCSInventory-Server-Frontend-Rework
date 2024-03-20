@@ -16,7 +16,7 @@
 	</div>
 </template>
 <script>
-import AddRuleModal from '@/components/Modals/AddItem/AddRuleModal'
+import AddRuleModal from '@/components/Modals/AddItem/AddRuleModal.vue'
 
 export default {
 	name: "Rule",

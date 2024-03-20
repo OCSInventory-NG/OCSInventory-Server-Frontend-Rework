@@ -44,11 +44,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import Datatable from '@/components/Datatable/Datatable'
-import PageHeader from '@/components/Header/PageHeader'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'History',
@@ -74,13 +73,13 @@ export default {
 			}
 			this.getHeader()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") {
@@ -101,7 +100,7 @@ export default {
 				})
 		},
 		getPackages() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length

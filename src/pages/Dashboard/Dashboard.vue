@@ -113,15 +113,14 @@
 </template>
 
 <script>
-import i18n from '../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
 import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader'
-import BarChart from '@/components/Dashboard/Chart/Bar'
-import Counter from '@/components/Dashboard/Counter/Counter'
-import DonutChart from '@/components/Dashboard/Chart/Donut'
-import LineChart from '@/components/Dashboard/Chart/Line'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import BarChart from '@/components/Dashboard/Chart/Bar.vue'
+import Counter from '@/components/Dashboard/Counter/Counter.vue'
+import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
+import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
 export default {
 	name: "Dashboard",
@@ -162,7 +161,7 @@ export default {
 					}
 				},
 				series: [{
-					name: i18n.t('dashboard.nbassets'),
+					name: this.$t('dashboard.nbassets'),
 					data: []
 				}]
 			},
@@ -183,7 +182,7 @@ export default {
 					}
 				},
 				series: [{
-					name: i18n.t('dashboard.nbnetwork'),
+					name: this.$t('dashboard.nbnetwork'),
 					data: []
 				}]
 			},
@@ -207,7 +206,7 @@ export default {
 	},
 	methods: {
 		getNetworks() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks.total = response.data.length
 					response.data.forEach(network => {
@@ -227,7 +226,7 @@ export default {
 				})
 		},
 		getNetdevices() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/", { headers: this.header })
 				.then(response => {
 					this.networks.devices.total = response.data.length
 					response.data.forEach(device => {
@@ -250,7 +249,7 @@ export default {
 		},
 		// Retrieve templates ID and sort by type
 		getTemplates() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
 						this.templates[template["os"]].push(template["id"])
@@ -266,7 +265,7 @@ export default {
 		},
 		// Count assets and sort by template types
 		getCount() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					var now = new Date().toJSON().slice(0,10)
 					this.total.total = response.data.length

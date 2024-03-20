@@ -220,10 +220,9 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'General',
@@ -261,14 +260,14 @@ export default {
 			}
 			this.getConfig()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}	
 	},
 	methods: {
 		// Get all config
 		getConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 					this.loading = false
@@ -282,7 +281,7 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"config/", this.configs, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/", this.configs, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

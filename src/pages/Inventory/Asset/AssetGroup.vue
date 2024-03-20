@@ -50,11 +50,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader' 
+import Loader from '@/components/Loader/Loader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue' 
 
 export default {
 	name: 'AssetGroup',
@@ -86,14 +85,14 @@ export default {
 			}
 			this.getHeader()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "assets") {
@@ -110,12 +109,12 @@ export default {
 				})
 		},
 		getAssetGroups() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const group of response.data) {
-						group.visibility = i18n.t("assetgroup."+group.visibility)
-						group.is_dynamic = i18n.t("generic."+group.is_dynamic)
-						group.allow_group_modification = i18n.t("generic."+group.allow_group_modification)
+						group.visibility = this.$t("assetgroup."+group.visibility)
+						group.is_dynamic = this.$t("generic."+group.is_dynamic)
+						group.allow_group_modification = this.$t("generic."+group.allow_group_modification)
 					}
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -129,7 +128,7 @@ export default {
 		},
 		getUserName() {
 			for (const group of this.rowdata) {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							group.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -150,7 +149,7 @@ export default {
 				if(row.groups) {
 					for (const group of row.groups) {
 						this.loading = true
-						Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+						Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)

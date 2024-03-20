@@ -44,10 +44,10 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Datatable from '@/components/Datatable/Datatable'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: "InventoryLog",
@@ -70,7 +70,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/logs", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/logs", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -90,7 +90,7 @@ export default {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?asset="+this.$route.params.id
 
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null

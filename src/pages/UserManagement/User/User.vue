@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AddUserModal from '@/components/Modals/AddItem/AddUserModal';
+import AddUserModal from '@/components/Modals/AddItem/AddUserModal.vue';
 
 export default {
 	name: "User",

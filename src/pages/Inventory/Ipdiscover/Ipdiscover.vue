@@ -49,11 +49,10 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import IpdiscoverCollapse from '@/components/Collapse/Ipdiscover/IpdiscoverCollapse'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import IpdiscoverCollapse from '@/components/Collapse/Ipdiscover/IpdiscoverCollapse.vue'
 
 export default {
 	name: "Ipdiscover",
@@ -97,14 +96,14 @@ export default {
 			}
 			this.getNetworks()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
 		// Retrieve networks group
 		getNetGroup() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroupdata = response.data
 					this.errorMsg = null
@@ -121,7 +120,7 @@ export default {
 			this.networkdata = []
 			this.netgroupdata = []
 			this.rowdata = []
-			Axios.get(process.env.VUE_APP_API_ROUTE+"networks/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networkdata = response.data
 					this.errorMsg = null
@@ -138,7 +137,7 @@ export default {
 			// Create UNKNOWN group
 			this.rowdata.push({
 				id: null,
-				name: i18n.t("network.unknown_network"),
+				name: this.$t("network.unknown_network"),
 				description: "",
 				networks: []
 			})

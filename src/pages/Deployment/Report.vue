@@ -37,11 +37,10 @@
 
 <script>
 //import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
+import Loader from '@/components/Loader/Loader.vue'
+import Alert from '@/components/Alert/Alert.vue'
 //import Datatable from '@/components/Datatable/Datatable'
-import PageHeader from '@/components/Header/PageHeader'
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'Report',
@@ -74,7 +73,7 @@ export default {
 				this.candelete = true
 			}
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	}
