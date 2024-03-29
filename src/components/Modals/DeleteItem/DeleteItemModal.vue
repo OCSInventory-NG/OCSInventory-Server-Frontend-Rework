@@ -1,9 +1,9 @@
 <template>
 	<div id="DeleteItemModal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t('generic.deleteitem')"
 			class="btn btn-ghost-danger"
+			@click="deleteact = !deleteact"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'trash-can']"
@@ -12,14 +12,29 @@
 
 		<b-modal 
 			:id="idModal" 
+			v-model="deleteact"
 			:title="$t('generic.deleteitem')"
 			hide-footer
 			modal-class="modal modal-blur"
 			size="sm"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('generic.deleteitem') }}
+					<b-spinner 
+						v-if="loadingdelete"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="deletewithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="deleteerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -35,6 +50,11 @@
 			<b-form
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="deleteerror"
+					:message="deleteerrormsg" 
+					variant="danger"
+				/>
 				<div class="text-center">
 					<font-awesome-icon 
 						:icon="['fas', 'triangle-exclamation']"
@@ -69,9 +89,11 @@
 
 <script>
 import Axios from 'axios'
+import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'DeleteItemModal',
+	components: { Alert },
 	props: {
 		id: { type: Number, default: null },
 		name: { type: String, default: '' },
@@ -82,10 +104,11 @@ export default {
 			row: {
 				id: this.id
 			},
-			errorMsg: null,
-			succesMsg: null,
-			errored: false,
-			successed: false,
+			loadingdelete: false,
+			deleteerror: false,
+			deleteerrormsg: null,
+			deletewithsuccess: false,
+			deleteact: false,
 			idModal: 'delete-item'+this.id,
 			text: null,
 			header: {
@@ -94,27 +117,34 @@ export default {
 			}
 		}
 	},
+	watch: {
+		deletewithsuccess: function() {
+			setTimeout(() => {
+				this.deleteact = false
+				this.deletewithsuccess = false
+				this.$emit('reloadDatatable')
+				this.$emit('reloadTemplate')
+			}, 500)
+		}
+	},
 	methods: {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingdelete = true
+			
 			Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('delete-item'+this.row.id)
-					this.$emit('reloadDatatable')
-					this.$emit('reloadTemplate')
+					this.deleteerrormsg = null
+					this.deleteerror = false
+					this.deletewithsuccess = true
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('delete-item'+this.row.id)
+					this.deleteerrormsg = e.message
+					this.deleteerror = true
+					this.deletewithsuccess = false
 				})
+				.finally(() => this.loadingdelete = false)
 		}
 	}
 }
