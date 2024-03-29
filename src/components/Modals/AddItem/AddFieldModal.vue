@@ -1,10 +1,10 @@
 <template>
 	<div id="add-field-modal">
 		<b-button 
-			v-b-modal="idModal"
 			:title="$t('template.addfield')"
 			variant="success"
 			class="add-button"
+			@click="addfield = !addfield"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'plus']"
@@ -12,14 +12,29 @@
 		</b-button>
 
 		<b-modal 
-			:id="idModal" 
+			:id="idModal"
+			v-model="addfield"
 			:title="$t('template.addfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('template.addfield') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +48,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -189,6 +210,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -216,11 +243,13 @@ export default {
 			},
 			options: {},
 			rowdata: [],
-			errorMsg: null,
-			succesMsg: null,
-			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
 			idModal: 'add-field'+this.section,
+			addfield: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -256,13 +285,24 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addfield = false
+				this.createwithsuccess = false
+				this.$emit('reloadTemplate')
+			}, 500)
+		}
+	},
 	created() {
 		this.row.section = this.section
+		this.loading = false
 	},
 	methods: {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
@@ -273,20 +313,16 @@ export default {
 			
 			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide(this.idModal)
-					this.$emit('reloadTemplate')
+					this.createwithsuccess = true
+					this.createerror = false
+					this.createerrormsg = null
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide(this.idModal)
+					this.createwithsuccess = false
+					this.createerror = true
+					this.createerrormsg = e.message
 				})
+				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

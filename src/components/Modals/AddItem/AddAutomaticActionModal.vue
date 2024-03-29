@@ -16,10 +16,10 @@
 						<!-- Button to add scheduler -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-scheduler
 							:title="$t('scheduler.addscheduler')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="addscheduler = !addscheduler"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -69,14 +61,29 @@
 							<!-- Modal to add scheduler -->
 							<b-modal 
 								v-if="canadd"
-								id="add-scheduler" 
+								id="add-scheduler"
+								v-model="addscheduler"
 								:title="$t('scheduler.addscheduler')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('scheduler.addscheduler') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -90,8 +97,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<b-form-group
@@ -166,6 +179,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -177,14 +196,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddAutomaticActionModal',
-	components: { Datatable, Loader, Alert, Breadcrumb },
+	components: { Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -205,9 +221,12 @@ export default {
 			rowheader: [],
 			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addscheduler: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -225,8 +244,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addscheduler = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -272,21 +294,20 @@ export default {
 		// Submit template creation and call getSchedulers to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 			
 			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-scheduler')
+					this.createwithsuccess = true
+					this.createerror = false
+					this.createerrormsg = null
+					this.loadingcreate = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-scheduler')
+					this.createwithsuccess = false
+					this.createerror = true
+					this.createerrormsg = e.message
+					this.loadingcreate = false
 				})
 				.finally(() => this.getSchedulers())
 		}

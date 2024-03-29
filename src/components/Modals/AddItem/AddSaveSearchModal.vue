@@ -5,7 +5,6 @@
 			align="right"
 		>
 			<b-button
-				v-b-modal.add-savesearch
 				:title="$t('search.savemysearch')"
 				class="btn btn-teal btn-save-search"
 				@click="getMyInfo()"
@@ -16,7 +15,6 @@
 				/>
 			</b-button>
 			<b-button
-				v-b-modal.use-savesearch
 				:title="$t('search.usesavedsearch')"
 				class="btn btn-yellow"
 				@click="getMySearches()"
@@ -29,12 +27,13 @@
 		</div>
 		<b-modal 
 			id="use-savesearch" 
+			v-model="modaluse"
 			:title="$t('search.usesavedsearch')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="lg"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('search.usesavedsearch') }}
 				</h5>
@@ -73,12 +72,13 @@
 			/>
 		</b-modal>
 		<b-modal 
-			id="add-savesearch" 
+			id="add-savesearch"
+			v-model="modalsavesearch"
 			:title="$t('search.savemysearch')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('search.savemysearch') }}
 					<b-spinner 
@@ -242,18 +242,21 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "AddSaveSearchModal",
-	components: { Datatable, Alert },
 	props: {
 		rowsearch: { type: Array, default: null }
 	},
@@ -291,6 +294,8 @@ export default {
 			createerrormsg: null,
 			updatesearchid: null,
 			updatesearch: [],
+			modaluse: false,
+			modalsavesearch: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -300,13 +305,14 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.$bvModal.hide('add-savesearch')
+				this.modalsavesearch = false
 				this.createwithsuccess = false
-			}, 1000)
+			}, 500)
 		}
 	},
 	methods: {
 		getMySearches(update = false) {
+			this.modaluse = true
 			this.loading = true
 			this.rowsavesearch = []
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
@@ -349,6 +355,7 @@ export default {
 			this.loading = false 
 		},
 		getMyInfo() {
+			this.modalsavesearch = true
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
@@ -426,7 +433,7 @@ export default {
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', this.savedsearches[id])
-			this.$bvModal.hide('use-savesearch')
+			this.modaluse = false
 		},
 		goToSavedSearches(){
 			this.$router.push('/inventory/savedsearch'); 

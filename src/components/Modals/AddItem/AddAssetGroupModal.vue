@@ -5,7 +5,6 @@
 			align="center"
 		>
 			<b-button
-				v-b-modal.add-assetgroup
 				:title="$t('assetgroup.saveasgroup')"
 				class="d-none d-sm-inline-block btn-teal"
 				@click="getMyInfo()"
@@ -18,11 +17,12 @@
 		</div>
 		<b-modal 
 			id="add-assetgroup" 
+			v-model="addassetgroup"
 			:title="$t('assetgroup.saveasgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('assetgroup.saveasgroup') }}
 					<b-spinner 
@@ -221,12 +221,9 @@
 
 <script>
 import Axios from 'axios'
-import Alert from '@/components/Alert/Alert.vue'
-import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: "AddAssetGroupModal",
-	components: { Alert, Loader },
 	props: {
 		search: { type: Array, default: null },
 		assetrow: { type: Array, default: null}
@@ -264,6 +261,7 @@ export default {
 			groupaction: "create",
 			updategroup: [],
 			updategroupid: null,
+			addassetgroup: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -273,15 +271,16 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.$bvModal.hide('add-assetgroup')
+				this.addassetgroup = false
 				this.createwithsuccess = false
-			}, 1000)
+			}, 500)
 		}
 	},
 	methods: {
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+			this.addassetgroup = !this.addassetgroup
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.user = response.data
@@ -341,6 +340,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			this.rowgroup.assets = this.assetrow
 			this.rowgroup.search = this.search

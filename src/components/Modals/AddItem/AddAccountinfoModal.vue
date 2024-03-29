@@ -16,10 +16,10 @@
 						<!-- Button to add accountinfo -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-accountinfo
 							:title="$t('accountinfo.addaccountinfo')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="addaccountinfo = !addaccountinfo"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -76,13 +68,28 @@
 							<b-modal 
 								v-if="canadd"
 								id="add-accountinfo" 
+								v-model="addaccountinfo"
 								:title="$t('accountinfo.addaccountinfo')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('accountinfo.addaccountinfo') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -96,8 +103,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<b-form-group
@@ -172,6 +185,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -183,17 +202,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "AddAccountinfoModal",
 	components: {
-		Datatable,
-		Loader,
-		Alert,
 		Breadcrumb
 	},
 	props: {
@@ -216,10 +229,13 @@ export default {
 			config: [],
 			rowheader: [],
 			loading: true,
-			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			errorMsg: null,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addaccountinfo: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -238,8 +254,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addaccountinfo = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -298,21 +317,20 @@ export default {
 		// Submit template creation and call getAccountinfoConfig to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 			
 			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-accountinfo')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
+					this.loadingcreate = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-accountinfo')
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
+					this.loadingcreate = false
 				})
 				.finally(() => this.getAccountinfoConfig())
 		}

@@ -16,10 +16,10 @@
 						<!-- Button to add user -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-user
 							:title="$t('user.adduser')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="adduser = !adduser"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -71,15 +63,30 @@
 							<!-- Modal to add user -->
 							<b-modal 
 								v-if="canadd"
-								id="add-user" 
+								id="add-user"
+								v-model="adduser"
 								:title="$t('user.adduser')"
-								size="xl"
+								size="md"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('user.adduser') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -93,8 +100,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<h4>{{ $t('user.user_informations') }}</h4>
@@ -218,6 +231,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -229,14 +248,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'AddUserModal',
-	components: { Loader, Breadcrumb, Alert, Datatable },
+	components: { Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -261,10 +277,13 @@ export default {
 			groups: [],
 			groupsLabel: [],
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
 			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			adduser: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -272,8 +291,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.adduser = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -347,21 +369,23 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
+
 			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-user')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
-				.finally(() => this.getUsers())
+				.finally(() => {
+					this.loadingcreate = false
+					this.getUsers()
+				})
 		},
 		reloadDatatable() {
 			this.getUsers()

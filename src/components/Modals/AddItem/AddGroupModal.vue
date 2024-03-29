@@ -16,10 +16,10 @@
 						<!-- Button to add group -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-group
 							:title="$t('group.addgroup')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="addgroup = !addgroup"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -71,15 +63,31 @@
 
 							<!-- Modal to add group -->
 							<b-modal 
-								id="add-group" 
+								id="add-group"
+								v-model="addgroup"
 								:title="$t('group.addgroup')"
 								size="xl"
 								hide-footer
+								scrollable
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('group.addgroup') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -93,8 +101,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<h4>{{ $t('group.group_informations') }}</h4>
@@ -143,6 +157,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -154,15 +174,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 import Matrix from '@/components/Matrix/Matrix.vue'
 
 export default {
 	name: 'AddGroupModal',
-	components: { Loader, Breadcrumb, Alert, Datatable, Matrix },
+	components: { Breadcrumb, Matrix },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -183,8 +200,12 @@ export default {
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
-			successed: false,
 			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addgroup: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -192,8 +213,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addgroup = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -311,21 +335,18 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 			
 			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-group')
+					this.createwithsuccess = true
+					this.createerror = false
+					this.createerrormsg = null
 				})
 				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-group')
+					this.createwithsuccess = false
+					this.createerror = true
+					this.createerrormsg = e.message
 				})
 				.finally(() => this.getGroups())
 		},
