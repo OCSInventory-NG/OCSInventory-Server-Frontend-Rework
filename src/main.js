@@ -48,6 +48,18 @@ library.add({
 	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar
 })
 
+/***** Loader *****/
+import Loader from '@/components/Loader/Loader.vue'
+app.component("Loader", Loader)
+
+/***** Alert *****/
+import Alert from '@/components/Alert/Alert.vue'
+app.component("Alert", Alert)
+
+/***** Datatable *****/
+import Datatable from '@/components/Datatable/Datatable.vue'
+app.component("Datatable", Datatable)
+
 await router.isReady()
 
 app.mount('#app')
