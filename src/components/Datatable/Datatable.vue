@@ -112,13 +112,13 @@
 				striped
 				hover
 				bordered
-				:selectMode="selectMode"
+				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sortBy="sortBy"
-				:sortDesc="sortDesc"
-				:perPage="perPage"
-				:currentPage="currentPage"
+				:sort-by="sortBy"
+				:sort-desc="sortDesc"
+				:per-page="perPage"
+				:current-page="currentPage"
 				:filter="filter"
 				primary-key="id"
 				style="white-space: pre-line;"
