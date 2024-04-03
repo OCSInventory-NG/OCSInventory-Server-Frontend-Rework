@@ -21,53 +21,55 @@
 			<draggable 
 				v-if="rowdatas.length > 0"
 				v-model="rowdatas" 
+				item-key="id"
 				:disabled="!canedit"
 				tag="tbody"
+				handle=".handle"
 				@change="updatePriority"
 			>
-				<tr
-					v-for="value in rowdatas"
-					:key="value.id"
-				>
-					<td>
-						<font-awesome-icon 
-							:icon="['fas', 'bars']"
-							class="draggable-icon"
-						/>
-					</td>
-					<td 
-						v-for="theader in rowheader" 
-						:key="theader"
-					>
-						{{ value[theader] }}
-					</td>
-					<td 
-						v-if="candelete || canedit"
-						class="section-table-btn"
-					>
-						<b-button-toolbar>
-							<b-button-group class="mr-1">
-								<EditMappingModal 
-									:id="value.id"
-								/>
-								<!-- Edit button -->
-								<component 
-									:is="editcomponent"
-									v-if="canedit"
-									v-bind="{ id: value.id }"
-									@reloadDatatable="reloadDatatable"
-								/>
-								<delete-item-modal 
-									v-if="candelete"
-									:id="value.id"
-									:name="value.name"
-									:parameter="apiroute"
-									@reloadDatatable="reloadDatatable"
-								/>
-							</b-button-group>
-						</b-button-toolbar>
-					</td>
-				</tr>
+				<template #item="{ element }">
+					<tr>
+						<td>
+							<font-awesome-icon 
+								:icon="['fas', 'bars']"
+								class="draggable-icon handle"
+							/>
+						</td>
+						<td 
+							v-for="theader in rowheader" 
+							:key="theader"
+						>
+							{{ element[theader] }}
+						</td>
+						<td 
+							v-if="candelete || canedit"
+							class="section-table-btn"
+						>
+							<b-button-toolbar>
+								<b-button-group class="mr-1">
+									<EditMappingModal 
+										v-if="canaddmapping"
+										:id="element.id"
+									/>
+									<!-- Edit button -->
+									<component 
+										:is="editcomponent"
+										v-if="canedit"
+										v-bind="{ id: element.id }"
+										@reloadDatatable="reloadDatatable"
+									/>
+									<delete-item-modal 
+										v-if="candelete"
+										:id="element.id"
+										:name="element.name"
+										:parameter="apiroute"
+										@reloadDatatable="reloadDatatable"
+									/>
+								</b-button-group>
+							</b-button-toolbar>
+						</td>
+					</tr>
+				</template>
 			</draggable>
 			<tbody v-else>
 				<tr>
