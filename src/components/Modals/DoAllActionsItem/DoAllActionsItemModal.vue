@@ -1,9 +1,9 @@
 <template>
 	<div id="do-all-actions-item-modal">
 		<button 
-			v-b-modal="idModal"
 			:title="$t(translationkey+titlevalue)"
 			class="btn btn-ghost-warning"
+			@click="doallaction = !doallaction"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
@@ -12,13 +12,28 @@
 
 		<b-modal 
 			:id="idModal"
+			v-model="doallaction"
 			:title="$t(translationkey+titlevalue)"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t(translationkey+titlevalue) }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="errored"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -32,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="errored"
+					:message="errorMsg" 
+					variant="danger"
+				/>
 				<div
 					v-for="(input, index) in datavalues"
 					:key="`valueInput-${index}`"
@@ -101,6 +122,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -123,10 +150,12 @@ export default {
 				id: this.id
 			},
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
 			idModal: 'manage-item'+this.id,
+			loading: true,
+			loadingcreate: false,
+			createwithsuccess: false,
+			doallaction: false,
 			text: null,
 			datavalues: [{value: ""}],
 			get: this.reconciliationname+"="+this.id,
@@ -136,6 +165,16 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.loadingcreate = false
+				this.doallaction = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	created() {
 		this.getData()	
 	},
@@ -143,6 +182,7 @@ export default {
 		// Submit dynamic datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			var jsonAdd = []
 
@@ -158,43 +198,37 @@ export default {
 			if(jsonAdd.length > 0) {
 				Axios.post(import.meta.env.VITE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
 						this.errorMsg = null
 						this.errored = false
 					})
 					.catch(e => {
 						this.errorMsg = e
 						this.errored = true
-						this.succesMsg = null
-						this.successed = false
 					})
-					.finally(() => this.$emit("reloadDatatable"))
-			} else {
-				this.$emit("reloadDatatable")
+					.finally(() => this.loadingcreate = false)
 			}
 
-			this.$bvModal.hide('manage-item'+this.row.id)
+			if(!this.errored) {
+				this.createwithsuccess = true
+			}
 		},
 		onUpdate(input) {
 			if(input.id) {
 				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
 					{ headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
 						this.errorMsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errorMsg = e.message
 						this.errored = true
-						this.succesMsg = null
-						this.successed = false
 					})
 			}
 		},
 		getData() {
+			this.loading = true
+			
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
 					if(response.data.length > 0) {
@@ -207,9 +241,10 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errorMsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
 		addField(value, fieldType) {
 			fieldType.push({ value: "" })
@@ -218,16 +253,12 @@ export default {
 			if(typeof fieldType[index].id !== 'undefined') {
 				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
 						this.errorMsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errorMsg = e.message
 						this.errored = true
-						this.succesMsg = null
-						this.successed = false
 					})
 			}
 			fieldType.splice(index, 1)
