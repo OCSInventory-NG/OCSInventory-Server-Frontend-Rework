@@ -1,7 +1,6 @@
 <template>
 	<div id="edit-automatic-action-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('scheduler.editscheduler')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
@@ -13,13 +12,28 @@
 
 		<b-modal 
 			:id="idmodal"
+			v-model="editscheduler"
 			:title="$t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('scheduler.editscheduler') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -108,6 +128,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -129,11 +155,14 @@ export default {
 				recurence: "hourly"
 			},
 			rowdata: [],
-			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editscheduler: false,
 			header: {
 				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -151,8 +180,19 @@ export default {
 			idmodal: 'edit-scheduler.'+this.id
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editscheduler = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editscheduler = true
 			this.getScheduler(id)
 		},
 		getScheduler(id) {
@@ -171,30 +211,21 @@ export default {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
-
-			let formdata = new FormData()
-
-			Object.keys(this.row).forEach(key => {
-				formdata.append(key, this.row[key])
-			})
+			this.loadingcreate = true
 			
-			Axios.put(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
-				formdata, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
+				this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-scheduler.'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-scheduler.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

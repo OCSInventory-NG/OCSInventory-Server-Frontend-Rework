@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-section-modal">
 		<button 
-			v-b-modal="'edit-section.'+idmodal"
 			:title="$t('template.editsection')"
 			class="btn btn-ghost-dark"
+			@click="loadData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -12,13 +12,28 @@
 
 		<b-modal 
 			:id="'edit-section.'+idmodal"
+			v-model="editsection"
 			:title="$t('template.editsection')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('template.editsection') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -32,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -160,6 +181,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -179,9 +206,13 @@ export default {
 			row: null,
 			options: {},
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editsection: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -217,6 +248,15 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editsection = false
+				this.createwithsuccess = false
+				this.$emit('reloadTemplate')
+			}, 500)
+		}
+	},
 	created() {
 		this.row = this.rowsectiondata
 		this.options = this.row.options
@@ -231,9 +271,17 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.loading = true
+			this.editsection = true
+			this.loading = false
+		},
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
+
+			delete this.row.fields
 
 			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
 				this.row.options = {}
@@ -245,20 +293,16 @@ export default {
 			
 			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-section.'+this.row.id)
-					this.$emit('reloadTemplate')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-section.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

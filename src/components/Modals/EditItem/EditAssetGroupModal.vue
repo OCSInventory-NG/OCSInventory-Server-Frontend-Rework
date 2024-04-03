@@ -1,7 +1,6 @@
 <template>
 	<div id="edit-assetgroup-modal">
 		<button 
-			v-b-modal="'edit-assetgroup.'+id"
 			:title="$t('assetgroup.editassetgroup')"
 			class="btn btn-ghost-dark"
 			@click="getAssetGroupInfo()"
@@ -12,11 +11,12 @@
 		</button>
 		<b-modal 
 			:id="'edit-assetgroup.'+id"
+			v-model="editassetgroup"
 			:title="$t('assetgroup.editassetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('assetgroup.editassetgroup') }}
 					<b-spinner 
@@ -175,12 +175,9 @@
 
 <script>
 import Axios from 'axios'
-import Alert from '@/components/Alert/Alert.vue'
-import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: 'EditAssetGroupModal',
-	components: { Alert, Loader },
 	props: {
 		id: { type: Number, required: true },
 	},
@@ -191,6 +188,7 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			loadingcreate: false,
+			editassetgroup: false,
 			groupinfo: {
 				name: null,
 				description: null,
@@ -216,14 +214,17 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.$emit('reloadDatatable')
-				this.$bvModal.hide('edit-assetgroup.'+this.id)
+				this.editassetgroup = false
 				this.createwithsuccess = false
-			}, 1000)
+				this.$emit('reloadDatatable')
+			}, 500)
 		}
 	},
 	methods: {
 		getAssetGroupInfo() {
+			this.loading = true
+			this.editassetgroup = true
+
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
 				.then(response => {
 					delete response.data.search
@@ -280,6 +281,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault();
+			this.loadingcreate = true
 
 			this.groupinfo.user = this.user.id
 
