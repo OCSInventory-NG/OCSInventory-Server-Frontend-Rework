@@ -60,6 +60,6 @@ app.component("Alert", Alert)
 import Datatable from '@/components/Datatable/Datatable.vue'
 app.component("Datatable", Datatable)
 
-await router.isReady()
+router.isReady()
 
 app.mount('#app')
