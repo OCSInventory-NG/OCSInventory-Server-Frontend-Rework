@@ -1,15 +1,15 @@
 <template>
-    <component :is="this.$route.meta.layout">
-        <slot />
-    </component>
+	<component :is="this.$route.meta.layout">
+		<slot />
+	</component>
 </template>
 
 <script>
 import Axios from 'axios'
 
 export default {
-    name: 'App',
-    beforeCreate() {
+	name: 'App',
+	beforeCreate() {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
