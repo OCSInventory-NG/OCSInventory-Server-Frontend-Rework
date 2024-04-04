@@ -117,12 +117,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'Accountinfo',
-	components: { Loader, Alert },
 	props: {
 		type: { type: String, default: '' },
 		id: { type: Number, default: null },

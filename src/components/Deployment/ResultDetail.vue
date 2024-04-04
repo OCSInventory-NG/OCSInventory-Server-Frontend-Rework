@@ -32,13 +32,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'ResultDetail',
-	components: { Loader, Alert, Datatable },
+	components: { Datatable },
 	props: {
 		type: { type: String, default: '' },
 		id: { type: String, default: null }

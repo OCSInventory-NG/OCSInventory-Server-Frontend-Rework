@@ -188,12 +188,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: "RuleCriteria",
-	components: { Loader, Alert },
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },

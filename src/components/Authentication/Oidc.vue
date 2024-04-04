@@ -105,13 +105,11 @@
 
 <script>
 import Axios from 'axios'
-import Alert from '@/components/Alert/Alert.vue'
-import Loader from '@/components/Loader/Loader.vue'
 import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
 
 export default {
 	name: "Oidc",
-	components: { Alert, Loader, EditMappingModal },
+	components: { EditMappingModal },
 	data() {
 		return {
 			errorMsg: null,

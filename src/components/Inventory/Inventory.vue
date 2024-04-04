@@ -79,13 +79,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: "Inventory",
-	components: { Loader, Alert, Datatable },
 	props: {
 		id: { type: String, default: "0" },
 	},
