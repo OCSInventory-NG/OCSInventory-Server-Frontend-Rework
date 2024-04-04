@@ -256,7 +256,7 @@ export default {
 							if(~permissionDetails.codename.indexOf(type)) {
 								var permissionKey = permissionDetails.codename.replace(type, "")
 
-								if(i18n.te("permission." + permissionKey)) {
+								if(this.$te("permission." + permissionKey)) {
 									var key = permissionKey + "_" + permissionDetails.content_type
 									
 									if(typeof this.permissions[key] === 'undefined') {
@@ -285,7 +285,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t('permission.'+label.split("_")[0])
+							trad: this.$t('permission.'+label.split("_")[0])
 						})
 					})
 
