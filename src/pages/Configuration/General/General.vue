@@ -38,6 +38,7 @@
 							@submit="onSubmit"
 						>
 							<b-tabs 
+								v-model="activetab"
 								content-class="mt-3"
 								fill
 							>
@@ -235,6 +236,7 @@ export default {
 			loading: true,
 			canedit: false,
 			canview: false,
+			activetab: 0,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -247,7 +249,10 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => this.successed = false, 5000)
+		},
+		errored: function() {
+			setTimeout(() => this.errored = false, 5000)
 		}
 	},
 	mounted() {
@@ -279,7 +284,10 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/", this.configs, { headers: this.header })
+			var configToUpdate = this.configs[this.activetab].name
+
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
