@@ -68,8 +68,8 @@
 import Axios from 'axios'
 
 export default {
-    name: "Login",
-    data() {
+	name: "Login",
+	data() {
 		return {
 			errorMessage: null,
 			sso: false,

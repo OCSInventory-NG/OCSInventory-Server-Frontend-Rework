@@ -21,11 +21,11 @@ app.use(VueApexCharts)
 
 /***** Vue Json Excel 3 *****/
 import JsonExcel from 'vue-json-excel3'
-app.component("downloadExcel", JsonExcel)
+app.component("DownloadExcel", JsonExcel)
 
 /***** Vue select *****/
 import vSelect from "vue-select"
-app.component("v-select", vSelect)
+app.component("VSelect", vSelect)
 import "vue-select/dist/vue-select.css"
 
 /***** Icons *****/
@@ -39,8 +39,8 @@ import {
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar
 } from '@fortawesome/free-regular-svg-icons'
-app.component('font-awesome-icon', FontAwesomeIcon)
-app.component('font-awesome-layers', FontAwesomeLayers)
+app.component('FontAwesomeIcon', FontAwesomeIcon)
+app.component('FontAwesomeLayers', FontAwesomeLayers)
 library.add({ 
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
