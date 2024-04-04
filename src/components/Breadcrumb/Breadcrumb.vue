@@ -47,6 +47,13 @@ export default {
 						routeExists = true
 						return false
 					}
+
+					if(path+"s" == route.path) {
+						routeExists = true
+						path = path + "s"
+						return false
+					}
+					
 					return true
 				})
 
