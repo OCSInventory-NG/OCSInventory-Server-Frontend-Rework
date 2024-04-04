@@ -204,7 +204,8 @@ export default {
 				}
 			}
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
+				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
