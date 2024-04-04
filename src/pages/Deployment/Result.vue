@@ -117,17 +117,14 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: "Result",
-	components: { Loader, Alert, PageHeader, Counter, DonutChart, Datatable, BarChart },
+	components: { PageHeader, Counter, DonutChart, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},

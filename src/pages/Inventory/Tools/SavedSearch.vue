@@ -47,14 +47,11 @@
 
 <script>
 import Axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Loader from '@/components/Loader/Loader.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "SavedSearch",
-	components: { Datatable, Alert, Loader, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			rowdata: [],

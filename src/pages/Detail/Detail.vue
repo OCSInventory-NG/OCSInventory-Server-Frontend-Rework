@@ -113,8 +113,6 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
 import ResultDetail from '@/components/Deployment/ResultDetail.vue'
@@ -122,7 +120,7 @@ import Inventory from '@/components/Inventory/Inventory.vue'
 
 export default {
 	name: 'Detail',
-	components: { Loader, Alert, PageHeader, Accountinfo, ResultDetail, Inventory },
+	components: { PageHeader, Accountinfo, ResultDetail, Inventory },
 	data() {
 		return {
 			errorMsg: null,

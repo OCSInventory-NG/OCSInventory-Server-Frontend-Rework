@@ -220,13 +220,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'General',
-	components: { Alert, Loader, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			configs: [],

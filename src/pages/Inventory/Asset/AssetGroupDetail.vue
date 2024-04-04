@@ -138,15 +138,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Search from '@/components/Filter/Search.vue'
 
 export default {
 	name: 'AssetGroupDetail',
-	components: { Loader, Datatable, Alert, PageHeader, Search },
+	components: { PageHeader, Search },
 	data() {
 		return {
 			errorMsg: null,

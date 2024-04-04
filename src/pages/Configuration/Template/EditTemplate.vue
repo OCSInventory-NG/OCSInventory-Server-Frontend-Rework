@@ -49,14 +49,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
 import SectionCollapse from '@/components/Collapse/Template/SectionCollapse.vue'
 import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal.vue'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'EditTemplate',
-	components: { Loader, AddSectionModal, Alert, SectionCollapse	},
+	components: { AddSectionModal, SectionCollapse	},
 	props: {
 		id: { type: String, required: true },
 	},

@@ -108,8 +108,6 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Ldap from '@/components/Authentication/Ldap.vue'
 import Cas from '@/components/Authentication/Cas.vue'
@@ -117,7 +115,7 @@ import Oidc from '@/components/Authentication/Oidc.vue'
 
 export default {
 	name: 'Authentication',
-	components: { Loader, Alert, PageHeader, Ldap, Cas, Oidc },
+	components: { PageHeader, Ldap, Cas, Oidc },
 	data() {
 		return {
 			errorMsg: null,

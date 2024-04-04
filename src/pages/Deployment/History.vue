@@ -44,14 +44,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'History',
-	components: { Loader, Alert, Datatable, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			rowdata: [],

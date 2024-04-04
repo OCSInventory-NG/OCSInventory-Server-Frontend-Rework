@@ -90,15 +90,13 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import RuleCriteria from '@/components/Rule/RuleCriteria.vue'
 import RuleAction from '@/components/Rule/RuleAction.vue'
 
 export default {
 	name: "EditRule",
-	components: { Loader, Alert, PageHeader, RuleCriteria, RuleAction },
+	components: { PageHeader, RuleCriteria, RuleAction },
 	props: {
 		id: { type: String, required: true },
 	},

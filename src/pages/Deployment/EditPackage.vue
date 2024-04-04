@@ -57,14 +57,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal.vue'
 import Draggable from '@/components/Draggable/Draggable.vue'
 
 export default {
 	name: 'EditPackage',
-	components: { Loader, Alert, AddActionListModal, Draggable	},
+	components: { AddActionListModal, Draggable	},
 	props: {
 		id: { type: String, required: true }
 	},

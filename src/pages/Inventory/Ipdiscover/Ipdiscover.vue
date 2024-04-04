@@ -49,14 +49,12 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import IpdiscoverCollapse from '@/components/Collapse/Ipdiscover/IpdiscoverCollapse.vue'
 
 export default {
 	name: "Ipdiscover",
-	components: { Loader, IpdiscoverCollapse, Alert, PageHeader },
+	components: { IpdiscoverCollapse, PageHeader },
 	data() {
 		return {
 			errorMsg: null,

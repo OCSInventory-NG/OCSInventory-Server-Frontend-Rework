@@ -65,16 +65,13 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Search from '@/components/Filter/Search.vue'
 import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal.vue'
 
 export default {
 	name: "Multisearch",
-	components: { Loader, Datatable, Alert, PageHeader, Search, AddAssetGroupModal },
+	components: { PageHeader, Search, AddAssetGroupModal },
 	data() {
 		return {
 			errorMsg: null,

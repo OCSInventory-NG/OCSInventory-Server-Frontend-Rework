@@ -37,14 +37,11 @@
 
 <script>
 //import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Alert from '@/components/Alert/Alert.vue'
-//import Datatable from '@/components/Datatable/Datatable'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'Report',
-	components: { Loader, Alert, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			canview: false,

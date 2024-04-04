@@ -146,12 +146,10 @@
 <script>
 import Axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
-import Alert from '@/components/Alert/Alert.vue'
-import Loader from '@/components/Loader/Loader.vue'
 
 export default {
 	name: "MyAccount",
-	components: { PageHeader, Alert, Loader },
+	components: { PageHeader },
 	data() {
 		return {
 			errorMsg: null,

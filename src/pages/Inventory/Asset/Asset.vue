@@ -47,14 +47,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader.vue'
-import Datatable from '@/components/Datatable/Datatable.vue'
-import Alert from '@/components/Alert/Alert.vue'
 import PageHeader from '@/components/Header/PageHeader.vue' 
 
 export default {
 	name: 'Assets',
-	components: { Loader, Datatable, Alert, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			errorMsg: null,
