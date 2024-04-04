@@ -1,5 +1,5 @@
 <template>
-	<component :is="this.$route.meta.layout">
+	<component :is="$route.meta.layout">
 		<slot />
 	</component>
 </template>
@@ -29,8 +29,6 @@ export default {
 					console.log(e.message)
 				})
 		} else {
-			const currentPath = this.$router.currentRoute.value.path;
-
 			if (localStorage.getItem("authenticated") === null
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
@@ -45,7 +43,7 @@ export default {
 								|| localStorage.getItem("authenticated") === "false"
 								|| localStorage.getItem('token_authentication') === null 
 								|| localStorage.getItem('permissions') === null) {
-									this.$router.push({path:'/login'}).catch(() => {});
+									this.$router.push({path:'/login'}).catch(() => {})
 								}
 							}
 						}
@@ -53,10 +51,6 @@ export default {
 					.catch(e => {
 						console.log(e.message)
 					})
-			} else {
-				if (currentPath === "/" || currentPath === "/ocsreports") {
-					this.$router.push({path:'/dashboard'}).catch(() => {});
-				}
 			}
 		}
 	},
@@ -75,7 +69,7 @@ export default {
 						this.$router.push('/dashboard')
 					} else {
 						this.errorMessage = this.$t("message.error_no_permissions")
-						this.$router.push("/login").catch(() => {});
+						this.$router.push("/login").catch(() => {})
 					}
 				})
 				.catch(e => {

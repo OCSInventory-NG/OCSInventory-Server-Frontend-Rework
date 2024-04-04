@@ -4,6 +4,10 @@ import AuthLayout from "./layouts/AuthLayout.vue"
 
 const routes = [
 	{
+		path: '/',
+		redirect: '/dashboard'
+	},
+	{
 		path: '/login',
 		name: 'Login',
 		meta: {
