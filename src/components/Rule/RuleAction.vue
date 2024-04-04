@@ -42,7 +42,7 @@
 									:options="routeopt[trigger]" 
 									class="mb-3 form-select form-control"
 									:required="true"
-									@input="getFields(index, input.model)"
+									@update:modelValue="getFields(index, input.model)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -55,7 +55,7 @@
 									:required="true"
 									class="mb-3 form-select form-control"
 									:disabled="(loadingfield) ? true : false"
-									@input="setFieldType(input, index)"
+									@update:modelValue="setFieldType(input, index)"
 								/>
 							</b-form-group>
 						</b-col>

@@ -61,7 +61,7 @@
 									class="mb-3 form-select form-control"
 									:required="true"
 									:disabled="disableforgroup"
-									@input="getFields(input.route, masterindex, index)"
+									@update:modelValue="getFields(input.route, masterindex, index)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -74,7 +74,7 @@
 								class="mb-3 form-select form-control"
 								:required="true"
 								:disabled="(loadingtemplate || disableforgroup) ? true : false"
-								@input="getSections(input.template, masterindex, index)"
+								@update:modelValue="getSections(input.template, masterindex, index)"
 							/>
 						</b-col>
 						<b-col v-if="input.object == 'inventory_sections'">
@@ -86,7 +86,7 @@
 								class="mb-3 form-select form-control"
 								:required="true"
 								:disabled="(loadingsection || disableforgroup) ? true : false"
-								@input="getFields(input.section, masterindex, index, true)"
+								@update:modelValue="getFields(input.section, masterindex, index, true)"
 							/>
 						</b-col>
 						<b-col>
@@ -106,7 +106,7 @@
 									class="mb-3 form-select form-control"
 									:required="true"
 									:disabled="disableforgroup"
-									@input="setFieldType(input, masterindex, index)"
+									@update:modelValue="setFieldType(input, masterindex, index)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -382,7 +382,6 @@ export default {
 			this.$emit('reloadDatatable', this.datavalues)
 		},
 		getFields(route, masterindex, index, section = false) {
-
 			if(!section) {
 				var component = route.split("/")[0]
 
