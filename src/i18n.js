@@ -25,8 +25,8 @@ const i18n = createI18n({
 		fr
 	},
 	globalInjection: true,
-    allowComposition: true,
-    legacy: false
+	allowComposition: true,
+	legacy: false
 })
 
 export default i18n
