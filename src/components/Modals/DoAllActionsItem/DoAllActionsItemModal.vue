@@ -3,7 +3,7 @@
 		<button 
 			:title="$t(translationkey+titlevalue)"
 			class="btn btn-ghost-warning"
-			@click="doallaction = !doallaction"
+			@click="getData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
@@ -16,6 +16,7 @@
 			:title="$t(translationkey+titlevalue)"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -168,15 +169,11 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.loadingcreate = false
 				this.doallaction = false
 				this.createwithsuccess = false
 				this.$emit('reloadDatatable')
 			}, 500)
 		}
-	},
-	created() {
-		this.getData()	
 	},
 	methods: {
 		// Submit dynamic datas
@@ -209,6 +206,7 @@ export default {
 			}
 
 			if(!this.errored) {
+				this.loadingcreate = false
 				this.createwithsuccess = true
 			}
 		},
@@ -228,6 +226,7 @@ export default {
 		},
 		getData() {
 			this.loading = true
+			this.doallaction = true
 			
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
