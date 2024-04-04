@@ -66,6 +66,12 @@
 						</div>
 					</div>
 				</div>
+				<div 
+					v-else
+					class="ocs-loader"
+				>
+					<Loader />
+				</div>
 			</div>
 		</section>
 	</div>
