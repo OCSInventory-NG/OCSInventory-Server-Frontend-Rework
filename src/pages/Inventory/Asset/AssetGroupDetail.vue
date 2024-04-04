@@ -113,7 +113,7 @@
 											:canedit="canedit"
 											:candelete="candelete"
 											:rowheader="rowheader"
-											title="assetgroups"
+											title="asset"
 											translationkey="inventory."
 										/>
 									</b-tab>

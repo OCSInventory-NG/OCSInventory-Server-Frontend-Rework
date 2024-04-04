@@ -35,7 +35,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:rowheader="rowheader"
-								title="asset/groups"
+								title="assetgroups"
 								translationkey="assetgroup."
 								editcomponent="EditAssetGroupModal"
 								@reloadDatatable="reloadDatatable"
