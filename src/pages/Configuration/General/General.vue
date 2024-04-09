@@ -38,6 +38,7 @@
 							@submit="onSubmit"
 						>
 							<b-tabs 
+								v-model="activetab"
 								content-class="mt-3"
 								fill
 							>
@@ -220,14 +221,11 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'General',
-	components: { Alert, Loader, PageHeader },
+	components: { PageHeader },
 	data() {
 		return {
 			configs: [],
@@ -238,6 +236,7 @@ export default {
 			loading: true,
 			canedit: false,
 			canview: false,
+			activetab: 0,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -250,7 +249,10 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => this.successed = false, 5000)
+		},
+		errored: function() {
+			setTimeout(() => this.errored = false, 5000)
 		}
 	},
 	mounted() {
@@ -261,14 +263,14 @@ export default {
 			}
 			this.getConfig()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}	
 	},
 	methods: {
 		// Get all config
 		getConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"config", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 					this.loading = false
@@ -282,7 +284,10 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"config/", this.configs, { headers: this.header })
+			var configToUpdate = this.configs[this.activetab].name
+
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

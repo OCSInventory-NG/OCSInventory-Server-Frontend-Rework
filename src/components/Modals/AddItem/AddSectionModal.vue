@@ -15,10 +15,10 @@
 				</div>
 				<div class="col-auto ms-auto">
 					<b-button
-						v-b-modal.add-section
 						:title="$t('template.addsection')"
 						variant="primary"
 						class="d-none d-sm-inline-block"
+						@click="addsection = !addsection"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -28,13 +28,28 @@
 
 					<b-modal 
 						id="add-section" 
+						v-model="addsection"
 						:title="$t('template.addsection')"
 						hide-footer
 						modal-class="custom-modal modal-blur"
 					>
-						<template #modal-header="{ close }">
+						<template #header="{ close }">
 							<h5 class="modal-title">
 								{{ $t('template.addsection') }}
+								<b-spinner 
+									v-if="loadingcreate"
+									variant="success"
+								/>
+								<font-awesome-icon 
+									v-if="createwithsuccess"
+									:icon="['fas', 'check']"
+									color="green"
+								/>
+								<font-awesome-icon 
+									v-if="createerror"
+									:icon="['fas', 'xmark']"
+									color="red"
+								/>
 							</h5>
 							<b-button 
 								size="sm" 
@@ -48,8 +63,14 @@
 							</b-button>
 						</template>
 						<b-form
+							v-if="!loading"
 							@submit="onSubmit"
 						>
+							<Alert 
+								v-if="createerror"
+								:message="createerrormsg" 
+								variant="danger"
+							/>
 							<b-row>
 								<b-col>
 									<b-form-group
@@ -176,6 +197,12 @@
 								<b-col align-self="end" />
 							</b-row>
 						</b-form>
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
 					</b-modal>
 				</div>
 			</div>
@@ -185,8 +212,7 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddSectionModal',
@@ -209,26 +235,27 @@ export default {
 			options : {},
 			rowdata: [],
 			loading: true,
-			errorMsg: null,
-			succesMsg: null,
-			errored: false,
-			successed: false,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addsection: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			methodoptions: [
-				{ value: 'FILE', text: i18n.t('template.FILE') },
-				{ value: 'BASH', text: i18n.t('template.BASH') },
-				{ value: 'PW', text: i18n.t('template.PW') },
-				{ value: 'CMD', text: i18n.t('template.CMD') }
+				{ value: 'FILE', text: this.$t('template.FILE') },
+				{ value: 'BASH', text: this.$t('template.BASH') },
+				{ value: 'PW', text: this.$t('template.PW') },
+				{ value: 'CMD', text: this.$t('template.CMD') }
 			],
 			outputoptions: [
-				{ value: 'PTXT', text: i18n.t('template.PTXT') },
-				{ value: 'JSON', text: i18n.t('template.JSON') },
-				{ value: 'TBLE', text: i18n.t('template.TBLE') },
-				{ value: 'REGX', text: i18n.t('template.REGX') },
-				{ value: 'GREP', text: i18n.t('template.GREP') }
+				{ value: 'PTXT', text: this.$t('template.PTXT') },
+				{ value: 'JSON', text: this.$t('template.JSON') },
+				{ value: 'TBLE', text: this.$t('template.TBLE') },
+				{ value: 'REGX', text: this.$t('template.REGX') },
+				{ value: 'GREP', text: this.$t('template.GREP') }
 			],
 			outputoptionoptions: {
 				"TBLE": [
@@ -248,13 +275,24 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addsection = false
+				this.createwithsuccess = false
+				this.$emit('reloadTemplate')
+			}, 500)
+		}
+	},
 	created() {
 		this.row.template = this.template
+		this.loading = false
 	},
 	methods: {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
@@ -263,22 +301,18 @@ export default {
 				})
 			}
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-section')
-					this.$emit('reloadTemplate')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-section')
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

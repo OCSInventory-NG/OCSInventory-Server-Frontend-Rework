@@ -1,7 +1,6 @@
 <template>
 	<div id="edit-assetgroup-modal">
 		<button 
-			v-b-modal="'edit-assetgroup.'+id"
 			:title="$t('assetgroup.editassetgroup')"
 			class="btn btn-ghost-dark"
 			@click="getAssetGroupInfo()"
@@ -12,11 +11,12 @@
 		</button>
 		<b-modal 
 			:id="'edit-assetgroup.'+id"
+			v-model="editassetgroup"
 			:title="$t('assetgroup.editassetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('assetgroup.editassetgroup') }}
 					<b-spinner 
@@ -175,13 +175,9 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
 
 export default {
 	name: 'EditAssetGroupModal',
-	components: { Alert, Loader },
 	props: {
 		id: { type: Number, required: true },
 	},
@@ -192,6 +188,7 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			loadingcreate: false,
+			editassetgroup: false,
 			groupinfo: {
 				name: null,
 				description: null,
@@ -202,9 +199,9 @@ export default {
 				groups: []
 			},
 			optvisibility: [
-				{ value: "public", text: i18n.t("assetgroup.public") },
-				{ value: "private_personal", text: i18n.t("assetgroup.private_personal") },
-				{ value: "private_group", text: i18n.t("assetgroup.private_group") }
+				{ value: "public", text: this.$t("assetgroup.public") },
+				{ value: "private_personal", text: this.$t("assetgroup.private_personal") },
+				{ value: "private_group", text: this.$t("assetgroup.private_group") }
 			],
 			user: [],
 			groups: [],
@@ -217,15 +214,18 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.$emit('reloadDatatable')
-				this.$bvModal.hide('edit-assetgroup.'+this.id)
+				this.editassetgroup = false
 				this.createwithsuccess = false
-			}, 1000)
+				this.$emit('reloadDatatable')
+			}, 500)
 		}
 	},
 	methods: {
 		getAssetGroupInfo() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+			this.loading = true
+			this.editassetgroup = true
+
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
 				.then(response => {
 					delete response.data.search
 					delete response.data.assets
@@ -242,7 +242,7 @@ export default {
 				})
 		},
 		getUserName() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					if(response.data.first_name != "") {
@@ -262,7 +262,7 @@ export default {
 			if(this.groupinfo.groups) {
 				for (const group of this.groupinfo.groups) {
 					this.loading = true
-					Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+					Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 						.then(response => {
 							this.groups.push({
 								value: response.data.id,
@@ -281,6 +281,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault();
+			this.loadingcreate = true
 
 			this.groupinfo.user = this.user.id
 
@@ -289,7 +290,7 @@ export default {
 				this.groupinfo.allow_group_modification = false
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"asset/groups/"+this.groupinfo.id+"/", this.groupinfo, 
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.groupinfo.id+"/", this.groupinfo, 
 				{ headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true

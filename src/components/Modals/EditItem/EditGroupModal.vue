@@ -12,14 +12,30 @@
 
 		<b-modal 
 			:id="idModal" 
+			v-model="editgroup"
 			:title="$t('group.editgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
+			scrollable
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('group.editgroup') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +49,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<h4>{{ $t('group.group_informations') }}</h4>
@@ -86,14 +108,19 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Matrix from '@/components/Matrix/Matrix'
+import Matrix from '@/components/Matrix/Matrix.vue'
 
 export default {
 	name: 'EditGroupModal',
@@ -110,23 +137,38 @@ export default {
 			permissions: [],
 			permissionslabel: [],
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
 			idModal: 'edit-group'+this.id,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editgroup: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editgroup = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editgroup = true
 			this.getPermissions(id)
 		},
 		// Get all permissions
 		getPermissions(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -139,7 +181,7 @@ export default {
 							if(~permissionDetails.codename.indexOf(type)) {
 								var permissionKey = permissionDetails.codename.replace(type, "")
 
-								if(i18n.te("permission." + permissionKey)) {
+								if(this.$te("permission." + permissionKey)) {
 									var key = permissionKey + "_" + permissionDetails.content_type
 
 									if(typeof this.permissions[key] === 'undefined') {
@@ -169,7 +211,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t('permission.'+label.split("_")[0])
+							trad: this.$t('permission.'+label.split("_")[0])
 						})
 					})
 
@@ -180,37 +222,35 @@ export default {
 		},
 		// Get groups
 		getGroup(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.show('edit-group'+id)
 				})
 				.catch(e => {
 					this.errorMsg = e
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
+			this.loadingcreate = true
+
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-group'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-group'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

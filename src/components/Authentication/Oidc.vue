@@ -105,14 +105,11 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
+import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
 
 export default {
 	name: "Oidc",
-	components: { Alert, Loader, EditMappingModal },
+	components: { EditMappingModal },
 	data() {
 		return {
 			errorMsg: null,
@@ -156,14 +153,14 @@ export default {
 			}
 			this.getOidcConfiguration()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getOidcConfiguration() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
 					this.errorMsg = null
@@ -181,7 +178,7 @@ export default {
 
 			delete this.oidcdata.mappings
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

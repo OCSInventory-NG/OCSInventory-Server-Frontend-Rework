@@ -1,9 +1,9 @@
 <template>
 	<div id="edit-field-modal">
 		<button 
-			v-b-modal="'edit-field.'+idmodal"
 			:title="$t('template.editfield')"
 			class="btn btn-ghost-dark"
+			@click="loadData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'pencil']"
@@ -12,13 +12,28 @@
 
 		<b-modal 
 			:id="'edit-field.'+idmodal"
+			v-model="editfield"
 			:title="$t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('template.editfield') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -32,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -188,13 +209,18 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
 
 export default {
 	name: 'EditFieldModal',
@@ -208,25 +234,29 @@ export default {
 			row: null,
 			options: {},
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editfield: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			methodoptions: [
-				{ value: 'FILE', text: i18n.t('template.FILE') },
-				{ value: 'BASH', text: i18n.t('template.BASH') },
-				{ value: 'PW', text: i18n.t('template.PW') },
-				{ value: 'CMD', text: i18n.t('template.CMD') }
+				{ value: 'FILE', text: this.$t('template.FILE') },
+				{ value: 'BASH', text: this.$t('template.BASH') },
+				{ value: 'PW', text: this.$t('template.PW') },
+				{ value: 'CMD', text: this.$t('template.CMD') }
 			],
 			outputoptions: [
-				{ value: 'PTXT', text: i18n.t('template.PTXT') },
-				{ value: 'JSON', text: i18n.t('template.JSON') },
-				{ value: 'TBLE', text: i18n.t('template.TBLE') },
-				{ value: 'REGX', text: i18n.t('template.REGX') },
-				{ value: 'GREP', text: i18n.t('template.GREP') }
+				{ value: 'PTXT', text: this.$t('template.PTXT') },
+				{ value: 'JSON', text: this.$t('template.JSON') },
+				{ value: 'TBLE', text: this.$t('template.TBLE') },
+				{ value: 'REGX', text: this.$t('template.REGX') },
+				{ value: 'GREP', text: this.$t('template.GREP') }
 			],
 			outputoptionoptions: {
 				"TBLE": [
@@ -246,14 +276,27 @@ export default {
 			}
 		}
 	},
-	created() {
-		this.row = this.rowfielddata
-		this.options = this.row.options
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editfield = false
+				this.createwithsuccess = false
+				this.$emit('reloadTemplate')
+			}, 500)
+		}
 	},
 	methods: {
+		loadData() {
+			this.loading = true
+			this.editfield = true
+			this.row = this.rowfielddata
+			this.options = this.row.options
+			this.loading = false
+		},
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
 				this.row.options = {}
@@ -263,22 +306,18 @@ export default {
 				})
 			}
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-field.'+this.row.id)
-					this.$emit('reloadTemplate')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-field.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

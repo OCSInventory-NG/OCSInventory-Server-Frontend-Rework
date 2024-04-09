@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AddGroupModal from '@/components/Modals/AddItem/AddGroupModal';
+import AddGroupModal from '@/components/Modals/AddItem/AddGroupModal.vue';
 
 export default {
 	name: "Group",

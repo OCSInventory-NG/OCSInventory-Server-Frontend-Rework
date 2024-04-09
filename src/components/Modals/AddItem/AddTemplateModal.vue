@@ -16,10 +16,10 @@
 						<!-- Button to add template -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-template
 							:title="$t('template.addtemplate')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="addtemplate = !addtemplate"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -71,14 +63,29 @@
 							<!-- Modal to add template -->
 							<b-modal 
 								v-if="canadd"
-								id="add-template" 
+								id="add-template"
+								v-model="addtemplate"
 								:title="$t('template.addtemplate')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('template.addtemplate') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -92,8 +99,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<b-form-group
@@ -139,6 +152,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -150,15 +169,11 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
 	name: 'AddTemplateModal',
-	components: { Datatable, Loader, Alert, Breadcrumb },
+	components: { Breadcrumb },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -178,9 +193,12 @@ export default {
 			rowheader: [],
 			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addtemplate: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -193,8 +211,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addtemplate = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -203,7 +224,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -217,12 +238,12 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}
 		},
 		getTemplates() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"templates/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null
@@ -240,23 +261,23 @@ export default {
 		// Submit template creation and call getTemplates to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-template')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-template')
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
-				.finally(() => this.getTemplates())
+				.finally(() => {
+					this.loadingcreate = false
+					this.getTemplates()
+				})
 		}
 	}
 }

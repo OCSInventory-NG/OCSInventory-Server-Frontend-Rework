@@ -16,10 +16,10 @@
 						<!-- Button to add group -->
 						<b-button
 							v-if="canadd"
-							v-b-modal.add-group
 							:title="$t('group.addgroup')"
 							variant="primary"
 							class="d-none d-sm-inline-block"
+							@click="addgroup = !addgroup"
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'plus']"
@@ -33,14 +33,6 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
-						<section v-if="successed">
-							<Alert 
-								:message="$t('message.success_saved')" 
-								variant="success"
-							/>
-						</section>
-
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
@@ -71,15 +63,31 @@
 
 							<!-- Modal to add group -->
 							<b-modal 
-								id="add-group" 
+								id="add-group"
+								v-model="addgroup"
 								:title="$t('group.addgroup')"
 								size="xl"
 								hide-footer
+								scrollable
 								modal-class="custom-modal modal-blur"
 							>
-								<template #modal-header="{ close }">
+								<template #header="{ close }">
 									<h5 class="modal-title">
 										{{ $t('group.addgroup') }}
+										<b-spinner 
+											v-if="loadingcreate"
+											variant="success"
+										/>
+										<font-awesome-icon 
+											v-if="createwithsuccess"
+											:icon="['fas', 'check']"
+											color="green"
+										/>
+										<font-awesome-icon 
+											v-if="createerror"
+											:icon="['fas', 'xmark']"
+											color="red"
+										/>
 									</h5>
 									<b-button 
 										size="sm" 
@@ -93,8 +101,14 @@
 									</b-button>
 								</template>
 								<b-form
+									v-if="!loading"
 									@submit="onSubmit"
 								>
+									<Alert 
+										v-if="createerror"
+										:message="createerrormsg" 
+										variant="danger"
+									/>
 									<b-row>
 										<b-col>
 											<h4>{{ $t('group.group_informations') }}</h4>
@@ -143,6 +157,12 @@
 										<b-col align-self="end" />
 									</b-row>
 								</b-form>
+								<div 
+									v-if="loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
 							</b-modal>
 						</div>
 					</div>
@@ -154,16 +174,12 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb'
-import Alert from '@/components/Alert/Alert'
-import Datatable from '@/components/Datatable/Datatable'
-import Matrix from '@/components/Matrix/Matrix'
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
+import Matrix from '@/components/Matrix/Matrix.vue'
 
 export default {
 	name: 'AddGroupModal',
-	components: { Loader, Breadcrumb, Alert, Datatable, Matrix },
+	components: { Breadcrumb, Matrix },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -184,8 +200,12 @@ export default {
 			errorMsg: null,
 			succesMsg: null,
 			errored: false,
-			successed: false,
 			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			addgroup: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -193,8 +213,11 @@ export default {
 		}
 	},
 	watch: {
-		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.addgroup = false
+				this.createwithsuccess = false
+			}, 500)
 		}
 	},
 	mounted() {
@@ -203,7 +226,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
@@ -217,13 +240,13 @@ export default {
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = i18n.t("message.dont_have_right_to_see")
+				this.errorMsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}	
 		},
 		// Get all permissions
 		getPermissions() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"permissions", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -233,7 +256,7 @@ export default {
 							if(~permissionDetails.codename.indexOf(type)) {
 								var permissionKey = permissionDetails.codename.replace(type, "")
 
-								if(i18n.te("permission." + permissionKey)) {
+								if(this.$te("permission." + permissionKey)) {
 									var key = permissionKey + "_" + permissionDetails.content_type
 									
 									if(typeof this.permissions[key] === 'undefined') {
@@ -262,7 +285,7 @@ export default {
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: i18n.t('permission.'+label.split("_")[0])
+							trad: this.$t('permission.'+label.split("_")[0])
 						})
 					})
 
@@ -277,7 +300,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()
@@ -298,9 +321,9 @@ export default {
 						this.permissions[label.id].forEach(permissions => {
 							if(permissions.id == permissionsDetails) {
 								if(typeof tmpPermissions[label.trad] === 'undefined') {
-									tmpPermissions[label.trad] = [i18n.t('generic.'+permissions.type)]
+									tmpPermissions[label.trad] = [this.$t('generic.'+permissions.type)]
 								} else {
-									tmpPermissions[label.trad].push(i18n.t('generic.'+permissions.type)) 
+									tmpPermissions[label.trad].push(this.$t('generic.'+permissions.type)) 
 								}
 							}
 						})					
@@ -320,21 +343,18 @@ export default {
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('add-group')
+					this.createwithsuccess = true
+					this.createerror = false
+					this.createerrormsg = null
 				})
 				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('add-group')
+					this.createwithsuccess = false
+					this.createerror = true
+					this.createerrormsg = e.message
 				})
 				.finally(() => this.getGroups())
 		},

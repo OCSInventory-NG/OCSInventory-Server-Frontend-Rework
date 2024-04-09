@@ -3,19 +3,11 @@
 		id="locale-switcher" 
 		class="locale-switcher"
 	>
-		<b-form-select 
-			v-model="$root.$i18n.locale"
-			class="form-select"
-			@change="setLocale()"
-		>
-			<b-form-select-option 
-				v-for="(lang, i) in langs" 
-				:key="`Lang${i}`" 
-				:value="i"
-			>
-				{{ lang }}
-			</b-form-select-option>
-		</b-form-select>
+		<BFormSelect
+			v-model="$root.$i18n.locale" 
+			:options="supportedLocales"
+			@change="setLocale"
+		/>
 	</div>
 </template>
 
@@ -24,15 +16,15 @@ export default {
 	name: 'LocaleSwitcher',
 	data() {
 		return {
-			langs: {
-				'fr': 'Français',
-				'en': 'English'
-			}
-		};
+			supportedLocales: [
+				{value: 'fr', text: 'Français'},
+				{value: 'en', text: 'English'},
+			]
+		}
 	},
 	methods: {
 		setLocale() {
-			localStorage.setItem('lang', this.$root.$i18n.locale)
+			localStorage.setItem('locale', this.$root.$i18n.locale)
 		}
 	}
 }

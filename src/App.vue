@@ -1,17 +1,14 @@
 <template>
-	<div id="ocsreports">
-		<vue-extend-layouts loading="loading" />
-	</div>
+	<component :is="$route.meta.layout">
+		<slot />
+	</component>
 </template>
 
 <script>
-import VueExtendLayouts from 'vue-extend-layout'
 import Axios from 'axios'
-import i18n from './i18n'
 
 export default {
-	name: "Ocsreports",
-	components: { VueExtendLayouts },
+	name: 'App',
 	beforeCreate() {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
@@ -20,7 +17,7 @@ export default {
 		var sso = window.location.search
 
 		if(sso) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"callback/"+sso, { headers: header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"callback/"+sso, { headers: header })
 				.then(response => {
 					if(response.data.token_authentication) {
 						localStorage.setItem('token_authentication', response.data.token_authentication)
@@ -32,13 +29,11 @@ export default {
 					console.log(e.message)
 				})
 		} else {
-			const currentPath = this.$router.history.current.path;
-
 			if (localStorage.getItem("authenticated") === null
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
 			|| localStorage.getItem('permissions') === null) {
-				Axios.get(process.env.VUE_APP_API_ROUTE+"login/", { headers: header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
 					.then(response => {
 						if(response.data) {
 							if(response.data.auto_redirect) {
@@ -48,7 +43,7 @@ export default {
 								|| localStorage.getItem("authenticated") === "false"
 								|| localStorage.getItem('token_authentication') === null 
 								|| localStorage.getItem('permissions') === null) {
-									this.$router.push("/login").catch(() => {});
+									this.$router.push({path:'/login'}).catch(() => {})
 								}
 							}
 						}
@@ -56,10 +51,6 @@ export default {
 					.catch(e => {
 						console.log(e.message)
 					})
-			} else {
-				if (currentPath === "/" || currentPath === "/ocsreports") {
-					this.$router.push("/dashboard");
-				}
 			}
 		}
 	},
@@ -70,15 +61,15 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {
 						localStorage.setItem('permissions', tmpUser)
 						this.$router.push('/dashboard')
 					} else {
-						this.errorMessage = i18n.t("message.error_no_permissions")
-						this.$router.push("/login").catch(() => {});
+						this.errorMessage = this.$t("message.error_no_permissions")
+						this.$router.push("/login").catch(() => {})
 					}
 				})
 				.catch(e => {
@@ -89,4 +80,6 @@ export default {
 }
 </script>
 
-<style src="./styles/ocsreports.scss" lang="scss" />
+<style lang="scss">
+@import "./assets/styles/ocsreports.scss";
+</style>

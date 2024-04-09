@@ -1,36 +1,34 @@
-/* eslint-disable */ 
-import Vue from 'vue'
-import router from './routes'
-import App from './App'
+import { createApp } from 'vue'
+import App from '@/App.vue'
 
-/***** BOOTSTRAP *****/
-import BootstrapVue from 'bootstrap-vue'
-Vue.use(BootstrapVue)
+const app = createApp(App)
 
-/***** VUE-SELECT *****/
-import vSelect from "vue-select";
-Vue.component("v-select", vSelect);
-import "vue-select/dist/vue-select.css";
+/***** Bootstrap *****/
+import { createBootstrap } from 'bootstrap-vue-next'
+app.use(createBootstrap())
 
-/***** AXIOS *****/
-import axios from 'axios'
-import VueAxios from 'vue-axios'
-Vue.use(VueAxios, axios)
+/***** Vue Router *****/
+import router from '@/route'
+app.use(router)
 
-/***** I18N *****/
-import i18n from './i18n'
-Vue.use(i18n)
+/***** I18n *****/
+import i18n from '@/i18n'
+app.use(i18n)
 
-/***** JSON/EXCEL *****/
-import JsonExcel from "vue-json-excel"
-Vue.component('downloadExcel', JsonExcel)
+/***** Apex Charts *****/
+import VueApexCharts from 'vue3-apexcharts'
+app.use(VueApexCharts)
 
-/***** APEX CHARTS *****/
-import VueApexCharts from 'vue-apexcharts'
-Vue.use(VueApexCharts)
-Vue.component('apexchart', VueApexCharts)
+/***** Vue Json Excel 3 *****/
+import JsonExcel from 'vue-json-excel3'
+app.component("DownloadExcel", JsonExcel)
 
-/***** ICONS *****/
+/***** Vue select *****/
+import vSelect from "vue-select"
+app.component("VSelect", vSelect)
+import "vue-select/dist/vue-select.css"
+
+/***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { 
@@ -41,8 +39,8 @@ import {
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar
 } from '@fortawesome/free-regular-svg-icons'
-Vue.component('font-awesome-icon', FontAwesomeIcon)
-Vue.component('font-awesome-layers', FontAwesomeLayers)
+app.component('FontAwesomeIcon', FontAwesomeIcon)
+app.component('FontAwesomeLayers', FontAwesomeLayers)
 library.add({ 
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
@@ -50,11 +48,18 @@ library.add({
 	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar
 })
 
-Vue.config.productionTip = false
+/***** Loader *****/
+import Loader from '@/components/Loader/Loader.vue'
+app.component("Loader", Loader)
 
-new Vue({
-	router,
-	i18n,
-	axios,
-	render: h => h(App),
-}).$mount('#app')
+/***** Alert *****/
+import Alert from '@/components/Alert/Alert.vue'
+app.component("Alert", Alert)
+
+/***** Datatable *****/
+import Datatable from '@/components/Datatable/Datatable.vue'
+app.component("Datatable", Datatable)
+
+router.isReady()
+
+app.mount('#app')

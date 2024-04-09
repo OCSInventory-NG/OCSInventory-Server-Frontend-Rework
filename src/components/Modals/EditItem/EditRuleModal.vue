@@ -1,7 +1,6 @@
 <template lang="">
 	<div id="edit-rule-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('rule.editrule')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
@@ -13,13 +12,28 @@
 
 		<b-modal 
 			:id="idmodal"
+			v-model="editrule"
 			:title="$t('rule.editrule')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('rule.editrule') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -81,6 +101,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -98,11 +124,14 @@ export default {
 				description: null,
 				enabled: false
 			},
-			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editrule: false,
 			idmodal: 'edit-rule.'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -110,12 +139,23 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editrule = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editrule = true
 			this.getRules(id)
 		},
 		getRules(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -130,27 +170,24 @@ export default {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			delete this.row.logic
 			delete this.row.actions
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-rule.'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-rule.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

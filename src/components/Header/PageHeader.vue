@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import Breadcrumb from '../Breadcrumb/Breadcrumb.vue';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue';
 
 export default {
 	name: "PageHeader",

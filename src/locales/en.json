@@ -437,6 +437,7 @@
     "accountinfo": "Administrative data",
     "accountinfo/config": "Administrative data Configurations",
     "accountinfo/data": "Administrative data Data",
+    "asset": "Assets",
     "assets": "Assets",
     "assetgroups": "Asset groups",
     "authentication": "Authentication",

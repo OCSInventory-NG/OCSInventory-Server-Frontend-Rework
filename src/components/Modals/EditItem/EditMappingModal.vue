@@ -1,7 +1,6 @@
 <template>
 	<div id="edit-mapping-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('authentication.editmapping')"
 			class="btn btn-ghost-warning"
 			@click="loadData(id)"
@@ -13,13 +12,28 @@
 
 		<b-modal 
 			:id="idmodal"
+			v-model="editmapping"
 			:title="$t('authentication.editmapping')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('authentication.editmapping') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row
 					v-for="(row, index) in rows"
 					:key="index"
@@ -68,13 +88,18 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-//import i18n from '@/i18n'
 
 export default {
 	name: 'EditMappingModal',
@@ -92,9 +117,12 @@ export default {
 			mapping: [],
 			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editmapping: false,
 			idmodal: 'edit-mapping.'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -102,12 +130,23 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editmapping = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editmapping = true
 			this.getMappingConfig(id)
 		},
 		getMappingConfig(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 
@@ -131,6 +170,7 @@ export default {
 		// Submit edit mapping config and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			var jsonToUpdate = []
 			var jsonToAdd = []
@@ -175,58 +215,52 @@ export default {
 
 			if(jsonToUpdate.length) {
 				jsonToUpdate.forEach(data => {
-					Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
+					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
 						.then(() => {
-							this.succesMsg = "success"
-							this.successed = true
-							this.errorMsg = null
-							this.errored = false
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
-							this.errored = true
-							this.succesMsg = null
-							this.successed = false
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
 						})
+						.finally(() => this.loadingcreate = false)
 				})
 			}
 
 			if(jsonToAdd.length) {
-				Axios.post(process.env.VUE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
-						this.successed = true
-						this.errorMsg = null
-						this.errored = false
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
-						this.errored = true
-						this.succesMsg = null
-						this.successed = false
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
 					})
+					.finally(() => this.loadingcreate = false)
 			}
 
 			if(jsonToDelete.length) {
 				jsonToDelete.forEach(data => {
-					Axios.delete(process.env.VUE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
+					Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
 						.then(() => {
-							this.succesMsg = "success"
-							this.successed = true
-							this.errorMsg = null
-							this.errored = false
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
-							this.errored = true
-							this.succesMsg = null
-							this.successed = false
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
 						})
+						.finally(() => this.loadingcreate = false)
 				})
 			}
-
-			this.$bvModal.hide('edit-mapping.'+this.id)
-			this.$emit('reloadDatatable')
 		}
 	}
 }

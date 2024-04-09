@@ -32,13 +32,11 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader';
-import Alert from '@/components/Alert/Alert.vue';
-import Datatable from '@/components/Datatable/Datatable'
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'ResultDetail',
-	components: { Loader, Alert, Datatable },
+	components: { Datatable },
 	props: {
 		type: { type: String, default: '' },
 		id: { type: String, default: null }
@@ -63,7 +61,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"deployment/results", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -78,7 +76,7 @@ export default {
 				})
 		},
 		getResult() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/results?asset="+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results?asset="+this.id, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null

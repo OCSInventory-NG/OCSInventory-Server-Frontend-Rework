@@ -109,10 +109,10 @@
 </template>
 
 <script>
-import FieldCollapse from '@/components/Collapse/Template/FieldCollapse'
-import EditSectionModal from '@/components/Modals/EditItem/EditSectionModal'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
-import AddFieldModal from '@/components/Modals/AddItem/AddFieldModal'
+import FieldCollapse from '@/components/Collapse/Template/FieldCollapse.vue'
+import EditSectionModal from '@/components/Modals/EditItem/EditSectionModal.vue'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
+import AddFieldModal from '@/components/Modals/AddItem/AddFieldModal.vue'
 
 export default {
 	name: 'SectionCollapse',

@@ -2,6 +2,10 @@
 //  OCSREPORTS THEME
 // ===========================================
 
+h4 {
+  margin-top: 1rem;
+}
+
 .form-control {
   margin-bottom: 7px;
   margin-top: 7px;
@@ -11,6 +15,6 @@
   margin-left: 5px;
 }
 
-h4 {
-  margin-top: 1rem;
+.btn-link {
+  color: unset;
 }

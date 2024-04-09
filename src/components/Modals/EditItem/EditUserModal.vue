@@ -11,15 +11,30 @@
 		</button>
 
 		<b-modal 
-			:id="idModal" 
+			:id="idModal"
+			v-model="edituser"
 			:title="$t('user.edituser')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('user.edituser') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +48,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<h4>{{ $t('user.user_informations') }}</h4>
@@ -162,6 +183,12 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -187,28 +214,43 @@ export default {
 			},
 			groups: [],
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
 			idModal: 'edit-user'+this.id,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			edituser: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.edituser = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.edituser = true
 			this.getUser(id)
 		},
 		// Get user
 		getUser(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
 					this.errored = false
-					this.getGroups(id)
+					this.getGroups()
 				})
 				.catch(e => {
 					this.errorMsg = e
@@ -216,8 +258,8 @@ export default {
 				})
 		},
 		// Get groups
-		getGroups(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"groups/", { headers: this.header })
+		getGroups() {
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.groups = []
 					response.data.forEach(groupDetails => {
@@ -227,33 +269,31 @@ export default {
 							name: groupDetails.name
 						})
 					})
-					this.$bvModal.show('edit-user'+id)
+
+					this.loading = false
 				})
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			if(this.row.password == "") {
 				delete this.row.password
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-user'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-user'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

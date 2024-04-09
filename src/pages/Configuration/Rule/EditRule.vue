@@ -90,16 +90,13 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import RuleCriteria from '@/components/Rule/RuleCriteria'
-import RuleAction from '@/components/Rule/RuleAction'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import RuleCriteria from '@/components/Rule/RuleCriteria.vue'
+import RuleAction from '@/components/Rule/RuleAction.vue'
 
 export default {
 	name: "EditRule",
-	components: { Loader, Alert, PageHeader, RuleCriteria, RuleAction },
+	components: { PageHeader, RuleCriteria, RuleAction },
 	props: {
 		id: { type: String, required: true },
 	},
@@ -121,8 +118,8 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			rulemenus: [
-				{ value: "logic", text: i18n.t("rule.logic"), enabled: true },
-				{ value: "actions", text: i18n.t("rule.actions"), enabled: true },
+				{ value: "logic", text: this.$t("rule.logic"), enabled: true },
+				{ value: "actions", text: this.$t("rule.actions"), enabled: true },
 			]
 		}
 	},
@@ -136,7 +133,7 @@ export default {
 	},
 	methods: {
 		getTriggerModels() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
 				.then(response => {
 					this.triggers = response.data
 					this.getRuleInfo()
@@ -147,7 +144,7 @@ export default {
 				})
 		},
 		getRuleInfo() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rule = response.data
 					this.trigger = response.data.trigger

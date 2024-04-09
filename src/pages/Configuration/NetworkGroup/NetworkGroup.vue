@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AddNetworkGroupModal from '@/components/Modals/AddItem/AddNetworkGroupModal'
+import AddNetworkGroupModal from '@/components/Modals/AddItem/AddNetworkGroupModal.vue'
 
 export default {
 	name: "NetworkGroup",

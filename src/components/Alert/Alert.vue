@@ -1,6 +1,6 @@
 <template>
 	<b-alert 
-		:show="!!message" 
+		:model-value="!!message" 
 		class="alert-sm" 
 		:variant="variant"
 	>

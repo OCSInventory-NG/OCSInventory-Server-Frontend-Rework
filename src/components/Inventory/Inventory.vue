@@ -66,6 +66,12 @@
 						</div>
 					</div>
 				</div>
+				<div 
+					v-else
+					class="ocs-loader"
+				>
+					<Loader />
+				</div>
 			</div>
 		</section>
 	</div>
@@ -73,13 +79,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import Datatable from '@/components/Datatable/Datatable'
 
 export default {
 	name: "Inventory",
-	components: { Loader, Alert, Datatable },
 	props: {
 		id: { type: String, default: "0" },
 	},
@@ -111,7 +113,7 @@ export default {
 	},
 	methods: {
 		getInventory() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
 				.then(response => {
 					for (const inventory of response.data) {
 						var sectionName = this.allsections[inventory.template_section].name
@@ -159,7 +161,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		getSection() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"sections", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections", { headers: this.header })
 				.then(response => {
 					for (const section of response.data) {
 						this.allsections[section.id] = section

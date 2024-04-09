@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import AddPackageModal from '@/components/Modals/AddItem/AddPackageModal'
+import AddPackageModal from '@/components/Modals/AddItem/AddPackageModal.vue'
 
 export default {
 	name: 'Packages',

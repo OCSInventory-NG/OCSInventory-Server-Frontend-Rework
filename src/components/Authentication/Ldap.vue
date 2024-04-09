@@ -57,9 +57,8 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Alert from '@/components/Alert/Alert'
-import AddLdapModal from '@/components/Modals/AddItem/AddLdapModal'
+import Alert from '@/components/Alert/Alert.vue'
+import AddLdapModal from '@/components/Modals/AddItem/AddLdapModal.vue'
 
 export default {
 	name: "Ldap",
@@ -97,14 +96,14 @@ export default {
 			}
 			this.getLdapConfiguration()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getLdapConfiguration() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
 				.then(response => {
 					this.ldapdata = response.data
 					this.errorMsg = null
@@ -130,7 +129,7 @@ export default {
 				priority: state
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

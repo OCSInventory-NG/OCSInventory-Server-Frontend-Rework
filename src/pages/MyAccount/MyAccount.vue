@@ -145,13 +145,11 @@
 
 <script>
 import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader'
-import Alert from '@/components/Alert/Alert'
-import Loader from '@/components/Loader/Loader';
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "MyAccount",
-	components: { PageHeader, Alert, Loader },
+	components: { PageHeader },
 	data() {
 		return {
 			errorMsg: null,
@@ -173,7 +171,7 @@ export default {
 		}
 	},
 	mounted() {
-		Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+		Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errorMsg = null
@@ -206,7 +204,8 @@ export default {
 				}
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
+				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

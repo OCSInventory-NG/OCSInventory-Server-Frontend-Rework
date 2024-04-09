@@ -65,17 +65,13 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Datatable from '@/components/Datatable/Datatable'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Search from '@/components/Filter/Search'
-import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import Search from '@/components/Filter/Search.vue'
+import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal.vue'
 
 export default {
 	name: "Multisearch",
-	components: { Loader, Datatable, Alert, PageHeader, Search, AddAssetGroupModal },
+	components: { PageHeader, Search, AddAssetGroupModal },
 	data() {
 		return {
 			errorMsg: null,
@@ -96,14 +92,14 @@ export default {
 		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
 			this.getHeader()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -124,7 +120,7 @@ export default {
 		reloadDatatable(search) {
 			this.rowsearch = search
 			
-			Axios.post(process.env.VUE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					this.assetids = []
@@ -138,7 +134,7 @@ export default {
 					})
 
 					if(this.rowdata.length == 0) {
-						this.noresult = i18n.t("search.no_result")
+						this.noresult = this.$t("search.no_result")
 					}
 
 					this.succesMsg = "success"

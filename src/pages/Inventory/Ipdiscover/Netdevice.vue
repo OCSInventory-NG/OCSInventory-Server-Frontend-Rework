@@ -48,15 +48,11 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Datatable from '@/components/Datatable/Datatable'
+import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "Netdevice",
-	components: { Loader, Alert, PageHeader, Datatable },
+	components: { PageHeader },
 	data() {
 		return {
 			errorMsg: null,
@@ -82,13 +78,13 @@ export default {
 			}
 			this.getHeader()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(process.env.VUE_APP_API_ROUTE+"netdevices", { headers: this.header })
+			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"netdevices", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -107,7 +103,7 @@ export default {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?network="+this.$route.params.id
 
-			Axios.get(process.env.VUE_APP_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errorMsg = null

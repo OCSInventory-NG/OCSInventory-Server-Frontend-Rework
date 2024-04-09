@@ -1,7 +1,6 @@
 <template lang="">
 	<div id="edit-save-search-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('search.editsavesearch')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
@@ -13,13 +12,28 @@
 
 		<b-modal 
 			:id="idmodal"
+			v-model="editsavesearch"
 			:title="$t('search.editsavesearch')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('search.editsavesearch') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -32,16 +46,15 @@
 					/>
 				</b-button>
 			</template>
-			<div 
-				v-if="loading"
-				class="ocs-loader"
-			>
-				<Loader />
-			</div>
 			<b-form
-				v-else
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -133,18 +146,21 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
-import Loader from '@/components/Loader/Loader'
 
 export default {
 	name: "EditSaveSearchModal",
-	components: { Loader },
 	props: {
 		id: { type: Number, default: null }
 	},data() {
@@ -158,15 +174,18 @@ export default {
 			},
 			rowuser: [],
 			optvisibility: [
-				{ value: "public", text: i18n.t("search.public") },
-				{ value: "private_personal", text: i18n.t("search.private_personal") },
-				{ value: "private_group", text: i18n.t("search.private_group") }
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") }
 			],
-			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editsavesearch: false,
 			groups : [],
 			idmodal: 'edit-savesearch.'+this.id,
 			header: {
@@ -175,12 +194,23 @@ export default {
 			}
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editsavesearch = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editsavesearch = true
 			this.getSavedSearch(id)
 		},
 		getSavedSearch(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -195,7 +225,7 @@ export default {
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
 					this.errorMsg = null
@@ -214,7 +244,7 @@ export default {
 			this.groups = []
 			for (const group of groups) {
 				this.loading = true
-				Axios.get(process.env.VUE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -231,27 +261,24 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			delete this.row.search
 			delete this.row.user
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-savesearch.'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-savesearch.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

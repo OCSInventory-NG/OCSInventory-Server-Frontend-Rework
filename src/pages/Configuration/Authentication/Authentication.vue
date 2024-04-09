@@ -108,17 +108,14 @@
 
 <script>
 import Axios from 'axios'
-import i18n from '../../../i18n'
-import Loader from '@/components/Loader/Loader'
-import Alert from '@/components/Alert/Alert'
-import PageHeader from '@/components/Header/PageHeader'
-import Ldap from '@/components/Authentication/Ldap'
-import Cas from '@/components/Authentication/Cas'
-import Oidc from '@/components/Authentication/Oidc'
+import PageHeader from '@/components/Header/PageHeader.vue'
+import Ldap from '@/components/Authentication/Ldap.vue'
+import Cas from '@/components/Authentication/Cas.vue'
+import Oidc from '@/components/Authentication/Oidc.vue'
 
 export default {
 	name: 'Authentication',
-	components: { Loader, Alert, PageHeader, Ldap, Cas, Oidc },
+	components: { PageHeader, Ldap, Cas, Oidc },
 	data() {
 		return {
 			errorMsg: null,
@@ -135,10 +132,10 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			authmenus: [
-				{ value: "global", text: i18n.t("authentication.global"), enabled: true },
-				{ value: "LDAP", text: i18n.t("authentication.LDAP"), enabled: false },
-				{ value: "CAS", text: i18n.t("authentication.CAS"), enabled: false },
-				{ value: "OIDC", text: i18n.t("authentication.OIDC"), enabled: false },
+				{ value: "global", text: this.$t("authentication.global"), enabled: true },
+				{ value: "LDAP", text: this.$t("authentication.LDAP"), enabled: false },
+				{ value: "CAS", text: this.$t("authentication.CAS"), enabled: false },
+				{ value: "OIDC", text: this.$t("authentication.OIDC"), enabled: false },
 			]
 		}
 	},
@@ -155,14 +152,14 @@ export default {
 			}
 			this.getAuthMethod()
 		} else {
-			this.errorMsg = i18n.t("message.dont_have_right_to_see")
+			this.errorMsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getAuthMethod() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"auth_method/", { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method/", { headers: this.header })
 				.then(response => {
 					this.authmethods = response.data
 					this.authmethods.forEach(authmethod => {
@@ -192,7 +189,7 @@ export default {
 				enabled: state
 			}
 
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true

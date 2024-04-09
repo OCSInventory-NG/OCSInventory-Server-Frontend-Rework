@@ -117,12 +117,9 @@
 
 <script>
 import Axios from 'axios'
-import Loader from '@/components/Loader/Loader';
-import Alert from '@/components/Alert/Alert.vue';
 
 export default {
 	name: 'Accountinfo',
-	components: { Loader, Alert },
 	props: {
 		type: { type: String, default: '' },
 		id: { type: Number, default: null },
@@ -155,7 +152,7 @@ export default {
 	},
 	methods: {
 		getAccountinfoConfig() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -187,7 +184,7 @@ export default {
 			return array
 		},
 		getAccountinfoData() {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"accountinfo/data?object_slug="
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
@@ -223,7 +220,7 @@ export default {
 			})
 
 			if(this.create) {
-				Axios.post(process.env.VUE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
+				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
@@ -237,7 +234,7 @@ export default {
 						this.successed = false
 					})
 			} else {
-				Axios.patch(process.env.VUE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"

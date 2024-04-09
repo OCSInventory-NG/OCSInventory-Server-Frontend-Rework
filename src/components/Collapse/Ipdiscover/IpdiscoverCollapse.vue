@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import Datatable from '@/components/Datatable/Datatable';
+import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'IpdiscoverCollapse',

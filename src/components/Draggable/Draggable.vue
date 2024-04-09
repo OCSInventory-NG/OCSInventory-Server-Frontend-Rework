@@ -21,53 +21,55 @@
 			<draggable 
 				v-if="rowdatas.length > 0"
 				v-model="rowdatas" 
+				item-key="id"
 				:disabled="!canedit"
 				tag="tbody"
+				handle=".handle"
 				@change="updatePriority"
 			>
-				<tr
-					v-for="value in rowdatas"
-					:key="value.id"
-				>
-					<td>
-						<font-awesome-icon 
-							:icon="['fas', 'bars']"
-							class="draggable-icon"
-						/>
-					</td>
-					<td 
-						v-for="theader in rowheader" 
-						:key="theader"
-					>
-						{{ value[theader] }}
-					</td>
-					<td 
-						v-if="candelete || canedit"
-						class="section-table-btn"
-					>
-						<b-button-toolbar>
-							<b-button-group class="mr-1">
-								<EditMappingModal 
-									:id="value.id"
-								/>
-								<!-- Edit button -->
-								<component 
-									:is="editcomponent"
-									v-if="canedit"
-									v-bind="{ id: value.id }"
-									@reloadDatatable="reloadDatatable"
-								/>
-								<delete-item-modal 
-									v-if="candelete"
-									:id="value.id"
-									:name="value.name"
-									:parameter="apiroute"
-									@reloadDatatable="reloadDatatable"
-								/>
-							</b-button-group>
-						</b-button-toolbar>
-					</td>
-				</tr>
+				<template #item="{ element }">
+					<tr>
+						<td>
+							<font-awesome-icon 
+								:icon="['fas', 'bars']"
+								class="draggable-icon handle"
+							/>
+						</td>
+						<td 
+							v-for="theader in rowheader" 
+							:key="theader"
+						>
+							{{ element[theader] }}
+						</td>
+						<td 
+							v-if="candelete || canedit"
+							class="section-table-btn"
+						>
+							<b-button-toolbar>
+								<b-button-group class="mr-1">
+									<EditMappingModal 
+										v-if="canaddmapping"
+										:id="element.id"
+									/>
+									<!-- Edit button -->
+									<component 
+										:is="editcomponent"
+										v-if="canedit"
+										v-bind="{ id: element.id }"
+										@reloadDatatable="reloadDatatable"
+									/>
+									<delete-item-modal 
+										v-if="candelete"
+										:id="element.id"
+										:name="element.name"
+										:parameter="apiroute"
+										@reloadDatatable="reloadDatatable"
+									/>
+								</b-button-group>
+							</b-button-toolbar>
+						</td>
+					</tr>
+				</template>
 			</draggable>
 			<tbody v-else>
 				<tr>
@@ -83,10 +85,10 @@
 <script>
 import draggable from 'vuedraggable'
 import Axios from 'axios'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal'
-import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal'
+import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
+import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal.vue'
+import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 
 export default {
 	name: "DraggableComponent",
@@ -134,7 +136,7 @@ export default {
 					priority: priority
 				}
 
-				Axios.patch(process.env.VUE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
+				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
 					.catch(e => {
 						console.log(e)
 					})

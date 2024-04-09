@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AddAutomaticActionModal from '@/components/Modals/AddItem/AddAutomaticActionModal'
+import AddAutomaticActionModal from '@/components/Modals/AddItem/AddAutomaticActionModal.vue'
 
 export default {
 	name: "AutomaticAction",

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal'
+import AddTemplateModal from '@/components/Modals/AddItem/AddTemplateModal.vue'
 
 export default {
 	name: 'Template',

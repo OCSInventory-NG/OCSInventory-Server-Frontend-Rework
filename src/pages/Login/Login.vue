@@ -8,115 +8,85 @@
 					align="center"
 				>
 					<img 
-						src="../../assets/illu_communaute.png" 
+						src="../../assets/img/illu_communaute.png" 
 						class="ocs-logo"
 					>
 				</div>
 			</div>
 
 			<div class="col-4 form-login">
-				<form 
+				<BForm 
 					class="mt" 
-					@submit.prevent="login"
+					@submit="onSubmit"
 				>
-					<!-- Alert component -->
-					<Alert 
-						:message="errorMessage"
-						variant="danger"
-					/>
-
 					<!-- Language selection -->
 					<div class="form-group locale-changer login-form-group">
-						<b-form-select 
-							v-model="$root.$i18n.locale"
-							class="form-select"
-						>
-							<b-form-select-option 
-								v-for="(lang, i) in langs" 
-								:key="`Lang${i}`" 
-								:value="i"
-							>
-								{{ lang }}
-							</b-form-select-option>
-						</b-form-select>
+						<BFormSelect
+							v-model="$root.$i18n.locale" 
+							:options="langs" 
+						/>
 					</div>
-
 					<!-- Username -->
 					<div class="form-group login-form-group">
-						<input 
-							ref="email" 
-							:placeholder="$t('user.username')" 
-							class="form-control no-border" 
+						<BFormInput
+							v-model="username"
+							:placeholder="$t('user.username')"
+							class="form-control no-border"
+							type="text"
 							required 
-							type="text" 
-							name="email"
-						>
+						/>
 					</div>
-
 					<!-- Password -->
 					<div class="form-group login-form-group">
-						<input 
-							ref="password" 
-							:placeholder="$t('user.password')" 
-							class="form-control no-border" 
+						<BFormInput
+							v-model="password"
+							:placeholder="$t('user.password')"
+							class="form-control no-border"
+							type="password"
 							required 
-							type="password" 
-							name="password"
-						>
+						/>
 					</div>
-					
 					<!-- Submit button -->
-					<b-row>
-						<b-col>
-							<b-button 
+					<BRow>
+						<BCol>
+							<BButton
 								type="submit"
 								class="auth-btn mb-3" 
 								variant="inverse"
 							>
 								{{ $t('generic.login') }}
-							</b-button>
-						</b-col>
-						<b-col>
-							<b-button 
-								v-if="sso"
-								:href="redirect_url"
-								class="auth-btn mb-3" 
-								variant="inverse"
-							>
-								SSO
-							</b-button>
-						</b-col>
-					</b-row>
-				</form>
+							</BButton>
+						</BCol>
+					</BRow>
+				</BForm>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import Axios from 'axios';
-import i18n from '../../i18n';
-import Alert from '@/components/Alert/Alert.vue'
+import Axios from 'axios'
 
 export default {
-	name: 'LoginPage',
-	components: { Alert },
+	name: "Login",
 	data() {
 		return {
 			errorMessage: null,
 			sso: false,
 			redirect_url: null,
-			langs: {
-				'fr': 'Français',
-				'en': 'English'
-			}
+			username: null,
+			password: null,
+			langs: [
+				{value: 'fr', text: 'Français'},
+				{value: 'en', text: 'English'},
+			]
 		};
 	},
 	beforeCreate() {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
-		Axios.get(process.env.VUE_APP_API_ROUTE+"login/", { headers: header })
+		Axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
 			.then(response => {
 				if(response.data) {
 					this.sso = response.data.SSO
@@ -128,13 +98,12 @@ export default {
 			})
 	},
 	methods: {
-		login() {
-			const email = this.$refs.email.value;
-			const password = this.$refs.password.value;
+		onSubmit(event) {
+			event.preventDefault()
 
 			const loginOptions = { 
-				"username": email,
-				"password": password
+				"username": this.username,
+				"password": this.password
 			}
 
 			const header = {
@@ -143,12 +112,12 @@ export default {
 				"Content-Type": "application/json;charset=utf-8"
 			}
 
-			Axios.post(process.env.VUE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
 				.then(response => {
 					this.errorMessage = null
 					localStorage.setItem('token_authentication', response.data.token)
 					localStorage.setItem('authenticated', true)
-					localStorage.setItem('lang', this.$root.$i18n.locale)
+					localStorage.setItem('locale', this.$root.$i18n.locale)
 					this.getPermissions()
 				})
 				.catch(e => {
@@ -165,19 +134,19 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			Axios.get(process.env.VUE_APP_API_ROUTE+"myaccount/", { headers: header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {
 						localStorage.setItem('permissions', tmpUser)
 						this.$router.push('/dashboard')
 					}
-					this.errorMessage = i18n.t("message.error_no_permissions")
+					this.errorMessage = this.$t("message.error_no_permissions")
 				})
 				.catch(e => {
 					this.errorMessage = e.message
 				})
 		}
-	},
+	}
 }
 </script>

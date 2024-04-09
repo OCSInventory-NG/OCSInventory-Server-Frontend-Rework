@@ -1,7 +1,6 @@
 <template>
 	<div id="edit-action-list-modal">
 		<button 
-			v-b-modal="idmodal"
 			:title="$t('deployment.editaction')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
@@ -13,13 +12,28 @@
 
 		<b-modal 
 			:id="idmodal"
+			v-model="editaction"
 			:title="$t('deployment.editaction')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('deployment.editaction') }}
+					<b-spinner 
+						v-if="loadingcreate"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="createwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="createerror"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -33,8 +47,14 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="!loading"
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="createerror"
+					:message="createerrormsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -107,13 +127,18 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+			<div 
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
 		</b-modal>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import i18n from '@/i18n'
 
 export default {
 	name: 'EditPackageModal',
@@ -130,32 +155,46 @@ export default {
 				file: ''
 			},
 			rowdata: [],
-			loading: true,
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			editaction: false,
 			header: {
 				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			actionoptions: [
-				{ value: 'EXEC', text: i18n.t('deployment.EXEC') },
-				{ value: 'LAUNCH', text: i18n.t('deployment.LAUNCH') },
-				{ value: 'STORE', text: i18n.t('deployment.STORE') }
+				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
+				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
+				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			],
 			idmodal: 'edit-action.'+this.id
 		}
 	},
+	watch: {
+		createwithsuccess: function() {
+			setTimeout(() => {
+				this.editaction = false
+				this.createwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
+		}
+	},
 	methods: {
 		loadData(id) {
+			this.loading = true
+			this.editaction = true
 			this.getAction(id)
 		},
 		processFile(event){
 			this.row.file = event.target.files[0];
 		},
 		getAction(id) {
-			Axios.get(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
+			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errorMsg = null
@@ -170,6 +209,7 @@ export default {
 		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			let formdata = new FormData()
 
@@ -177,23 +217,19 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 			
-			Axios.patch(process.env.VUE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
+			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-					this.$bvModal.hide('edit-action.'+this.row.id)
-					this.$emit('reloadDatatable')
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('edit-action.'+this.row.id)
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
 				})
+				.finally(() => this.loadingcreate = false)
 		},
 	}
 }

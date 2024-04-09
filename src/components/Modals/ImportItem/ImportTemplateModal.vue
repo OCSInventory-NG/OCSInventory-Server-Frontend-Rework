@@ -1,10 +1,10 @@
 <template>
 	<div id="import-template-modal">
 		<b-button 
-			v-b-modal.import-template
 			:title="$t('template.import_template')"
 			variant="bg-light"
 			class="form-control btn datatable-btn datatable-btn-maxsize"
+			@click="importtemplate = !importtemplate"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'upload']"
@@ -13,14 +13,29 @@
 
 		<b-modal 
 			id="import-template" 
+			v-model="importtemplate"
 			:title="$t('template.import_template')"
 			hide-footer
 			size="md"
 			modal-class="custom-modal modal-blur"
 		>
-			<template #modal-header="{ close }">
+			<template #header="{ close }">
 				<h5 class="modal-title">
 					{{ $t('template.import_template') }}
+					<b-spinner 
+						v-if="loadingimport"
+						variant="success"
+					/>
+					<font-awesome-icon 
+						v-if="importwithsuccess"
+						:icon="['fas', 'check']"
+						color="green"
+					/>
+					<font-awesome-icon 
+						v-if="errored"
+						:icon="['fas', 'xmark']"
+						color="red"
+					/>
 				</h5>
 				<b-button 
 					size="sm" 
@@ -36,6 +51,11 @@
 			<b-form
 				@submit="onSubmit"
 			>
+				<Alert 
+					v-if="errored"
+					:message="errorMsg" 
+					variant="danger"
+				/>
 				<b-row>
 					<b-col>
 						<b-form-file
@@ -73,15 +93,25 @@ export default {
 	data() {
 		return {
 			errorMsg: null,
-			succesMsg: null,
 			errored: false,
-			successed: false,
+			loadingimport: false,
+			importwithsuccess: false,
+			importtemplate: false,
 			file: null,
 			jsonToSend: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
+		}
+	},
+	watch: {
+		importwithsuccess: function() {
+			setTimeout(() => {
+				this.importtemplate = false
+				this.importwithsuccess = false
+				this.$emit('reloadDatatable')
+			}, 500)
 		}
 	},
 	methods: {
@@ -98,22 +128,20 @@ export default {
 		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit() {
-			Axios.post(process.env.VUE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
+			this.loadingimport = true
+			
+			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
-					this.successed = true
 					this.errorMsg = null
 					this.errored = false
-					this.$bvModal.hide('import-template')
-					this.$emit('reloadDatatable')
+					this.importwithsuccess = true
 				})
 				.catch(e => {
 					this.errorMsg = e.message
 					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-					this.$bvModal.hide('import-template')
+					this.importwithsuccess = false
 				})
+				.finally(() => this.loadingimport = false)
 		}
 	}
 }
