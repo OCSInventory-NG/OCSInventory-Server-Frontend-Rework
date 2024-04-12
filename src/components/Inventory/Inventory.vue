@@ -21,18 +21,12 @@
 				<div v-if="isDataLoaded">
 					<div align="right">
 						<b-button
+							v-b-toggle="allcollapse"
 							variant="ghost-dark"
-							:title="(!expandall) ? $t('inventory.expandall') : $t('inventory.unexpandall')"
-							@click="(!expandall) ? expand() : collapse()"
+							:title="$t('inventory.expandall')"
 						>
 							<font-awesome-icon 
-								v-if="!expandall"
-								:icon="['fas', 'up-right-and-down-left-from-center']"
-								size="1x"
-							/>
-							<font-awesome-icon 
-								v-else
-								:icon="['fas', 'down-left-and-up-right-to-center']"
+								:icon="['far', 'window-maximize']"
 								size="1x"
 							/>
 						</b-button>
@@ -195,14 +189,6 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
-		},
-		expand() {
-			const collapseList = [...this.allcollapse].map(c => document.getElementById(c).classList.add("show"))
-			this.expandall = true
-		},
-		collapse() {
-			const collapseList = [...this.allcollapse].map(c => document.getElementById(c).classList.remove("show"))
-			this.expandall = false
 		}
 	}
 }
