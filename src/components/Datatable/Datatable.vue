@@ -375,7 +375,7 @@ export default {
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: false },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },

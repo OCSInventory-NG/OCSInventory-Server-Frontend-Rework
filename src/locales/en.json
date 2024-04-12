@@ -258,6 +258,7 @@
   },
   "network": {
     "addnetgroup": "Add a network group",
+    "addsnmp": "Add a SNMP configuration",
     "description": "Description",
     "editnetdevice": "Edit the network device",
     "editnetgroup": "Edit a Network Group",
@@ -469,7 +470,7 @@
     "result": "Results",
     "rules": "Rules",
     "savedsearch": "Saved searches",
-    "snmp": "Snmp",
+    "snmp": "SNMP",
     "system": "System",
     "template": "Template",
     "templates": "Templates",

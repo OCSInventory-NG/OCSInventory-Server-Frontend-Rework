@@ -137,6 +137,10 @@
 							header: $t('title.rules'), link: '/configurations/rules', 
 							route:'Rule', column: 'inventory' 
 						},
+						{ 
+							header: $t('title.snmp'), link: '/configurations/snmp', 
+							route:'Snmp', column: 'network' 
+						}
 					]"
 					link="/configurations"
 					icon-name="wrench"

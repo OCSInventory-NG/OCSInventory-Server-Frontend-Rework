@@ -272,7 +272,11 @@ export default {
 		getConfig() {
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
-					this.configs = response.data
+					for(const config of response.data) {
+						if(config.name != "snmp") {
+							this.configs.push(config)
+						}
+					}
 					this.loading = false
 				})
 				.catch(e => {
