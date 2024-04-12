@@ -19,6 +19,24 @@
 
 			<div v-else>
 				<div v-if="isDataLoaded">
+					<div align="right">
+						<b-button
+							variant="ghost-dark"
+							:title="(!expandall) ? $t('inventory.expandall') : $t('inventory.unexpandall')"
+							@click="(!expandall) ? expand() : collapse()"
+						>
+							<font-awesome-icon 
+								v-if="!expandall"
+								:icon="['fas', 'up-right-and-down-left-from-center']"
+								size="1x"
+							/>
+							<font-awesome-icon 
+								v-else
+								:icon="['fas', 'down-left-and-up-right-to-center']"
+								size="1x"
+							/>
+						</b-button>
+					</div><br>
 					<div
 						v-for="(section_name) in sectionstitle"
 						:key="section_name"
@@ -95,6 +113,8 @@ export default {
 			loading: true,
 			errored: false,
 			errorMsg: null,
+			expandall: false,
+			allcollapse: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -120,6 +140,7 @@ export default {
 
 						if(!this.sectionstitle.includes(sectionName)) {
 							this.sectionstitle.push(sectionName)
+							this.allcollapse.push("section-"+sectionName)
 						}
 
 						if(!this.sections[sectionName]) {
@@ -174,6 +195,14 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
+		},
+		expand() {
+			const collapseList = [...this.allcollapse].map(c => document.getElementById(c).classList.add("show"))
+			this.expandall = true
+		},
+		collapse() {
+			const collapseList = [...this.allcollapse].map(c => document.getElementById(c).classList.remove("show"))
+			this.expandall = false
 		}
 	}
 }
