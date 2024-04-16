@@ -225,6 +225,7 @@
     "DEPLOYMENT_ACK": "Acknowledgment of a successful deployment",
     "DEPLOYMENT_ERR": "Error during the deployment process",
     "domain": "Domain",
+    "expandall": "Expand inventory",
     "id": "ID",
     "INVENTORY_BASE_ERR": "Error related to the base inventory operations",
     "INVENTORY_BASE_INSERT": "Inserting new items into the base inventory",
