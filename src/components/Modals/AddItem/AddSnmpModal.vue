@@ -83,6 +83,9 @@
 								</b-list-group>
 							</div>
 							<hr>
+							<div class="col-auto">
+								<h2>{{ $t("network.snmpcommunity") }}</h2>
+							</div>
 							<Datatable
 								id="snmpconfig-datatable"
 								:rowdata="rowdata"
@@ -325,6 +328,14 @@
 								</div>
 							</b-modal>
 						</div>
+						<hr>
+						<add-snmp-template-modal 
+							:canadd="canadd"
+							:canedit="canedit"
+							:candelete="candelete"
+							:canview="canview"
+							page-title="snmp"
+						/>
 					</div>
 				</div>
 			</div>
@@ -335,10 +346,11 @@
 <script>
 import Axios from 'axios'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
+import AddSnmpTemplateModal from '@/components/Modals/AddItem/AddSnmpTemplateModal.vue'
 
 export default {
 	name: "AddSnmpModal",
-	components: { Breadcrumb },
+	components: { Breadcrumb, AddSnmpTemplateModal },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -470,7 +482,7 @@ export default {
 			this.loadingcreate = true
 
 			if(this.row.subnets != null && this.row.subnets.trim() != "") {
-				this.row.subnets = this.row.subnets.replace(/[^0-9\.\/`,]+/g, "").split(",")
+				this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
 			} else {
 				this.row.subnets = []
 			}
