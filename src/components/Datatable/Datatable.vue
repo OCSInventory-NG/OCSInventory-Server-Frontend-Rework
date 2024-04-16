@@ -256,6 +256,16 @@
 								/>
 							</button>
 							<button 
+								v-if="caneditsnmptemplate"
+								:title="$t('template.edittemplate')"
+								class="btn btn-ghost-dark"
+								@click="goToEditSnmpTemplate(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'pencil']"
+								/>
+							</button>
+							<button 
 								v-if="canviewaction"
 								:title="$t('deployment.manageaction')"
 								class="btn btn-ghost-dark"
@@ -378,6 +388,7 @@ export default {
 		usecheckbox: { type: Boolean, default: false },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
+		caneditsnmptemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
@@ -538,6 +549,9 @@ export default {
 		},
 		goToEditTemplate(id){
 			this.$router.push('/configurations/templates/'+id); 
+		},
+		goToEditSnmpTemplate(id){
+			this.$router.push('/configurations/snmp/'+id); 
 		},
 		goToEditPackage(id){
 			this.$router.push('/deployment/packages/'+id); 
