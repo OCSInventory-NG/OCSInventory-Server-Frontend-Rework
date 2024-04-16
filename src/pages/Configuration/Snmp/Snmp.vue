@@ -1,25 +1,25 @@
 <template>
-    <div
-        id="snmp" 
+	<div
+		id="snmp" 
 		class="container-xl"
-    >
-        <AddSnmpModalVue
-            :canadd="canadd"
-            :canedit="canedit"
-            :candelete="candelete"
-            :canview="canview"
-            page-title="snmp"
-        />
-    </div>
+	>
+		<AddSnmpModalVue
+			:canadd="canadd"
+			:canedit="canedit"
+			:candelete="candelete"
+			:canview="canview"
+			page-title="snmp"
+		/>
+	</div>
 </template>
 
 <script>
 import AddSnmpModalVue from '@/components/Modals/AddItem/AddSnmpModal.vue'
 
 export default {
-    name: "Snmp",
-    components: { AddSnmpModalVue },
-    data() {
+	name: "Snmp",
+	components: { AddSnmpModalVue },
+	data() {
 		return {
 			canadd: false,
 			canedit: false,
