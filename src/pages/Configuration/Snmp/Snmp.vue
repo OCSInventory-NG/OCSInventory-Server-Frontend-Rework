@@ -1,6 +1,6 @@
 <template>
 	<div
-		id="snmp" 
+		id="snmp"
 		class="container-xl"
 	>
 		<AddSnmpModalVue
