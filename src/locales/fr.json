@@ -260,7 +260,8 @@
   },
   "network": {
     "addnetgroup": "Ajouter un groupe Réseaux",
-    "addsnmp": "Ajouter une configuration SNMP",
+    "addsnmpcommunity": "Ajouter une communauté SNMP",
+    "addsnmptemplate": "Ajouter un modèle SNMP",
     "auth_protocol": "Auth protocol",
     "description": "Description",
     "editnetdevice": "Modifier le périphérique réseau",
@@ -283,6 +284,8 @@
     "priv_password": "Priv mot de passe",
     "priv_protocol": "Priv protocol",
     "retries": "Tentatives",
+    "snmpcommunity": "Communautés",
+    "snmptemplates": "Modèles",
     "subnets": "Réseaux",
     "timeout": "Timeout",
     "unknown_network": "Réseaux inconnus",
