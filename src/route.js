@@ -97,6 +97,15 @@ const routes = [
 		}
 	},
 	{
+		path: '/configurations/Snmp/:id',
+		name: 'EditTemplate',
+		component: () => import('@/pages/Configuration/Template/EditTemplate.vue'),		
+		props: true,
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/configurations/authentication',
 		name: 'Authentication',
 		component: () => import('@/pages/Configuration/Authentication/Authentication.vue'),
