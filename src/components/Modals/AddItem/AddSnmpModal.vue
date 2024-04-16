@@ -3,113 +3,55 @@
 		id="add-snmp-modal"
 		class="container-xl"
 	>
-		<div>
-			<div class="page-header d-print-none text-white">
-				<div class="row align-items-center">
-					<div class="col">
-						<div class="page-pretitle">
-							<Breadcrumb />
-						</div>
-						<h2 class="page-title">
-							{{ $t('title.'+pageTitle) }}
-						</h2>
-					</div>
-					<div class="col-auto ms-auto">
-						<!-- Button to add netgroup -->
-						<b-button
-							v-if="canadd"
-							:title="$t('network.addsnmp')"
-							variant="primary"
-							class="d-none d-sm-inline-block"
-							@click="addsnmp = !addsnmp"
-						>
-							<font-awesome-icon 
-								:icon="['fas', 'plus']"
-							/>
-							{{ $t('network.addsnmp') }}
-						</b-button>
-					</div>
-				</div>
+		<!-- Display error box message -->
+		<section v-if="errored">
+			<Alert 
+				:message="errorMsg" 
+				variant="danger"
+			/>
+		</section>
+
+		<!-- Display info if no error -->
+		<section v-else>
+			<div 
+				v-if="loading"
+				align="center"
+			>
+				<Loader />
 			</div>
-			<!-- Display datatable -->
-			<div class="page-body">
-				<div class="card">
-					<div class="card-body">
-						<!-- Display error box message -->
-						<section v-if="errored">
-							<Alert 
-								:message="errorMsg" 
-								variant="danger"
-							/>
-						</section>
-						<section v-if="successed">
-							<Alert 
-								:message="succesMsg" 
-								variant="success"
-							/>
-						</section>
-						<div 
-							v-if="loading"
-							class="ocs-loader"
-						>
-							<Loader />
+			<div v-else>
+				<div class="page-header d-print-none">
+					<div class="row">
+						<div class="col-auto">
+							<h2>{{ $t("network.snmpcommunity") }}</h2>
 						</div>
-						<div v-else>
-							<div>
-								<b-list-group flush>
-									<b-list-group-item 
-										class="d-flex justify-content-between align-items-center"
-									>
-										<div>
-											<h4 class="mb-1">
-												{{ $t("title.snmp") }}
-											</h4>
-											<p class="mb-1">
-												{{ $t("network.enablesnmp") }}
-											</p>
-										</div>
-										<div>
-											<label class="form-check form-switch">
-												<input 
-													v-model="configs.value[0].value"
-													class="form-check-input"
-													type="checkbox"
-													:disabled="!canedit"
-													@change="enableSnmp()"
-												>
-											</label>
-										</div>
-									</b-list-group-item>
-								</b-list-group>
-							</div>
-							<hr>
-							<div class="col-auto">
-								<h2>{{ $t("network.snmpcommunity") }}</h2>
-							</div>
-							<Datatable
-								id="snmpconfig-datatable"
-								:rowdata="rowdata"
-								:rowheader="rowheader"
-								:canedit="canedit"
-								:candelete="candelete"
-								editcomponent="EditSnmpModal"
-								title="snmp"
-								translationkey="network."
-								@reloadDatatable="reloadDatatable"
-							/>
-							<!-- Modal to add netgroup -->
+						<div class="col-auto ms-auto">
+							<!-- Button to add ldap -->
+							<b-button
+								v-if="canadd"
+								:title="$t('network.addsnmpcommunity')"
+								variant="primary"
+								class="d-none d-sm-inline-block"
+								@click="addsnmpcommunity = !addsnmpcommunity"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'plus']"
+								/>
+								{{ $t('network.addsnmpcommunity') }}
+							</b-button>
+
 							<b-modal 
 								v-if="canadd"
 								id="add-snmp" 
-								v-model="addsnmp"
-								:title="$t('network.addsnmp')"
+								v-model="addsnmpcommunity"
+								:title="$t('network.addsnmpcommunity')"
 								hide-footer
 								modal-class="custom-modal modal-blur"
 								scrollable
 							>
 								<template #header="{ close }">
 									<h5 class="modal-title">
-										{{ $t('network.addsnmp') }}
+										{{ $t('network.addsnmpcommunity') }}
 										<b-spinner 
 											v-if="loadingcreate"
 											variant="success"
@@ -328,29 +270,31 @@
 								</div>
 							</b-modal>
 						</div>
-						<hr>
-						<add-snmp-template-modal 
-							:canadd="canadd"
-							:canedit="canedit"
-							:candelete="candelete"
-							:canview="canview"
-							page-title="snmp"
-						/>
 					</div>
 				</div>
+				<div class="page-body">
+					<Datatable
+						id="snmpconfig-datatable"
+						:rowdata="rowdata"
+						:rowheader="rowheader"
+						:canedit="canedit"
+						:candelete="candelete"
+						editcomponent="EditSnmpModal"
+						title="snmp"
+						translationkey="network."
+						@reloadDatatable="reloadDatatable"
+					/>
+				</div>
 			</div>
-		</div>
+		</section>
 	</div>
 </template>
 
 <script>
 import Axios from 'axios'
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
-import AddSnmpTemplateModal from '@/components/Modals/AddItem/AddSnmpTemplateModal.vue'
 
 export default {
 	name: "AddSnmpModal",
-	components: { Breadcrumb, AddSnmpTemplateModal },
 	props: {
 		canadd: { type: Boolean, default: false },
 		canedit: { type: Boolean, default: false },
@@ -387,7 +331,7 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			addsnmp: false,
+			addsnmpcommunity: false,
 			voptions: [
 				{value: "1", text: "1"},
 				{value: "2c", text: "2c"},
@@ -460,22 +404,6 @@ export default {
 		},
 		reloadDatatable() {
 			this.getSnmpConfig()
-		},
-		enableSnmp() {
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/snmp/", this.configs,
-				{ headers: this.header })
-				.then(() => {
-					this.succesMsg = this.$t("message.success_saved")
-					this.successed = true
-					this.errorMsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errorMsg = e.message
-					this.errored = true
-					this.succesMsg = null
-					this.successed = false
-				})
 		},
 		onSubmit(event) {
 			event.preventDefault()
