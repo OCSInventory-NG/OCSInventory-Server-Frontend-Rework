@@ -19,6 +19,18 @@
 
 			<div v-else>
 				<div v-if="isDataLoaded">
+					<div align="right">
+						<b-button
+							v-b-toggle="allcollapse"
+							variant="ghost-dark"
+							:title="$t('inventory.expandall')"
+						>
+							<font-awesome-icon 
+								:icon="['far', 'window-maximize']"
+								size="1x"
+							/>
+						</b-button>
+					</div><br>
 					<div
 						v-for="(section_name) in sectionstitle"
 						:key="section_name"
@@ -95,6 +107,8 @@ export default {
 			loading: true,
 			errored: false,
 			errorMsg: null,
+			expandall: false,
+			allcollapse: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -120,6 +134,7 @@ export default {
 
 						if(!this.sectionstitle.includes(sectionName)) {
 							this.sectionstitle.push(sectionName)
+							this.allcollapse.push("section-"+sectionName)
 						}
 
 						if(!this.sections[sectionName]) {

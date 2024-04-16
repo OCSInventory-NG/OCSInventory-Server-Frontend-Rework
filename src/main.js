@@ -37,7 +37,7 @@ import {
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple
 } from '@fortawesome/free-solid-svg-icons'
 import {
-	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar
+	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
 } from '@fortawesome/free-regular-svg-icons'
 app.component('FontAwesomeIcon', FontAwesomeIcon)
 app.component('FontAwesomeLayers', FontAwesomeLayers)
@@ -45,7 +45,7 @@ library.add({
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar
+	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize
 })
 
 /***** Loader *****/

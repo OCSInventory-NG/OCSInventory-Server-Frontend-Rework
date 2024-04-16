@@ -225,6 +225,7 @@
     "DEPLOYMENT_ACK": "Prise en compte du déploiement",
     "DEPLOYMENT_ERR": "Erreur lors de la prise en compte/exécution du déploiement",
     "domain": "Domaine",
+    "expandall": "Agrandir l'inventaire",
     "id": "ID",
     "INVENTORY_BASE_ERR": "Erreur lors de la gestion de l'inventaire base",
     "INVENTORY_BASE_INSERT": "Insertion de l'inventaire base",
