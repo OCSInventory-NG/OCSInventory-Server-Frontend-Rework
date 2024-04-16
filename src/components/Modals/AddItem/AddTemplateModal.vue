@@ -245,7 +245,11 @@ export default {
 		getTemplates() {
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					for (const temp of response.data) {
+						if(temp.os != "SNMP") {
+							this.rowdata.push(temp)
+						}
+					}
 					this.errorMsg = null
 					this.errored = false
 				})
