@@ -98,7 +98,7 @@ const routes = [
 	},
 	{
 		path: '/configurations/Snmp/:id',
-		name: 'EditTemplate',
+		name: 'EditSnmpTemplate',
 		component: () => import('@/pages/Configuration/Template/EditTemplate.vue'),		
 		props: true,
 		meta: {
