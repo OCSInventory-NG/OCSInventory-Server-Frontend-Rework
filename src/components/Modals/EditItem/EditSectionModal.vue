@@ -69,7 +69,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.retrival_method')" 
@@ -84,7 +84,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.retrival_output')" 
@@ -99,7 +99,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.target')" 
@@ -113,7 +113,10 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<div v-if="outputoptionoptions[row.retrival_output]">
+				<div 
+					v-if="outputoptionoptions[row.retrival_output]
+						&& routetype != 'snmp'"
+				>
 					<b-row>
 						<b-col>
 							<h4>{{ $t('template.retrieval_output_options') }}</h4>
@@ -213,6 +216,7 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			editsection: false,
+			routetype: "assets",
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -258,6 +262,9 @@ export default {
 		}
 	},
 	created() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetype = "snmp"
+		}
 		this.row = this.rowsectiondata
 		this.options = this.row.options
 		this.row.id = this.idmodal

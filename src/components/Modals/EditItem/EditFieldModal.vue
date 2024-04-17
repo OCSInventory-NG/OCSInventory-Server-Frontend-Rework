@@ -83,7 +83,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp'">
 					<b-col>
 						<b-form-checkbox
 							id="override_target"
@@ -96,7 +96,7 @@
 						</b-form-checkbox>
 					</b-col>
 				</b-row>
-				<div v-if="row.override_target == 'true'">
+				<div v-if="row.override_target == true">
 					<b-row>
 						<b-col>
 							<b-form-group
@@ -241,6 +241,7 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			editfield: false,
+			routetype: "assets",
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -283,6 +284,11 @@ export default {
 				this.createwithsuccess = false
 				this.$emit('reloadTemplate')
 			}, 500)
+		}
+	},
+	created() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetype = "snmp"
 		}
 	},
 	methods: {

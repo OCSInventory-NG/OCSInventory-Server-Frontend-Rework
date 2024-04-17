@@ -84,7 +84,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp'">
 					<b-col>
 						<b-form-checkbox
 							id="override_target"
@@ -226,7 +226,8 @@ import Axios from 'axios'
 export default {
 	name: 'AddFieldModal',
 	props: {
-		section: { type: Number, required: true }
+		section: { type: Number, required: true },
+		routetype: { type: String, default: "assets" }
 	},
 	data() {
 		return {

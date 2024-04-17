@@ -134,7 +134,7 @@
 						:caneditsnmptemplate="canedit"
 						:candelete="candelete"
 						:canexport="false"
-						:exporttemplate="exporttemplate"
+						:exporttemplate="true"
 						title="templates"
 						translationkey="template."
 						@reloadDatatable="reloadDatatable"

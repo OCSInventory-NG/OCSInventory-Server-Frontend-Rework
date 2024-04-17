@@ -19,11 +19,11 @@
 						<tr>
 							<th>{{ $t('user.name') }}</th>
 							<th>{{ $t('template.retrival_value') }}</th>
-							<th>{{ $t('template.override_target') }}</th>
-							<th>{{ $t('template.retrival_method') }}</th>
-							<th>{{ $t('template.new_target') }}</th>
-							<th>{{ $t('template.retrival_output') }}</th>
-							<th>{{ $t('template.retrieval_output_options') }}</th>
+							<th v-if="routetype != 'snmp'">{{ $t('template.override_target') }}</th>
+							<th v-if="routetype != 'snmp'">{{ $t('template.retrival_method') }}</th>
+							<th v-if="routetype != 'snmp'">{{ $t('template.new_target') }}</th>
+							<th v-if="routetype != 'snmp'">{{ $t('template.retrival_output') }}</th>
+							<th v-if="routetype != 'snmp'">{{ $t('template.retrieval_output_options') }}</th>
 							<th class="section-table-title">
 								{{ $t('generic.actions') }}
 							</th>
@@ -37,11 +37,15 @@
 						>
 							<td>{{ value.name }}</td>
 							<td>{{ value.retrival_value }}</td>
-							<td>{{ value.override_target }}</td>
-							<td>{{ (value.retrival_output != null) ? $t('template.' + value.retrival_method) : null }}</td>
-							<td>{{ value.new_target }}</td>
-							<td>{{ (value.retrival_output != null) ? $t('template.' + value.retrival_output) : null }}</td>
-							<td>
+							<td v-if="routetype != 'snmp'">{{ value.override_target }}</td>
+							<td v-if="routetype != 'snmp'">
+								{{ (value.retrival_output != null) ? $t('template.' + value.retrival_method) : null }}
+							</td>
+							<td v-if="routetype != 'snmp'">{{ value.new_target }}</td>
+							<td v-if="routetype != 'snmp'">
+								{{ (value.retrival_output != null) ? $t('template.' + value.retrival_output) : null }}
+							</td>
+							<td v-if="routetype != 'snmp'">
 								<p
 									v-for="(option, optioname) in value.options"
 									:key="optioname"
@@ -88,6 +92,7 @@ export default {
 	},
 	props: {
 		rowfielddata: { type: Array, default: null },
+		routetype: { type: String, default: "assets" }
 	},
 	data() {
 		return {

@@ -85,7 +85,7 @@
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row>
+							<b-row v-if="routetype != 'snmp'">
 								<b-col>
 									<b-form-group
 										:label="$t('template.retrival_method')" 
@@ -100,7 +100,7 @@
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row>
+							<b-row v-if="routetype != 'snmp'">
 								<b-col>
 									<b-form-group
 										:label="$t('template.target')" 
@@ -114,7 +114,7 @@
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<b-row>
+							<b-row v-if="routetype != 'snmp'">
 								<b-col>
 									<b-form-group
 										:label="$t('template.retrival_output')" 
@@ -129,7 +129,10 @@
 									</b-form-group>
 								</b-col>
 							</b-row>
-							<div v-if="outputoptionoptions[row.retrival_output]">
+							<div 
+								v-if="outputoptionoptions[row.retrival_output]
+									&& routetype != 'snmp'"
+							>
 								<b-row>
 									<b-col>
 										<h4>{{ $t('template.retrieval_output_options') }}</h4>
@@ -219,6 +222,7 @@ export default {
 	components: { Breadcrumb },
 	props: {
 		template: { type: String, required: true },
+		routetype: { type: String, default: "assets" }
 	},
 	data() {
 		return {
@@ -228,6 +232,16 @@ export default {
 				retrival_method: 'FILE',
 				retrival_output: null,
 				target: null,
+				fields: [],
+				template: null,
+				options: {}
+			},
+			snmprow: {
+				id: null,
+				name: null,
+				retrival_method: "OID",
+				retrival_output: "JSON",
+				target: "SNMP",
 				fields: [],
 				template: null,
 				options: {}
@@ -284,7 +298,10 @@ export default {
 			}, 500)
 		}
 	},
-	created() {
+	mounted() {
+		if(this.routetype == "snmp") {
+			this.row = this.snmprow
+		}
 		this.row.template = this.template
 		this.loading = false
 	},

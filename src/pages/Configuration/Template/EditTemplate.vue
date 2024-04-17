@@ -6,6 +6,7 @@
 		<div>
 			<AddSectionModal
 				:template="id"
+				:routetype="routetype"
 				@reloadTemplate="reloadTemplate"
 			/>
 
@@ -36,6 +37,7 @@
 								</b-col>
 							</b-row>
 							<SectionCollapse
+								:routetype="routetype"
 								:rowsectiondata="rowsectiondata"
 								@reloadTemplate="reloadTemplate"
 							/>
@@ -67,6 +69,7 @@ export default {
 			successed: false,
 			loading: true,
 			errored: false,
+			routetype: "assets",
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -76,6 +79,11 @@ export default {
 	watch: {
 		successed: function() {
 			setTimeout(() => this.successed = false, 10000)
+		}
+	},
+	beforeMount() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetype = "snmp"
 		}
 	},
 	mounted() {

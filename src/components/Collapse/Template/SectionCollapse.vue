@@ -36,10 +36,12 @@
 									<thead>
 										<tr>
 											<th>{{ $t('user.name') }}</th>
-											<th>{{ $t('template.retrival_output') }}</th>
-											<th>{{ $t('template.retrival_output') }}</th>
-											<th>{{ $t('template.target') }}</th>
-											<th>{{ $t('template.retrieval_output_options') }}</th>
+											<th>{{ $t('template.retrival_method') }}</th>
+											<th v-if="routetype != 'snmp'">{{ $t('template.retrival_output') }}</th>
+											<th v-if="routetype != 'snmp'">{{ $t('template.target') }}</th>
+											<th v-if="routetype != 'snmp'">
+												{{ $t('template.retrieval_output_options') }}
+											</th>
 											<th class="section-table-title">
 												{{ $t('generic.actions') }}
 											</th>
@@ -49,9 +51,9 @@
 										<tr>
 											<td>{{ value.name }}</td>
 											<td>{{ $t("template."+value.retrival_method) }}</td>
-											<td>{{ $t("template."+value.retrival_output) }}</td>
-											<td>{{ value.target }}</td>
-											<td>
+											<td v-if="routetype != 'snmp'">{{ $t("template."+value.retrival_output) }}</td>
+											<td v-if="routetype != 'snmp'">{{ value.target }}</td>
+											<td v-if="routetype != 'snmp'">
 												<p
 													v-for="(option,optionname) in value.options"
 													:key="optionname"
@@ -79,6 +81,7 @@
 													</b-button-group>
 													<b-button-group class="mx-3">
 														<AddFieldModal
+															:routetype="routetype"
 															:section="value.id"
 															@reloadTemplate="reloadTemplate"
 														/>
@@ -95,6 +98,7 @@
 							>
 								<b-col>
 									<FieldCollapse
+										:routetype="routetype"
 										:rowfielddata="value.fields"
 										@reloadTemplate="reloadTemplate"
 									/>
@@ -124,6 +128,7 @@ export default {
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
+		routetype: { type: String, default: "assets" }
 	},
 	methods: {
 		reloadTemplate() {
