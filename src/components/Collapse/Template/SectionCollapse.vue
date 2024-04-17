@@ -37,8 +37,12 @@
 										<tr>
 											<th>{{ $t('user.name') }}</th>
 											<th>{{ $t('template.retrival_method') }}</th>
-											<th v-if="routetype != 'snmp'">{{ $t('template.retrival_output') }}</th>
-											<th v-if="routetype != 'snmp'">{{ $t('template.target') }}</th>
+											<th v-if="routetype != 'snmp'">
+												{{ $t('template.retrival_output') }}
+											</th>
+											<th v-if="routetype != 'snmp'">
+												{{ $t('template.target') }}
+											</th>
 											<th v-if="routetype != 'snmp'">
 												{{ $t('template.retrieval_output_options') }}
 											</th>
@@ -51,8 +55,12 @@
 										<tr>
 											<td>{{ value.name }}</td>
 											<td>{{ $t("template."+value.retrival_method) }}</td>
-											<td v-if="routetype != 'snmp'">{{ $t("template."+value.retrival_output) }}</td>
-											<td v-if="routetype != 'snmp'">{{ value.target }}</td>
+											<td v-if="routetype != 'snmp'">
+												{{ $t("template."+value.retrival_output) }}
+											</td>
+											<td v-if="routetype != 'snmp'">
+												{{ value.target }}
+											</td>
 											<td v-if="routetype != 'snmp'">
 												<p
 													v-for="(option,optionname) in value.options"
