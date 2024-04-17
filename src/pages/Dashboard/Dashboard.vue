@@ -250,7 +250,9 @@ export default {
 			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
-						this.templates[template["os"]].push(template["id"])
+						if(template.os != "SNMP") {
+							this.templates[template.os].push(template.id)
+						}
 					})
 					this.errorMsgAsset = null
 					this.erroredasset = false
