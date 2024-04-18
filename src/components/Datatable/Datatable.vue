@@ -64,7 +64,7 @@
 				>
 					<b-button-group class="mr-1">
 						<AddPackageResultModal
-							:items="selected"
+							:items="(multisearch && selected.length == 0) ? rowdata : selected"
 						/>
 					</b-button-group>
 				</div>
@@ -407,6 +407,7 @@ export default {
 		canviewruleaction: { type: Boolean, default: false },
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
+		multisearch: { type: Boolean, default: false },
 	},
 	data() {
 		return {
