@@ -22,8 +22,10 @@
 					id="assets-deployment-datatable"
 					:rowdata="rowdata"
 					:rowheader="rowheader"
-					title="assets-deployment-result"
+					:candelete="true"
+					title="deployment/results"
 					translationkey="deployment."
+					@reloadDatatable="reloadDatatable"
 				/>
 			</div>
 		</section>
@@ -38,6 +40,7 @@ export default {
 	name: 'ResultDetail',
 	components: { Datatable },
 	props: {
+		reload: { type: Boolean, default: false },
 		type: { type: String, default: '' },
 		id: { type: String, default: null }
 	},
@@ -53,6 +56,13 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+		}
+	},
+	watch: {
+		reload: function() {
+			if(this.reload) {
+				this.getResult()
 			}
 		}
 	},
@@ -86,7 +96,14 @@ export default {
 					this.errorMsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
+				.finally(() => {
+					this.loading = false
+					this.$emit('endReloadDeployment')
+				})
+		},
+		reloadDatatable() {
+			this.loading = true
+			this.getResult()
 		}
 	}
 }

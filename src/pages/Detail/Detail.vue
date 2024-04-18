@@ -43,6 +43,7 @@
 										<b-button-group class="mr-1">
 											<AddPackageResultModal
 												:items="rowdata"
+												@reloadDeployment="reloadDeployment"
 											/>
 										</b-button-group>
 									</b-col>
@@ -113,6 +114,8 @@
 									>
 										<ResultDetail
 											:id="$route.params.id"
+											:reload="reload"
+											@endReloadDeployment="endReloadDeployment"
 										/>
 									</b-tab>
 								</b-tabs>
@@ -147,6 +150,7 @@ export default {
 			slug: null,
 			translationkey: null,
 			id: null,
+			reload: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -181,6 +185,14 @@ export default {
 				this.errorMsg = e.message
 				this.errored = true
 			})
+	},
+	methods: {
+		reloadDeployment() {
+			this.reload = true
+		},
+		endReloadDeployment() {
+			this.reload = false
+		}
 	}
 }
 </script>

@@ -238,6 +238,7 @@ export default {
 					})
 					.finally(() => {
 						this.loadingcreate = false
+						this.$emit('reloadDeployment')
 					})
 			}
 		}
