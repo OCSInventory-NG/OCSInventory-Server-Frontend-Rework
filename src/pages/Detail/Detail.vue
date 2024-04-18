@@ -49,7 +49,7 @@
 									</b-col>
 									<b-col
 										md="1"
-										alignSelf="end"
+										align-self="end"
 									>
 										<router-link 
 											:to="'/inventory/inventory_logs/'+$route.params.id"
