@@ -42,7 +42,7 @@
 									>
 										<b-button-group class="mr-1">
 											<AddPackageResultModal
-												:items="rowdata"
+												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>
 										</b-button-group>
@@ -69,7 +69,7 @@
 							</div>
 							<div class="datagrid">
 								<div 
-									v-for="(value,key) in rowdata[0]"
+									v-for="(value,key) in rowdata"
 									:key="key"
 									class="datagrid-item"
 								>
@@ -92,7 +92,7 @@
 									>
 										<fieldset class="form-fieldset">
 											<Accountinfo
-												:id="rowdata[0].id"
+												:id="rowdata.id"
 												:type="type"
 												:canedit="canedit"
 												:slug="slug"
@@ -151,6 +151,7 @@ export default {
 			translationkey: null,
 			id: null,
 			reload: false,
+			deployment: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -176,7 +177,8 @@ export default {
 		Axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
-				this.rowdata.push(response.data)
+				this.rowdata = response.data
+				this.deployment.push(response.data)
 				this.errorMsg = null
 				this.errored = false
 				this.loading = false

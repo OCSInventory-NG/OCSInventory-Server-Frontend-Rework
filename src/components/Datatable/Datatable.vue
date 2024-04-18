@@ -189,7 +189,7 @@
 					#cell(name)="row"
 				>
 					<router-link  
-						:to="'/inventory/asset/'+row.item.id"
+						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
@@ -202,7 +202,7 @@
 					#cell(netname)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/'+row.item.id"
+						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.netname }}
@@ -438,6 +438,7 @@ export default {
 			// Export parameters
 			json_fields: {},
 			json_data: [],
+			redirectto: null,
 			json_meta: [
 				[
 					{
@@ -475,6 +476,12 @@ export default {
 		}
 	},
 	created() {
+		if(this.title == "asset/bases") {
+			this.redirectto = "asset"
+		} else {
+			this.redirectto = this.title
+		}
+
 		if(this.usecheckbox == true) {
 			this.fields.push({
 				key: "selected", 
