@@ -256,6 +256,8 @@
     "deletevalid": "Are you sure?",
     "dont_have_right_to_see": "You don't have the rights to view this page",
     "error_no_permissions": "You don't have any permissions, please contact your administrator",
+    "no_inventory": "No inventory data available",
+    "no_selection": "No machine has been selected",
     "success_saved": "Configuration successfully saved!"
   },
   "network": {
