@@ -34,19 +34,33 @@
 							<Loader />
 						</div>
 						<div v-else>
-							<div
-								v-if="type == 'ASSET'"
-								align="right"
-							>
-								<router-link 
-									:to="'/inventory/inventory_logs/'+$route.params.id"
-									:title="$t('inventory.see_logs')"
-									class="btn"
-								>
-									<font-awesome-icon 
-										:icon="['far', 'file-lines']"
-									/>
-								</router-link>
+							<div v-if="type == 'ASSET'">
+								<b-row class="asset-btn">
+									<b-col
+										md="1"
+										align="right"
+									>
+										<b-button-group class="mr-1">
+											<AddPackageResultModal
+												:items="rowdata"
+											/>
+										</b-button-group>
+									</b-col>
+									<b-col
+										md="1"
+										alignSelf="end"
+									>
+										<router-link 
+											:to="'/inventory/inventory_logs/'+$route.params.id"
+											:title="$t('inventory.see_logs')"
+											class="btn datatable-btn"
+										>
+											<font-awesome-icon 
+												:icon="['far', 'file-lines']"
+											/>
+										</router-link>
+									</b-col>
+								</b-row>
 							</div>
 
 							<div class="hr-text">
@@ -54,7 +68,7 @@
 							</div>
 							<div class="datagrid">
 								<div 
-									v-for="(value,key) in rowdata"
+									v-for="(value,key) in rowdata[0]"
 									:key="key"
 									class="datagrid-item"
 								>
@@ -77,7 +91,7 @@
 									>
 										<fieldset class="form-fieldset">
 											<Accountinfo
-												:id="rowdata.id"
+												:id="rowdata[0].id"
 												:type="type"
 												:canedit="canedit"
 												:slug="slug"
@@ -117,10 +131,11 @@ import PageHeader from '@/components/Header/PageHeader.vue'
 import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
 import ResultDetail from '@/components/Deployment/ResultDetail.vue'
 import Inventory from '@/components/Inventory/Inventory.vue'
+import AddPackageResultModal from '@/components/Modals/AddItem/AddPackageResultModal.vue'
 
 export default {
 	name: 'Detail',
-	components: { PageHeader, Accountinfo, ResultDetail, Inventory },
+	components: { PageHeader, Accountinfo, ResultDetail, Inventory, AddPackageResultModal },
 	data() {
 		return {
 			errorMsg: null,
@@ -157,7 +172,7 @@ export default {
 		Axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
-				this.rowdata = response.data
+				this.rowdata.push(response.data)
 				this.errorMsg = null
 				this.errored = false
 				this.loading = false
