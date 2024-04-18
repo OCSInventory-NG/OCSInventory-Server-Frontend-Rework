@@ -35,9 +35,9 @@
 						</div>
 						<div v-else>
 							<div v-if="type == 'ASSET'">
-								<b-row class="asset-btn">
-									<b-col
-										md="1"
+								<b-row class="asset-btn responsive">
+									<div
+										class="col-1"
 										align="right"
 									>
 										<b-button-group class="mr-1">
@@ -46,21 +46,18 @@
 												@reloadDeployment="reloadDeployment"
 											/>
 										</b-button-group>
-									</b-col>
-									<b-col
-										md="1"
-										align-self="end"
-									>
+									</div>
+									<div class="col-1">
 										<router-link 
 											:to="'/inventory/inventory_logs/'+$route.params.id"
 											:title="$t('inventory.see_logs')"
-											class="btn datatable-btn"
+											class="btn datatable-btn mr-1"
 										>
 											<font-awesome-icon 
 												:icon="['far', 'file-lines']"
 											/>
 										</router-link>
-									</b-col>
+									</div>
 								</b-row>
 							</div>
 
