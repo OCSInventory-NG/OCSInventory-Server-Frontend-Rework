@@ -148,6 +148,7 @@
     "addpackage": "Ajouter un paquet",
     "all": "Tous les résultats",
     "asset": "Actif",
+    "attrpkg": "Attribuer des paquets",
     "command": "Commande",
     "comment": "Commentaire",
     "date_created": "Date de création",
@@ -255,6 +256,7 @@
     "deletevalid": "Êtes-vous sûr ?",
     "dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page",
     "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
+    "no_selection": "Aucune machine n'a été sélectionnée",
     "success_saved": "Configuration sauvegardée avec succès !"
   },
   "network": {
