@@ -25,7 +25,7 @@
 				<!-- Export Excel -->
 				<div
 					v-if="canexport"
-					class="col-2" 
+					class="col-1" 
 				>
 					<b-button-group class="mr-1">
 						<download-excel
@@ -50,11 +50,23 @@
 				<!-- Export template -->
 				<div
 					v-if="exporttemplate"
-					class="col"
+					class="col-1"
 				>
 					<ImportTemplateModal
 						@reloadDatatable="reloadDatatable"
 					/>
+				</div>
+
+				<!-- Attribute package -->
+				<div
+					v-if="candeploy"
+					class="col-1"
+				>
+					<b-button-group class="mr-1">
+						<AddPackageResultModal
+							:items="selected"
+						/>
+					</b-button-group>
 				</div>
 
 				<!-- Show/Hide columns -->
@@ -126,6 +138,7 @@
 				show-empty
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
+				@row-unselected="onRowUnselected"
 			>
 				<!-- No data available -->
 				<template #empty="">
@@ -136,15 +149,15 @@
 				<template #head(selected)="">
 					<b-form-group>
 						<input 
-							type="checkbox" 
-							@click="selectAllRows"
+							v-model="isChecked"
+							type="checkbox"
 						>
 					</b-form-group>
 				</template>
 
-				<template #cell(selected)="{ rowSelected }">
+				<template #cell(selected)="row">
 					<!-- If row is selected -->
-					<template v-if="rowSelected">
+					<template v-if="selected.findIndex(v => v.id === row.item.id) != -1">
 						<font-awesome-icon 
 							:icon="['far', 'square-check']"
 						/>
@@ -176,7 +189,7 @@
 					#cell(name)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/'+row.item.id"
+						:to="'/inventory/asset/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
@@ -347,6 +360,7 @@ import EditAssetGroupModal from '@/components/Modals/EditItem/EditAssetGroupModa
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
+import AddPackageResultModal from '@/components/Modals/AddItem/AddPackageResultModal.vue'
 
 export default {
 	name: 'Datatable',
@@ -365,7 +379,8 @@ export default {
 		EditSaveSearchModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
-		ImportTemplateModal
+		ImportTemplateModal,
+		AddPackageResultModal
 	},
 	props: {
 		title: { type: String, default: '' },
@@ -391,6 +406,7 @@ export default {
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
 		canshowhide: { type: Boolean, default: true },
+		candeploy: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -413,7 +429,8 @@ export default {
 			filter: null,
 			// Select row parameter
 			selectMode: 'multi',
-			selected: null,
+			selected: [],
+			isChecked: false,
 			// Sort datatable parameters
 			sortDesc: null,
 			sortBy: null,
@@ -446,6 +463,15 @@ export default {
 		rowdata: function () {
 			this.totalRows = this.rowdata.length
 		},
+		isChecked: function () {
+			if(this.isChecked) {
+				this.$refs.selectableTable.selectAllRows()
+			} else {
+				this.$refs.selectableTable.clearSelected()
+				this.selected = []
+			}
+			this.attributePackage()
+		}
 	},
 	created() {
 		if(this.usecheckbox == true) {
@@ -515,23 +541,24 @@ export default {
 			this.json_data = filteredItems
 			this.currentPage = 1
 		},
-		// Trigger selection rows
-		selectAllRows() {
-			if(this.$refs.selectableTable.selectedRows[0] === true) {
-				this.$refs.selectableTable.clearSelected()
-				this.selected = this.rowdata
-			} else {
-				this.$refs.selectableTable.selectAllRows()
-			}
+		onRowSelected(item) {
+			this.selected.push(item)
+			this.attributePackage()
 		},
-		onRowSelected(items) {
-			this.selected = items
-			if(this.selected.length == 0) {
-				this.selected = this.rowdata
-			}
+		onRowUnselected(item) {
+			this.selected.splice(
+				this.selected.findIndex(
+					v => v.id === item.id
+				),
+				1
+			)
+			this.attributePackage()
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')
+		},
+		attributePackage() {
+			this.$emit('attributePackage', this.selected)
 		},
 		onSave() {
 			this.$emit('reloadDatatable', this.rowdata)
