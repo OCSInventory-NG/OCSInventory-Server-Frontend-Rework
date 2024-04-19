@@ -58,13 +58,16 @@
 								v-model="oidcdata.config[index]"
 								:disabled="!canedit"
 							/>
-							<b-form-select
+							<v-select
 								v-if="index == 'SIGN_ALGO'"
 								:id="index"
 								v-model="oidcdata.config[index]" 
-								:options="options" 
-								class="mb-3 form-select"
+								:options="options"
+								:reduce="text => text.value"
+								:clearable="false"
 								:disabled="!canedit"
+								label="text"
+								class="mb-3"
 							/>
 							<label 
 								v-if="booleans.includes(index)"

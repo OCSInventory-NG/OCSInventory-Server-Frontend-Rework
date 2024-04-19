@@ -58,13 +58,16 @@
 								v-model="casdata.config[index]"
 								:disabled="!canedit"
 							/>
-							<b-form-select
+							<v-select
 								v-if="index == 'VERSION'"
 								:id="index"
 								v-model="casdata.config[index]" 
-								:options="options" 
-								class="mb-3 form-select"
+								:options="options"
+								:reduce="text => text.value"
+								:clearable="false"
 								:disabled="!canedit"
+								label="text"
+								class="mb-3"
 							/>
 							<label 
 								v-if="index == 'AUTO_REDIRECT'"
