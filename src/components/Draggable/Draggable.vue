@@ -25,7 +25,7 @@
 				:disabled="!canedit"
 				tag="tbody"
 				handle=".handle"
-				@change="updatePriority"
+				@end="onEnd"
 			>
 				<template #item="{ element }">
 					<tr>
@@ -56,6 +56,7 @@
 										:is="editcomponent"
 										v-if="canedit"
 										v-bind="{ id: element.id }"
+										:update="true"
 										@reloadDatatable="reloadDatatable"
 									/>
 									<delete-item-modal 
@@ -84,8 +85,8 @@
 
 <script>
 import draggable from 'vuedraggable'
-import Axios from 'axios'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
+import axios from 'axios'
+import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
 import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal.vue'
 import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
@@ -94,7 +95,7 @@ export default {
 	name: "DraggableComponent",
 	components: { 
 		draggable,
-		EditActionListModal,
+		ActionListModal,
 		EditLdapModal,
 		EditMappingModal,
 		DeleteItemModal
@@ -104,7 +105,7 @@ export default {
 		rowheader: { type: Array, default: null },
 		translationkey: { type: String, default: "deployment." },
 		apiroute: { type: String, default: "deployment/actions" },
-		editcomponent: { type: String, default: "EditActionListModal" },
+		editcomponent: { type: String, default: "ActionListModal" },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false }
@@ -123,27 +124,21 @@ export default {
 		this.rowdatas.sort((a,b) => a.priority - b.priority)
 	},
 	methods: {
-		updatePriority(event) {
+		onEnd(event) {
 			event.preventDefault
 
-			var priority = 1
-			var index = 0
-
-			this.rowdatas.forEach(action => {
-				this.rowdatas[index].priority = priority
-
-				var json = {
-					priority: priority
-				}
-
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
-					.catch(e => {
-						console.log(e)
-					})
-
-				index += 1
-				priority += 1
-			});
+			this.rowdatas[event.newIndex].priority = event.newIndex + 1
+			axios.patch(
+				import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
+				this.rowdatas[event.newIndex],
+				{ headers: this.header }
+			)
+				.then(() => {
+					this.$emit('reloadDatatable')
+				})
+				.catch(e => {
+					console.log(e)
+				})			
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')
