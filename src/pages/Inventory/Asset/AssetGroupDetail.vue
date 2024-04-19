@@ -171,7 +171,7 @@ import ResultDetail from '@/components/Deployment/ResultDetail.vue'
 
 export default {
 	name: 'AssetGroupDetail',
-	components: { PageHeader, Search, AddPackageResultModal },
+	components: { PageHeader, Search, AddPackageResultModal, ResultDetail },
 	data() {
 		return {
 			errorMsg: null,
