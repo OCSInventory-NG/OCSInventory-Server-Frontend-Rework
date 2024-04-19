@@ -158,6 +158,7 @@
     "error": "En erreur",
     "EXEC": "Exécuter une commande",
     "file": "Fichier/Dossier compressé",
+    "group": "Attribué depuis le groupe",
     "id": "ID",
     "LAUNCH": "Exécuter un fichier/script",
     "manageaction": "Gérer les actions",
@@ -175,6 +176,7 @@
     "success": "Succès",
     "target_os": "Système d'exploitation ciblé",
     "toperror": "Erreurs les plus courantes",
+    "total": "Nombre de machines total",
     "viewhistory": "Voir l'historique des résultats",
     "waiting": "En attente"
   },
