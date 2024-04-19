@@ -51,7 +51,7 @@
 								title="assets"
 								translationkey="inventory."
 							/>
-							<AddAssetGroupModal 
+							<AssetGroupModal 
 								:assetrow="assetids"
 								:search="rowsearch"
 							/>
@@ -67,11 +67,10 @@
 import Axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Search from '@/components/Filter/Search.vue'
-import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal.vue'
 
 export default {
 	name: "Multisearch",
-	components: { PageHeader, Search, AddAssetGroupModal },
+	components: { PageHeader, Search },
 	data() {
 		return {
 			errorMsg: null,

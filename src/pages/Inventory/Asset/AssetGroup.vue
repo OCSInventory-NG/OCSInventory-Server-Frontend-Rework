@@ -37,7 +37,7 @@
 								:rowheader="rowheader"
 								title="assetgroups"
 								translationkey="assetgroup."
-								editcomponent="EditAssetGroupModal"
+								editcomponent="AssetGroupModal"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>

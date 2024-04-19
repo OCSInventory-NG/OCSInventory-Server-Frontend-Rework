@@ -1,36 +1,82 @@
 <template>
 	<div 
-		id="Accountinfo"
+		id="accountinfo"
 		class="container-xl"
 	>
 		<div>
-			<AddAccountinfoModal
-				:canadd="canadd"
-				:canedit="canedit"
-				:candelete="candelete"
-				:canaddvalue="canaddvalue"
-				:canview="canview"
+			<!-- Page header -->
+			<PageHeader 
 				page-title="accountinfo"
 			/>
+			<!-- Display Datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<div v-if="errored">
+							<Alert 
+								:message="errormsg" 
+								variant="danger"
+							/>
+						</div>
+
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+
+						<div v-else>
+							<AccountinfoModal
+								v-if="canadd"
+								@reloadDatatable="reloadDatatable"
+							/>
+							<Datatable
+								id="accountinfodatatable"
+								:rowdata="rowdata"
+								:rowheader="rowheader"
+								:canedit="canedit"
+								:candelete="candelete"
+								:canaddvalue="canaddvalue"
+								editcomponent="AccountinfoModal"
+								title="accountinfo/config"
+								titlevalue="accountinfo_param"
+								adddvalueroute="accountinfo/value"
+								reconciliationname="accountinfo_config"
+								translationkey="accountinfo."
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import AddAccountinfoModal from '@/components/Modals/AddItem/AddAccountinfoModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Accountinfo",
-	components: {
-		AddAccountinfoModal
-	},
 	data() {
 		return {
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canaddvalue: false,
-			canview: false
+			canview: false,
+			rowdata: [],
+			rowheader: [],
+			config: [],
+			errored: false,
+			errormsg: null,
+			loading: true,
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	created() {
@@ -47,8 +93,58 @@ export default {
 			}
 			if(localStorage.getItem('permissions').split(",").includes("add_accountinfovalue")) {
 				this.canaddvalue = true
-			}		
+			}
+			this.getHeader()
+		} else {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
 		}
 	},
+	methods: {
+		getHeader() {
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
+					})
+					this.errormsg = null
+					this.errored = false
+					this.getAccountinfoConfig()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getAccountinfoConfig() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
+				.then(response => {
+					this.config = response.data
+					this.accountinfovaluesTreatment()
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		accountinfovaluesTreatment() {
+			Object.keys(this.config).forEach(key => {
+				var tmpValues = []
+				for (const accountvalue of this.config[key].accountinfo_values) {
+					tmpValues.push(accountvalue.value)
+				}
+				this.config[key].accountinfo_values = tmpValues.join('\n')
+			})
+
+			this.rowdata = this.config
+			this.loading = false
+		},
+		reloadDatatable() {
+			this.loading = true
+			this.getAccountinfoConfig()
+		}
+	}
 }
 </script>
