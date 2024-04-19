@@ -87,11 +87,14 @@
 					:class="(canshowhide) ? 'col-1' : 'col-2'" 
 					align="right"
 				>
-					<b-form-select
+					<v-select
 						id="per-page-select"
 						v-model="perPage"
 						:options="pageOptions"
-						class="form-select datatable-btn"
+						:reduce="text => text.value"
+						:clearable="false"
+						label="text"
+						class="datatable-btn"
 					/>
 				</div>
 			</div>
@@ -300,6 +303,7 @@
 								:is="editcomponent"
 								v-if="canedit"
 								v-bind="{ id: row.item.id }"
+								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
@@ -334,38 +338,38 @@
 <script>
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal.vue'
 import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal.vue'
-import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal.vue'
-import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal.vue'
 import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal.vue'
 import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal.vue'
 import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal.vue'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
-import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal.vue'
 import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal.vue'
 import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal.vue'
-import EditAssetGroupModal from '@/components/Modals/EditItem/EditAssetGroupModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
+
+import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
+import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
+import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
+import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
 
 export default {
 	name: 'Datatable',
 	components: {
 		EditUserModal,
 		EditGroupModal,
-		EditAccountinfoModal,
-		EditNetworkGroupModal,
 		EditNetworkModal,
 		EditNetdeviceModal,
 		EditPackageModal,
-		EditActionListModal,
-		EditAutomaticActionModal,
 		EditRuleModal,
-		EditAssetGroupModal,
 		EditSaveSearchModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
-		ImportTemplateModal
+		ImportTemplateModal,
+
+		AccountinfoModal,
+		NetworkGroupModal,
+		AssetGroupModal,
+		AutomaticActionModal,
 	},
 	props: {
 		title: { type: String, default: '' },
