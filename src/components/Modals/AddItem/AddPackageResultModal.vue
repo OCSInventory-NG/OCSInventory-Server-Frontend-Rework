@@ -136,7 +136,8 @@ import Axios from 'axios'
 export default {
 	name: "AddPackageResultModal",
 	props: {
-		items: { type: Array, default: null }
+		items: { type: Array, default: null },
+		group: { type: String, default: null }
 	},
 	data() {
 		return {
@@ -217,7 +218,8 @@ export default {
 						asset: asset.id,
 						name: pkg.name,
 						status: 0,
-						comment: "Waiting notification"
+						comment: "Waiting notification",
+						group: parseInt(this.group)
 					}
 
 					row.push(tmp)
