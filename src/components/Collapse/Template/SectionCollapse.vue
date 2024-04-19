@@ -78,7 +78,7 @@
 														/>
 													</b-button-group>
 													<b-button-group class="mx-3">
-														<AddFieldModal
+														<FieldModal
 															:section="value.id"
 															@reloadTemplate="reloadTemplate"
 														/>
@@ -112,15 +112,13 @@
 import FieldCollapse from '@/components/Collapse/Template/FieldCollapse.vue'
 import EditSectionModal from '@/components/Modals/EditItem/EditSectionModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
-import AddFieldModal from '@/components/Modals/AddItem/AddFieldModal.vue'
 
 export default {
 	name: 'SectionCollapse',
 	components: {
 		FieldCollapse,
 		EditSectionModal,
-		DeleteItemModal,
-		AddFieldModal
+		DeleteItemModal
 	},
 	props: {
 		rowsectiondata: { type: Array, default: null },
