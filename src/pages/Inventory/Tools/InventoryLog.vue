@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
@@ -51,7 +51,7 @@ export default {
 	components: { PageHeader },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			rowheader: [],
 			loading: true,
@@ -67,18 +67,18 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/logs", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/logs", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getLogs()
 				})
 				.catch(e => {
 					console.log(e)
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -87,14 +87,14 @@ export default {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?asset="+this.$route.params.id
 
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

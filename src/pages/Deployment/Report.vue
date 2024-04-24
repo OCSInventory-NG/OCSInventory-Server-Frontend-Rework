@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-//import Axios from 'axios'
+//import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
@@ -50,7 +50,7 @@ export default {
 			canedit: false,
 			loading: true,
 			errored: false,
-			errorMsg: null,
+			errormsg: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -70,7 +70,7 @@ export default {
 				this.candelete = true
 			}
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	}

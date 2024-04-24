@@ -307,7 +307,7 @@
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
-							<delete-item-modal 
+							<DeleteItemModal 
 								v-if="candelete"
 								:id="row.item.id"
 								:name="row.item.name || row.item.username"
@@ -337,39 +337,33 @@
 
 <script>
 import EditUserModal from '@/components/Modals/EditItem/EditUserModal.vue'
-import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal.vue'
-import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal.vue'
-import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal.vue'
-import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal.vue'
-import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal.vue'
 import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal.vue'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
-import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
-import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
 
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
 import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
 import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
 import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
+import GroupModal from '@/components/Modals/Item/GroupModal.vue'
+import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
+import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
+import PackageModal from '@/components/Modals/Item/PackageModal.vue'
+import RuleModal from '@/components/Modals/Item/RuleModal.vue'
 
 export default {
 	name: 'Datatable',
 	components: {
 		EditUserModal,
-		EditGroupModal,
-		EditNetworkModal,
-		EditNetdeviceModal,
-		EditPackageModal,
-		EditRuleModal,
 		EditSaveSearchModal,
-		DeleteItemModal,
-		DoAllActionsItemModal,
-		ImportTemplateModal,
 
 		AccountinfoModal,
 		NetworkGroupModal,
 		AssetGroupModal,
 		AutomaticActionModal,
+		GroupModal,
+		NetdeviceModal,
+		NetworkModal,
+		PackageModal,
+		RuleModal,
 	},
 	props: {
 		title: { type: String, default: '' },

@@ -53,10 +53,11 @@
 							<td class="section-table-btn">
 								<b-button-toolbar>
 									<b-button-group class="mr-1">
-										<EditFieldModal
+										<FieldModal
 											:rowfielddata="value"
-											:idmodal="value.id"
+											:id="value.id"
 											:section="value.section"
+											:update="true"
 											@reloadTemplate="reloadTemplate"
 										/>
 										<delete-item-modal 
@@ -77,15 +78,8 @@
 </template>
 
 <script>
-import EditFieldModal from '@/components/Modals/EditItem/EditFieldModal.vue'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
-
 export default {
 	name: "FieldCollapse",
-	components: {
-		EditFieldModal,
-		DeleteItemModal
-	},
 	props: {
 		rowfielddata: { type: Array, default: null },
 	},

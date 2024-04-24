@@ -224,7 +224,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal.vue'
 
 export default {
@@ -236,7 +236,7 @@ export default {
 	},
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
@@ -399,7 +399,7 @@ export default {
 			this.fieldopt[masterindex][index] = []
 
 			if(route == "accountinfo/config?datatarget=ASSET") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
@@ -419,12 +419,12 @@ export default {
 							1 : ((b.text > a.text) ? -1 : 0))
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loading = false)
 			} else if(route == "templates") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingtemplate = true
 						if(!Array.isArray(this.templateopt[masterindex])) {
@@ -446,11 +446,11 @@ export default {
 						this.loadingtemplate = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			} else if (section) {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -468,12 +468,12 @@ export default {
 							1 : ((b.text > a.text) ? -1 : 0))
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loading = false)
 			} else {
-				Axios.options(import.meta.env.VITE_APP_API_ROUTE+route+"/", { headers: this.header })
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -510,11 +510,11 @@ export default {
 						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
 							1 : ((b.text > a.text) ? -1 : 0))
 
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loading = false)
@@ -522,7 +522,7 @@ export default {
 			
 		},
 		getSections(templateId, masterindex, index) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
 					if(!Array.isArray(this.sectionopt[masterindex])) {
@@ -542,7 +542,7 @@ export default {
 						1 : ((b.text > a.text) ? -1 : 0))
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => this.loadingsection = false)
@@ -596,7 +596,7 @@ export default {
 			})
 
 			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingadmin = true
@@ -617,7 +617,7 @@ export default {
 						this.loadingadmin = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			}

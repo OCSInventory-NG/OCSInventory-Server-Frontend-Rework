@@ -23,7 +23,7 @@ export default {
 	components: { AddTemplateModal },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			loading: true,
 			errored: false,
 			canadd: false,

@@ -253,7 +253,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "AddSaveSearchModal",
@@ -312,10 +312,13 @@ export default {
 	},
 	methods: {
 		getMySearches(update = false) {
-			this.modaluse = true
-			this.loading = true
+			if(!update) {
+				this.modaluse = true
+				this.loading = true
+			}
+			
 			this.rowsavesearch = []
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					if(!update) {
 						this.rowsavesearchheader = [
@@ -340,12 +343,12 @@ export default {
 						}
 					}
 					
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -358,10 +361,10 @@ export default {
 			this.modalsavesearch = true
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					if(this.rowuser.groups) {
 						this.getGroups(this.rowuser.groups)
@@ -369,14 +372,14 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -384,7 +387,7 @@ export default {
 						})
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			}
@@ -402,7 +405,7 @@ export default {
 			}
 
 			if(this.searchaction == "create") {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -415,7 +418,7 @@ export default {
 					})
 					.finally(() => { this.loadingcreate = false })
 			} else {
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

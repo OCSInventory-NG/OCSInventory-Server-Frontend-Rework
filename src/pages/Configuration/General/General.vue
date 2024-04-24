@@ -23,7 +23,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -220,7 +220,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
@@ -229,7 +229,7 @@ export default {
 	data() {
 		return {
 			configs: [],
-			errorMsg: null,
+			errormsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
@@ -263,20 +263,20 @@ export default {
 			}
 			this.getConfig()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}	
 	},
 	methods: {
 		// Get all config
 		getConfig() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.loading = false
 				})
@@ -286,16 +286,16 @@ export default {
 
 			var configToUpdate = this.configs[this.activetab].name
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import Alert from '@/components/Alert/Alert.vue'
 
 export default {
@@ -133,7 +133,7 @@ export default {
 			event.preventDefault()
 			this.loadingdelete = true
 			
-			Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+			axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
 				.then(() => {
 					this.deleteerrormsg = null
 					this.deleteerror = false

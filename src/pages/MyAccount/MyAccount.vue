@@ -25,7 +25,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -144,7 +144,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
@@ -152,7 +152,7 @@ export default {
 	components: { PageHeader },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			succesMsg: null,
 			rowdata: [{}],
 			loading: true,
@@ -171,15 +171,15 @@ export default {
 		}
 	},
 	mounted() {
-		Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+		axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 			.then(response => {
 				this.rowdata = response.data
-				this.errorMsg = null
+				this.errormsg = null
 				this.errored = false
 				this.loading = false
 			})
 			.catch(e => {
-				this.errorMsg = e.message
+				this.errormsg = e.message
 				this.errored = true
 			})
 	},
@@ -204,16 +204,16 @@ export default {
 				}
 			}
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

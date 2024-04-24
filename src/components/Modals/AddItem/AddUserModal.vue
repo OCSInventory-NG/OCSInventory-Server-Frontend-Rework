@@ -36,7 +36,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -247,7 +247,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
@@ -276,7 +276,7 @@ export default {
 			rowheader: [],
 			groups: [],
 			groupsLabel: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
@@ -304,34 +304,34 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
 						})
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 						this.getGroups()
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = this.$t("message.dont_have_right_to_see")
+				this.errormsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}	
 		},
 		// Get all users
 		getUsers() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => {
@@ -350,7 +350,7 @@ export default {
 		},
 		// Get groups
 		getGroups() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -363,7 +363,7 @@ export default {
 					this.getUsers()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -371,7 +371,7 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

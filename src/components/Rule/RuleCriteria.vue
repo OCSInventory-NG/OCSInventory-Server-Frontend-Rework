@@ -11,7 +11,7 @@
 		<!-- Display error box message -->
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errorMsg.message" 
+				:message="errormsg.message" 
 				variant="danger"
 			/>
 		</section>
@@ -187,7 +187,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "RuleCriteria",
@@ -199,7 +199,7 @@ export default {
 	data() {
 		return {
 			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			errorCode: null,
 			errored: false,
 			successed: false,
@@ -274,7 +274,7 @@ export default {
 	},
 	methods: {
 		getModelField() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
 					this.loadingfield = true
 
@@ -290,7 +290,7 @@ export default {
 					this.loadingfield = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => { this.loading = false })
@@ -486,17 +486,17 @@ export default {
 
 			this.logicupdate.logic = logicTmp
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.$emit('reloadRule')
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

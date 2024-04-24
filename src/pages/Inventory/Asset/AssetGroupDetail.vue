@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</div>
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Search from '@/components/Filter/Search.vue'
 
@@ -146,7 +146,7 @@ export default {
 	components: { PageHeader, Search },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			groupinfo: [],
 			rowheader: [],
@@ -168,37 +168,37 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getAssetGroup()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getAssetGroup() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
 				.then(response => {
 					this.assets = response.data.assets
 					delete response.data.assets
 					this.groupinfo = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getUserName()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getUserName() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
 				.then(response => {
 					if(response.data.first_name != "") {
 						this.groupinfo.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -207,7 +207,7 @@ export default {
 					}
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 			this.getGroups()
@@ -216,13 +216,13 @@ export default {
 			this.groups = []
 			if(this.groupinfo.groups) {
 				for (const group of this.groupinfo.groups) {
-					Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+					axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 						.then(response => {
 							this.groups.push(response.data.name)
 							this.groupinfo.groups = this.groups.join(", ")
 						})
 						.catch(e => {
-							this.errorMsg = e.message
+							this.errormsg = e.message
 							this.errored = true
 						})
 				}
@@ -233,12 +233,12 @@ export default {
 			this.rowdata = []
 			for (const asset of this.assets) {
 				this.loading = true
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/"+asset, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/"+asset, { headers: this.header })
 					.then(response => {
 						this.rowdata.push(response.data)
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 					.finally(() => this.loading = false)

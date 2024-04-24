@@ -3,7 +3,7 @@
 		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
-				:message="errorMsg" 
+				:message="errormsg" 
 				variant="danger"
 			/>
 		</section>
@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "Inventory",
@@ -106,7 +106,7 @@ export default {
 			allfields: [],
 			loading: true,
 			errored: false,
-			errorMsg: null,
+			errormsg: null,
 			expandall: false,
 			allcollapse: [],
 			header: {
@@ -127,7 +127,7 @@ export default {
 	},
 	methods: {
 		getInventory() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
 				.then(response => {
 					for (const inventory of response.data) {
 						var sectionName = this.allsections[inventory.template_section].name
@@ -166,17 +166,17 @@ export default {
 						}
 					}
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
 		getSection() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections", { headers: this.header })
 				.then(response => {
 					for (const section of response.data) {
 						this.allsections[section.id] = section
@@ -186,7 +186,7 @@ export default {
 					}
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		}

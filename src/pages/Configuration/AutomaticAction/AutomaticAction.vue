@@ -94,34 +94,29 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			if(this.canview) {
-				axios.options(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
-					.then(response => {
-						Object.keys(response.data.actions.POST).forEach(field => {
-							this.rowheader.push(field)
-						})
-						this.errorMsg = null
-						this.errored = false
-						this.getSchedulers()
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowheader.push(field)
 					})
-					.catch(e => {
-						this.errorMsg = e.message
-						this.errored = true
-					})
-			} else {
-				this.errorMsg = this.$t("message.dont_have_right_to_see")
-				this.errored = true
-			}
+					this.errormsg = null
+					this.errored = false
+					this.getSchedulers()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 		},
 		getSchedulers() {
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

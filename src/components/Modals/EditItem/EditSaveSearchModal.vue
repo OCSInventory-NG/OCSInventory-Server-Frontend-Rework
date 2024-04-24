@@ -157,7 +157,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "EditSaveSearchModal",
@@ -178,7 +178,7 @@ export default {
 				{ value: "private_personal", text: this.$t("search.private_personal") },
 				{ value: "private_group", text: this.$t("search.private_group") }
 			],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
@@ -210,25 +210,25 @@ export default {
 			this.getSavedSearch(id)
 		},
 		getSavedSearch(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getMyInfo()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getMyInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					if(this.rowuser.groups) {
 						this.getGroups(this.rowuser.groups)
@@ -236,7 +236,7 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -244,7 +244,7 @@ export default {
 			this.groups = []
 			for (const group of groups) {
 				this.loading = true
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -252,7 +252,7 @@ export default {
 						})
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 					.finally(() => { this.loading = false })
@@ -266,7 +266,7 @@ export default {
 			delete this.row.search
 			delete this.row.user
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.row.id+"/", this.row,
 				{ headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true

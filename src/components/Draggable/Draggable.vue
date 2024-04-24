@@ -47,7 +47,7 @@
 						>
 							<b-button-toolbar>
 								<b-button-group class="mr-1">
-									<EditMappingModal 
+									<MappingModal 
 										v-if="canaddmapping"
 										:id="element.id"
 									/>
@@ -59,7 +59,7 @@
 										:update="true"
 										@reloadDatatable="reloadDatatable"
 									/>
-									<delete-item-modal 
+									<DeleteItemModal 
 										v-if="candelete"
 										:id="element.id"
 										:name="element.name"
@@ -87,18 +87,14 @@
 import draggable from 'vuedraggable'
 import axios from 'axios'
 import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
-import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal.vue'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
+import LdapModal from '@/components/Modals/Item/LdapModal.vue'
 
 export default {
 	name: "DraggableComponent",
 	components: { 
 		draggable,
 		ActionListModal,
-		EditLdapModal,
-		EditMappingModal,
-		DeleteItemModal
+		LdapModal
 	},
 	props: {
 		rowdata: { type: Array, default: null },

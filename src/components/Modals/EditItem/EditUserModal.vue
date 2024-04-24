@@ -194,7 +194,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: 'EditUserModal',
@@ -213,7 +213,7 @@ export default {
 				groups: []
 			},
 			groups: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			idModal: 'edit-user'+this.id,
 			loading: true,
@@ -245,21 +245,21 @@ export default {
 		},
 		// Get user
 		getUser(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getGroups()
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 		},
 		// Get groups
 		getGroups() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.groups = []
 					response.data.forEach(groupDetails => {
@@ -282,7 +282,7 @@ export default {
 				delete this.row.password
 			}
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

@@ -36,7 +36,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -127,11 +127,14 @@
 												:label="$t('inventory.os')" 
 												label-for="os"
 											>
-												<b-form-select
+												<v-select
 													id="os"
 													v-model="row.os" 
 													:options="options" 
-													class="mb-3 form-select"
+													:reduce="text => text.value"
+													:clearable="false"
+													label="text"
+													class="mb-3"
 												/>
 											</b-form-group>
 										</b-col>
@@ -168,7 +171,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue'
 
 export default {
@@ -192,7 +195,7 @@ export default {
 			rowdata: [],
 			rowheader: [],
 			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loadingcreate: false,
 			createerror: false,
@@ -224,33 +227,33 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				Axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							this.rowheader.push(field)
 						})
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 						this.getTemplates()
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			} else {
-				this.errorMsg = this.$t("message.dont_have_right_to_see")
+				this.errormsg = this.$t("message.dont_have_right_to_see")
 				this.errored = true
 			}
 		},
 		getTemplates() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -263,7 +266,7 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 			
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

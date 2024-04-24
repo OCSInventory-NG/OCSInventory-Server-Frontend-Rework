@@ -37,7 +37,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:canaccesschild="canaccesschild"
-								editcomponent="EditNetworkModal"
+								editcomponent="NetworkModal"
 								translationkey="network."
 								@reloadDatatable="reloadDatatable"
 							/>

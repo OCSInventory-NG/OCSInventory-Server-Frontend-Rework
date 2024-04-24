@@ -23,7 +23,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 import PageHeader from '@/components/Header/PageHeader.vue'
 import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
 import ResultDetail from '@/components/Deployment/ResultDetail.vue'
@@ -123,7 +123,7 @@ export default {
 	components: { PageHeader, Accountinfo, ResultDetail, Inventory },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			loading: true,
 			errored: false,
@@ -154,16 +154,16 @@ export default {
 			this.translationkey = "network."
 		}
 
-		Axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
+		axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data
-				this.errorMsg = null
+				this.errormsg = null
 				this.errored = false
 				this.loading = false
 			})
 			.catch(e => {
-				this.errorMsg = e.message
+				this.errormsg = e.message
 				this.errored = true
 			})
 	}

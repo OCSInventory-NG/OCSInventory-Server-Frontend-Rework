@@ -11,7 +11,7 @@
 		<!-- Display error box message -->
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errorMsg.message" 
+				:message="errormsg.message" 
 				variant="danger"
 			/>
 		</section>
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "RuleAction",
@@ -161,7 +161,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			errorMsg: null,
+			errormsg: null,
 			errorCode: null,
 			errored: false,
 			successed: false,
@@ -296,7 +296,7 @@ export default {
 			}
 
 			if(model == "accountinfo.accountinfoconfig") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 						this.fieldopt[index] = []
@@ -313,12 +313,12 @@ export default {
 							1 : ((b.text > a.text) ? -1 : 0))
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loadingfield = false)
 			} else {
-				Axios.options(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 
@@ -337,11 +337,11 @@ export default {
 						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
 							1 : ((b.text > a.text) ? -1 : 0))
 
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loadingfield = false)
@@ -379,7 +379,7 @@ export default {
 					route = "templates"
 				}
 
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
@@ -393,11 +393,11 @@ export default {
 						this.loadingselect = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			} else if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingselect = true
@@ -414,7 +414,7 @@ export default {
 						this.loadingselect = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			}
@@ -487,16 +487,16 @@ export default {
 
 			this.actionupdate.forEach(action => {
 				if(action.id != null) {
-					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
+					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true
-							this.errorMsg = null
+							this.errormsg = null
 							this.errored = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
+							this.errormsg = e.message
 							this.errored = true
 							this.succesMsg = null
 							this.successed = false
@@ -506,16 +506,16 @@ export default {
 					delete action.object_id
 					delete action.object_slug
 
-					Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/action/", action, 
+					axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true
-							this.errorMsg = null
+							this.errormsg = null
 							this.errored = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
+							this.errormsg = e.message
 							this.errored = true
 							this.succesMsg = null
 							this.successed = false
@@ -524,15 +524,15 @@ export default {
 			})
 
 			actionremove.forEach(id => {
-				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
+				axios.delete(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 						this.succesMsg = null
 						this.successed = false
