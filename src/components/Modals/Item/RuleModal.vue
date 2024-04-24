@@ -1,5 +1,5 @@
 <template>
-	<div id="network-group-modal">
+	<div id="rule-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('network.addnetgroup')"
+						:title="$t('rule.addrule')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="netgroupmodal = !netgroupmodal"
+						@click="rulemodal = !rulemodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('network.addnetgroup') }}
+						{{ $t('rule.addrule') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('network.editnetgroup')"
+				:title="$t('rule.editrule')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,15 +32,15 @@
 			</button>
 		</div>
 		<b-modal 
-			id="netgroupmodal" 
-			v-model="netgroupmodal"
-			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
+			id="rulemodal" 
+			v-model="rulemodal"
+			:title="(!update) ? $t('rule.addrule') : $t('rule.editrule')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('network.addnetgroup') : $t('network.editnetgroup') }}
+					{{ (!update) ? $t('rule.addrule') : $t('rule.editrule') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -79,21 +79,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
-							label-for="name"
-						>
-							<b-form-input
-								id="name"
-								v-model="row.name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('generic.description')" 
+							:label="$t('rule.description')" 
 							label-for="description"
 						>
 							<b-form-input
@@ -104,21 +90,37 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="update">
+				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.network')" 
-							label-for="network"
+							:label="$t('rule.trigger')" 
+							label-for="trigger"
 						>
 							<v-select
-								id="network"
-								v-model="netid"
-								:options="networks"
+								id="trigger"
+								v-model="row.trigger" 
+								:options="options" 
 								:reduce="text => text.value"
+								:clearable="false"
 								label="text"
 								class="mb-3"
-								multiple
 							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('rule.enabled')" 
+							label-for="enabled"
+						>
+							<label class="form-check form-switch">
+								<input 
+									v-model="row.enabled"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</label>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -152,7 +154,7 @@
 import axios from 'axios'
 
 export default {
-	name: "NetworkGroupModal",
+	name: "RuleModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
@@ -160,8 +162,11 @@ export default {
 	data() {
 		return {
 			row: {
-				name: null,
-				description: null
+				description: null,
+				trigger: 'inventory_received',
+				enabled: false,
+				logic: {},
+				actions: []
 			},
 			errormsg: null,
 			errored: false,
@@ -170,9 +175,12 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			netgroupmodal: false,
-			networks: [],
-			netid: [],
+			rulemodal: false,
+			options: [
+				{ value: 'inventory_received', text: this.$t('rule.inventory_received') },
+				{ value: 'user_login', text: this.$t('rule.user_login') },
+				{ value: 'netdevice_received', text: this.$t('rule.netdevice_received') }
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -182,7 +190,7 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.netgroupmodal = false
+				this.rulemodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -196,81 +204,45 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.netgroupmodal = true
-			this.getNetgroup(id)
+			this.rulemodal = true
+			this.getRules(id)
 		},
-		getNetgroup(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
+		getRules(id) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
 					this.errored = false
-					this.getNetworks()
 				})
 				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-		},
-		getNetworks() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
-				.then(response => {
-					this.networks = []
-					response.data.forEach(network => {
-						this.networks.push({
-							value: network.id,
-							text: network.netid
-						})
-					});
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		updateNetworks() {
-			this.netid.forEach(element => {
-				var json = {
-					group: this.row.id
-				}
-
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-			});
-		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
+			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
-						this.createerror = false
 						this.createerrormsg = null
+						this.createerror = false
 					})
 					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
 						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				if(this.netid.length > 0) {
-					this.updateNetworks()
-				}
-
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
+				delete this.row.logic
+				delete this.row.actions
+				
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -282,7 +254,7 @@ export default {
 						this.createwithsuccess = false
 					})
 					.finally(() => this.loadingcreate = false)
-			}
+			}			
 		}
 	}
 }

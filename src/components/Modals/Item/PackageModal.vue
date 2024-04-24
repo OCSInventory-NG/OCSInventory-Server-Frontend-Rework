@@ -1,5 +1,5 @@
 <template>
-	<div id="network-group-modal">
+	<div id="package-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('network.addnetgroup')"
+						:title="$t('deployment.addpackage')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="netgroupmodal = !netgroupmodal"
+						@click="packagemodal = !packagemodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('network.addnetgroup') }}
+						{{ $t('deployment.addpackage') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('network.editnetgroup')"
+				:title="$t('deployment.editpackage')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,15 +32,15 @@
 			</button>
 		</div>
 		<b-modal 
-			id="netgroupmodal" 
-			v-model="netgroupmodal"
-			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
+			id="packagemodal" 
+			v-model="packagemodal"
+			:title="(!update) ? $t('deployment.addpackage') : $t('deployment.editpackage')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('network.addnetgroup') : $t('network.editnetgroup') }}
+					{{ (!update) ? $t('deployment.addpackage') : $t('deployment.editpackage') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -79,7 +79,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
+							:label="$t('deployment.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -93,8 +93,8 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('generic.description')" 
-							label-for="description"
+							:label="$t('deployment.description')" 
+							label-for="name"
 						>
 							<b-form-input
 								id="description"
@@ -104,20 +104,20 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="update">
+				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.network')" 
-							label-for="network"
+							:label="$t('deployment.target_os')" 
+							label-for="target_os"
 						>
 							<v-select
-								id="network"
-								v-model="netid"
-								:options="networks"
+								id="target_os"
+								v-model="row.target_os" 
+								:options="options" 
 								:reduce="text => text.value"
+								:clearable="false"
 								label="text"
 								class="mb-3"
-								multiple
 							/>
 						</b-form-group>
 					</b-col>
@@ -152,7 +152,7 @@
 import axios from 'axios'
 
 export default {
-	name: "NetworkGroupModal",
+	name: "PackageModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
@@ -161,7 +161,8 @@ export default {
 		return {
 			row: {
 				name: null,
-				description: null
+				description: null,
+				target_os: 'WIN'
 			},
 			errormsg: null,
 			errored: false,
@@ -170,9 +171,12 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			netgroupmodal: false,
-			networks: [],
-			netid: [],
+			packagemodal: false,
+			options: [
+				{ value: 'WIN', text: this.$t('template.WIN') },
+				{ value: 'LIN', text: this.$t('template.LIN') },
+				{ value: 'MAC', text: this.$t('template.MAC') }
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -182,7 +186,7 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.netgroupmodal = false
+				this.packagemodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -196,81 +200,45 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.netgroupmodal = true
-			this.getNetgroup(id)
+			this.packagemodal = true
+			this.getPackages(id)
 		},
-		getNetgroup(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
+		getPackages(id) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
 					this.errored = false
-					this.getNetworks()
 				})
 				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-		},
-		getNetworks() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
-				.then(response => {
-					this.networks = []
-					response.data.forEach(network => {
-						this.networks.push({
-							value: network.id,
-							text: network.netid
-						})
-					});
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		updateNetworks() {
-			this.netid.forEach(element => {
-				var json = {
-					group: this.row.id
-				}
-
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-			});
-		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
+			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
-						this.createerror = false
 						this.createerrormsg = null
+						this.createerror = false
 					})
 					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
 						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				if(this.netid.length > 0) {
-					this.updateNetworks()
-				}
-
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
+				delete this.row.actions_list
+				delete this.row.result
+				
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -282,7 +250,7 @@ export default {
 						this.createwithsuccess = false
 					})
 					.finally(() => this.loadingcreate = false)
-			}
+			}			
 		}
 	}
 }
