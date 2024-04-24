@@ -64,9 +64,9 @@
 												<b-button-toolbar>
 													<b-button-group class="mr-1">
 														<SectionModal
+															:id="value.id"
 															:update="true"
 															:rowsectiondata="value"
-															:id="value.id"
 															:template="value.template"
 															@reloadTemplate="reloadTemplate"
 														/>

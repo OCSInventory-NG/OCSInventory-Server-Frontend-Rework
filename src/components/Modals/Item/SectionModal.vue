@@ -143,7 +143,7 @@
 										:required="!row.retrival_output"
 										v-bind="attributes"
 										v-on="events"
-									/>
+									>
 								</template>
 							</v-select>
 						</b-form-group>

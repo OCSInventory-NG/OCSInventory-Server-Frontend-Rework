@@ -135,8 +135,8 @@ export default {
 				this.candelete = true
 			}
 			if(localStorage.getItem('permissions').split(",").includes("add_authmapping")) {
-			this.canaddmapping = true
-		}
+				this.canaddmapping = true
+			}
 			this.getLdapConfiguration()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
