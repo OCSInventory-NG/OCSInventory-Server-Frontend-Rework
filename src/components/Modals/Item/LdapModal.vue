@@ -295,7 +295,8 @@ export default {
 			} else {
 				delete this.row.mappings
 			
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

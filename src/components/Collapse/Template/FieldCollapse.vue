@@ -55,7 +55,6 @@
 									<b-button-group class="mr-1">
 										<FieldModal
 											:rowfielddata="value"
-											:id="value.id"
 											:section="value.section"
 											:update="true"
 											@reloadTemplate="reloadTemplate"

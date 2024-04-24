@@ -143,8 +143,8 @@ import axios from 'axios'
 export default {
 	name: "GroupModal",
 	props: {
-		permissionsprop: { type: Array, default: [] },
-		permissionslabelprop: { type: Array, default: [] },
+		permissionsprop: { type: Array, default: null },
+		permissionslabelprop: { type: Array, default: null },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},

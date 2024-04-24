@@ -263,8 +263,7 @@ export default {
 	props: {
 		rowfielddata: { type: Object, default: null },
 		section: { type: Number, required: true },
-		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		update: { type: Boolean, default: false }
 	},
 	data() {
 		return {

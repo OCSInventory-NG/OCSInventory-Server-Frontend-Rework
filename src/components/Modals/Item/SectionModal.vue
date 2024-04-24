@@ -235,8 +235,7 @@ export default {
 	props: {
 		rowsectiondata: { type: Object, default: null },
 		template: { type: Number, required: true },
-		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		update: { type: Boolean, default: false }
 	},
 	data() {
 		return {
