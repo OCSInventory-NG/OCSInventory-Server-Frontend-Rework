@@ -66,6 +66,7 @@
 														<SectionModal
 															:update="true"
 															:rowsectiondata="value"
+															:id="value.id"
 															:template="value.template"
 															@reloadTemplate="reloadTemplate"
 														/>

@@ -15,7 +15,7 @@
 			<button 
 				:title="$t('template.editfield')"
 				class="btn btn-ghost-dark"
-				@click="loadData(id)"
+				@click="loadData()"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'pencil']"
@@ -338,7 +338,7 @@ export default {
 		}
 	},
 	methods: {
-		loadData(id) {
+		loadData() {
 			this.loading = true
 			this.fieldmodal = true
 			this.row = this.rowfielddata

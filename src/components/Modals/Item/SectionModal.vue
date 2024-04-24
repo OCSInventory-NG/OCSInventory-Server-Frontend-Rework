@@ -24,7 +24,7 @@
 			<button 
 				:title="$t('template.editsection')"
 				class="btn btn-ghost-dark"
-				@click="loadData(id)"
+				@click="loadData()"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'pencil']"
@@ -235,7 +235,8 @@ export default {
 	props: {
 		rowsectiondata: { type: Object, default: null },
 		template: { type: Number, required: true },
-		update: { type: Boolean, default: false }
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
@@ -321,7 +322,7 @@ export default {
 		}
 	},
 	methods: {
-		loadData(id) {
+		loadData() {
 			this.loading = true
 			this.sectionmodal = true
 			this.loading = false
