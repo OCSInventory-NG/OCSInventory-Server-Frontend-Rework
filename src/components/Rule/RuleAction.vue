@@ -67,7 +67,7 @@
 											:required="!input.field"
 											v-bind="attributes"
 											v-on="events"
-										/>
+										>
 									</template>
 								</v-select>
 							</b-form-group>
@@ -107,7 +107,7 @@
 												:required="!input.value"
 												v-bind="attributes"
 												v-on="events"
-											/>
+											>
 										</template>
 									</v-select>
 								</div>

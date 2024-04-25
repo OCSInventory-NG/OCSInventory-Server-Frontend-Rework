@@ -89,7 +89,7 @@
 										:required="!input.template"
 										v-bind="attributes"
 										v-on="events"
-									/>
+									>
 								</template>
 							</v-select>
 						</b-col>
@@ -113,7 +113,7 @@
 										:required="!input.section"
 										v-bind="attributes"
 										v-on="events"
-									/>
+									>
 								</template>
 							</v-select>
 						</b-col>
@@ -138,7 +138,7 @@
 											:required="!input.field"
 											v-bind="attributes"
 											v-on="events"
-										/>
+										>
 									</template>
 								</v-select>
 							</b-form-group>
@@ -161,7 +161,7 @@
 											:required="!input.operator"
 											v-bind="attributes"
 											v-on="events"
-										/>
+										>
 									</template>
 								</v-select>
 							</b-form-group>
@@ -196,7 +196,7 @@
 												:required="!input.value"
 												v-bind="attributes"
 												v-on="events"
-											/>
+											>
 										</template>
 									</v-select>
 								</div>
