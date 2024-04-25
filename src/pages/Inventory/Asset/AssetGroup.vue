@@ -50,11 +50,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue' 
 
 export default {
 	name: 'AssetGroup',
-	components: { PageHeader },
 	data() {
 		return {
 			errormsg: null,

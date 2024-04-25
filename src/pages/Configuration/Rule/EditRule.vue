@@ -90,13 +90,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import RuleCriteria from '@/components/Rule/RuleCriteria.vue'
-import RuleAction from '@/components/Rule/RuleAction.vue'
 
 export default {
 	name: "EditRule",
-	components: { PageHeader, RuleCriteria, RuleAction },
 	props: {
 		id: { type: String, required: true },
 	},

@@ -44,11 +44,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "InventoryLog",
-	components: { PageHeader },
 	data() {
 		return {
 			errormsg: null,

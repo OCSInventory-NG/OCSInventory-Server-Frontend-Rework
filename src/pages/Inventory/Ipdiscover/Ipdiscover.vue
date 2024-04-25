@@ -49,12 +49,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import IpdiscoverCollapse from '@/components/Collapse/Ipdiscover/IpdiscoverCollapse.vue'
 
 export default {
 	name: "Ipdiscover",
-	components: { IpdiscoverCollapse, PageHeader },
 	data() {
 		return {
 			errormsg: null,

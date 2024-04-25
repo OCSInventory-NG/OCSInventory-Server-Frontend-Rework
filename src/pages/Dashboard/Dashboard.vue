@@ -114,7 +114,6 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
@@ -122,7 +121,7 @@ import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
 export default {
 	name: "Dashboard",
-	components: { PageHeader, BarChart, Counter, DonutChart, LineChart },
+	components: { BarChart, Counter, DonutChart, LineChart },
 	data() {
 		return {
 			templates: {

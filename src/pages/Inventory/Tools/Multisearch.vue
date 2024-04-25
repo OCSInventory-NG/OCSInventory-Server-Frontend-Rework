@@ -65,12 +65,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Search from '@/components/Filter/Search.vue'
 
 export default {
 	name: "Multisearch",
-	components: { PageHeader, Search },
 	data() {
 		return {
 			errormsg: null,

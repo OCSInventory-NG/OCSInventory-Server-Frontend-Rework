@@ -145,11 +145,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "MyAccount",
-	components: { PageHeader },
 	data() {
 		return {
 			errormsg: null,

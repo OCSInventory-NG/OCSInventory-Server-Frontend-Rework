@@ -117,14 +117,13 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 
 export default {
 	name: "Result",
-	components: { PageHeader, Counter, DonutChart, BarChart },
+	components: { Counter, DonutChart, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},

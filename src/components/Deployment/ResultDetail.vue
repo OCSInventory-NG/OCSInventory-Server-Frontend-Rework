@@ -32,11 +32,9 @@
 
 <script>
 import axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable.vue'
 
 export default {
 	name: 'ResultDetail',
-	components: { Datatable },
 	props: {
 		type: { type: String, default: '' },
 		id: { type: String, default: null }

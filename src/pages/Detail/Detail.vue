@@ -113,14 +113,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
-import ResultDetail from '@/components/Deployment/ResultDetail.vue'
-import Inventory from '@/components/Inventory/Inventory.vue'
 
 export default {
 	name: 'Detail',
-	components: { PageHeader, Accountinfo, ResultDetail, Inventory },
 	data() {
 		return {
 			errormsg: null,

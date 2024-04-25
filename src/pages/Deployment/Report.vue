@@ -37,11 +37,9 @@
 
 <script>
 //import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: 'Report',
-	components: { PageHeader },
 	data() {
 		return {
 			canview: false,

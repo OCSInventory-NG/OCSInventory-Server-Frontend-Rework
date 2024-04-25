@@ -138,12 +138,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Search from '@/components/Filter/Search.vue'
 
 export default {
 	name: 'AssetGroupDetail',
-	components: { PageHeader, Search },
 	data() {
 		return {
 			errormsg: null,

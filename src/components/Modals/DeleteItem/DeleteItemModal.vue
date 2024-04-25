@@ -89,11 +89,9 @@
 
 <script>
 import axios from 'axios'
-import Alert from '@/components/Alert/Alert.vue'
 
 export default {
 	name: 'DeleteItemModal',
-	components: { Alert },
 	props: {
 		id: { type: Number, default: null },
 		name: { type: String, default: '' },
