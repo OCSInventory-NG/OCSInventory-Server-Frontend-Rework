@@ -88,11 +88,14 @@
 							:label="$t('title.netgroup')" 
 							label-for="netgroup"
 						>
-							<b-form-select
+							<v-select
 								id="netgroup"
 								v-model="row.group" 
 								:options="netgroup" 
-								class="mb-3 form-select"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>

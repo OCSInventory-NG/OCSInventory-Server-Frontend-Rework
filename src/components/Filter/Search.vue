@@ -42,84 +42,128 @@
 							cols="1"
 						>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'link'+masterindex+index"
-									v-model="datavalues[masterindex][index].link"
-									:options="linkopt"
-									class="mb-3 form-select form-control"
-									:required="true"
+									v-model="datavalues[masterindex][index].link" 
+									:options="linkopt" 
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
 									:disabled="disableforgroup"
 								/>
 							</b-form-group>
 						</b-col>
 						<b-col>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'route'+masterindex+index"
 									v-model="input.route" 
 									:options="routeopt" 
-									class="mb-3 form-select form-control"
-									:required="true"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
 									:disabled="disableforgroup"
-									@update:modelValue="getFields(input.route, masterindex, index)"
+									@option:selected="getFields(input.route, masterindex, index)"
 								/>
 							</b-form-group>
 						</b-col>
 						<b-col v-if="input.object == 'inventory_sections'">
-							<b-form-select
+							<v-select
 								:id="'template'+masterindex+index"
 								v-model="input.template" 
 								:options="(loadingtemplate || templateopt[masterindex] == undefined) ? 
 									[] : templateopt[masterindex][index]" 
-								class="mb-3 form-select form-control"
-								:required="true"
-								:disabled="(loadingtemplate || disableforgroup) ? true : false"
-								@update:modelValue="getSections(input.template, masterindex, index)"
-							/>
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3 ocs-select"
+								:disabled="disableforgroup"
+								:loading="loadingtemplate"
+								@option:selected="getSections(input.template, masterindex, index)"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										:required="!input.template"
+										v-bind="attributes"
+										v-on="events"
+									/>
+								</template>
+							</v-select>
 						</b-col>
 						<b-col v-if="input.object == 'inventory_sections'">
-							<b-form-select
+							<v-select
 								:id="'section'+masterindex+index"
 								v-model="input.section" 
 								:options="(loadingsection || sectionopt[masterindex] == undefined) ? 
 									[] : sectionopt[masterindex][index]" 
-								class="mb-3 form-select form-control"
-								:required="true"
-								:disabled="(loadingsection || disableforgroup) ? true : false"
-								@update:modelValue="getFields(input.section, masterindex, index, true)"
-							/>
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3 ocs-select"
+								:disabled="disableforgroup"
+								:loading="loadingsection"
+								@option:selected="getFields(input.section, masterindex, index, true)"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										:required="!input.section"
+										v-bind="attributes"
+										v-on="events"
+									/>
+								</template>
+							</v-select>
 						</b-col>
 						<b-col>
 							<b-form-group>
-								<b-form-select
-									v-if="loading"
-									:id="'field'+masterindex+index"
-									v-model="input.field"
-									class="mb-3 form-select form-control"
-									:disabled="true"
-								/>
-								<b-form-select
-									v-else
+								<v-select
 									:id="'field'+masterindex+index"
 									v-model="input.field" 
-									:options="fieldopt[masterindex][index]" 
-									class="mb-3 form-select form-control"
-									:required="true"
+									:options="(fieldopt[masterindex]) ? 
+										fieldopt[masterindex][index] : []" 
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
 									:disabled="disableforgroup"
-									@update:modelValue="setFieldType(input, masterindex, index)"
-								/>
+									:loading="loading"
+									@option:selected="setFieldType(input, masterindex, index)"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.field"
+											v-bind="attributes"
+											v-on="events"
+										/>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 						<b-col cols="2">
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'operator'+masterindex+index"
-									v-model="input.operator"
-									:options="operatoropt[input.fieldtype]"
-									class="mb-3 form-select form-control"
-									:required="true"
+									v-model="input.operator" 
+									:options="operatoropt[input.fieldtype]" 
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
 									:disabled="disableforgroup"
-								/>
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.operator"
+											v-bind="attributes"
+											v-on="events"
+										/>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 						<b-col cols="3">
@@ -133,23 +177,28 @@
 									:disabled="disableforgroup"
 								/>
 								<div v-else>
-									<b-form-select
-										v-if="loadingadmin"
-										:id="'field'+masterindex+index"
-										v-model="input.value"
-										class="mb-3 form-select form-control"
-										:disabled="true"
-									/>
-									<b-form-select
-										v-else
+									<v-select
 										:id="'value'+masterindex+index"
-										v-model="input.value"
+										v-model="input.value" 
 										:options="(input.fieldtype == 'choice') ?
-											scope : adminopt[masterindex][index]"
-										class="mb-3 form-select form-control"
-										:required="true"
+											scope : (adminopt[masterindex]) ?
+												adminopt[masterindex][index] : []" 
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:loading="loadingadmin"
 										:disabled="disableforgroup"
-									/>
+									>
+										<template #search="{attributes, events}">
+											<input
+												class="vs__search"
+												:required="!input.value"
+												v-bind="attributes"
+												v-on="events"
+											/>
+										</template>
+									</v-select>
 								</div>
 							</b-form-group>
 						</b-col>

@@ -89,23 +89,29 @@
 							</b-col>
 							<b-col>
 								<b-form-group>
-									<b-form-select
+									<v-select
 										id="field"
-										v-model="input.field"
+										v-model="input.field" 
 										:options="fields" 
-										class="mb-3 form-select form-control"
-										:disabled="(loadingfield) ? true : false"
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:loading="(loadingfield) ? true : false"
 									/>
 								</b-form-group>
 							</b-col>
 							<b-col cols="3">
 								<b-form-group>
-									<b-form-select
+									<v-select
 										id="operator"
-										v-model="input.operator"
-										:options="operators"
-										class="mb-3 form-select form-control"
-										:required="true"
+										v-model="input.operator" 
+										:options="operators" 
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										required
 									/>
 								</b-form-group>
 							</b-col>

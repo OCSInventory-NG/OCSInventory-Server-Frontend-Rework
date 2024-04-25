@@ -36,27 +36,40 @@
 					<b-row>
 						<b-col>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'route'+index"
 									v-model="input.model" 
 									:options="routeopt[trigger]" 
-									class="mb-3 form-select form-control"
-									:required="true"
-									@update:modelValue="getFields(index, input.model)"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									@option:selected="getFields(index, input.model)"
 								/>
 							</b-form-group>
 						</b-col>
 						<b-col>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'field'+index"
-									v-model="input.field"
-									:options="fieldopt[index]"
-									:required="true"
-									class="mb-3 form-select form-control"
-									:disabled="(loadingfield) ? true : false"
-									@update:modelValue="setFieldType(input, index)"
-								/>
+									v-model="input.field" 
+									:options="fieldopt[index]" 
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									:loading="(loadingfield) ? true : false"
+									@option:selected="setFieldType(input, index)"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.field"
+											v-bind="attributes"
+											v-on="events"
+										/>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 						<b-col cols="1">
@@ -78,14 +91,25 @@
 									class="mb-3"
 								/>
 								<div v-else>
-									<b-form-select
-										:id="'field'+index"
-										v-model="input.value"
-										:options="selectfieldopt[index]"
-										class="mb-3 form-select form-control"
-										:required="true"
-										:disabled="(loadingselect) ? true : false"
-									/>
+									<v-select
+										:id="'value'+index"
+										v-model="input.value" 
+										:options="selectfieldopt[index]" 
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:loading="(loadingselect) ? true : false"
+									>
+										<template #search="{attributes, events}">
+											<input
+												class="vs__search"
+												:required="!input.value"
+												v-bind="attributes"
+												v-on="events"
+											/>
+										</template>
+									</v-select>
 								</div>
 							</b-form-group>
 						</b-col>
