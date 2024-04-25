@@ -1,6 +1,6 @@
 <template>
 	<div id="search">
-		<AddSaveSearchModal 
+		<SaveSearchModal 
 			v-if="cansave && !disableforgroup"
 			:rowsearch="datavalues"
 			@useSaveSearch="useSaveSearch"
@@ -225,11 +225,9 @@
 
 <script>
 import axios from 'axios'
-import AddSaveSearchModal from '@/components/Modals/AddItem/AddSaveSearchModal.vue'
 
 export default {
 	name: 'Search',
-	components: { AddSaveSearchModal },
 	props: {
 		searchgroup: { type: Array, default: null },
 		disableforgroup: { type: Boolean, default: false }

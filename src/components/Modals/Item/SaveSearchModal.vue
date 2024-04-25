@@ -1,33 +1,50 @@
 <template>
-	<div id="add-save-search-modal">
+	<div id="save-search-modal">
 		<div 
-			class="col-auto ms-auto div-save-search" 
-			align="right"
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<b-button
-				:title="$t('search.savemysearch')"
-				class="btn btn-teal btn-save-search"
-				@click="getMyInfo()"
+			<div 
+				class="col-auto ms-auto div-save-search" 
+				align="right"
+			>
+				<b-button
+					:title="$t('search.savemysearch')"
+					class="btn btn-teal btn-save-search"
+					@click="getMyInfo()"
+				>
+					<font-awesome-icon 
+						:icon="['far', 'floppy-disk']"
+						size="lg"
+					/>
+				</b-button>
+				<b-button
+					:title="$t('search.usesavedsearch')"
+					class="btn btn-yellow"
+					@click="getMySearches()"
+				>
+					<font-awesome-icon 
+						:icon="['far', 'star']"
+						size="lg"
+					/>
+				</b-button>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('search.editsavesearch')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
 			>
 				<font-awesome-icon 
-					:icon="['far', 'floppy-disk']"
-					size="lg"
+					:icon="['fas', 'pencil']"
 				/>
-			</b-button>
-			<b-button
-				:title="$t('search.usesavedsearch')"
-				class="btn btn-yellow"
-				@click="getMySearches()"
-			>
-				<font-awesome-icon 
-					:icon="['far', 'star']"
-					size="lg"
-				/>
-			</b-button>
+			</button>
 		</div>
 		<b-modal 
+			v-if="!update"
 			id="use-savesearch" 
-			v-model="modaluse"
+			v-model="usesavesearchmodal"
 			:title="$t('search.usesavedsearch')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
@@ -72,19 +89,18 @@
 			/>
 		</b-modal>
 		<b-modal 
-			id="add-savesearch"
-			v-model="modalsavesearch"
-			:title="$t('search.savemysearch')"
+			id="savesearchmodal" 
+			v-model="savesearchmodal"
+			:title="(!update) ? $t('search.savemysearch') : $t('search.editsavesearch')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('search.savemysearch') }}
+					{{ (!update) ? $t('search.savemysearch') : $t('search.editsavesearch') }}
 					<b-spinner 
 						v-if="loadingcreate"
-						variant="success" 
-						label="Spinning"
+						variant="success"
 					/>
 					<font-awesome-icon 
 						v-if="createwithsuccess"
@@ -108,28 +124,30 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
-				<b-row>
+				<b-row v-if="!update">
 					<b-col>
 						<b-form-group
 							:label="$t('search.action')" 
 							label-for="action"
 						>
-							<b-form-select
+							<v-select
 								id="action"
-								v-model="searchaction"
-								:options="optactions"
-								class="mb-3 form-select form-control"
-								required
-								@input="getMySearches(true)"
+								v-model="searchaction" 
+								:options="optactions" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+								@option:selected="getMySearches(searchaction)"
 							/>
 						</b-form-group>
 					</b-col>
@@ -140,13 +158,15 @@
 							:label="$t('search.selectsavedsearch')" 
 							label-for="savedsearch"
 						>
-							<b-form-select
+							<v-select
 								id="savedsearch"
-								v-model="updatesearchid"
-								:options="optsearch"
-								class="mb-3 form-select form-control"
-								required
-								@input="setSearchInfo(updatesearchid)"
+								v-model="updatesearchid" 
+								:options="optsearch" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+								@option:selected="setSearchInfo(updatesearchid)"
 							/>
 						</b-form-group>
 					</b-col>
@@ -184,12 +204,14 @@
 							:label="$t('search.visibility')" 
 							label-for="visibility"
 						>
-							<b-form-select
+							<v-select
 								id="visibility"
-								v-model="savesearch.visibility"
-								:options="optvisibility"
-								class="mb-3 form-select form-control"
-								required
+								v-model="savesearch.visibility" 
+								:options="optvisibility" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -236,7 +258,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.add') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -256,8 +278,10 @@
 import axios from 'axios'
 
 export default {
-	name: "AddSaveSearchModal",
+	name: "SaveSearchModal",
 	props: {
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null },
 		rowsearch: { type: Array, default: null }
 	},
 	data() {
@@ -287,15 +311,17 @@ export default {
 			savedsearches: [],
 			rowsavesearchheader: [],
 			rowsavesearch: [],
-			loading: true,
-			loadingcreate: false,
-			createwithsuccess: false,
-			createerror: false,
-			createerrormsg: null,
 			updatesearchid: null,
 			updatesearch: [],
-			modaluse: false,
-			modalsavesearch: false,
+			errormsg: null,
+			errored: false,
+			loading: true,
+			loadingcreate: false,
+			createerror: false,
+			createerrormsg: null,
+			createwithsuccess: false,
+			usesavesearchmodal: false,
+			savesearchmodal: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -305,22 +331,46 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.modalsavesearch = false
+				this.savesearchmodal = false
 				this.createwithsuccess = false
+				if(this.update) {
+					this.$emit("reloadDatatable")
+				}
 			}, 500)
 		}
 	},
 	methods: {
-		getMySearches(update = false) {
-			if(!update) {
-				this.modaluse = true
+		loadData(id) {
+			this.loading = true
+			this.savesearchmodal = true
+			this.getSavedSearch(id)
+		},
+		getSavedSearch(id) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
+				.then(response => {
+					this.savesearch = response.data
+					this.errormsg = null
+					this.errored = false
+					this.getMyInfo()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getMySearches(searchaction) {
+			if(searchaction == undefined) {
+				this.usesavesearchmodal = true
 				this.loading = true
 			}
 			
 			this.rowsavesearch = []
+			this.optsearch = []
+			this.updatesearch = []
+
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
-					if(!update) {
+					if(searchaction == undefined) {
 						this.rowsavesearchheader = [
 							"searchname", "description"
 						]
@@ -358,8 +408,8 @@ export default {
 			this.loading = false 
 		},
 		getMyInfo() {
-			this.modalsavesearch = true
 			this.loading = true
+			this.savesearchmodal = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
@@ -396,29 +446,49 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			this.savesearch.user = this.rowuser.id
-			this.savesearch.search = this.rowsearch
 
 			if(this.savesearch.visibility != "private_group") {
 				this.savesearch.groups = []
 				this.savesearch.allow_group_modification = false
 			}
 
-			if(this.searchaction == "create") {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => { this.loadingcreate = false })
+			if(!this.update) {
+				this.savesearch.user = this.rowuser.id
+				this.savesearch.search = this.rowsearch
+
+				if(this.searchaction == "create") {
+					axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
+						.then(() => {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+						})
+						.catch(e => {
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
+						})
+						.finally(() => { this.loadingcreate = false })
+				} else {
+					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+						{ headers: this.header })
+						.then(() => {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+						})
+						.catch(e => {
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
+						})
+						.finally(() => { this.loadingcreate = false })
+				}
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+				delete this.savesearch.search
+				delete this.savesearch.user
+
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
@@ -430,17 +500,16 @@ export default {
 						this.createerror = true
 						this.createwithsuccess = false
 					})
-					.finally(() => { this.loadingcreate = false })
-			}
-			
+					.finally(() => this.loadingcreate = false)
+			}			
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', this.savedsearches[id])
-			this.modaluse = false
+			this.usesavesearchmodal = false
 		},
 		goToSavedSearches(){
 			this.$router.push('/inventory/savedsearch'); 
-		},
+		}
 	}
 }
 </script>

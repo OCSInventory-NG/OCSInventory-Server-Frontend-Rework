@@ -1,26 +1,46 @@
 <template>
-	<div id="edit-user-modal">
-		<button 
-			:title="$t('user.edituser')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="user-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('user.adduser')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="usermodal = !usermodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('user.adduser') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('user.edituser')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idModal"
-			v-model="edituser"
-			:title="$t('user.edituser')"
+			id="usermodal" 
+			v-model="usermodal"
+			:title="(!update) ? $t('user.adduser') : $t('user.edituser')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
-			size="xl"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('user.edituser') }}
+					{{ (!update) ? $t('user.adduser') : $t('user.edituser') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -47,15 +67,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<h4>{{ $t('user.user_informations') }}</h4>
@@ -71,9 +91,7 @@
 								id="username"
 								v-model="row.username"
 								required
-							>
-								{{ row.username }}
-							</b-form-input>
+							/>
 						</b-form-group>
 					</b-col>
 					<b-col>
@@ -85,6 +103,7 @@
 								id="password"
 								v-model="row.password"
 								type="password"
+								:required="(!update) ? true : false"
 							/>
 						</b-form-group>
 					</b-col>
@@ -98,9 +117,8 @@
 							<b-form-input
 								id="email"
 								v-model="row.email"
-							>
-								{{ row.email }}
-							</b-form-input>
+								required
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -113,9 +131,8 @@
 							<b-form-input
 								id="first_name"
 								v-model="row.first_name"
-							>
-								{{ row.first_name }}
-							</b-form-input>
+								required
+							/>
 						</b-form-group>
 					</b-col>
 					<b-col>
@@ -126,9 +143,8 @@
 							<b-form-input
 								id="last_name"
 								v-model="row.last_name"
-							>
-								{{ row.last_name }}
-							</b-form-input>
+								required
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -177,7 +193,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -197,8 +213,10 @@
 import axios from 'axios'
 
 export default {
-	name: 'EditUserModal',
+	name: "UserModal",
 	props: {
+		groupsprop: { type: Array, default: null },
+		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
@@ -210,18 +228,18 @@ export default {
 				first_name: null,
 				last_name: null,
 				is_staff: false,
-				groups: []
+				groups: [],
+				user_permissions: []
 			},
-			groups: [],
 			errormsg: null,
 			errored: false,
-			idModal: 'edit-user'+this.id,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			edituser: false,
+			usermodal: false,
+			groups: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -231,19 +249,24 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.edituser = false
+				this.usermodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				this.$emit("reloadDatatable")
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.groups = this.groupsprop
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.edituser = true
+			this.usermodal = true
 			this.getUser(id)
 		},
-		// Get user
 		getUser(id) {
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
@@ -257,7 +280,6 @@ export default {
 					this.errored = true
 				})
 		},
-		// Get groups
 		getGroups() {
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
@@ -273,27 +295,41 @@ export default {
 					this.loading = false
 				})
 		},
-		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				if(this.row.password == "") {
+					delete this.row.password
+				}
 
-			if(this.row.password == "") {
-				delete this.row.password
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
 			}
-
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

@@ -336,9 +336,6 @@
 </template>
 
 <script>
-import EditUserModal from '@/components/Modals/EditItem/EditUserModal.vue'
-import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal.vue'
-
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
 import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
 import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
@@ -348,13 +345,13 @@ import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
 import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
+import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
+import UserModal from '@/components/Modals/Item/UserModal.vue'
 
 export default {
 	name: 'Datatable',
 	components: {
-		EditUserModal,
-		EditSaveSearchModal,
-
+		UserModal,
 		AccountinfoModal,
 		NetworkGroupModal,
 		AssetGroupModal,
@@ -364,6 +361,7 @@ export default {
 		NetworkModal,
 		PackageModal,
 		RuleModal,
+		SaveSearchModal,
 	},
 	props: {
 		title: { type: String, default: '' },

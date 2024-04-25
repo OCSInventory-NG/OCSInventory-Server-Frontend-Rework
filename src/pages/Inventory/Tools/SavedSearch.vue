@@ -34,7 +34,7 @@
 								:candelete="candelete"
 								title="search/save"
 								translationkey="search."
-								editcomponent="EditSaveSearchModal"
+								editcomponent="SaveSearchModal"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -47,11 +47,9 @@
 
 <script>
 import axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
 
 export default {
 	name: "SavedSearch",
-	components: { PageHeader },
 	data() {
 		return {
 			rowdata: [],
