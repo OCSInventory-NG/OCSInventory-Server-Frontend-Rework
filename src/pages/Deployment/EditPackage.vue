@@ -4,10 +4,9 @@
 		class="container-xl"
 	>
 		<div>
-			<AddActionListModal
-				:package="id"
-				:canaddaction="canaddaction"
-				@reloadPackage="reloadPackage"
+			<!-- Page header -->
+			<PageHeader 
+				page-title="actionlist"
 			/>
 
 			<div class="page-body">
@@ -16,7 +15,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -27,19 +26,21 @@
 							<Loader />
 						</div>
 						<div v-else>
-							<b-row class="text-center">
+							<b-row align="center">
 								<h2>{{ rowpackagedata.name }}</h2>
 							</b-row>
-							<b-row class="text-center">
+							<b-row align="center">
 								<b-col>
 									<p>{{ $t('deployment.description') }} : {{ rowpackagedata.description }}</p>
 									<p>{{ $t('deployment.target_os') }} : {{ $t('template.'+rowpackagedata.target_os) }}</p>
 									<p>{{ $t('deployment.date_created') }} : {{ rowpackagedata.date_created }}</p>
 								</b-col>
 							</b-row><br>
-							<b-row class="text-center">
-								<h3>{{ $t('deployment.actions') }}</h3>
-							</b-row>
+							<ActionListModal
+								v-if="canaddaction"
+								:package="id"
+								@reloadPackage="reloadPackage"
+							/>
 							<Draggable 
 								:rowdata="rowactiondata"
 								:rowheader="rowheader"
@@ -56,19 +57,16 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import AddActionListModal from '@/components/Modals/AddItem/AddActionListModal.vue'
-import Draggable from '@/components/Draggable/Draggable.vue'
+import axios from 'axios'
 
 export default {
 	name: 'EditPackage',
-	components: { AddActionListModal, Draggable	},
 	props: {
 		id: { type: String, required: true }
 	},
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowpackagedata: [],
 			rowactiondata: [],
 			rowheader: [],
@@ -87,7 +85,7 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => this.successed = false, 5000)
 		}
 	},
 	mounted() {
@@ -104,37 +102,39 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getPackage()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
-		reloadDatatable() {
-			this.loading = true
-			this.getPackage()
-		},
-		getPackage() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
+		getPackage(reload = false) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
 				.then(response => {
-					this.rowpackagedata = response.data
+					if(!reload) {
+						this.rowpackagedata = response.data
+					}
 					this.rowactiondata = response.data.actions_list
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
+		},
+		reloadDatatable() {
+			this.loading = true
+			this.getPackage(true)
 		},
 		reloadPackage() {
 			this.loading = true

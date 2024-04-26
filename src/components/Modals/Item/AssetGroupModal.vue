@@ -1,13 +1,14 @@
 <template>
-	<div id="add-asset-group-modal">
-		<div 
+	<div id="asset-group-modal">
+		<div
+			v-if="!update"
 			class="col-auto ms-auto" 
 			align="center"
 		>
 			<b-button
 				:title="$t('assetgroup.saveasgroup')"
 				class="d-none d-sm-inline-block btn-teal"
-				@click="getMyInfo()"
+				@click="getUserInfo()"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'plus']"
@@ -15,16 +16,27 @@
 				{{ $t('assetgroup.group') }}
 			</b-button>
 		</div>
+		<div v-else>
+			<button 
+				:title="$t('assetgroup.editassetgroup')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			id="add-assetgroup" 
-			v-model="addassetgroup"
-			:title="$t('assetgroup.saveasgroup')"
+			id="assetgroupmodal" 
+			v-model="assetgroupmodal"
+			:title="(!update) ? $t('assetgroup.saveasgroup') : $t('assetgroup.editassetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('assetgroup.saveasgroup') }}
+					{{ (!update) ? $t('assetgroup.saveasgroup') : $t('assetgroup.editassetgroup') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -51,16 +63,16 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
-				<b-row>
+				<b-row v-if="!update">
 					<b-col>
 						<b-form-group
 							:label="$t('assetgroup.action')" 
@@ -203,7 +215,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -220,13 +232,15 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: "AddAssetGroupModal",
+	name: "AssetGroupModal",
 	props: {
 		search: { type: Array, default: null },
-		assetrow: { type: Array, default: null}
+		assetrow: { type: Array, default: null},
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
@@ -241,11 +255,14 @@ export default {
 				user: null,
 				groups: []
 			},
-			loading: false,
+			errormsg: null,
+			errored: false,
+			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
+			assetgroupmodal: false,
 			optvisibility: [
 				{ value: "public", text: this.$t("assetgroup.public") },
 				{ value: "private_personal", text: this.$t("assetgroup.private_personal") },
@@ -261,7 +278,6 @@ export default {
 			groupaction: "create",
 			updategroup: [],
 			updategroupid: null,
-			addassetgroup: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -271,35 +287,79 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.addassetgroup = false
+				this.assetgroupmodal = false
 				this.createwithsuccess = false
+				if(this.update) {
+					this.$emit("reloadDatatable")
+				}
 			}, 500)
 		}
 	},
 	methods: {
-		getMyInfo() {
+		loadData(id) {
 			this.loading = true
-			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			this.addassetgroup = !this.addassetgroup
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			this.assetgroupmodal = true
+			this.getAssetGroupInfo(id)
+		},
+		getAssetGroupInfo() {
+			this.loading = true
+			this.assetgroupmodal = true
+
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+				.then(response => {
+					delete response.data.search
+					delete response.data.assets
+
+					this.rowgroup = response.data
+					
+					this.errormsg = null
+					this.errored = false
+					this.getUserName()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getUserName() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
 				.then(response => {
 					this.user = response.data
-					this.createerrormsg = null
-					this.createerror = false
+					if(response.data.first_name != "") {
+						this.rowgroup.user = response.data.last_name.concat(" ", response.data.first_name)
+					} else {
+						this.rowgroup.user = response.data.username
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+			this.getGroups(this.rowgroup.groups)
+		},
+		getUserInfo() {
+			this.loading = true
+			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+			this.assetgroupmodal = true
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+				.then(response => {
+					this.user = response.data
+					this.errormsg = null
+					this.errored = false
 					if(this.user.groups) {
 						this.getGroups(this.user.groups)
 					}
 					this.loading = false
 				})
 				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
+					this.errormsg = e.message
+					this.errored = true
 				})
 		},
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -307,14 +367,15 @@ export default {
 						})
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
+						this.errormsg = e.message
+						this.errored = true
 					})
 			}
 			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+			this.loading = false
 		},
 		getMyAssetGroups() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
@@ -325,12 +386,12 @@ export default {
 						this.updategroup[assetgroup.id] = assetgroup
 					}
 					
-					this.createerrormsg = null
-					this.createerror = false
+					this.errormsg = null
+					this.errored = false
 				})
 				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
+					this.errormsg = e.message
+					this.errored = true
 				})
 		},
 		setAssetGroupInfo(id) {
@@ -342,30 +403,53 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			this.rowgroup.assets = this.assetrow
-			this.rowgroup.search = this.search
-			this.rowgroup.user = this.user.id
+			if(!this.update) {
+				this.rowgroup.assets = this.assetrow
+				this.rowgroup.search = this.search
+				this.rowgroup.user = this.user.id
 
-			if(this.rowgroup.visibility != "private_group") {
-				this.rowgroup.groups = []
-				this.rowgroup.allow_group_modification = false
-			}
+				if(this.rowgroup.visibility != "private_group") {
+					this.rowgroup.groups = []
+					this.rowgroup.allow_group_modification = false
+				}
 
-			if(this.groupaction == "create") {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => { this.loadingcreate = false })
+				if(this.groupaction == "create") {
+					axios.post(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
+						.then(() => {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+						})
+						.catch(e => {
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
+						})
+						.finally(() => { this.loadingcreate = false })
+				} else {
+					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
+						{ headers: this.header })
+						.then(() => {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+						})
+						.catch(e => {
+							this.createerrormsg = e.message
+							this.createerror = true
+							this.createwithsuccess = false
+						})
+						.finally(() => { this.loadingcreate = false })
+				}
 			} else {
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
+				this.rowgroup.user = this.user.id
+
+				if(this.rowgroup.visibility != "private_group") {
+					this.rowgroup.groups = []
+					this.rowgroup.allow_group_modification = false
+				}
+
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

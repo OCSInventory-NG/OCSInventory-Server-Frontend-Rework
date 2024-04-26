@@ -53,7 +53,7 @@
 			>
 				<Alert 
 					v-if="errored"
-					:message="errorMsg" 
+					:message="errormsg" 
 					variant="danger"
 				/>
 				<div
@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: 'DoAllActionsItemModal',
@@ -150,7 +150,7 @@ export default {
 			row: {
 				id: this.id
 			},
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			idModal: 'manage-item'+this.id,
 			loading: true,
@@ -193,13 +193,13 @@ export default {
 			})
 
 			if(jsonAdd.length > 0) {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
 					.then(() => {
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loadingcreate = false)
@@ -212,14 +212,14 @@ export default {
 		},
 		onUpdate(input) {
 			if(input.id) {
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
 					{ headers: this.header })
 					.then(() => {
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			}
@@ -228,7 +228,7 @@ export default {
 			this.loading = true
 			this.doallaction = true
 			
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
 					if(response.data.length > 0) {
 						this.datavalues = []
@@ -236,11 +236,11 @@ export default {
 					response.data.forEach(details => {
 						this.datavalues.push(details)
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -250,13 +250,13 @@ export default {
 		},
 		removeField(index, fieldType) {
 			if(typeof fieldType[index].id !== 'undefined') {
-				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
+				axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
 					.then(() => {
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			}

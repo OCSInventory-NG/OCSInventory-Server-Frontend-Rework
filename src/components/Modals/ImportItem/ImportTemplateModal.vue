@@ -53,7 +53,7 @@
 			>
 				<Alert 
 					v-if="errored"
-					:message="errorMsg" 
+					:message="errormsg" 
 					variant="danger"
 				/>
 				<b-row>
@@ -86,13 +86,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: 'ImportTemplateModal',
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loadingimport: false,
 			importwithsuccess: false,
@@ -122,7 +122,7 @@ export default {
 				reader.onload = (res) => {
 					this.jsonToSend = res.target.result
 				};
-				reader.onerror = (err) => this.errorMsg = err
+				reader.onerror = (err) => this.errormsg = err
 				reader.readAsText(this.file);
 			}
 		},
@@ -130,14 +130,14 @@ export default {
 		onSubmit() {
 			this.loadingimport = true
 			
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
 				.then(() => {
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.importwithsuccess = true
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.importwithsuccess = false
 				})

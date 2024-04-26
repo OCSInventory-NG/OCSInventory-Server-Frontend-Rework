@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -116,15 +116,14 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
+import axios from 'axios'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 
 export default {
 	name: "Result",
-	components: { PageHeader, Counter, DonutChart, BarChart },
+	components: { Counter, DonutChart, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},
@@ -136,7 +135,7 @@ export default {
 			rowdatasuccess: [],
 			rowdataerror: [],
 			count: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			resultcount: {
@@ -176,23 +175,23 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getPackageResult()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getPackageResult() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 
@@ -252,11 +251,11 @@ export default {
 					this.resultcount.series.push(this.count.success)
 					this.resultcount.series.push(this.count.error)
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "Login",
@@ -86,7 +86,7 @@ export default {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
-		Axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
+		axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
 			.then(response => {
 				if(response.data) {
 					this.sso = response.data.SSO
@@ -112,7 +112,7 @@ export default {
 				"Content-Type": "application/json;charset=utf-8"
 			}
 
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
 				.then(response => {
 					this.errorMessage = null
 					localStorage.setItem('token_authentication', response.data.token)
@@ -134,7 +134,7 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {

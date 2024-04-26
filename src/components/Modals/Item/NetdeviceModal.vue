@@ -1,7 +1,7 @@
 <template>
-	<div id="edit-accountinfo-modal">
+	<div id="netdevice-modal">
 		<button 
-			:title="$t('accountinfo.editaccountinfo')"
+			:title="$t('network.editnetdevice')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -11,15 +11,15 @@
 		</button>
 
 		<b-modal 
-			:id="idModal"
-			v-model="editaccountinfo"
-			:title="$t('accountinfo.editaccountinfo')"
+			:id="idmodal"
+			v-model="netdevicemodal"
+			:title="$t('network.editnetdevice')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('accountinfo.editaccountinfo') }}
+					{{ row.ip }} - {{ row.mac }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,43 +46,40 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror"
+				:message="createerrormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
 							:label="$t('user.name')" 
-							label-for="name"
+							label-for="netname"
 						>
 							<b-form-input
-								id="name"
-								v-model="row.name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row><b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('generic.description')" 
-							label-for="description"
-						>
-							<b-form-input
-								id="description"
-								v-model="row.description"
+								id="netname"
+								v-model="row.netname"
 								required
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
+					<b-form-input
+						id="ip"
+						v-model="row.ip"
+						hidden
+					/>
+					<b-form-input
+						id="mac"
+						v-model="row.mac"
+						hidden
+					/>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -109,29 +106,29 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: "EditAccountinfoModal",
+	name: 'NetdeviceModal',
 	props: {
-		id: { type: Number, required: true },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
-				id: null,
-				name: null,
-				description: null
+				netname: null,
+				ip: null,
+				mac: null
 			},
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editaccountinfo: false,
-			idModal: 'edit-accountinfo'+this.id,
+			netdevicemodal: false,
+			idmodal: 'edit-netdevice'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -141,7 +138,7 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editaccountinfo = false
+				this.netdevicemodal = false
 				this.createwithsuccess = false
 				this.$emit('reloadDatatable')
 			}, 500)
@@ -150,35 +147,29 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editaccountinfo = true
-			this.getAccountinfo(id)
+			this.netdevicemodal = true
+			this.getNetdevice(id)
 		},
-		// Get accountinfo
-		getAccountinfo(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
+		// Retrieve networks info by id
+		getNetdevice(id) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit accountinfo creation and call refresh edit template to reload
+		// Submit edit netdevice creation and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 			
-			var update = {
-				name: this.row.name,
-				description: this.row.description
-			}
-
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update,
-				{ headers: this.header })
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

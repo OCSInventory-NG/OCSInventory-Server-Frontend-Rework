@@ -1,25 +1,46 @@
 <template>
-	<div id="edit-package-modal">
-		<button 
-			:title="$t('deployment.editpackage')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="package-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('deployment.addpackage')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="packagemodal = !packagemodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('deployment.addpackage') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('deployment.editpackage')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idmodal"
-			v-model="editpackage"
-			:title="$t('deployment.editpackage')"
+			id="packagemodal" 
+			v-model="packagemodal"
+			:title="(!update) ? $t('deployment.addpackage') : $t('deployment.editpackage')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('deployment.editpackage') }}
+					{{ (!update) ? $t('deployment.addpackage') : $t('deployment.editpackage') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,15 +67,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -89,11 +110,14 @@
 							:label="$t('deployment.target_os')" 
 							label-for="target_os"
 						>
-							<b-form-select
+							<v-select
 								id="target_os"
 								v-model="row.target_os" 
 								:options="options" 
-								class="mb-3 form-select"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -108,7 +132,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -125,11 +149,12 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditPackageModal',
+	name: "PackageModal",
 	props: {
+		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
@@ -137,78 +162,96 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				target_os: null
+				target_os: 'WIN'
 			},
-			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
+			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editpackage: false,
-			idmodal: 'edit-package.'+this.id,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			packagemodal: false,
 			options: [
 				{ value: 'WIN', text: this.$t('template.WIN') },
 				{ value: 'LIN', text: this.$t('template.LIN') },
 				{ value: 'MAC', text: this.$t('template.MAC') }
-			]
+			],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editpackage = false
+				this.packagemodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				this.$emit("reloadDatatable")
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editpackage = true
+			this.packagemodal = true
 			this.getPackages(id)
 		},
 		getPackages(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
-			delete this.row.actions_list
-			delete this.row.result
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
-				{ headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
-		},
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				delete this.row.actions_list
+				delete this.row.result
+				
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
+					{ headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
+		}
 	}
 }
 </script>

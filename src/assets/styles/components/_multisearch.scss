@@ -29,3 +29,25 @@
   margin-left: auto;
   margin-right: 5px;
 }
+
+.ocs-select {
+  background-color: $white;
+  border-radius: 4px;
+  margin-top: 7px;
+}
+
+.vs__dropdown-toggle {
+  border: 1px solid #dadfe5 !important;
+  height: 40px;
+}
+
+.vs__dropdown-menu {
+  min-width: unset !important;
+}
+
+.vs__selected-options {
+  flex-wrap: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}

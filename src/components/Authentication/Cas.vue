@@ -11,7 +11,7 @@
 		<!-- Display error box message -->
 		<div v-if="errored">
 			<Alert 
-				:message="errorMsg.message" 
+				:message="errormsg.message" 
 				variant="danger"
 			/>
 		</div>
@@ -26,7 +26,7 @@
 					<h2>{{ $t("authentication.cas_config") }}</h2>
 				</div>
 				<div class="col-auto ms-auto">
-					<EditMappingModal
+					<MappingModal
 						v-if="canaddmapping"
 						:id="casdata.id"
 					/>
@@ -58,13 +58,16 @@
 								v-model="casdata.config[index]"
 								:disabled="!canedit"
 							/>
-							<b-form-select
+							<v-select
 								v-if="index == 'VERSION'"
 								:id="index"
 								v-model="casdata.config[index]" 
-								:options="options" 
-								class="mb-3 form-select"
+								:options="options"
+								:reduce="text => text.value"
+								:clearable="false"
 								:disabled="!canedit"
+								label="text"
+								class="mb-3"
 							/>
 							<label 
 								v-if="index == 'AUTO_REDIRECT'"
@@ -104,15 +107,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Cas",
-	components: { EditMappingModal },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			loading: true,
 			errored: false,
 			canview: false,
@@ -148,21 +149,21 @@ export default {
 			}
 			this.getCasConfiguration()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getCasConfiguration() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -173,16 +174,16 @@ export default {
 
 			delete this.casdata.mappings
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

@@ -1,25 +1,46 @@
 <template>
-	<div id="edit-netgroup-modal">
-		<button 
-			:title="$t('network.editnetgroup')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="network-group-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('network.addnetgroup')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="netgroupmodal = !netgroupmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('network.addnetgroup') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('network.editnetgroup')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idModal" 
-			v-model="editnetgroup"
-			:title="$t('network.editnetgroup')"
+			id="netgroupmodal" 
+			v-model="netgroupmodal"
+			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('network.editnetgroup') }}
+					{{ (!update) ? $t('network.addnetgroup') : $t('network.editnetgroup') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,15 +67,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -65,9 +86,7 @@
 								id="name"
 								v-model="row.name"
 								required
-							>
-								{{ row.name }}
-							</b-form-input>
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -81,13 +100,11 @@
 								id="description"
 								v-model="row.description"
 								required
-							>
-								{{ row.description }}
-							</b-form-input>
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="update">
 					<b-col>
 						<b-form-group
 							:label="$t('title.network')" 
@@ -115,7 +132,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -132,30 +149,30 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: "EditNetworkGroupModal",
+	name: "NetworkGroupModal",
 	props: {
+		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
 				name: null,
-				description: null,
+				description: null
 			},
-			netid: [],
-			networks: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editnetgroup: false,
-			idModal: 'edit-netgroup'+this.id,
+			netgroupmodal: false,
+			networks: [],
+			netid: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -165,33 +182,38 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editnetgroup = false
+				this.netgroupmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				this.$emit("reloadDatatable")
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editnetgroup = true
+			this.netgroupmodal = true
 			this.getNetgroup(id)
 		},
 		getNetgroup(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getNetworks()
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 		},
 		getNetworks() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks = []
 					response.data.forEach(network => {
@@ -200,11 +222,11 @@ export default {
 							text: network.netid
 						})
 					});
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -215,36 +237,52 @@ export default {
 					group: this.row.id
 				}
 
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
 					.then(() => {
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			});
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
-			if(this.netid.length > 0) {
-				this.updateNetworks()
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerror = false
+						this.createerrormsg = null
+					})
+					.catch(e => {
+						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				if(this.netid.length > 0) {
+					this.updateNetworks()
+				}
+
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
 			}
-
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
 		}
 	}
 }

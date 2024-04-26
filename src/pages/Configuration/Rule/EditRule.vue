@@ -22,7 +22,7 @@
 					<!-- Display error box message -->
 					<section v-if="errored && errorCode == null">
 						<Alert 
-							:message="errorMsg.message" 
+							:message="errormsg.message" 
 							variant="danger"
 						/>
 					</section>
@@ -39,7 +39,7 @@
 							<!-- Display error box message -->
 							<div v-if="errored && errorCode != null">
 								<Alert 
-									:message="errorMsg" 
+									:message="errormsg" 
 									variant="danger"
 								/>
 							</div>
@@ -89,20 +89,16 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import RuleCriteria from '@/components/Rule/RuleCriteria.vue'
-import RuleAction from '@/components/Rule/RuleAction.vue'
+import axios from 'axios'
 
 export default {
 	name: "EditRule",
-	components: { PageHeader, RuleCriteria, RuleAction },
 	props: {
 		id: { type: String, required: true },
 	},
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			errorCode: null,
 			loading: true,
 			errored: false,
@@ -133,29 +129,29 @@ export default {
 	},
 	methods: {
 		getTriggerModels() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
 				.then(response => {
 					this.triggers = response.data
 					this.getRuleInfo()
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 		},
 		getRuleInfo() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rule = response.data
 					this.trigger = response.data.trigger
 					this.logic = response.data.logic
 					this.actions = response.data.actions
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
