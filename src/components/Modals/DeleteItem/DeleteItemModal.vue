@@ -1,5 +1,5 @@
 <template>
-	<div id="DeleteItemModal">
+	<div id="delete-item-modal">
 		<button 
 			:title="$t('generic.deleteitem')"
 			class="btn btn-ghost-danger"
@@ -94,13 +94,18 @@ export default {
 	name: 'DeleteItemModal',
 	props: {
 		id: { type: Number, default: null },
+		ids: { type: Array, default: null },
 		name: { type: String, default: '' },
-		parameter: { type: String, default: '' }
+		parameter: { type: String, default: '' },
+		multiple: { type: Boolean, default: false }
 	},
 	data() {
 		return {
 			row: {
 				id: this.id
+			},
+			rows: {
+				ids: this.ids
 			},
 			loadingdelete: false,
 			deleteerror: false,
@@ -131,18 +136,33 @@ export default {
 			event.preventDefault()
 			this.loadingdelete = true
 			
-			axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
-				.then(() => {
-					this.deleteerrormsg = null
-					this.deleteerror = false
-					this.deletewithsuccess = true
-				})
-				.catch(e => {
-					this.deleteerrormsg = e.message
-					this.deleteerror = true
-					this.deletewithsuccess = false
-				})
-				.finally(() => this.loadingdelete = false)
+			if(!this.multiple) {
+				axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+					.then(() => {
+						this.deleteerrormsg = null
+						this.deleteerror = false
+						this.deletewithsuccess = true
+					})
+					.catch(e => {
+						this.deleteerrormsg = e.message
+						this.deleteerror = true
+						this.deletewithsuccess = false
+					})
+					.finally(() => this.loadingdelete = false)
+			} else {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/?delete=true", this.rows, { headers: this.header })
+					.then(() => {
+						this.deleteerrormsg = null
+						this.deleteerror = false
+						this.deletewithsuccess = true
+					})
+					.catch(e => {
+						this.deleteerrormsg = e.message
+						this.deleteerror = true
+						this.deletewithsuccess = false
+					})
+					.finally(() => this.loadingdelete = false)
+			}
 		}
 	}
 }

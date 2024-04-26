@@ -24,6 +24,8 @@
 					:rowheader="rowheader"
 					:candelete="true"
 					:usecheckbox="false"
+					:deletemultiple="(group) ? true : false"
+					:deleteids="rows"
 					title="deployment/results"
 					translationkey="deployment."
 					@reloadDatatable="reloadDatatable"
@@ -48,6 +50,7 @@ export default {
 		return {
 			rowdata: [],
 			rowheader: [],
+			rows: [],
 			loading: true,
 			errormsg: null,
 			succesMsg: null,
@@ -101,6 +104,7 @@ export default {
 				})
 		},
 		getResult() {
+			this.rowdata = []
 			if(this.group) {
 				this.parameter = "group=" + this.group
 			} else {
@@ -130,10 +134,12 @@ export default {
 		calculForGroup(data) {
 			this.loading = true
 			var tmprow = []
+			this.rows = []
 
 			for (const pkg of data) {
 				if(tmprow[pkg.package] == undefined) {
 					tmprow[pkg.package] = {}
+					tmprow[pkg.package].id = pkg.package
 					tmprow[pkg.package].package = pkg.package
 					tmprow[pkg.package].name = pkg.name
 					tmprow[pkg.package].total = 1
@@ -150,6 +156,10 @@ export default {
 						tmprow[pkg.package].success = 0
 						tmprow[pkg.package].waiting = 1
 					}
+					console.log(pkg)
+
+					this.rows[pkg.package] = []
+					this.rows[pkg.package].push(pkg.id)
 				} else {
 					tmprow[pkg.package].total += 1
 					if(pkg.status == 2) {
@@ -159,6 +169,7 @@ export default {
 					} else {
 						tmprow[pkg.package].waiting += 1
 					}
+					this.rows[pkg.package].push(pkg.id)
 				}
 			}
 

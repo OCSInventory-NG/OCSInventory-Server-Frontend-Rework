@@ -49,7 +49,7 @@
 
 				<!-- Export template -->
 				<div
-					v-if="exporttemplate"
+					v-if="importtemplate"
 					class="col-1"
 				>
 					<ImportTemplateModal
@@ -323,8 +323,10 @@
 							<DeleteItemModal 
 								v-if="candelete"
 								:id="row.item.id"
-								:name="row.item.name || row.item.username"
-								:parameter="title"
+								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
+								:name="row.item.name || row.item.username || $t('generic.removeselection')"
+								:parameter="deleterte"
+								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</b-button-group>
@@ -360,9 +362,9 @@ import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.
 import GroupModal from '@/components/Modals/Item/GroupModal.vue'
 import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
+import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
-import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 
 export default {
@@ -371,7 +373,7 @@ export default {
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal,
-		PackageResultModal,
+		SaveSearchModal,
 		UserModal,
 		AccountinfoModal,
 		NetworkGroupModal,
@@ -380,9 +382,9 @@ export default {
 		GroupModal,
 		NetdeviceModal,
 		NetworkModal,
-		PackageModal,
 		RuleModal,
-		SaveSearchModal
+		PackageModal,
+		PackageResultModal,
 	},
 	props: {
 		title: { type: String, default: '' },
@@ -395,7 +397,7 @@ export default {
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
-		exporttemplate: { type: Boolean, default: false },
+		importtemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
@@ -410,6 +412,8 @@ export default {
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
+		deletemultiple: { type: Boolean, default: false },
+		deleteids: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -441,6 +445,7 @@ export default {
 			json_fields: {},
 			json_data: [],
 			redirectto: null,
+			deleterte: null,
 			json_meta: [
 				[
 					{
@@ -482,6 +487,12 @@ export default {
 			this.redirectto = "asset"
 		} else {
 			this.redirectto = this.title
+		}
+
+		if(this.title == "assetgroups") {
+			this.deleterte = "asset/groups"
+		} else {
+			this.deleterte = this.title
 		}
 
 		if(this.usecheckbox == true) {
