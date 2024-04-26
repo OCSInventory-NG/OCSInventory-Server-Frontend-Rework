@@ -39,7 +39,7 @@
 								:canedittemplate="canedit"
 								:candelete="candelete"
 								:canexport="false"
-								:exporttemplate="exporttemplate"
+								:importtemplate="importtemplate"
 								title="templates"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
@@ -80,15 +80,13 @@ export default {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("add_template")) {
 				this.canadd = true
-				this.exportemplate = true
+				this.importtemplate = true
 			}
 			if(localStorage.getItem('permissions').split(",").includes("change_template")) {
 				this.canedit = true
-				this.exportemplate = true
 			}
 			if(localStorage.getItem('permissions').split(",").includes("delete_template")) {
 				this.candelete = true
-				this.exportemplate = true
 			}
 			this.getHeader()
 		} else {
