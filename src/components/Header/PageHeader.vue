@@ -24,11 +24,8 @@
 </template>
 
 <script>
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb.vue';
-
 export default {
 	name: "PageHeader",
-	components: { Breadcrumb },
 	props: {
 		pageTitle: { type: String, default: "" }
 	},

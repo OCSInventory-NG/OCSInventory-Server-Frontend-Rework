@@ -88,12 +88,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import Alert from '@/components/Alert/Alert.vue'
+import axios from 'axios'
 
 export default {
 	name: 'DeleteItemModal',
-	components: { Alert },
 	props: {
 		id: { type: Number, default: null },
 		name: { type: String, default: '' },
@@ -133,7 +131,7 @@ export default {
 			event.preventDefault()
 			this.loadingdelete = true
 			
-			Axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+			axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
 				.then(() => {
 					this.deleteerrormsg = null
 					this.deleteerror = false

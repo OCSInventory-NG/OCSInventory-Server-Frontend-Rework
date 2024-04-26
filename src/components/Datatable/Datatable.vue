@@ -63,7 +63,7 @@
 					class="col-1"
 				>
 					<b-button-group class="mr-1">
-						<AddPackageResultModal
+						<PackageResultModal
 							:items="(multisearch && selected.length == 0) ? rowdata : selected"
 						/>
 					</b-button-group>
@@ -99,11 +99,14 @@
 					:class="(canshowhide) ? 'col-1' : 'col-2'" 
 					align="right"
 				>
-					<b-form-select
+					<v-select
 						id="per-page-select"
 						v-model="perPage"
 						:options="pageOptions"
-						class="form-select datatable-btn"
+						:reduce="text => text.value"
+						:clearable="false"
+						label="text"
+						class="datatable-btn"
 					/>
 				</div>
 			</div>
@@ -313,10 +316,11 @@
 								:is="editcomponent"
 								v-if="canedit"
 								v-bind="{ id: row.item.id }"
+								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
-							<delete-item-modal 
+							<DeleteItemModal 
 								v-if="candelete"
 								:id="row.item.id"
 								:name="row.item.name || row.item.username"
@@ -345,42 +349,40 @@
 </template>
 
 <script>
-import EditUserModal from '@/components/Modals/EditItem/EditUserModal.vue'
-import EditGroupModal from '@/components/Modals/EditItem/EditGroupModal.vue'
-import EditAccountinfoModal from '@/components/Modals/EditItem/EditAccountinfoModal.vue'
-import EditNetworkGroupModal from '@/components/Modals/EditItem/EditNetworkGroupModal.vue'
-import EditNetworkModal from '@/components/Modals/EditItem/EditNetworkModal.vue'
-import EditNetdeviceModal from '@/components/Modals/EditItem/EditNetdeviceModal.vue'
-import EditPackageModal from '@/components/Modals/EditItem/EditPackageModal.vue'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
-import EditAutomaticActionModal from '@/components/Modals/EditItem/EditAutomaticActionModal.vue'
-import EditRuleModal from '@/components/Modals/EditItem/EditRuleModal.vue'
-import EditSaveSearchModal from '@/components/Modals/EditItem/EditSaveSearchModal.vue'
-import EditAssetGroupModal from '@/components/Modals/EditItem/EditAssetGroupModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
-import AddPackageResultModal from '@/components/Modals/AddItem/AddPackageResultModal.vue'
+import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
+import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
+import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
+import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
+import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
+import GroupModal from '@/components/Modals/Item/GroupModal.vue'
+import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
+import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
+import PackageModal from '@/components/Modals/Item/PackageModal.vue'
+import RuleModal from '@/components/Modals/Item/RuleModal.vue'
+import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
+import UserModal from '@/components/Modals/Item/UserModal.vue'
 
 export default {
 	name: 'Datatable',
 	components: {
-		EditUserModal,
-		EditGroupModal,
-		EditAccountinfoModal,
-		EditNetworkGroupModal,
-		EditNetworkModal,
-		EditNetdeviceModal,
-		EditPackageModal,
-		EditActionListModal,
-		EditAutomaticActionModal,
-		EditRuleModal,
-		EditAssetGroupModal,
-		EditSaveSearchModal,
 		DeleteItemModal,
 		DoAllActionsItemModal,
 		ImportTemplateModal,
-		AddPackageResultModal
+		PackageResultModal,
+		UserModal,
+		AccountinfoModal,
+		NetworkGroupModal,
+		AssetGroupModal,
+		AutomaticActionModal,
+		GroupModal,
+		NetdeviceModal,
+		NetworkModal,
+		PackageModal,
+		RuleModal,
+		SaveSearchModal
 	},
 	props: {
 		title: { type: String, default: '' },

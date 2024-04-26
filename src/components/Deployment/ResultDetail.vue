@@ -3,7 +3,7 @@
 		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
-				:message="errorMsg" 
+				:message="errormsg" 
 				variant="danger"
 			/>
 		</section>
@@ -34,12 +34,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import Datatable from '@/components/Datatable/Datatable.vue'
+import axios from 'axios'
 
 export default {
 	name: 'ResultDetail',
-	components: { Datatable },
 	props: {
 		reload: { type: Boolean, default: false },
 		type: { type: String, default: '' },
@@ -51,7 +49,7 @@ export default {
 			rowdata: [],
 			rowheader: [],
 			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			succesMsg: null,
 			errored: false,
 			successed: false,
@@ -74,7 +72,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "package") {
@@ -93,12 +91,12 @@ export default {
 						this.rowheader.push("error")
 					}
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getResult()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -109,19 +107,19 @@ export default {
 				this.parameter = "asset=" + this.id
 			}
 
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
 				.then(response => {
 					if(this.group) {
 						this.calculForGroup(response.data)
 					} else {
 						this.rowdata = response.data
 					}
-					
-					this.errorMsg = null
+
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => {

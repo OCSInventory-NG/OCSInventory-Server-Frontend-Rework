@@ -1,7 +1,7 @@
 <template>
-	<div id="edit-automatic-action-modal">
+	<div id="network-modal">
 		<button 
-			:title="$t('scheduler.editscheduler')"
+			:title="$t('network.editnetwork')"
 			class="btn btn-ghost-dark"
 			@click="loadData(id)"
 		>
@@ -12,14 +12,14 @@
 
 		<b-modal 
 			:id="idmodal"
-			v-model="editscheduler"
-			:title="$t('scheduler.editscheduler')"
+			v-model="networkmodal"
+			:title="$t('network.editnetwork')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('scheduler.editscheduler') }}
+					{{ row.netid }} - {{ row.mask }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,19 +46,19 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror"
+				:message="createerrormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('scheduler.name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -72,7 +72,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('scheduler.description')" 
+							:label="$t('generic.description')" 
 							label-for="description"
 						>
 							<b-form-input
@@ -85,34 +85,32 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('scheduler.active')" 
-							label-for="active"
+							:label="$t('title.netgroup')" 
+							label-for="netgroup"
 						>
-							<b-form-select
-								id="active"
-								v-model="row.active" 
-								:options="active" 
-								class="mb-3 form-select"
+							<v-select
+								id="netgroup"
+								v-model="row.group" 
+								:options="netgroup" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('scheduler.recurence')" 
-							label-for="recurence"
-						>
-							<b-form-select
-								id="recurence"
-								v-model="row.recurence" 
-								:options="recurences" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
+					<b-form-input
+						id="netid"
+						v-model="row.netid"
+						hidden
+					/>
+					<b-form-input
+						id="mask"
+						v-model="row.mask"
+						hidden
+					/>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -139,10 +137,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditAutomaticActionModal',
+	name: 'NetworkModal',
 	props: {
 		id: { type: Number, default: null }
 	},
@@ -151,39 +149,30 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				active: false,
-				recurence: "hourly"
+				netid: null,
+				mask: null,
+				group: null
 			},
-			rowdata: [],
-			errorMsg: null,
+			netgroup: [],
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editscheduler: false,
+			networkmodal: false,
+			idmodal: 'edit-network'+this.id,
 			header: {
-				"Content-Type": "multipart/form-data;charset=utf-8",
+				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
-			active: [
-				{ value: true, text: this.$t('generic.yes') },
-				{ value: false, text: this.$t('generic.no') }
-			],
-			recurences: [
-				{ value: 'hourly', text: this.$t('scheduler.hourly') },
-				{ value: 'daily', text: this.$t('scheduler.daily') },
-				{ value: 'weekly', text: this.$t('scheduler.weekly') },
-				{ value: 'monthly', text: this.$t('scheduler.monthly') }
-			],
-			idmodal: 'edit-scheduler.'+this.id
+			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editscheduler = false
+				this.networkmodal = false
 				this.createwithsuccess = false
 				this.$emit('reloadDatatable')
 			}, 500)
@@ -192,29 +181,49 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editscheduler = true
-			this.getScheduler(id)
+			this.networkmodal = true
+			this.getNetworks(id)
 		},
-		getScheduler(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
+		getNetworks(id) {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
+					this.errored = false
+					this.getNetGroup()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getNetGroup() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+				.then(response => {
+					this.netgroup.push({
+						value: null,
+						text: this.$t("network.unknown_network")
+					})
+					response.data.forEach(element => {
+						this.netgroup.push({
+							value: element.id,
+							text: element.name
+						})
+					});
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
-				this.row, { headers: this.header })
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

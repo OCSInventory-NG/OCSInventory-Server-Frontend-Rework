@@ -11,7 +11,7 @@
 		<!-- Display error box message -->
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errorMsg.message" 
+				:message="errormsg.message" 
 				variant="danger"
 			/>
 		</section>
@@ -36,27 +36,40 @@
 					<b-row>
 						<b-col>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'route'+index"
 									v-model="input.model" 
 									:options="routeopt[trigger]" 
-									class="mb-3 form-select form-control"
-									:required="true"
-									@update:modelValue="getFields(index, input.model)"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									@option:selected="getFields(index, input.model)"
 								/>
 							</b-form-group>
 						</b-col>
 						<b-col>
 							<b-form-group>
-								<b-form-select
+								<v-select
 									:id="'field'+index"
-									v-model="input.field"
-									:options="fieldopt[index]"
-									:required="true"
-									class="mb-3 form-select form-control"
-									:disabled="(loadingfield) ? true : false"
-									@update:modelValue="setFieldType(input, index)"
-								/>
+									v-model="input.field" 
+									:options="fieldopt[index]" 
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									:loading="(loadingfield) ? true : false"
+									@option:selected="setFieldType(input, index)"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.field"
+											v-bind="attributes"
+											v-on="events"
+										>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 						<b-col cols="1">
@@ -78,14 +91,25 @@
 									class="mb-3"
 								/>
 								<div v-else>
-									<b-form-select
-										:id="'field'+index"
-										v-model="input.value"
-										:options="selectfieldopt[index]"
-										class="mb-3 form-select form-control"
-										:required="true"
-										:disabled="(loadingselect) ? true : false"
-									/>
+									<v-select
+										:id="'value'+index"
+										v-model="input.value" 
+										:options="selectfieldopt[index]" 
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:loading="(loadingselect) ? true : false"
+									>
+										<template #search="{attributes, events}">
+											<input
+												class="vs__search"
+												:required="!input.value"
+												v-bind="attributes"
+												v-on="events"
+											>
+										</template>
+									</v-select>
 								</div>
 							</b-form-group>
 						</b-col>
@@ -148,7 +172,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "RuleAction",
@@ -161,7 +185,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			errorMsg: null,
+			errormsg: null,
 			errorCode: null,
 			errored: false,
 			successed: false,
@@ -296,7 +320,7 @@ export default {
 			}
 
 			if(model == "accountinfo.accountinfoconfig") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 						this.fieldopt[index] = []
@@ -313,12 +337,12 @@ export default {
 							1 : ((b.text > a.text) ? -1 : 0))
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loadingfield = false)
 			} else {
-				Axios.options(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 
@@ -337,11 +361,11 @@ export default {
 						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
 							1 : ((b.text > a.text) ? -1 : 0))
 
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 					.finally(() => this.loadingfield = false)
@@ -379,7 +403,7 @@ export default {
 					route = "templates"
 				}
 
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
@@ -393,11 +417,11 @@ export default {
 						this.loadingselect = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			} else if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingselect = true
@@ -414,7 +438,7 @@ export default {
 						this.loadingselect = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
 					})
 			}
@@ -487,16 +511,16 @@ export default {
 
 			this.actionupdate.forEach(action => {
 				if(action.id != null) {
-					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
+					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true
-							this.errorMsg = null
+							this.errormsg = null
 							this.errored = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
+							this.errormsg = e.message
 							this.errored = true
 							this.succesMsg = null
 							this.successed = false
@@ -506,16 +530,16 @@ export default {
 					delete action.object_id
 					delete action.object_slug
 
-					Axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/action/", action, 
+					axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
 							this.successed = true
-							this.errorMsg = null
+							this.errormsg = null
 							this.errored = false
 						})
 						.catch(e => {
-							this.errorMsg = e.message
+							this.errormsg = e.message
 							this.errored = true
 							this.succesMsg = null
 							this.successed = false
@@ -524,15 +548,15 @@ export default {
 			})
 
 			actionremove.forEach(id => {
-				Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
+				axios.delete(import.meta.env.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 						this.succesMsg = null
 						this.successed = false

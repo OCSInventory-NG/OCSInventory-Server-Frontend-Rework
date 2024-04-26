@@ -4,23 +4,58 @@
 		class="container-xl"
 	>
 		<div>
-			<AddRuleModal
-				:canadd="canadd"
-				:canedit="canedit"
-				:candelete="candelete"
-				:canviewaction="canviewaction"
-				:canview="canview"
+			<!-- Page header -->
+			<PageHeader 
 				page-title="rules"
 			/>
+			<!-- Display Datatable -->
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<!-- Error box message -->
+						<div v-if="errored">
+							<Alert 
+								:message="errormsg" 
+								variant="danger"
+							/>
+						</div>
+
+						<div 
+							v-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+
+						<div v-else>
+							<RuleModal
+								v-if="canadd"
+								@reloadDatatable="reloadDatatable"
+							/>
+							<Datatable
+								id="rules-datatable"
+								:rowdata="rowdata"
+								:rowheader="rowheader"
+								:candelete="candelete"
+								:canedit="canedit"
+								:canviewruleaction="canviewaction"
+								editcomponent="RuleModal"
+								title="automation/rule"
+								translationkey="rule."
+								@reloadDatatable="reloadDatatable"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 <script>
-import AddRuleModal from '@/components/Modals/AddItem/AddRuleModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Rule",
-	components: { AddRuleModal },
 	data() {
 		return {
 			canadd: false,
@@ -28,6 +63,16 @@ export default {
 			candelete: false,
 			canview: false,
 			canviewaction: false,
+			rowdata: [],
+			rowheader: [],
+			loading: true,
+			errormsg: null,
+			errored: false,
+			excludefields: ["logic", "actions"],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	created() {
@@ -45,6 +90,53 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("view_action")) {
 				this.canviewaction = true
 			}
+			this.getHeader()
+		} else {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
+		}
+	},
+	methods: {
+		getHeader() {
+			if(this.canview) {
+				axios.options(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+					.then(response => {
+						Object.keys(response.data.actions.POST).forEach(field => {
+							if(!this.excludefields.includes(field)) {
+								this.rowheader.push(field)
+							}
+						})
+						this.errormsg = null
+						this.errored = false
+						this.getRules()
+					})
+					.catch(e => {
+						this.errormsg = e.message
+						this.errored = true
+					})
+			} else {
+				this.errormsg = this.$t("message.dont_have_right_to_see")
+				this.errored = true
+			}
+		},
+		getRules() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+				.then(response => {
+					response.data.forEach(element => {
+						element.trigger = this.$t("rule." + element.trigger)
+					})
+					this.rowdata = response.data
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		},
+		reloadDatatable() {
+			this.getRules()
 		}
 	}
 }

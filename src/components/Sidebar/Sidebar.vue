@@ -148,11 +148,8 @@
 </template>
 
 <script>
-import NavLink from './NavLink/NavLink.vue';
-
 export default {
 	name: 'Sidebar',
-	components: { NavLink },
 	props: {
 		showmobilemenu: { type: Boolean, default: false }
 	},

@@ -1,5 +1,5 @@
 <template>
-	<div id="edit-mapping-modal">
+	<div id="mapping-modal">
 		<button 
 			:title="$t('authentication.editmapping')"
 			class="btn btn-ghost-warning"
@@ -12,7 +12,7 @@
 
 		<b-modal 
 			:id="idmodal"
-			v-model="editmapping"
+			v-model="mappingmodal"
 			:title="$t('authentication.editmapping')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
@@ -46,15 +46,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror"
+				:message="createerrormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row
 					v-for="(row, index) in rows"
 					:key="index"
@@ -99,10 +99,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditMappingModal',
+	name: 'MappingModal',
 	props: {
 		id: { type: Number, default: null }
 	},
@@ -116,13 +116,13 @@ export default {
 			},
 			mapping: [],
 			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editmapping: false,
+			mappingmodal: false,
 			idmodal: 'edit-mapping.'+this.id,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -133,7 +133,7 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editmapping = false
+				this.mappingmodal = false
 				this.createwithsuccess = false
 				this.$emit('reloadDatatable')
 			}, 500)
@@ -142,11 +142,11 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editmapping = true
+			this.mappingmodal = true
 			this.getMappingConfig(id)
 		},
 		getMappingConfig(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 
@@ -158,16 +158,15 @@ export default {
 						})
 					}
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit mapping config and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
@@ -215,7 +214,7 @@ export default {
 
 			if(jsonToUpdate.length) {
 				jsonToUpdate.forEach(data => {
-					Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
+					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null
@@ -231,7 +230,7 @@ export default {
 			}
 
 			if(jsonToAdd.length) {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -247,7 +246,7 @@ export default {
 
 			if(jsonToDelete.length) {
 				jsonToDelete.forEach(data => {
-					Axios.delete(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
+					axios.delete(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null

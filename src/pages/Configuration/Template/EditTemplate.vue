@@ -4,9 +4,9 @@
 		class="container-xl"
 	>
 		<div>
-			<AddSectionModal
-				:template="id"
-				@reloadTemplate="reloadTemplate"
+			<!-- Page header -->
+			<PageHeader 
+				page-title="edittemplate"
 			/>
 
 			<div class="page-body">
@@ -15,7 +15,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -35,6 +35,10 @@
 									<p>{{ $t('inventory.last_update') }} : {{ rowtemplatedata.last_update }}</p>
 								</b-col>
 							</b-row>
+							<SectionModal
+								:template="parseInt(id)"
+								@reloadTemplate="reloadTemplate"
+							/>
 							<SectionCollapse
 								:rowsectiondata="rowsectiondata"
 								@reloadTemplate="reloadTemplate"
@@ -48,19 +52,16 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import SectionCollapse from '@/components/Collapse/Template/SectionCollapse.vue'
-import AddSectionModal from '@/components/Modals/AddItem/AddSectionModal.vue'
+import axios from 'axios'
 
 export default {
 	name: 'EditTemplate',
-	components: { AddSectionModal, SectionCollapse	},
 	props: {
 		id: { type: String, required: true },
 	},
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowtemplatedata: [],
 			rowsectiondata: [],
 			succesMsg: null,
@@ -83,16 +84,16 @@ export default {
 	},
 	methods: {
 		getTemplate() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},

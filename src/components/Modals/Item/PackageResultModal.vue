@@ -1,5 +1,5 @@
 <template>
-	<div id="add-package-result-modal">
+	<div id="package-result-modal">
 		<div 
 			class="col-auto ms-auto"
 		>
@@ -16,7 +16,7 @@
 		</div>
 		<b-modal 
 			id="attr-pkg" 
-			v-model="attrpkg"
+			v-model="packageresultmodal"
 			:title="$t('deployment.attrpkg')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
@@ -131,10 +131,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: "AddPackageResultModal",
+	name: "PackageResultModal",
 	props: {
 		items: { type: Array, default: null },
 		group: { type: String, default: null }
@@ -142,7 +142,7 @@ export default {
 	data() {
 		return {
 			emptyselection: false,
-			attrpkg: false,
+			packageresultmodal: false,
 			errored: false,
 			errormsg: null,
 			rowheader: [],
@@ -160,7 +160,7 @@ export default {
 	watch: {
 		successed: function() {
 			setTimeout(() => {
-				this.attrpkg = false
+				this.packageresultmodal = false
 				this.successed = false
 			}, 500)
 		}
@@ -168,8 +168,8 @@ export default {
 	methods: {
 		getHeader() {
 			this.loading = true
-			this.attrpkg = true
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			this.packageresultmodal = true
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") {
@@ -186,7 +186,7 @@ export default {
 				})	
 		},
 		getPackages() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						delete packages.result
@@ -227,7 +227,7 @@ export default {
 			}
 
 			if(row.length > 0) {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", row, { headers: this.header })
 					.then(() => {
 						this.successed = true
 						this.errored = null

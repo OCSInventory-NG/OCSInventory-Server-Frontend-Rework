@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</div>
@@ -52,7 +52,7 @@
 								title="assets"
 								translationkey="inventory."
 							/>
-							<AddAssetGroupModal 
+							<AssetGroupModal 
 								:assetrow="assetids"
 								:search="rowsearch"
 							/>
@@ -65,17 +65,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Search from '@/components/Filter/Search.vue'
-import AddAssetGroupModal from '@/components/Modals/AddItem/AddAssetGroupModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Multisearch",
-	components: { PageHeader, Search, AddAssetGroupModal },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			rowheader: [],
 			rowsearch: [],
@@ -93,14 +89,14 @@ export default {
 		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
 			this.getHeader()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -108,20 +104,20 @@ export default {
 						}
 					})
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		reloadDatatable(search) {
 			this.rowsearch = search
 			
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					this.assetids = []
@@ -140,11 +136,11 @@ export default {
 
 					this.succesMsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.response.data.error
+					this.errormsg = e.response.data.error
 					this.errored = true
 					this.succesMsg = null
 					this.successed = false

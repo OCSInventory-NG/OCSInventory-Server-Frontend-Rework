@@ -11,7 +11,7 @@
 					<!-- Error box message -->
 					<section v-if="erroredasset">
 						<Alert 
-							:message="errorMsgAsset" 
+							:message="errormsgAsset" 
 							variant="danger"
 						/>
 					</section>
@@ -72,7 +72,7 @@
 					<!-- Error box message -->
 					<section v-if="errorednetwork">
 						<Alert 
-							:message="errorMsgNetwork" 
+							:message="errormsgNetwork" 
 							variant="danger"
 						/>
 					</section>
@@ -113,8 +113,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
+import axios from 'axios'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
@@ -122,7 +121,7 @@ import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
 export default {
 	name: "Dashboard",
-	components: { PageHeader, BarChart, Counter, DonutChart, LineChart },
+	components: { BarChart, Counter, DonutChart, LineChart },
 	data() {
 		return {
 			templates: {
@@ -184,8 +183,8 @@ export default {
 					data: []
 				}]
 			},
-			errorMsgAsset: null,
-			errorMsgNetwork: null,
+			errormsgAsset: null,
+			errormsgNetwork: null,
 			loadingasset: true,
 			loadingnetwork: true,
 			erroredasset: false,
@@ -204,7 +203,7 @@ export default {
 	},
 	methods: {
 		getNetworks() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks.total = response.data.length
 					response.data.forEach(network => {
@@ -214,17 +213,17 @@ export default {
 							nbdevices: 0
 						}
 					})
-					this.errorMsgNetwork = null
+					this.errormsgNetwork = null
 					this.errorednetwork = false
 					this.getNetdevices()
 				})
 				.catch(e => {
-					this.errorMsgNetwork = e.message
+					this.errormsgNetwork = e.message
 					this.errorednetwork = true
 				})
 		},
 		getNetdevices() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/", { headers: this.header })
 				.then(response => {
 					this.networks.devices.total = response.data.length
 					response.data.forEach(device => {
@@ -236,34 +235,34 @@ export default {
 						this.networkopt.series[0].data.push(network.nbdevices)
 					})
 
-					this.errorMsgNetwork = null
+					this.errormsgNetwork = null
 					this.errorednetwork = false
 				})
 				.catch(e => {
-					this.errorMsgNetwork = e.message
+					this.errormsgNetwork = e.message
 					this.errorednetwork = true
 				})
 				.finally(() => this.loadingnetwork = false)
 		},
 		// Retrieve templates ID and sort by type
 		getTemplates() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
 						this.templates[template["os"]].push(template["id"])
 					})
-					this.errorMsgAsset = null
+					this.errormsgAsset = null
 					this.erroredasset = false
 					this.getCount()
 				})
 				.catch(e => {
-					this.errorMsgAsset = e.message
+					this.errormsgAsset = e.message
 					this.erroredasset = true
 				})
 		},
 		// Count assets and sort by template types
 		getCount() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					var now = new Date().toJSON().slice(0,10)
 					this.total.total = response.data.length
@@ -310,11 +309,11 @@ export default {
 						})
 					}
 
-					this.errorMsgAsset = null
+					this.errormsgAsset = null
 					this.erroredasset = false
 				})
 				.catch(e => {
-					this.errorMsgAsset = e.message
+					this.errormsgAsset = e.message
 					this.erroredasset = true
 				})
 				.finally(() => this.loadingasset = false)
