@@ -150,7 +150,8 @@ export default {
 					})
 					.finally(() => this.loadingdelete = false)
 			} else {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/?delete=true", this.rows, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/?delete=true", this.rows,
+					{ headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null
 						this.deleteerror = false
