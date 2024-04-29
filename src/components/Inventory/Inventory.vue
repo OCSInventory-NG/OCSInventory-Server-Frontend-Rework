@@ -19,63 +19,71 @@
 
 			<div v-else>
 				<div v-if="isDataLoaded">
-					<div align="right">
-						<b-button
-							v-b-toggle="allcollapse"
-							variant="ghost-dark"
-							:title="$t('inventory.expandall')"
-						>
-							<font-awesome-icon 
-								:icon="['far', 'window-maximize']"
-								size="1x"
-							/>
-						</b-button>
-					</div><br>
-					<div
-						v-for="(section_name) in sectionstitle"
-						:key="section_name"
-					>
-						<div
-							class="accordion"
-							role="tablist"
-						>
-							<b-card
-								no-body
-								class="mb-1"
+					<div v-if="sectionstitle.length > 0">
+						<div align="right">
+							<b-button
+								v-b-toggle="allcollapse"
+								variant="ghost-dark"
+								:title="$t('inventory.expandall')"
 							>
-								<b-card-header
-									header-tag="header"
-									class="p-1"
-									role="tab"
+								<font-awesome-icon 
+									:icon="['far', 'window-maximize']"
+									size="1x"
+								/>
+							</b-button>
+						</div><br>
+						<div
+							v-for="(section_name) in sectionstitle"
+							:key="section_name"
+						>
+							<div
+								class="accordion"
+								role="tablist"
+							>
+								<b-card
+									no-body
+									class="mb-1"
 								>
-									<b-button
-										v-b-toggle="'section-'+section_name"
-										block
-										class="section-btn"
+									<b-card-header
+										header-tag="header"
+										class="p-1"
+										role="tab"
 									>
-										{{ section_name }}
-									</b-button>
-								</b-card-header>
+										<b-button
+											v-b-toggle="'section-'+section_name"
+											block
+											class="section-btn"
+										>
+											{{ section_name }}
+										</b-button>
+									</b-card-header>
 
-								<b-collapse
-									:id="'section-'+section_name"
-									accordion="my-accordion"
-									role="tabpanel"
-								>
-									<b-card-body>
-										<b-card-text>
-											<Datatable
-												id="battery-datatable"
-												:rowdata="sections[section_name]"
-												:usecheckbox="false"
-												:rowheader="sectionsheader[section_name]"
-												title="section"
-											/>
-										</b-card-text>
-									</b-card-body>
-								</b-collapse>
-							</b-card>
+									<b-collapse
+										:id="'section-'+section_name"
+										accordion="my-accordion"
+										role="tabpanel"
+									>
+										<b-card-body>
+											<b-card-text>
+												<Datatable
+													id="battery-datatable"
+													:rowdata="sections[section_name]"
+													:usecheckbox="false"
+													:rowheader="sectionsheader[section_name]"
+													title="section"
+												/>
+											</b-card-text>
+										</b-card-body>
+									</b-collapse>
+								</b-card>
+							</div>
 						</div>
+					</div>
+					<div v-else>
+						<Alert 
+							:message="$t('message.no_inventory')" 
+							variant="info"
+						/>
 					</div>
 				</div>
 				<div 

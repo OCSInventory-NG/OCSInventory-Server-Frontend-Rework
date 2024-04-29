@@ -25,7 +25,7 @@
 				<!-- Export Excel -->
 				<div
 					v-if="canexport"
-					class="col-2" 
+					class="col-1" 
 				>
 					<b-button-group class="mr-1">
 						<download-excel
@@ -49,12 +49,24 @@
 
 				<!-- Export template -->
 				<div
-					v-if="exporttemplate"
-					class="col"
+					v-if="importtemplate"
+					class="col-1"
 				>
 					<ImportTemplateModal
 						@reloadDatatable="reloadDatatable"
 					/>
+				</div>
+
+				<!-- Attribute package -->
+				<div
+					v-if="candeploy"
+					class="col-1"
+				>
+					<b-button-group class="mr-1">
+						<PackageResultModal
+							:items="(multisearch && selected.length == 0) ? rowdata : selected"
+						/>
+					</b-button-group>
 				</div>
 
 				<!-- Show/Hide columns -->
@@ -129,6 +141,7 @@
 				show-empty
 				@filtered="onFiltered"
 				@row-selected="onRowSelected"
+				@row-unselected="onRowUnselected"
 			>
 				<!-- No data available -->
 				<template #empty="">
@@ -139,15 +152,15 @@
 				<template #head(selected)="">
 					<b-form-group>
 						<input 
-							type="checkbox" 
-							@click="selectAllRows"
+							v-model="isChecked"
+							type="checkbox"
 						>
 					</b-form-group>
 				</template>
 
-				<template #cell(selected)="{ rowSelected }">
+				<template #cell(selected)="row">
 					<!-- If row is selected -->
-					<template v-if="rowSelected">
+					<template v-if="selected.findIndex(v => v.id === row.item.id) != -1">
 						<font-awesome-icon 
 							:icon="['far', 'square-check']"
 						/>
@@ -179,7 +192,7 @@
 					#cell(name)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/'+row.item.id"
+						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
@@ -192,7 +205,7 @@
 					#cell(netname)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+title+'/'+row.item.id"
+						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.netname }}
@@ -310,8 +323,10 @@
 							<DeleteItemModal 
 								v-if="candelete"
 								:id="row.item.id"
-								:name="row.item.name || row.item.username"
-								:parameter="title"
+								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
+								:name="row.item.name || row.item.username || $t('generic.removeselection')"
+								:parameter="deleterte"
+								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</b-button-group>
@@ -336,6 +351,10 @@
 </template>
 
 <script>
+import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
+import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
+import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
+import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
 import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
 import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
@@ -343,14 +362,18 @@ import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.
 import GroupModal from '@/components/Modals/Item/GroupModal.vue'
 import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
+import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
-import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 
 export default {
 	name: 'Datatable',
 	components: {
+		DeleteItemModal,
+		DoAllActionsItemModal,
+		ImportTemplateModal,
+		SaveSearchModal,
 		UserModal,
 		AccountinfoModal,
 		NetworkGroupModal,
@@ -359,9 +382,9 @@ export default {
 		GroupModal,
 		NetdeviceModal,
 		NetworkModal,
-		PackageModal,
 		RuleModal,
-		SaveSearchModal,
+		PackageModal,
+		PackageResultModal,
 	},
 	props: {
 		title: { type: String, default: '' },
@@ -374,7 +397,7 @@ export default {
 		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
-		exporttemplate: { type: Boolean, default: false },
+		importtemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
@@ -387,6 +410,10 @@ export default {
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
 		canshowhide: { type: Boolean, default: true },
+		candeploy: { type: Boolean, default: false },
+		multisearch: { type: Boolean, default: false },
+		deletemultiple: { type: Boolean, default: false },
+		deleteids: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -409,13 +436,16 @@ export default {
 			filter: null,
 			// Select row parameter
 			selectMode: 'multi',
-			selected: null,
+			selected: [],
+			isChecked: false,
 			// Sort datatable parameters
 			sortDesc: null,
 			sortBy: null,
 			// Export parameters
 			json_fields: {},
 			json_data: [],
+			redirectto: null,
+			deleterte: null,
 			json_meta: [
 				[
 					{
@@ -442,8 +472,29 @@ export default {
 		rowdata: function () {
 			this.totalRows = this.rowdata.length
 		},
+		isChecked: function () {
+			if(this.isChecked) {
+				this.$refs.selectableTable.selectAllRows()
+			} else {
+				this.$refs.selectableTable.clearSelected()
+				this.selected = []
+			}
+			this.attributePackage()
+		}
 	},
 	created() {
+		if(this.title == "asset/bases") {
+			this.redirectto = "asset"
+		} else {
+			this.redirectto = this.title
+		}
+
+		if(this.title == "assetgroups") {
+			this.deleterte = "asset/groups"
+		} else {
+			this.deleterte = this.title
+		}
+
 		if(this.usecheckbox == true) {
 			this.fields.push({
 				key: "selected", 
@@ -511,23 +562,24 @@ export default {
 			this.json_data = filteredItems
 			this.currentPage = 1
 		},
-		// Trigger selection rows
-		selectAllRows() {
-			if(this.$refs.selectableTable.selectedRows[0] === true) {
-				this.$refs.selectableTable.clearSelected()
-				this.selected = this.rowdata
-			} else {
-				this.$refs.selectableTable.selectAllRows()
-			}
+		onRowSelected(item) {
+			this.selected.push(item)
+			this.attributePackage()
 		},
-		onRowSelected(items) {
-			this.selected = items
-			if(this.selected.length == 0) {
-				this.selected = this.rowdata
-			}
+		onRowUnselected(item) {
+			this.selected.splice(
+				this.selected.findIndex(
+					v => v.id === item.id
+				),
+				1
+			)
+			this.attributePackage()
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')
+		},
+		attributePackage() {
+			this.$emit('attributePackage', this.selected)
 		},
 		onSave() {
 			this.$emit('reloadDatatable', this.rowdata)

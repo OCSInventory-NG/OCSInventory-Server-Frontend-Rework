@@ -45,9 +45,10 @@
 							<Datatable
 								id="search-datatable"
 								:rowdata="rowdata"
-								:usecheckbox="false"
 								:rowheader="rowheader"
 								:canaccessdetails="true"
+								:candeploy="true"
+								:multisearch="true"
 								title="assets"
 								translationkey="inventory."
 							/>

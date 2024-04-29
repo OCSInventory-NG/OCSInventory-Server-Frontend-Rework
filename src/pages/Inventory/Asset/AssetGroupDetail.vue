@@ -28,6 +28,22 @@
 						</div>
 
 						<div v-else>
+							<div>
+								<b-row class="asset-btn responsive">
+									<div
+										class="col-1"
+										align="right"
+									>
+										<b-button-group class="mr-1">
+											<PackageResultModal
+												:items="rowdata"
+												:group="$route.params.id"
+												@reloadDeployment="reloadDeployment"
+											/>
+										</b-button-group>
+									</div>
+								</b-row>
+							</div>
 							<div class="hr-text">
 								{{ $t("generic.information") }}
 							</div>
@@ -113,8 +129,18 @@
 											:canedit="canedit"
 											:candelete="candelete"
 											:rowheader="rowheader"
+											:usecheckbox="false"
 											title="asset"
 											translationkey="inventory."
+										/>
+									</b-tab>
+									<b-tab
+										:title="$t('title.deployment')"
+									>
+										<ResultDetail
+											:group="$route.params.id"
+											:reload="reload"
+											@endReloadDeployment="endReloadDeployment"
 										/>
 									</b-tab>
 									<b-tab
@@ -154,6 +180,7 @@ export default {
 			assets: [],
 			canedit: false,
 			candelete: false,
+			reload: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -241,6 +268,12 @@ export default {
 					.finally(() => this.loading = false)
 			}
 			this.loading = false
+		},
+		reloadDeployment() {
+			this.reload = true
+		},
+		endReloadDeployment() {
+			this.reload = false
 		}
 	}
 }

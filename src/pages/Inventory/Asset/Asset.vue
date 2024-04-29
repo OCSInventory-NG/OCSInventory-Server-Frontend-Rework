@@ -31,11 +31,13 @@
 							<Datatable
 								id="assets-datatable"
 								:rowdata="rowdata"
-								:usecheckbox="false"
 								:canaccessdetails="true"
+								:candelete="candelete"
 								:rowheader="rowheader"
-								title="asset"
+								:candeploy="true"
+								title="asset/bases"
 								translationkey="inventory."
+								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
@@ -57,6 +59,7 @@ export default {
 			rowheader: [],
 			loading: true,
 			errored: false,
+			candelete: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -65,6 +68,9 @@ export default {
 	},
 	mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
+			if(localStorage.getItem('permissions').split(",").includes("delete_inventorybase")) {
+				this.candelete = true
+			}
 			this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
@@ -102,7 +108,10 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
-		}
+		},
+		reloadDatatable() {
+			this.getAssets()
+		},
 	}
 }
 </script>
