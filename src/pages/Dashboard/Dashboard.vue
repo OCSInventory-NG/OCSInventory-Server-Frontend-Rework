@@ -22,8 +22,56 @@
 					>
 						<Loader />
 					</div>
+					<GridLayout 
+						v-else
+						v-model:layout="layout"
+						:row-height="30"
+					>
+						<template #item="{ item }">
+							<Counter 
+								v-if="item.i == 0"
+								firsttitle="dashboard.total"
+								:firstcount="total.total"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.total"
+							/>
+							<Counter 
+								v-if="item.i == 1"
+								firsttitle="dashboard.windows"
+								:firstcount="total.windows"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.windows"
+							/>
+							<Counter 
+								v-if="item.i == 2"
+								firsttitle="dashboard.linux"
+								:firstcount="total.linux"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.linux"
+							/>
+							<Counter 
+								v-if="item.i == 3"
+								firsttitle="dashboard.macos"
+								:firstcount="total.macos"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.macos"
+							/>
+							<DonutChart 
+								v-if="item.i == 4"
+								title="dashboard.osassets"
+								:options="oscount.options"
+								:series="oscount.series"
+							/>
+							<LineChart 
+								v-if="item.i == 5"
+								title="dashboard.lastcontacted"
+								:options="lastcontactedopt.options"
+								:series="lastcontactedopt.series"
+							/>
+						</template>
+					</GridLayout>
 
-					<div v-else>
+					<!--<div v-else>
 						<div class="row row-deck row-cards">
 							<Counter 
 								firsttitle="dashboard.total"
@@ -66,7 +114,7 @@
 								/>
 							</div>
 						</div>
-					</div>
+					</div>-->
 
 					<h1>{{ $t("title.network") }}</h1>
 					<!-- Error box message -->
@@ -121,9 +169,25 @@ import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
 export default {
 	name: "Dashboard",
-	components: { BarChart, Counter, DonutChart, LineChart },
+	components: { 
+		BarChart,
+		Counter,
+		DonutChart,
+		LineChart,
+	},
 	data() {
 		return {
+			layout: [
+				{"x":0,"y":0,"w":3,"h":4,"i":"0", static: false},
+				{"x":3,"y":0,"w":3,"h":4,"i":"1", static: false},
+				{"x":6,"y":0,"w":3,"h":4,"i":"2", static: false},
+				{"x":9,"y":0,"w":3,"h":4,"i":"3", static: false},
+				{"x":0,"y":4,"w":6,"h":8,"i":"4", static: false},
+				{"x":6,"y":4,"w":6,"h":8,"i":"5", static: false}
+			],
+			draggable: true,
+			resizable: true,
+			index: 0,
 			templates: {
 				WIN: [],
 				LIN: [],
@@ -249,7 +313,9 @@ export default {
 			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
-						this.templates[template["os"]].push(template["id"])
+						if(template.os != "SNMP") {
+							this.templates[template.os].push(template.id)
+						}	
 					})
 					this.errormsgAsset = null
 					this.erroredasset = false
