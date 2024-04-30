@@ -28,6 +28,11 @@ import vSelect from "vue-select"
 app.component("VSelect", vSelect)
 import "vue-select/dist/vue-select.css"
 
+/***** Grid layout plus *****/
+import { GridLayout, GridItem } from 'grid-layout-plus'
+app.component('GridLayout', GridLayout)
+app.component('GridItem', GridItem)
+
 /***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
