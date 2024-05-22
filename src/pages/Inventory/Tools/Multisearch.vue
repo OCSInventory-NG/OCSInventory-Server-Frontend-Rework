@@ -86,7 +86,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
+		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
 			this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")

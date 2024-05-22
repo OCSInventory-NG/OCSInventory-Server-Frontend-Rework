@@ -139,12 +139,12 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_authconfig")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_authconfig")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("add_authmapping")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
 			this.getCasConfiguration()

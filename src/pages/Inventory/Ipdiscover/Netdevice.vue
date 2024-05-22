@@ -67,11 +67,11 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_netdevice")) {
-			if(localStorage.getItem('permissions').split(",").includes("change_netdevice")) {
+		if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
+			if(localStorage.getItem('permissions').split(",").includes("netdevice_change_netdevice")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_netdevice")) {
+			if(localStorage.getItem('permissions').split(",").includes("netdevice_delete_netdevice")) {
 				this.candelete = true
 			}
 			this.getHeader()

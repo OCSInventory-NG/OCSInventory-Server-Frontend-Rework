@@ -80,18 +80,18 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_accountinfoconfig")) {
+		if(localStorage.getItem('permissions').split(",").includes("accountinfo_view_accountinfoconfig")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_accountinfoconfig")) {
+			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfoconfig")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_accountinfoconfig")) {
+			if(localStorage.getItem('permissions').split(",").includes("accountinfo_change_accountinfoconfig")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_accountinfoconfig")) {
+			if(localStorage.getItem('permissions').split(",").includes("accountinfo_delete_accountinfoconfig")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("add_accountinfovalue")) {
+			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfovalue")) {
 				this.canaddvalue = true
 			}
 			this.getHeader()

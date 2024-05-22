@@ -62,8 +62,8 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_history")) {
-			if(localStorage.getItem('permissions').split(",").includes("view_result")) {
+		if(localStorage.getItem('permissions').split(",").includes("history_view_history")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_view_result")) {
 				this.canviewhistory = true
 			}
 			this.getHeader()
