@@ -68,10 +68,10 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("change_search")) {
+		if(localStorage.getItem('permissions').split(",").includes("search_change_search")) {
 			this.canedit = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("delete_search")) {
+		if(localStorage.getItem('permissions').split(",").includes("search_delete_search")) {
 			this.candelete = true
 		}
 

@@ -90,13 +90,13 @@ export default {
 	},
 	mounted() {
 		this.getHeader()
-		if(localStorage.getItem('permissions').split(",").includes("add_action")) {
+		if(localStorage.getItem('permissions').split(",").includes("action_add_deploymentaction")) {
 			this.canaddaction = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("change_action")) {
+		if(localStorage.getItem('permissions').split(",").includes("action_change_deploymentaction")) {
 			this.caneditaction = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("delete_action")) {
+		if(localStorage.getItem('permissions').split(",").includes("action_delete_deploymentaction")) {
 			this.candeleteaction = true
 		}
 	},

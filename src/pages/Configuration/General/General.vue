@@ -254,9 +254,9 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
+		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
 				this.canedit = true
 			}
 			this.getConfig()

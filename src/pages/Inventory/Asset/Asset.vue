@@ -67,8 +67,8 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_inventorybase")) {
-			if(localStorage.getItem('permissions').split(",").includes("delete_inventorybase")) {
+		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
+			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
 				this.candelete = true
 			}
 			this.getHeader()

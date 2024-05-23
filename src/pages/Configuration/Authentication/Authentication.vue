@@ -140,9 +140,9 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_authmethod")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_method_view_authmethod")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_authmethod")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_method_change_authmethod")) {
 				this.canedit = true
 			}
 			this.getAuthMethod()
