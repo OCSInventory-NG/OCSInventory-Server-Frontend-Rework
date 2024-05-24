@@ -129,6 +129,7 @@
   "dashboard": {
     "contacted": "Contactés aujourd'hui",
     "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
+    "legacy": "Legacy",
     "linux": "Linux",
     "macos": "MacOS",
     "nbassets": "Nombre d'actifs",
