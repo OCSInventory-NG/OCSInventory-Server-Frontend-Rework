@@ -34,7 +34,8 @@ import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome
 import { 
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
-	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple
+	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
+	faSliders
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -45,7 +46,8 @@ library.add({
 	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize
+	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize,
+	faSliders
 })
 
 router.isReady()
