@@ -19,6 +19,14 @@ h4 {
   color: unset;
 }
 
+.asset-btn {
+  justify-content: flex-end;
+}
+
+.page-header {
+  margin-top: 15px;
+}
+
 @media (min-width: 1200px) {
   .container-xl {
     max-width: 1320px;

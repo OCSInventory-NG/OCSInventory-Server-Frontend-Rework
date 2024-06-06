@@ -23,7 +23,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -34,19 +34,31 @@
 							<Loader />
 						</div>
 						<div v-else>
-							<div
-								v-if="type == 'ASSET'"
-								align="right"
-							>
-								<router-link 
-									:to="'/inventory/inventory_logs/'+$route.params.id"
-									:title="$t('inventory.see_logs')"
-									class="btn"
-								>
-									<font-awesome-icon 
-										:icon="['far', 'file-lines']"
-									/>
-								</router-link>
+							<div v-if="type == 'ASSET'">
+								<b-row class="asset-btn responsive">
+									<div
+										class="col-1"
+										align="right"
+									>
+										<b-button-group class="mr-1">
+											<PackageResultModal
+												:items="deployment"
+												@reloadDeployment="reloadDeployment"
+											/>
+										</b-button-group>
+									</div>
+									<div class="col-1">
+										<router-link 
+											:to="'/inventory/inventory_logs/'+$route.params.id"
+											:title="$t('inventory.see_logs')"
+											class="btn datatable-btn mr-1"
+										>
+											<font-awesome-icon 
+												:icon="['far', 'file-lines']"
+											/>
+										</router-link>
+									</div>
+								</b-row>
 							</div>
 
 							<div class="hr-text">
@@ -99,6 +111,8 @@
 									>
 										<ResultDetail
 											:id="$route.params.id"
+											:reload="reload"
+											@endReloadDeployment="endReloadDeployment"
 										/>
 									</b-tab>
 								</b-tabs>
@@ -112,18 +126,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Accountinfo from '@/components/Accountinfo/Accountinfo.vue'
-import ResultDetail from '@/components/Deployment/ResultDetail.vue'
-import Inventory from '@/components/Inventory/Inventory.vue'
+import axios from 'axios'
 
 export default {
 	name: 'Detail',
-	components: { PageHeader, Accountinfo, ResultDetail, Inventory },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			loading: true,
 			errored: false,
@@ -132,6 +141,8 @@ export default {
 			slug: null,
 			translationkey: null,
 			id: null,
+			reload: false,
+			deployment: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -154,18 +165,27 @@ export default {
 			this.translationkey = "network."
 		}
 
-		Axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
+		axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data
-				this.errorMsg = null
+				this.deployment.push(response.data)
+				this.errormsg = null
 				this.errored = false
 				this.loading = false
 			})
 			.catch(e => {
-				this.errorMsg = e.message
+				this.errormsg = e.message
 				this.errored = true
 			})
+	},
+	methods: {
+		reloadDeployment() {
+			this.reload = true
+		},
+		endReloadDeployment() {
+			this.reload = false
+		}
 	}
 }
 </script>

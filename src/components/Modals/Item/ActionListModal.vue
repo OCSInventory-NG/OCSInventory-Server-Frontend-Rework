@@ -1,25 +1,46 @@
 <template>
-	<div id="edit-action-list-modal">
-		<button 
-			:title="$t('deployment.editaction')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="action-list-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('deployment.addaction')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="actionlistmodal = !actionlistmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('deployment.addaction') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('deployment.editaction')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idmodal"
-			v-model="editaction"
-			:title="$t('deployment.editaction')"
+			id="actionlistmodal" 
+			v-model="actionlistmodal"
+			:title="(!update) ? $t('deployment.addaction') : $t('deployment.editaction')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('deployment.editaction') }}
+					{{ (!update) ? $t('deployment.addaction') : $t('deployment.editaction') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,15 +67,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -75,11 +96,14 @@
 							:label="$t('deployment.action_type')" 
 							label-for="action_type"
 						>
-							<b-form-select
+							<v-select
 								id="action_type"
 								v-model="row.action_type" 
 								:options="actionoptions" 
-								class="mb-3 form-select"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -121,7 +145,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -138,11 +162,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditPackageModal',
+	name: "ActionListModal",
 	props: {
+		package: { type: String, default: null },
+		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
@@ -150,66 +176,81 @@ export default {
 			row: {
 				id: null,
 				name: null,
+				priority: 1,
 				action_type: "EXEC",
 				command: null,
-				file: ''
+				original_file_name: null
 			},
-			rowdata: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editaction: false,
-			header: {
-				"Content-Type": "multipart/form-data;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			actionlistmodal: false,
 			actionoptions: [
 				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
 				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
 				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			],
-			idmodal: 'edit-action.'+this.id
+			header: {
+				"Content-Type": "multipart/form-data;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editaction = false
+				this.actionlistmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				if(this.update) {
+					this.$emit('reloadDatatable')
+				} else {
+					this.$emit('reloadPackage')
+				}
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.row.package = this.package
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editaction = true
+			this.actionlistmodal = true
 			this.getAction(id)
 		},
-		processFile(event){
-			this.row.file = event.target.files[0];
-		},
 		getAction(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit section creation and call refresh edit template to reload
+		processFile(event){
+			this.row.file = event.target.files[0];
+		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+
+			if(!this.row.file) {
+				delete this.row.file
+				this.row.original_file_name = null
+			} else {
+				this.row.original_file_name = this.row.file.name
+			}
 
 			let formdata = new FormData()
 
@@ -217,20 +258,35 @@ export default {
 				formdata.append(key, this.row[key])
 			})
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
-				{ headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
-		},
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
+					{ headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
+		}
 	}
 }
 </script>

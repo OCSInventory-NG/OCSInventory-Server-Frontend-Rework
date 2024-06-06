@@ -22,7 +22,7 @@
 					<!-- Display error box message -->
 					<section v-if="errored && errorCode == null">
 						<Alert 
-							:message="errorMsg.message" 
+							:message="errormsg.message" 
 							variant="danger"
 						/>
 					</section>
@@ -36,7 +36,7 @@
 							<!-- Display error box message -->
 							<div v-if="errored && errorCode != null">
 								<Alert 
-									:message="errorMsg" 
+									:message="errormsg" 
 									variant="danger"
 								/>
 							</div>
@@ -107,25 +107,20 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import Ldap from '@/components/Authentication/Ldap.vue'
-import Cas from '@/components/Authentication/Cas.vue'
-import Oidc from '@/components/Authentication/Oidc.vue'
+import axios from 'axios'
 
 export default {
 	name: 'Authentication',
-	components: { PageHeader, Ldap, Cas, Oidc },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			errorCode: null,
 			loading: true,
 			errored: false,
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			authmethods: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -145,21 +140,21 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_authmethod")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_method_view_authmethod")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_authmethod")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_method_change_authmethod")) {
 				this.canedit = true
 			}
 			this.getAuthMethod()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getAuthMethod() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method/", { headers: this.header })
 				.then(response => {
 					this.authmethods = response.data
 					this.authmethods.forEach(authmethod => {
@@ -169,11 +164,11 @@ export default {
 							}
 						})
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -189,19 +184,19 @@ export default {
 				enabled: state
 			}
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
 					if(e.response.data) {
 						this.errorCode = e.response.status
-						this.errorMsg = e.response.data[0]
+						this.errormsg = e.response.data[0]
 					} else {
-						this.errorMsg = e
+						this.errormsg = e
 					}
 
 					this.authmethods.forEach(authmethod => {
@@ -214,7 +209,7 @@ export default {
 					})
 					
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

@@ -1,25 +1,46 @@
 <template>
-	<div id="edit-section-modal">
-		<button 
-			:title="$t('template.editsection')"
-			class="btn btn-ghost-dark"
-			@click="loadData()"
+	<div id="section-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('template.addsection')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="sectionmodal = !sectionmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('template.addsection') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('template.editsection')"
+				class="btn btn-ghost-dark"
+				@click="loadData()"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="'edit-section.'+idmodal"
-			v-model="editsection"
-			:title="$t('template.editsection')"
+			id="sectionmodal" 
+			v-model="sectionmodal"
+			:title="(!update) ? $t('template.addsection') : $t('template.editsection')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('template.editsection') }}
+					{{ (!update) ? $t('template.addsection') : $t('template.editsection') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,15 +67,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -69,37 +90,26 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="routetype != 'snmp'">
+				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.retrival_method')" 
 							label-for="retrival_method"
 						>
-							<b-form-select
+							<v-select
 								id="retrival_method"
 								v-model="row.retrival_method" 
 								:options="methodoptions" 
-								class="mb-3 form-select"
+
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="routetype != 'snmp'">
-					<b-col>
-						<b-form-group
-							:label="$t('template.retrival_output')" 
-							label-for="retrival_output"
-						>
-							<b-form-select
-								id="retrival_output"
-								v-model="row.retrival_output" 
-								:options="outputoptions" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row v-if="routetype != 'snmp'">
+				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.target')" 
@@ -113,9 +123,37 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
+				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
+					<b-col>
+						<b-form-group
+							:label="$t('template.retrival_output')" 
+							label-for="retrival_output"
+						>
+							<v-select
+								id="retrival_output"
+								v-model="row.retrival_output" 
+								:options="outputoptions" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										:required="!row.retrival_output"
+										v-bind="attributes"
+										v-on="events"
+									>
+								</template>
+							</v-select>
+						</b-form-group>
+					</b-col>
+				</b-row>
 				<div 
 					v-if="outputoptionoptions[row.retrival_output]
-						&& routetype != 'snmp'"
+						&& routetype != 'snmp'
+						&& routetypemut != 'snmp'"
 				>
 					<b-row>
 						<b-col>
@@ -178,7 +216,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -195,32 +233,49 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditSectionModal',
+	name: "SectionModal",
 	props: {
 		rowsectiondata: { type: Object, default: null },
-		idmodal: { type: Number, required: true },
 		template: { type: Number, required: true },
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null },
+		routetype: { type: String, default: "assets" }
 	},
 	data() {
 		return {
-			row: null,
-			options: {},
-			errorMsg: null,
+			row: {
+				id: null,
+				name: null,
+				retrival_method: 'FILE',
+				retrival_output: null,
+				target: null,
+				fields: [],
+				template: null,
+				options: {}
+			},
+			snmprow: {
+				id: null,
+				name: null,
+				retrival_method: "OID",
+				retrival_output: "JSON",
+				target: "SNMP",
+				fields: [],
+				template: null,
+				options: {}
+			},
+			routetypemut: "assets",
+			errormsg: null,
 			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editsection: false,
-			routetype: "assets",
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			sectionmodal: false,
+			options : {},
 			methodoptions: [
 				{ value: 'FILE', text: this.$t('template.FILE') },
 				{ value: 'BASH', text: this.$t('template.BASH') },
@@ -249,46 +304,57 @@ export default {
 					{ id: "multiple", type: "checkbox", default: false },
 					{ id: "separator", type: "text", default: null },
 				]
+			},
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editsection = false
+				this.sectionmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadTemplate')
+				this.$emit("reloadTemplate")
 			}, 500)
 		}
 	},
 	created() {
 		if(this.$route.path.includes("snmp")) {
-			this.routetype = "snmp"
+			this.routetypemut = "snmp"
 		}
-		this.row = this.rowsectiondata
-		this.options = this.row.options
-		this.row.id = this.idmodal
-		this.row.template = this.template
+	},
+	mounted() {
+		if(!this.update) {
+			if(this.routetype == "snmp" || this.routetypemut == "snmp") {
+				this.row = this.snmprow
+			}
+			this.row.template = this.template
+			this.loading = false
+		} else {
+			this.row = this.rowsectiondata
+			this.options = this.row.options
+			this.row.id = this.id
+			this.row.template = this.template
 
-		if(this.options == null && this.outputoptionoptions[this.row.retrival_output] != undefined) {
-			this.options = {}
-			this.outputoptionoptions[this.row.retrival_output].forEach(element => {
-				this.options[element.id] = element.default
-			})
+			if(this.options == null && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.options = {}
+				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+					this.options[element.id] = element.default
+				})
+			}
 		}
 	},
 	methods: {
 		loadData() {
 			this.loading = true
-			this.editsection = true
+			this.sectionmodal = true
 			this.loading = false
 		},
-		// Submit edit section creation and call refresh edit template to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
-			delete this.row.fields
 
 			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
 				this.row.options = {}
@@ -298,19 +364,36 @@ export default {
 				})
 			}
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
-		},
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				delete this.row.fields
+
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
+		}
 	}
 }
 </script>

@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -34,7 +34,7 @@
 								:candelete="candelete"
 								title="search/save"
 								translationkey="search."
-								editcomponent="EditSaveSearchModal"
+								editcomponent="SaveSearchModal"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -46,12 +46,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
+import axios from 'axios'
 
 export default {
 	name: "SavedSearch",
-	components: { PageHeader },
 	data() {
 		return {
 			rowdata: [],
@@ -60,7 +58,7 @@ export default {
 			candelete: false,
 			loading: true,
 			errored: false,
-			errorMsg: null,
+			errormsg: null,
 			user: null,
 			groups: [],
 			header: {
@@ -70,10 +68,10 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("change_search")) {
+		if(localStorage.getItem('permissions').split(",").includes("search_change_search")) {
 			this.canedit = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("delete_search")) {
+		if(localStorage.getItem('permissions').split(",").includes("search_delete_search")) {
 			this.candelete = true
 		}
 
@@ -81,26 +79,26 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "last_updated") {
 							this.rowheader.push(field)
 						}
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getSavedSearches()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getSavedSearches() {
 			this.rowdata = []
 			this.loading = true
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					for (const search of response.data) {
 						delete search.search
@@ -111,18 +109,18 @@ export default {
 					}
 
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getUserName()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getUserName() {
 			for (const search of this.rowdata) {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+search.user, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+search.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							search.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -131,7 +129,7 @@ export default {
 						}
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			}
@@ -143,14 +141,14 @@ export default {
 				if(search.groups) {
 					for (const group of search.groups) {
 						this.loading = true
-						Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+						axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)
 								this.rowdata[key].groups = this.groups[key].join(", ")
 							})
 							.catch(e => {
-								this.errorMsg = e.message
+								this.errormsg = e.message
 								this.errored = true
 							})
 							.finally(() => { this.loading = false })

@@ -67,12 +67,11 @@
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar/Sidebar.vue'
 import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher.vue'
 
 export default {
 	name: 'Header',
-	components: { Sidebar, Localeswitcher },
+	components: { Localeswitcher },
 	data() {
 		return {
 			showmobilemenu: false,

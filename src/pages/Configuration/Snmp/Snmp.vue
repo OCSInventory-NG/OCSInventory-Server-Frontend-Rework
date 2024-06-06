@@ -8,7 +8,6 @@
 			<PageHeader 
 				page-title="snmp"
 			/>
-
 			<!-- Display datatable -->
 			<div class="page-body">
 				<div class="card">
@@ -16,13 +15,13 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
 						<section v-if="successed">
 							<Alert 
-								:message="succesMsg" 
+								:message="successmsg" 
 								variant="success"
 							/>
 						</section>
@@ -49,7 +48,7 @@
 										<div>
 											<label class="form-check form-switch">
 												<input 
-													v-model="configs.value[0].value"
+													v-model="configs.value[1][0].value"
 													class="form-check-input"
 													type="checkbox"
 													:disabled="!canedit"
@@ -61,21 +60,54 @@
 								</b-list-group>
 							</div>
 							<hr>
-							<AddSnmpModalVue
-								:canadd="canadd"
-								:canedit="canedit"
-								:candelete="candelete"
-								:canview="canview"
-								page-title="snmp"
-							/>
+							<div class="page-header d-print-none">
+								<div class="row">
+									<div class="col-auto">
+										<h2>{{ $t("network.snmpcommunity") }}</h2>
+									</div>
+									<SnmpModal
+										@reloadDatatable="reloadDatatable"
+									/>
+								</div>
+							</div>
+							<div>
+								<Datatable
+									id="snmpconfig-datatable"
+									:rowdata="rowsnmpcomm"
+									:rowheader="rowsnmpcommheader"
+									:canedit="canedit"
+									:candelete="candelete"
+									editcomponent="SnmpModal"
+									title="snmp/config"
+									translationkey="network."
+									@reloadDatatable="reloadDatatable"
+								/>
+							</div>
 							<hr>
-							<AddSnmpTemplateModalVue
-								:canadd="canadd"
-								:canedit="canedit"
-								:candelete="candelete"
-								:canview="canview"
-								page-title="snmp"
-							/>
+							<div class="page-header d-print-none">
+								<div class="row">
+									<div class="col-auto">
+										<h2>{{ $t("network.snmptemplates") }}</h2>
+									</div>
+									<SnmpTemplateModal
+										@reloadDatatable="reloadDatatable"
+									/>
+								</div>
+							</div>
+							<div>
+								<Datatable
+									id="templatesnmp-datatable"
+									:rowdata="rowtemplatedata"
+									:rowheader="rowtemplateheader"
+									:caneditsnmptemplate="canedit"
+									:candelete="candelete"
+									:canexport="false"
+									:importtemplate="true"
+									title="templates"
+									translationkey="template."
+									@reloadDatatable="reloadDatatable"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -85,14 +117,10 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import AddSnmpModalVue from '@/components/Modals/AddItem/AddSnmpModal.vue'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import AddSnmpTemplateModalVue from '@/components/Modals/AddItem/AddSnmpTemplateModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Snmp",
-	components: { AddSnmpModalVue, PageHeader, AddSnmpTemplateModalVue },
 	data() {
 		return {
 			canadd: false,
@@ -100,11 +128,18 @@ export default {
 			candelete: false,
 			canview: false,
 			configs: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
-			succesMsg: null,
+			successmsg: null,
 			successed: false,
 			loading: true,
+			rowsnmpcommheader: [
+				"name", "version", "user", "level", "password", "auth_protocol",
+				"priv_protocol", "priv_password", "retries", "timeout", "subnets"
+			],
+			rowsnmpcomm: [],
+			rowtemplateheader: [],
+			rowtemplatedata: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -115,23 +150,26 @@ export default {
 		successed: function() {
 			setTimeout(() => {
 				this.successed = false
-				this.succesMsg = null
+				this.successmsg = null
 			}, 4000)
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
+		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("config_add_config")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("config_delete_config")) {
 				this.candelete = true
 			}
 			this.getSnmpConfig()
+		} else {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
 		}
 	},
 	methods: {
@@ -139,32 +177,80 @@ export default {
 			this.configs = []
 			this.loading = true
 			
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config/snmp", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config/networkscan", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
-					this.loading = false
+					this.getSnmpCommunities()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
-		enableSnmp() {
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/snmp/", this.configs,
-				{ headers: this.header })
-				.then(() => {
-					this.succesMsg = this.$t("message.success_saved")
-					this.successed = true
-					this.errorMsg = null
+		getSnmpCommunities() {
+			this.rowsnmpcomm = []
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+				.then(response => {
+					this.rowsnmpcomm = response.data
+					for (const community of this.rowsnmpcomm) {
+						community.subnets = community.subnets.join('\n')
+					}
+					this.getSnmpTemplateHeader()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getSnmpTemplateHeader() {
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						this.rowtemplateheader.push(field)
+					})
+					this.errormsg = null
+					this.errored = false
+					this.getSnmpTemplates()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		getSnmpTemplates() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os=SNMP", { headers: this.header })
+				.then(response => {
+					this.rowtemplatedata = response.data
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
-					this.succesMsg = null
+				})
+				.finally(() => this.loading = false)
+		},
+		enableSnmp() {
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/networkscan/", this.configs,
+				{ headers: this.header })
+				.then(() => {
+					this.successmsg = this.$t("message.success_saved")
+					this.successed = true
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+					this.successmsg = null
 					this.successed = false
 				})
 		},
+		reloadDatatable() {
+			this.loading = true
+			this.getSnmpCommunities()
+			this.getSnmpTemplates()
+		}
 	}
 }
 </script>

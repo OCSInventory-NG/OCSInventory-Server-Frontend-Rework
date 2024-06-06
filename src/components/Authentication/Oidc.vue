@@ -11,7 +11,7 @@
 		<!-- Display error box message -->
 		<div v-if="errored">
 			<Alert 
-				:message="errorMsg.message" 
+				:message="errormsg.message" 
 				variant="danger"
 			/>
 		</div>
@@ -26,7 +26,7 @@
 					<h2>{{ $t("authentication.oidc_config") }}</h2>
 				</div>
 				<div class="col-auto ms-auto">
-					<EditMappingModal
+					<MappingModal
 						v-if="canaddmapping"
 						:id="oidcdata.id"
 					/>
@@ -58,13 +58,16 @@
 								v-model="oidcdata.config[index]"
 								:disabled="!canedit"
 							/>
-							<b-form-select
+							<v-select
 								v-if="index == 'SIGN_ALGO'"
 								:id="index"
 								v-model="oidcdata.config[index]" 
-								:options="options" 
-								class="mb-3 form-select"
+								:options="options"
+								:reduce="text => text.value"
+								:clearable="false"
 								:disabled="!canedit"
+								label="text"
+								class="mb-3"
 							/>
 							<label 
 								v-if="booleans.includes(index)"
@@ -104,21 +107,19 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
+import axios from 'axios'
 
 export default {
 	name: "Oidc",
-	components: { EditMappingModal },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			loading: true,
 			errored: false,
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			oidcdata: [],
 			canaddmapping: false,
 			header: {
@@ -143,31 +144,31 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_authconfig")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_authconfig")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("add_authmapping")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
 			this.getOidcConfiguration()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getOidcConfiguration() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -178,18 +179,18 @@ export default {
 
 			delete this.oidcdata.mappings
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

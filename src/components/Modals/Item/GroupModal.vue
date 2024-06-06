@@ -1,19 +1,40 @@
 <template>
-	<div id="edit-group-modal">
-		<button 
-			:title="$t('group.editgroup')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="group-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('group.addgroup')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="groupmodal = !groupmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('group.addgroup') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('group.editgroup')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idModal" 
-			v-model="editgroup"
-			:title="$t('group.editgroup')"
+			id="groupmodal" 
+			v-model="groupmodal"
+			:title="(!update) ? $t('group.addgroup') : $t('group.editgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
@@ -21,7 +42,7 @@
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('group.editgroup') }}
+					{{ (!update) ? $t('group.addgroup') : $t('group.editgroup') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -48,15 +69,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<h4>{{ $t('group.group_informations') }}</h4>
@@ -72,9 +93,7 @@
 								id="name"
 								v-model="row.name"
 								required
-							>
-								{{ row.name }}
-							</b-form-input>
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -102,7 +121,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -119,13 +138,14 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import Matrix from '@/components/Matrix/Matrix.vue'
+import axios from 'axios'
 
 export default {
-	name: 'EditGroupModal',
-	components: { Matrix },
+	name: "GroupModal",
 	props: {
+		permissionsprop: { type: Array, default: null },
+		permissionslabelprop: { type: Array, default: null },
+		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
@@ -134,17 +154,16 @@ export default {
 				name: null,
 				permissions: []
 			},
-			permissions: [],
-			permissionslabel: [],
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
-			idModal: 'edit-group'+this.id,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editgroup: false,
+			groupmodal: false,
+			permissions: [],
+			permissionslabel: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -154,21 +173,27 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editgroup = false
+				this.groupmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				this.$emit("reloadDatatable")
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.permissions = this.permissionsprop
+			this.permissionslabel = this.permissionslabelprop
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editgroup = true
+			this.groupmodal = true
 			this.getPermissions(id)
 		},
-		// Get all permissions
 		getPermissions(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -220,37 +245,50 @@ export default {
 					this.getGroup(id)
 				})
 		},
-		// Get groups
 		getGroup(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e
+					this.errormsg = e
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
+			
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"groups/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerror = false
+						this.createerrormsg = null
+					})
+					.catch(e => {
+						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
 		}
 	}
 }

@@ -1,25 +1,47 @@
 <template>
-	<div id="edit-ldap-modal">
-		<button 
-			:title="$t('authentication.editldap')"
-			class="btn btn-ghost-dark"
-			@click="loadData(id)"
+	<div id="ldap-modal">
+		<div 
+			v-if="!update"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'pencil']"
-			/>
-		</button>
-
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('authentication.addldap')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="ldapmodal = !ldapmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('authentication.addldap') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
+		<div v-else>
+			<button 
+				:title="$t('authentication.editldap')"
+				class="btn btn-ghost-dark"
+				@click="loadData(id)"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idmodal"
-			v-model="editldap"
-			:title="$t('authentication.editldap')"
+			id="ldapmodal" 
+			v-model="ldapmodal"
+			:title="(!update) ? $t('authentication.addldap') : $t('authentication.editldap')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('authentication.editldap') }}
+					{{ (!update) ? $t('authentication.addldap') : $t('authentication.editldap') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -46,15 +68,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -126,11 +148,14 @@
 							label="PROTOCOL_VERSION" 
 							label-for="PROTOCOL_VERSION"
 						>
-							<b-form-select
+							<v-select
 								id="PROTOCOL_VERSION"
 								v-model="row.config.PROTOCOL_VERSION" 
 								:options="options" 
-								class="mb-3 form-select"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -158,7 +183,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -175,16 +200,19 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'EditLdapModal',
+	name: "LdapModal",
 	props: {
-		id: { type: Number, default: null }
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null },
+		authid: { type: Number, default: 2 }
 	},
 	data() {
 		return {
 			row: {
+				auth_method: this.authid,
 				enabled: true,
 				priority: 1,
 				config: {
@@ -197,73 +225,92 @@ export default {
 					PROTOCOL_VERSION: 3
 				}
 			},
-			loading: true,
-			errorMsg: null,
+			errormsg: null,
 			errored: false,
+			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			editldap: false,
-			idmodal: 'edit-ldap.'+this.id,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			ldapmodal: false,
 			options: [
 				{ value: 2, text: "v2" },
 				{ value: 3, text: "v3" }
-			]
+			],
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.editaccountinfo = false
+				this.ldapmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadDatatable')
+				this.$emit("reloadDatatable")
 			}, 500)
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.editldap = true
+			this.ldapmodal = true
 			this.getLdapConfig(id)
 		},
 		getLdapConfig(id) {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
 		},
-		// Submit edit ldap config and call refresh datatable to reload
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
-			delete this.row.mappings
 			
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerrormsg = null
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerrormsg = e.message
-					this.createerror = true
-					this.createwithsuccess = false
-				})
-				.finally(() => this.loadingcreate = false)
-		},
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_config/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerror = false
+						this.createerrormsg = null
+					})
+					.catch(e => {
+						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				delete this.row.mappings
+			
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row,
+					{ headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
+		}
 	}
 }
 </script>

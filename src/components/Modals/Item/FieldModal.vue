@@ -1,26 +1,37 @@
 <template>
-	<div id="add-field-modal">
-		<b-button 
+	<div id="field-modal">
+		<b-button
+			v-if="!update"
 			:title="$t('template.addfield')"
 			variant="success"
 			class="add-button"
-			@click="addfield = !addfield"
+			@click="fieldmodal = !fieldmodal"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'plus']"
 			/>
 		</b-button>
-
+		<div v-else>
+			<button 
+				:title="$t('template.editfield')"
+				class="btn btn-ghost-dark"
+				@click="loadData()"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'pencil']"
+				/>
+			</button>
+		</div>
 		<b-modal 
-			:id="idModal"
-			v-model="addfield"
-			:title="$t('template.addfield')"
+			id="fieldmodal" 
+			v-model="fieldmodal"
+			:title="(!update) ? $t('template.addfield') : $t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('template.addfield') }}
+					{{ (!update) ? $t('template.addfield') : $t('template.editfield') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -47,15 +58,15 @@
 					/>
 				</b-button>
 			</template>
+			<Alert 
+				v-if="createerror || errored"
+				:message="(createerror) ? createerrormsg : errormsg" 
+				variant="danger"
+			/>
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<Alert 
-					v-if="createerror"
-					:message="createerrormsg" 
-					variant="danger"
-				/>
 				<b-row>
 					<b-col>
 						<b-form-group
@@ -84,7 +95,9 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="routetype != 'snmp'">
+				<b-row 
+					v-if="routetypemut != 'snmp' && routetype != 'snmp'"
+				>
 					<b-col>
 						<b-form-checkbox
 							id="override_target"
@@ -104,12 +117,24 @@
 								:label="$t('template.retrival_method')" 
 								label-for="retrival_method"
 							>
-								<b-form-select
+								<v-select
 									id="retrival_method"
 									v-model="row.retrival_method" 
 									:options="methodoptions" 
-									class="mb-3 form-select"
-								/>
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!row.retrival_method"
+											v-bind="attributes"
+											v-on="events"
+										>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 					</b-row>
@@ -132,12 +157,24 @@
 								:label="$t('template.retrival_output')" 
 								label-for="retrival_output"
 							>
-								<b-form-select
+								<v-select
 									id="retrival_output"
 									v-model="row.retrival_output" 
 									:options="outputoptions" 
-									class="mb-3 form-select"
-								/>
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!row.retrival_output"
+											v-bind="attributes"
+											v-on="events"
+										>
+									</template>
+								</v-select>
 							</b-form-group>
 						</b-col>
 					</b-row>
@@ -193,7 +230,7 @@
 							</b-row>
 						</div>
 					</div>
-				</div>	
+				</div>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
@@ -204,7 +241,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ $t('generic.add') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -221,13 +258,15 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
-	name: 'AddFieldModal',
+	name: "FieldModal",
 	props: {
+		routetype: { type: String, default: "assets" },
+		rowfielddata: { type: Object, default: null },
 		section: { type: Number, required: true },
-		routetype: { type: String, default: "assets" }
+		update: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -242,19 +281,16 @@ export default {
 				options: {},
 				section: null
 			},
-			options: {},
-			rowdata: [],
+			routetypemut: "assets",
+			errormsg: null,
+			errored: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			idModal: 'add-field'+this.section,
-			addfield: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			fieldmodal: false,
+			options: {},
 			methodoptions: [
 				{ value: 'FILE', text: this.$t('template.FILE') },
 				{ value: 'BASH', text: this.$t('template.BASH') },
@@ -283,47 +319,80 @@ export default {
 					{ id: "multiple", type: "checkbox", default: false },
 					{ id: "separator", type: "text", default: null },
 				]
+			},
+			header: {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.addfield = false
+				this.fieldmodal = false
 				this.createwithsuccess = false
-				this.$emit('reloadTemplate')
+				this.$emit("reloadTemplate")
 			}, 500)
 		}
 	},
 	created() {
-		this.row.section = this.section
-		this.loading = false
+		if(this.$route.path.includes("snmp")) {
+			this.routetypemut = "snmp"
+		}
+	},
+	mounted() {
+		if(!this.update) {
+			this.row.section = this.section
+			this.loading = false
+		}
 	},
 	methods: {
-		// Submit template creation and call getTemplates to reload datatable datas
+		loadData() {
+			this.loading = true
+			this.fieldmodal = true
+			this.row = this.rowfielddata
+			this.options = this.row.options
+			this.loading = false
+		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
 			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+				this.row.options = {}
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
 					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
 						this.options[element.id] : element.default
 				})
 			}
 			
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerror = false
-					this.createerrormsg = null
-				})
-				.catch(e => {
-					this.createwithsuccess = false
-					this.createerror = true
-					this.createerrormsg = e.message
-				})
-				.finally(() => this.loadingcreate = false)
+			if(!this.update) {
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerror = false
+						this.createerrormsg = null
+					})
+					.catch(e => {
+						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
+					})
+					.finally(() => this.loadingcreate = false)
+			} else {
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerrormsg = null
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerrormsg = e.message
+						this.createerror = true
+						this.createwithsuccess = false
+					})
+					.finally(() => this.loadingcreate = false)
+			}			
 		}
 	}
 }

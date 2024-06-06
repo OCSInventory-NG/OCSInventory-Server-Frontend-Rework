@@ -25,7 +25,7 @@
 				:disabled="!canedit"
 				tag="tbody"
 				handle=".handle"
-				@change="updatePriority"
+				@end="onEnd"
 			>
 				<template #item="{ element }">
 					<tr>
@@ -47,7 +47,7 @@
 						>
 							<b-button-toolbar>
 								<b-button-group class="mr-1">
-									<EditMappingModal 
+									<MappingModal 
 										v-if="canaddmapping"
 										:id="element.id"
 									/>
@@ -56,9 +56,10 @@
 										:is="editcomponent"
 										v-if="canedit"
 										v-bind="{ id: element.id }"
+										:update="true"
 										@reloadDatatable="reloadDatatable"
 									/>
-									<delete-item-modal 
+									<DeleteItemModal 
 										v-if="candelete"
 										:id="element.id"
 										:name="element.name"
@@ -84,27 +85,23 @@
 
 <script>
 import draggable from 'vuedraggable'
-import Axios from 'axios'
-import EditActionListModal from '@/components/Modals/EditItem/EditActionListModal.vue'
-import EditLdapModal from '@/components/Modals/EditItem/EditLdapModal.vue'
-import EditMappingModal from '@/components/Modals/EditItem/EditMappingModal.vue'
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
+import axios from 'axios'
+import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
+import LdapModal from '@/components/Modals/Item/LdapModal.vue'
 
 export default {
 	name: "DraggableComponent",
 	components: { 
 		draggable,
-		EditActionListModal,
-		EditLdapModal,
-		EditMappingModal,
-		DeleteItemModal
+		ActionListModal,
+		LdapModal
 	},
 	props: {
 		rowdata: { type: Array, default: null },
 		rowheader: { type: Array, default: null },
 		translationkey: { type: String, default: "deployment." },
 		apiroute: { type: String, default: "deployment/actions" },
-		editcomponent: { type: String, default: "EditActionListModal" },
+		editcomponent: { type: String, default: "ActionListModal" },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false }
@@ -123,27 +120,21 @@ export default {
 		this.rowdatas.sort((a,b) => a.priority - b.priority)
 	},
 	methods: {
-		updatePriority(event) {
+		onEnd(event) {
 			event.preventDefault
 
-			var priority = 1
-			var index = 0
-
-			this.rowdatas.forEach(action => {
-				this.rowdatas[index].priority = priority
-
-				var json = {
-					priority: priority
-				}
-
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+action.id+"/", json, { headers: this.header })
-					.catch(e => {
-						console.log(e)
-					})
-
-				index += 1
-				priority += 1
-			});
+			this.rowdatas[event.newIndex].priority = event.newIndex + 1
+			axios.patch(
+				import.meta.env.VITE_APP_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
+				this.rowdatas[event.newIndex],
+				{ headers: this.header }
+			)
+				.then(() => {
+					this.$emit('reloadDatatable')
+				})
+				.catch(e => {
+					console.log(e)
+				})			
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')

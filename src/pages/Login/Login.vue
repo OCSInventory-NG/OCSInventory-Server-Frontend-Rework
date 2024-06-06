@@ -15,6 +15,12 @@
 			</div>
 
 			<div class="col-4 form-login">
+				<section v-if="errored">
+					<Alert 
+						:message="errormsg" 
+						variant="danger"
+					/>
+				</section>
 				<BForm 
 					class="mt" 
 					@submit="onSubmit"
@@ -65,13 +71,14 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: "Login",
 	data() {
 		return {
-			errorMessage: null,
+			errormsg: null,
+			errored: false,
 			sso: false,
 			redirect_url: null,
 			username: null,
@@ -86,15 +93,18 @@ export default {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
-		Axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
+		axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
 			.then(response => {
 				if(response.data) {
+					this.errored = false
+					this.errormsg = null
 					this.sso = response.data.SSO
 					this.redirect_url = response.data.redirect_url+window.location.origin
 				}
 			})
 			.catch(e => {
-				this.errorMessage = e.message
+				this.errored = true
+				this.errormsg = e.message
 			})
 	},
 	methods: {
@@ -112,19 +122,21 @@ export default {
 				"Content-Type": "application/json;charset=utf-8"
 			}
 
-			Axios.post(import.meta.env.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
 				.then(response => {
-					this.errorMessage = null
+					this.errored = false
+					this.errormsg = null
 					localStorage.setItem('token_authentication', response.data.token)
 					localStorage.setItem('authenticated', true)
 					localStorage.setItem('locale', this.$root.$i18n.locale)
 					this.getPermissions()
 				})
 				.catch(e => {
+					this.errored = true
 					if(e.response.data.non_field_errors) {
-						this.errorMessage = e.response.data.non_field_errors[0]
+						this.errormsg = e.response.data.non_field_errors[0]
 					} else {
-						this.errorMessage = e.message
+						this.errormsg = e.message
 					}
 				})
 		},
@@ -134,17 +146,21 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {
+						this.errored = false
+						this.errormsg = null
 						localStorage.setItem('permissions', tmpUser)
 						this.$router.push('/dashboard')
 					}
-					this.errorMessage = this.$t("message.error_no_permissions")
+					this.errored = true
+					this.errormsg = this.$t("message.error_no_permissions")
 				})
 				.catch(e => {
-					this.errorMessage = e.message
+					this.errored = true
+					this.errormsg = e.message
 				})
 		}
 	}

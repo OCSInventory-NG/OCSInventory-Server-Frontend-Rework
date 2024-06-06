@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -36,12 +36,10 @@
 </template>
 
 <script>
-//import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
+//import axios from 'axios'
 
 export default {
 	name: 'Report',
-	components: { PageHeader },
 	data() {
 		return {
 			canview: false,
@@ -50,7 +48,7 @@ export default {
 			canedit: false,
 			loading: true,
 			errored: false,
-			errorMsg: null,
+			errormsg: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -58,19 +56,19 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_result")) {
+		if(localStorage.getItem('permissions').split(",").includes("result_view_result")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_add_result")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_change_result")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_delete_result")) {
 				this.candelete = true
 			}
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	}

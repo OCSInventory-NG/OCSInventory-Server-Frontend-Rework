@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</div>
@@ -37,7 +37,7 @@
 								:rowheader="rowheader"
 								title="assetgroups"
 								translationkey="assetgroup."
-								editcomponent="EditAssetGroupModal"
+								editcomponent="AssetGroupModal"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -49,15 +49,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue' 
+import axios from 'axios'
 
 export default {
 	name: 'AssetGroup',
-	components: { PageHeader },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			rowheader: [],
 			loading: true,
@@ -73,40 +71,40 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_assetgroup")) {
-			if(localStorage.getItem('permissions').split(",").includes("change_assetgroup")) {
+		if(localStorage.getItem('permissions').split(",").includes("asset_group_view_assetgroup")) {
+			if(localStorage.getItem('permissions').split(",").includes("asset_group_change_assetgroup")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_assetgroup")) {
+			if(localStorage.getItem('permissions').split(",").includes("asset_group_delete_assetgroup")) {
 				this.candelete = true
 			}
 			this.getHeader()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 		}
 	},
 	methods: {
 		getHeader() {
-			Axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "assets") {
 							this.rowheader.push(field)
 						}
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getAssetGroups()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getAssetGroups() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const group of response.data) {
 						group.visibility = this.$t("assetgroup."+group.visibility)
@@ -114,18 +112,18 @@ export default {
 						group.allow_group_modification = this.$t("generic."+group.allow_group_modification)
 					}
 					this.rowdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getUserName()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
 		getUserName() {
 			for (const group of this.rowdata) {
-				Axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
+				axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							group.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -134,7 +132,7 @@ export default {
 						}
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
 					})
 			}
@@ -146,14 +144,14 @@ export default {
 				if(row.groups) {
 					for (const group of row.groups) {
 						this.loading = true
-						Axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+						axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)
 								this.rowdata[key].groups = this.groups[key].join(", ")
 							})
 							.catch(e => {
-								this.errorMsg = e.message
+								this.errormsg = e.message
 								this.errored = true
 							})
 							.finally(() => { this.loading = false })

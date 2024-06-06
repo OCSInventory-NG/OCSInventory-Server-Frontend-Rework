@@ -11,7 +11,7 @@
 		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
-				:message="errorMsg" 
+				:message="errormsg" 
 				variant="danger"
 			/>
 		</section>
@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import Axios from 'axios'
+import axios from 'axios'
 
 export default {
 	name: 'Accountinfo',
@@ -130,8 +130,8 @@ export default {
 		return {
 			rowdata: [],
 			loading: true,
-			errorMsg: null,
-			succesMsg: null,
+			errormsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			create: true,
@@ -152,7 +152,7 @@ export default {
 	},
 	methods: {
 		getAccountinfoConfig() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -163,12 +163,12 @@ export default {
 							values: this.getAccountinfoValue(rowDetails.accountinfo_values)
 						})
 					})
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getAccountinfoData()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -184,7 +184,7 @@ export default {
 			return array
 		},
 		getAccountinfoData() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data?object_slug="
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
@@ -197,11 +197,11 @@ export default {
 						}
 					})
 
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -220,32 +220,32 @@ export default {
 			})
 
 			if(this.create) {
-				Axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e.message
+						this.errormsg = e.message
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			} else {
-				Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
-						this.errorMsg = null
+						this.errormsg = null
 						this.errored = false
 					})
 					.catch(e => {
-						this.errorMsg = e
+						this.errormsg = e
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			}

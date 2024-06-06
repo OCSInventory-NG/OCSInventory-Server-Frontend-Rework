@@ -15,7 +15,7 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -48,16 +48,13 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
-import IpdiscoverCollapse from '@/components/Collapse/Ipdiscover/IpdiscoverCollapse.vue'
+import axios from 'axios'
 
 export default {
 	name: "Ipdiscover",
-	components: { IpdiscoverCollapse, PageHeader },
 	data() {
 		return {
-			errorMsg: null,
+			errormsg: null,
 			rowdata: [],
 			rowheader: {
 				id: "id",
@@ -82,34 +79,34 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_network")) {
-			if(localStorage.getItem('permissions').split(",").includes("change_network")) {
+		if(localStorage.getItem('permissions').split(",").includes("network_view_network")) {
+			if(localStorage.getItem('permissions').split(",").includes("network_change_network")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_network")) {
+			if(localStorage.getItem('permissions').split(",").includes("network_delete_network")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("view_netdevice")) {
+			if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
 			this.getNetworks()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
 		// Retrieve networks group
 		getNetGroup() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroupdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.dataFormatting()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},
@@ -118,15 +115,15 @@ export default {
 			this.networkdata = []
 			this.netgroupdata = []
 			this.rowdata = []
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networkdata = response.data
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 					this.getNetGroup()
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 				})
 		},

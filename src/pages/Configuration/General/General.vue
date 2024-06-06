@@ -23,7 +23,7 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errorMsg" 
+								:message="errormsg" 
 								variant="danger"
 							/>
 						</section>
@@ -220,17 +220,15 @@
 </template>
 
 <script>
-import Axios from 'axios'
-import PageHeader from '@/components/Header/PageHeader.vue'
+import axios from 'axios'
 
 export default {
 	name: 'General',
-	components: { PageHeader },
 	data() {
 		return {
 			configs: [],
-			errorMsg: null,
-			succesMsg: null,
+			errormsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
@@ -256,21 +254,21 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_config")) {
+		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("change_config")) {
+			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
 				this.canedit = true
 			}
 			this.getConfig()
 		} else {
-			this.errorMsg = this.$t("message.dont_have_right_to_see")
+			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}	
 	},
 	methods: {
 		// Get all config
 		getConfig() {
-			Axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					for(const config of response.data) {
 						if(config.name != "snmp") {
@@ -280,7 +278,7 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
 					this.loading = false
 				})
@@ -290,18 +288,18 @@ export default {
 
 			var configToUpdate = this.configs[this.activetab].name
 
-			Axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
-					this.errorMsg = null
+					this.errormsg = null
 					this.errored = false
 				})
 				.catch(e => {
-					this.errorMsg = e.message
+					this.errormsg = e.message
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}
