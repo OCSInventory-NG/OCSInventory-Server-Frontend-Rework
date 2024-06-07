@@ -325,16 +325,19 @@
 							<component 
 								:is="editcomponent"
 								v-if="canedit"
-								v-bind="{ id: row.item.id }"
+								v-bind="{ id: row.item.id || row.item.identifier }"
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
 							<DeleteItemModal 
 								v-if="candelete"
-								:id="row.item.id"
+								:id="row.item.id || row.item.identifier"
 								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
-								:name="row.item.name || row.item.username || $t('generic.removeselection')"
+								:name="row.item.name 
+									|| row.item.username 
+									|| row.item.identifier 
+									|| $t('generic.removeselection')"
 								:parameter="deleterte"
 								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
@@ -377,6 +380,7 @@ import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
+import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate.vue'
 
 export default {
@@ -398,6 +402,7 @@ export default {
 		PackageModal,
 		PackageResultModal,
 		SnmpModal,
+		SnmpScannerModal,
 		EditTemplate
 	},
 	props: {

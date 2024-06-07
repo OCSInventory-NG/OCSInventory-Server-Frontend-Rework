@@ -1,5 +1,5 @@
 <template>
-	<div id="snmp-modal">
+	<div id="snmp-scanner-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('network.addsnmpcommunity')"
+						:title="$t('network.addsnmpscanner')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="snmpmodal = !snmpmodal"
+						@click="snmpscannermodal = !snmpscannermodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('network.addsnmpcommunity') }}
+						{{ $t('network.addsnmpscanner') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('network.editsnmpcommunity')"
+				:title="$t('network.editsnmpscanner')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,16 +32,16 @@
 			</button>
 		</div>
 		<b-modal 
-			id="snmpmodal" 
-			v-model="snmpmodal"
-			:title="(!update) ? $t('network.addsnmpcommunity') : $t('network.editsnmpcommunity')"
+			id="snmpscannermodal" 
+			v-model="snmpscannermodal"
+			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('network.addsnmpcommunity') : $t('network.editsnmpcommunity') }}
+					{{ (!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -80,13 +80,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.name')" 
-							label-for="name"
+							:label="$t('network.identifier')" 
+							label-for="identifier"
 						>
 							<b-form-input
-								id="name"
-								v-model="row.name"
+								id="identifier"
+								v-model="row.identifier"
 								required
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
@@ -94,130 +95,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.version')" 
-							label-for="version"
-						>
-							<b-form-select
-								id="version"
-								v-model="row.version" 
-								:options="voptions" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.user')" 
-							label-for="user"
+							:label="$t('network.ip')" 
+							label-for="ip"
 						>
 							<b-form-input
-								id="user"
-								v-model="row.user"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.level')" 
-							label-for="level"
-						>
-							<b-form-select
-								id="level"
-								v-model="row.level" 
-								:options="loptions" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.password')" 
-							label-for="password"
-						>
-							<b-form-input
-								id="password"
-								v-model="row.password"
-								type="password"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.auth_protocol')" 
-							label-for="auth_protocol"
-						>
-							<b-form-select
-								id="auth_protocol"
-								v-model="row.auth_protocol" 
-								:options="apoptions" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.priv_protocol')" 
-							label-for="priv_protocol"
-						>
-							<b-form-select
-								id="priv_protocol"
-								v-model="row.priv_protocol" 
-								:options="ppoptions" 
-								class="mb-3 form-select"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.priv_password')" 
-							label-for="priv_password"
-						>
-							<b-form-input
-								id="priv_password"
-								v-model="row.priv_password"
-								type="password"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.retries')" 
-							label-for="retries"
-						>
-							<b-form-input
-								id="retries"
-								v-model="row.retries"
-								type="number"
+								id="ip"
+								v-model="row.ip"
 								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('network.timeout')" 
-							label-for="timeout"
-						>
-							<b-form-input
-								id="timeout"
-								v-model="row.timeout"
-								type="number"
-								required
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
@@ -226,11 +111,42 @@
 					<b-col>
 						<b-form-group
 							:label="$t('network.subnets')" 
-							label-for="subnets"
+							label-for="subnetstoscan"
 						>
 							<b-form-textarea
-								id="subnets"
+								id="subnetstoscan"
 								v-model="row.subnets"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('network.notes')" 
+							label-for="notes"
+						>
+							<b-form-input
+								id="notes"
+								v-model="row.notes"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('network.snmpcommunity')" 
+							label-for="configs"
+						>
+							<v-select
+								id="configs"
+								v-model="row.configs"
+								:options="configs"
+								:reduce="text => text.value"
+								label="text"
+								class="mb-3"
+								multiple
 							/>
 						</b-form-group>
 					</b-col>
@@ -265,24 +181,19 @@
 import axios from 'axios'
 
 export default {
-	name: "SnmpModal",
+	name: "SnmpScannerModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: String, default: null }
 	},
 	data() {
 		return {
 			row: {
-				name: null,
-				version: "2c",
-				user: null,
-				level: null,
-				password: null,
-				auth_protocol: null,
-				priv_protocol: null,
-				retries: 1,
-				timeout: 30,
-				subnets: null
+				identifier: null,
+				ip: null,
+				subnets: null,
+				notes: null,
+				configs: []
 			},
 			errormsg: null,
 			errored: false,
@@ -293,28 +204,8 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			snmpmodal: false,
-			voptions: [
-				{value: "1", text: "1"},
-				{value: "2c", text: "2c"},
-				{value: "3", text: "3"},
-			],
-			loptions: [
-				{value: null, text: this.$t("generic.none")},
-				{value: "noAuthNoPriv", text: "noAuthNoPriv"},
-				{value: "authNoPriv", text: "authNoPriv"},
-				{value: "authPriv", text: "authPriv"},
-			],
-			apoptions: [
-				{value: null, text: this.$t("generic.none")},
-				{value: "MD5", text: "MD5"},
-				{value: "SHA-1", text: "SHA-1"},
-			],
-			ppoptions: [
-				{value: null, text: this.$t("generic.none")},
-				{value: "DES", text: "DES"},
-				{value: "AES", text: "AES"},
-			],
+			snmpscannermodal: false,
+			configs: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -324,28 +215,51 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.snmpmodal = false
+				this.snmpscannermodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
 	mounted() {
-		if(!this.update) {
-			this.loading = false
-		}
+		this.getCommunities()
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.snmpmodal = true
-			this.getSnmpConfig(id)
+			this.snmpscannermodal = true
+			this.getSnmpScanner(id)
 		},
-		getSnmpConfig(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+id, { headers: this.header })
+		getSnmpScanner(id) {
+			this.row = []
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")
+					var configs = this.row.configs
+					this.row.configs = []
+					for (const config of configs) {
+						this.row.configs.push(config.id)
+					}
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		},
+		getCommunities() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+				.then(response => {
+					this.configs = []
+					for (const config of response.data) {
+						this.configs.push({
+							value: config.id,
+							text: config.name
+						})
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -366,7 +280,7 @@ export default {
 			}
 
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/", this.row,
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
@@ -380,7 +294,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+this.id+"/", this.row,
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
