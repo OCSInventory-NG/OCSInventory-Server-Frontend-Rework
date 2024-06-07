@@ -78,15 +78,15 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("group_view_group")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_view_group")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("group_add_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_add_group")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("group_change_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_change_group")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("group_delete_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_delete_group")) {
 				this.candelete = true
 			}
 			this.getHeader()
