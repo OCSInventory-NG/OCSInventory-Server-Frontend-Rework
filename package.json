@@ -1,6 +1,7 @@
 {
-  "name": "ocsreports",
+  "name": "ocsinventory-frontend",
   "version": "0.1.0",
+  "description": "Web UI for OCS Inventory API",
   "private": true,
   "scripts": {
     "build": "vite build",
