@@ -228,7 +228,7 @@ export default {
 			this.getScheduler(id)
 		},
 		getScheduler(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -245,7 +245,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
+				axios.post(this.$config.VITE_APP_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerror = false
@@ -258,7 +258,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
+				axios.patch(this.$config.VITE_APP_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
 					this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

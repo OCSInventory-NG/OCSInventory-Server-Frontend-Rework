@@ -193,7 +193,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
+				axios.post(this.$config.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

@@ -208,7 +208,7 @@ export default {
 			this.getRules(id)
 		},
 		getRules(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"automation/rule/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -225,7 +225,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
+				axios.post(this.$config.VITE_APP_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -241,7 +241,7 @@ export default {
 				delete this.row.logic
 				delete this.row.actions
 				
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
+				axios.patch(this.$config.VITE_APP_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

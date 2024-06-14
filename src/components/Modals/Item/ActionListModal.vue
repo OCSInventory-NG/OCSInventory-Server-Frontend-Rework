@@ -226,7 +226,7 @@ export default {
 			this.getAction(id)
 		},
 		getAction(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -259,7 +259,7 @@ export default {
 			})
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
+				axios.post(this.$config.VITE_APP_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -272,7 +272,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
+				axios.patch(this.$config.VITE_APP_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

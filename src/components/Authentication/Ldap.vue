@@ -145,7 +145,7 @@ export default {
 	},
 	methods: {
 		getLdapConfiguration() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
 				.then(response => {
 					this.ldapdata = response.data
 					this.errormsg = null
@@ -172,7 +172,7 @@ export default {
 				priority: state
 			}
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			axios.patch(this.$config.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"
 					this.successed = true
@@ -192,7 +192,7 @@ export default {
 			this.getLdapConfig()
 		},
 		getLdapConfig() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
 				.then(response => {
 					var tmpLdap = response.data
 

@@ -87,7 +87,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.options(this.$config.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "assets") {
@@ -104,7 +104,7 @@ export default {
 				})
 		},
 		getAssetGroups() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const group of response.data) {
 						group.visibility = this.$t("assetgroup."+group.visibility)
@@ -123,7 +123,7 @@ export default {
 		},
 		getUserName() {
 			for (const group of this.rowdata) {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
+				axios.get(this.$config.VITE_APP_API_ROUTE+"users/"+group.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							group.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -144,7 +144,7 @@ export default {
 				if(row.groups) {
 					for (const group of row.groups) {
 						this.loading = true
-						axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+						axios.get(this.$config.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)

@@ -80,7 +80,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.options(this.$config.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -97,7 +97,7 @@ export default {
 				})
 		},
 		getAssets() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null

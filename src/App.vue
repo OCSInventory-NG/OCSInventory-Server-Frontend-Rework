@@ -17,7 +17,7 @@ export default {
 		var sso = window.location.search
 
 		if(sso) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"callback/"+sso, { headers: header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"callback/"+sso, { headers: header })
 				.then(response => {
 					if(response.data.token_authentication) {
 						localStorage.setItem('token_authentication', response.data.token_authentication)
@@ -33,7 +33,7 @@ export default {
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
 			|| localStorage.getItem('permissions') === null) {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+"login/", { headers: header })
+				axios.get(this.$config.VITE_APP_API_ROUTE+"login/", { headers: header })
 					.then(response => {
 						if(response.data) {
 							if(response.data.auto_redirect) {
@@ -61,7 +61,7 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {

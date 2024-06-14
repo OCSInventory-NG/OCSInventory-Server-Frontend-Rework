@@ -263,7 +263,7 @@ export default {
 			this.getLdapConfig(id)
 		},
 		getLdapConfig(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"auth_config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -280,7 +280,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_config/", this.row, { headers: this.header })
+				axios.post(this.$config.VITE_APP_API_ROUTE+"auth_config/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerror = false
@@ -295,7 +295,7 @@ export default {
 			} else {
 				delete this.row.mappings
 			
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row,
+				axios.patch(this.$config.VITE_APP_API_ROUTE+"auth_config/"+this.row.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

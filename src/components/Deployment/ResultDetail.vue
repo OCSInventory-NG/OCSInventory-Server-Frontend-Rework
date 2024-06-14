@@ -75,7 +75,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/results", { headers: this.header })
+			axios.options(this.$config.VITE_APP_API_ROUTE+"deployment/results", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "package") {
@@ -111,7 +111,7 @@ export default {
 				this.parameter = "asset=" + this.id
 			}
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
+			axios.get(this.$config.VITE_APP_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
 				.then(response => {
 					if(this.group) {
 						this.calculForGroup(response.data)
