@@ -340,7 +340,7 @@ export default {
 			}
 			
 			if(!this.update) {
-				axios.post(this.$config.VITE_APP_API_ROUTE+"sections/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -355,7 +355,7 @@ export default {
 			} else {
 				delete this.row.fields
 
-				axios.patch(this.$config.VITE_APP_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(this.$config.BACKEND_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

@@ -204,7 +204,7 @@ export default {
 			this.getPackages(id)
 		},
 		getPackages(id) {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -221,7 +221,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(this.$config.VITE_APP_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -237,7 +237,7 @@ export default {
 				delete this.row.actions_list
 				delete this.row.result
 				
-				axios.patch(this.$config.VITE_APP_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
+				axios.patch(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

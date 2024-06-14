@@ -79,7 +79,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(this.$config.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "last_updated") {
@@ -98,7 +98,7 @@ export default {
 		getSavedSearches() {
 			this.rowdata = []
 			this.loading = true
-			axios.get(this.$config.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					for (const search of response.data) {
 						delete search.search
@@ -120,7 +120,7 @@ export default {
 		},
 		getUserName() {
 			for (const search of this.rowdata) {
-				axios.get(this.$config.VITE_APP_API_ROUTE+"users/"+search.user, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+"users/"+search.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							search.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -141,7 +141,7 @@ export default {
 				if(search.groups) {
 					for (const group of search.groups) {
 						this.loading = true
-						axios.get(this.$config.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+						axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)

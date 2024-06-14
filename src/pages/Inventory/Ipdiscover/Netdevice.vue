@@ -82,7 +82,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(this.$config.VITE_APP_API_ROUTE+"netdevices", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"netdevices", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -101,7 +101,7 @@ export default {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?network="+this.$route.params.id
 
-			axios.get(this.$config.VITE_APP_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null

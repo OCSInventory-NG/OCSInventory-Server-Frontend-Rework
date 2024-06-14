@@ -102,7 +102,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(this.$config.VITE_APP_API_ROUTE+"accountinfo/config", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"accountinfo/config", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -117,7 +117,7 @@ export default {
 				})
 		},
 		getAccountinfoConfig() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"accountinfo/config/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
 					this.config = response.data
 					this.accountinfovaluesTreatment()

@@ -185,7 +185,7 @@ export default {
 			this.getNetworks(id)
 		},
 		getNetworks(id) {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"networks/"+id+"/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"networks/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -198,7 +198,7 @@ export default {
 				})
 		},
 		getNetGroup() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroup.push({
 						value: null,
@@ -223,7 +223,7 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 			
-			axios.patch(this.$config.VITE_APP_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
+			axios.patch(this.$config.BACKEND_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

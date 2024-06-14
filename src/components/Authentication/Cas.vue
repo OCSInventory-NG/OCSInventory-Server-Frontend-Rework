@@ -156,7 +156,7 @@ export default {
 	},
 	methods: {
 		getCasConfiguration() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
 					this.errormsg = null
@@ -174,7 +174,7 @@ export default {
 
 			delete this.casdata.mappings
 			
-			axios.patch(this.$config.VITE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
 				{ headers: this.header })
 				.then(() => {
 					this.succesMsg = "success"

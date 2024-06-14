@@ -192,7 +192,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(this.$config.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -207,7 +207,7 @@ export default {
 				})
 		},
 		getAssetGroup() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
 				.then(response => {
 					this.assets = response.data.assets
 					delete response.data.assets
@@ -222,7 +222,7 @@ export default {
 				})
 		},
 		getUserName() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
 				.then(response => {
 					if(response.data.first_name != "") {
 						this.groupinfo.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -240,7 +240,7 @@ export default {
 			this.groups = []
 			if(this.groupinfo.groups) {
 				for (const group of this.groupinfo.groups) {
-					axios.get(this.$config.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+					axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 						.then(response => {
 							this.groups.push(response.data.name)
 							this.groupinfo.groups = this.groups.join(", ")
@@ -257,7 +257,7 @@ export default {
 			this.rowdata = []
 			for (const asset of this.assets) {
 				this.loading = true
-				axios.get(this.$config.VITE_APP_API_ROUTE+"asset/bases/"+asset, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+asset, { headers: this.header })
 					.then(response => {
 						this.rowdata.push(response.data)
 					})

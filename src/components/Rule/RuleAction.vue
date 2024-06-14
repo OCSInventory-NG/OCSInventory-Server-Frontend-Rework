@@ -320,7 +320,7 @@ export default {
 			}
 
 			if(model == "accountinfo.accountinfoconfig") {
-				axios.get(this.$config.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 						this.fieldopt[index] = []
@@ -342,7 +342,7 @@ export default {
 					})
 					.finally(() => this.loadingfield = false)
 			} else {
-				axios.options(this.$config.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.options(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingfield = true
 
@@ -403,7 +403,7 @@ export default {
 					route = "templates"
 				}
 
-				axios.get(this.$config.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
@@ -421,7 +421,7 @@ export default {
 						this.errored = true
 					})
 			} else if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				axios.get(this.$config.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingselect = true
@@ -511,7 +511,7 @@ export default {
 
 			this.actionupdate.forEach(action => {
 				if(action.id != null) {
-					axios.patch(this.$config.VITE_APP_API_ROUTE+"automation/action/"+action.id+"/", action, 
+					axios.patch(this.$config.BACKEND_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
@@ -530,7 +530,7 @@ export default {
 					delete action.object_id
 					delete action.object_slug
 
-					axios.post(this.$config.VITE_APP_API_ROUTE+"automation/action/", action, 
+					axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.succesMsg = "success"
@@ -548,7 +548,7 @@ export default {
 			})
 
 			actionremove.forEach(id => {
-				axios.delete(this.$config.VITE_APP_API_ROUTE+"automation/action/"+id, { headers: this.header })
+				axios.delete(this.$config.BACKEND_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
 						this.succesMsg = "success"
 						this.successed = true

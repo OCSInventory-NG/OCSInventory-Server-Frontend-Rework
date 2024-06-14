@@ -125,7 +125,7 @@ export default {
 
 			this.rowdatas[event.newIndex].priority = event.newIndex + 1
 			axios.patch(
-				this.$config.VITE_APP_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
+				this.$config.BACKEND_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
 				this.rowdatas[event.newIndex],
 				{ headers: this.header }
 			)

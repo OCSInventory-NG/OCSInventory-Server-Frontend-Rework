@@ -93,7 +93,7 @@ export default {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
-		axios.get(this.$config.VITE_APP_API_ROUTE+"login/", { headers: header })
+		axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
 			.then(response => {
 				if(response.data) {
 					this.errored = false
@@ -122,7 +122,7 @@ export default {
 				"Content-Type": "application/json;charset=utf-8"
 			}
 
-			axios.post(this.$config.VITE_APP_API_ROUTE+"api-auth/token", loginOptions, { header })
+			axios.post(this.$config.BACKEND_API_ROUTE+"api-auth/token", loginOptions, { header })
 				.then(response => {
 					this.errored = false
 					this.errormsg = null
@@ -146,7 +146,7 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 
-			axios.get(this.$config.VITE_APP_API_ROUTE+"myaccount/", { headers: header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: header })
 				.then(responseAccount => {
 					var tmpUser = responseAccount.data.full_permissions
 					if(tmpUser.length != 0) {

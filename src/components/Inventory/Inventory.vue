@@ -135,7 +135,7 @@ export default {
 	},
 	methods: {
 		getInventory() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
 				.then(response => {
 					for (const inventory of response.data) {
 						var sectionName = this.allsections[inventory.template_section].name
@@ -184,7 +184,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		getSection() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"sections", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"sections", { headers: this.header })
 				.then(response => {
 					for (const section of response.data) {
 						this.allsections[section.id] = section

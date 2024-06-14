@@ -305,7 +305,7 @@ export default {
 			this.loading = true
 			this.assetgroupmodal = true
 
-			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
 				.then(response => {
 					delete response.data.search
 					delete response.data.assets
@@ -322,7 +322,7 @@ export default {
 				})
 		},
 		getUserName() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					if(response.data.first_name != "") {
@@ -341,7 +341,7 @@ export default {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			this.assetgroupmodal = true
-			axios.get(this.$config.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					this.errormsg = null
@@ -359,7 +359,7 @@ export default {
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				axios.get(this.$config.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -375,7 +375,7 @@ export default {
 			this.loading = false
 		},
 		getMyAssetGroups() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"asset/groups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
@@ -414,7 +414,7 @@ export default {
 				}
 
 				if(this.groupaction == "create") {
-					axios.post(this.$config.VITE_APP_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
+					axios.post(this.$config.BACKEND_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null
@@ -427,7 +427,7 @@ export default {
 						})
 						.finally(() => { this.loadingcreate = false })
 				} else {
-					axios.patch(this.$config.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
+					axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
 						{ headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
@@ -449,7 +449,7 @@ export default {
 					this.rowgroup.allow_group_modification = false
 				}
 
-				axios.patch(this.$config.VITE_APP_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
+				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

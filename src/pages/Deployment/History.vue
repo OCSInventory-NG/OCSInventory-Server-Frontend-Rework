@@ -74,7 +74,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(this.$config.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") {
@@ -95,7 +95,7 @@ export default {
 				})
 		},
 		getPackages() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length

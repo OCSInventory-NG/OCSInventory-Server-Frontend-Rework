@@ -99,7 +99,7 @@ export default {
 	methods: {
 		getHeader() {
 			if(this.canview) {
-				axios.options(this.$config.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+				axios.options(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
 					.then(response => {
 						Object.keys(response.data.actions.POST).forEach(field => {
 							if(!this.excludefields.includes(field)) {
@@ -120,7 +120,7 @@ export default {
 			}
 		},
 		getRules() {
-			axios.get(this.$config.VITE_APP_API_ROUTE+"automation/rule/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(element => {
 						element.trigger = this.$t("rule." + element.trigger)
