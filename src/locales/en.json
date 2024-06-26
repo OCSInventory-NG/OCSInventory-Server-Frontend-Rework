@@ -401,6 +401,7 @@
     "addfield": "Add a new field",
     "addsection": "Add a new section",
     "addtemplate": "Add a new template",
+    "assign": "Assign an inventory template",
     "BASH": "Bash Command",
     "CMD": "Cmd Command",
     "editfield": "Edit the field",
