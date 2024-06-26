@@ -302,7 +302,7 @@
 								/>
 							</button>
 							<!-- Do all actions button -->
-							<DoAllActionsItemModal 
+							<DoAllActionsItemModal
 								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
 								:id="row.item.id"
 								:route="adddvalueroute"
@@ -312,7 +312,7 @@
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Edit button -->
-							<component 
+							<component
 								:is="editcomponent"
 								v-if="canedit"
 								v-bind="{ id: row.item.id }"
@@ -320,7 +320,7 @@
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
-							<DeleteItemModal 
+							<DeleteItemModal
 								v-if="candelete"
 								:id="row.item.id"
 								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
@@ -344,6 +344,17 @@
 					:per-page="perPage"
 					align="right"
 					size="sm"
+				/>
+			</b-col>
+			<b-col align="right">
+				<!-- Delete button -->
+				<DeleteItemModal
+					v-if="candelete"
+					:ids="selectedids"
+					:name="$t('generic.removeselection')"
+					:parameter="deleterte"
+					:multiple="true"
+					@reloadDatatable="reloadDatatable"
 				/>
 			</b-col>
 		</b-row>
@@ -437,6 +448,7 @@ export default {
 			// Select row parameter
 			selectMode: 'multi',
 			selected: [],
+			selectedids: [],
 			isChecked: false,
 			// Sort datatable parameters
 			sortDesc: null,
@@ -564,6 +576,7 @@ export default {
 		},
 		onRowSelected(item) {
 			this.selected.push(item)
+			this.selectedids.push(item.id)
 			this.attributePackage()
 		},
 		onRowUnselected(item) {
@@ -571,6 +584,10 @@ export default {
 				this.selected.findIndex(
 					v => v.id === item.id
 				),
+				1
+			)
+			this.selectedids.splice(
+				this.selectedids.indexOf(item.id),
 				1
 			)
 			this.attributePackage()
