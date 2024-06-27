@@ -129,6 +129,7 @@
   "dashboard": {
     "contacted": "Contacted today",
     "lastcontacted": "Assets last contacted in the last 7 days",
+    "legacy": "Legacy",
     "linux": "Linux",
     "macos": "MacOS",
     "nbassets": "Assets number",
