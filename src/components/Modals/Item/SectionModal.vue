@@ -90,7 +90,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
+				<b-row>
 					<b-col>
 						<b-form-group
 							:label="$t('template.retrival_method')" 
@@ -99,8 +99,8 @@
 							<v-select
 								id="retrival_method"
 								v-model="row.retrival_method" 
-								:options="methodoptions" 
-
+								:options="(routetype != 'snmp' && routetypemut != 'snmp') ?
+									methodoptions : snmpretrivalmethodoptions"
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
@@ -259,7 +259,7 @@ export default {
 			snmprow: {
 				id: null,
 				name: null,
-				retrival_method: "OID",
+				retrival_method: "SNMP_GET",
 				retrival_output: "JSON",
 				target: "SNMP",
 				fields: [],
@@ -305,6 +305,10 @@ export default {
 					{ id: "separator", type: "text", default: null },
 				]
 			},
+			snmpretrivalmethodoptions: [
+				{ value: 'SNMP_GET', text: this.$t('template.SNMP_GET') },
+				{ value: 'SNMP_WALK', text: this.$t('template.SNMP_WALK') }
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
