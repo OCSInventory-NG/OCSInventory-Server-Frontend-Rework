@@ -178,7 +178,8 @@ export default {
 				name: null,
 				priority: 1,
 				action_type: "EXEC",
-				command: null
+				command: null,
+				original_file_name: null
 			},
 			errormsg: null,
 			errored: false,
@@ -194,7 +195,7 @@ export default {
 				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			],
 			header: {
-				"Content-Type": "application/json;charset=utf-8",
+				"Content-Type": "multipart/form-data;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
@@ -246,6 +247,9 @@ export default {
 
 			if(!this.row.file) {
 				delete this.row.file
+				this.row.original_file_name = null
+			} else {
+				this.row.original_file_name = this.row.file.name
 			}
 
 			let formdata = new FormData()

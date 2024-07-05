@@ -379,7 +379,7 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("add_search")) {
+		if(localStorage.getItem('permissions').split(",").includes("search_add_search")) {
 			this.cansave = true
 		}
 

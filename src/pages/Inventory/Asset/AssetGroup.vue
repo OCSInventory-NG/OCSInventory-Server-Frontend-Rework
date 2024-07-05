@@ -71,11 +71,11 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_assetgroup")) {
-			if(localStorage.getItem('permissions').split(",").includes("change_assetgroup")) {
+		if(localStorage.getItem('permissions').split(",").includes("asset_group_view_assetgroup")) {
+			if(localStorage.getItem('permissions').split(",").includes("asset_group_change_assetgroup")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_assetgroup")) {
+			if(localStorage.getItem('permissions').split(",").includes("asset_group_delete_assetgroup")) {
 				this.candelete = true
 			}
 			this.getHeader()

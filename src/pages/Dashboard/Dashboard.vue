@@ -71,51 +71,6 @@
 						</template>
 					</GridLayout>
 
-					<!--<div v-else>
-						<div class="row row-deck row-cards">
-							<Counter 
-								firsttitle="dashboard.total"
-								:firstcount="total.total"
-								secondtitle="dashboard.contacted"
-								:secondcount="contacted.total"
-							/>
-							<Counter 
-								firsttitle="dashboard.windows"
-								:firstcount="total.windows"
-								secondtitle="dashboard.contacted"
-								:secondcount="contacted.windows"
-							/>
-							<Counter 
-								firsttitle="dashboard.linux"
-								:firstcount="total.linux"
-								secondtitle="dashboard.contacted"
-								:secondcount="contacted.linux"
-							/>
-							<Counter 
-								firsttitle="dashboard.macos"
-								:firstcount="total.macos"
-								secondtitle="dashboard.contacted"
-								:secondcount="contacted.macos"
-							/>
-						</div>
-						<div class="row">
-							<div class="col-lg-6">
-								<DonutChart 
-									title="dashboard.osassets"
-									:options="oscount.options"
-									:series="oscount.series"
-								/>
-							</div>
-							<div class="col-lg-6">
-								<LineChart 
-									title="dashboard.lastcontacted"
-									:options="lastcontactedopt.options"
-									:series="lastcontactedopt.series"
-								/>
-							</div>
-						</div>
-					</div>-->
-
 					<h1>{{ $t("title.network") }}</h1>
 					<!-- Error box message -->
 					<section v-if="errorednetwork">
@@ -191,19 +146,22 @@ export default {
 			templates: {
 				WIN: [],
 				LIN: [],
-				MAC: []
+				MAC: [],
+				LEG: [],
 			},
 			total: {
 				total: 0,
 				windows: 0,
 				linux: 0,
 				macos: 0,
+				legacy: 0,
 			},
 			contacted: {
 				total: 0,
 				windows: 0,
 				linux: 0,
 				macos: 0,
+				legacy: 0,
 			},
 			ostemp: {},
 			oscount: {
@@ -346,6 +304,10 @@ export default {
 						if(this.templates.MAC.includes(asset.template)) {
 							this.total.macos += 1
 							if(asset.last_update.slice(0,10) == now) this.contacted.macos += 1
+						}
+						if(this.templates.LEG.includes(asset.template)) {
+							this.total.legacy += 1
+							if(asset.last_update.slice(0,10) == now) this.contacted.legacy += 1
 						}
 						// Counter operating system
 						this.ostemp[asset.osname] = (this.ostemp[asset.osname]) ? this.ostemp[asset.osname]+1 : 1

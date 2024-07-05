@@ -79,14 +79,14 @@ export default {
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("view_network")) {
-			if(localStorage.getItem('permissions').split(",").includes("change_network")) {
+		if(localStorage.getItem('permissions').split(",").includes("network_view_network")) {
+			if(localStorage.getItem('permissions').split(",").includes("network_change_network")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_network")) {
+			if(localStorage.getItem('permissions').split(",").includes("network_delete_network")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("view_netdevice")) {
+			if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
 			this.getNetworks()

@@ -76,18 +76,18 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_rule")) {
+		if(localStorage.getItem('permissions').split(",").includes("rule_view_rule")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_rule")) {
+			if(localStorage.getItem('permissions').split(",").includes("rule_add_rule")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_rule")) {
+			if(localStorage.getItem('permissions').split(",").includes("rule_change_rule")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_rule")) {
+			if(localStorage.getItem('permissions').split(",").includes("rule_delete_rule")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("view_action")) {
+			if(localStorage.getItem('permissions').split(",").includes("rule_view_action")) {
 				this.canviewaction = true
 			}
 			this.getHeader()

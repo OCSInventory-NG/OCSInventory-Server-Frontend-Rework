@@ -56,15 +56,15 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_result")) {
+		if(localStorage.getItem('permissions').split(",").includes("result_view_result")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_add_result")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_change_result")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_result")) {
+			if(localStorage.getItem('permissions').split(",").includes("result_delete_result")) {
 				this.candelete = true
 			}
 		} else {

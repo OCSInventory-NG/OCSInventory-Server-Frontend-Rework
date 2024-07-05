@@ -76,16 +76,16 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("view_template")) {
+		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("add_template")) {
+			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("change_template")) {
+			if(localStorage.getItem('permissions').split(",").includes("template_change_template")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("delete_template")) {
+			if(localStorage.getItem('permissions').split(",").includes("template_delete_template")) {
 				this.candelete = true
 			}
 			this.getHeader()
