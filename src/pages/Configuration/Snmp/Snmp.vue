@@ -397,7 +397,7 @@ export default {
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field == "configs") {
-							this.rowscannerheader.push("community")
+							this.rowscannerheader.push("snmpcommunity")
 						} else {
 							this.rowscannerheader.push(field)
 						}
@@ -428,7 +428,7 @@ export default {
 							communities.push(community.name)
 						}
 
-						scan.community = communities.join('\n')
+						scan.snmpcommunity = communities.join('\n')
 					}
 				})
 				.catch(e => {
