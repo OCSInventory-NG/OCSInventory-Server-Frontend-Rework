@@ -1,7 +1,8 @@
 <template>
 	<div id="delete-item-modal">
 		<button 
-			:title="$t('generic.deleteitem')"
+			:title="(!multiple) ?
+				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			class="btn btn-ghost-danger"
 			@click="deleteact = !deleteact"
 		>
@@ -20,7 +21,7 @@
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('generic.deleteitem') }}
+					{{ (!multiple) ? $t('generic.deleteitem') : $t('generic.deleteselection') }}
 					<b-spinner 
 						v-if="loadingdelete"
 						variant="success"
@@ -48,6 +49,7 @@
 				</b-button>
 			</template>
 			<b-form
+				v-if="(!multiple) || (multiple && rows.ids.length > 0)"
 				@submit="onSubmit"
 			>
 				<Alert 
@@ -83,6 +85,19 @@
 					</div>
 				</div>
 			</b-form>
+			<div v-else>
+				<div class="text-center">
+					<font-awesome-icon
+						:icon="['fas', 'triangle-exclamation']"
+						size="5x"
+						color="#d63939"
+					/>
+					<Alert
+						:message="$t('message.no_selection')"
+						variant="warning"
+					/>
+				</div>
+			</div>
 		</b-modal>
 	</div>
 </template>
