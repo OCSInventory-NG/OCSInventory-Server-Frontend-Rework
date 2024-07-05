@@ -473,6 +473,8 @@
     "select_template_file": "Select your JSON template file",
     "separator": "Separator",
     "SNMP": "SNMP",
+    "SNMP_GET": "SNMP GET",
+    "SNMP_WALK": "SNMP WALK",
     "submap": "Submap",
     "TBLE": "Table format",
     "target": "Target",
