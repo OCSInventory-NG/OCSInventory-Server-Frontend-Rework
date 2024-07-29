@@ -10,3 +10,15 @@
 .badge {
   color: #fff;
 }
+
+.vgl-layout::before {
+  position: absolute;
+  width: calc(100% - 5px);
+  height: calc(100% - 5px);
+  margin: 5px;
+  content: '';
+  background-image: linear-gradient(to right, rgb(214, 214, 214) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(214, 214, 214) 1px, transparent 1px);
+  background-repeat: repeat;
+  background-size: calc(calc(100% - 5px) / 12) 40px;
+}
