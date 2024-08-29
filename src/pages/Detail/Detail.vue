@@ -103,6 +103,7 @@
 									>
 										<Inventory
 											:id="$route.params.id"
+											:template="rowdata.template"
 										/>
 									</b-tab>
 									<b-tab 
@@ -149,7 +150,7 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		var extendedRoute = null
 		if(this.$route.params.type == 'asset') {
 			extendedRoute = "asset/bases/"+this.$route.params.id
@@ -165,7 +166,7 @@ export default {
 			this.translationkey = "network."
 		}
 
-		axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
+		await axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data
