@@ -45,6 +45,10 @@
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>
+											<AssignTemplateModal
+												:item="deployment"
+												@reloadInventory="reloadInventory"
+											/>
 										</b-button-group>
 									</div>
 									<div class="col-1">
@@ -182,6 +186,9 @@ export default {
 	methods: {
 		reloadDeployment() {
 			this.reload = true
+		},
+		reloadInventory(item) {
+			this.rowdata = item[0]
 		},
 		endReloadDeployment() {
 			this.reload = false
