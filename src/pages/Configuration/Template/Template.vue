@@ -113,7 +113,11 @@ export default {
 		getTemplates() {
 			axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					for (const temp of response.data) {
+						if(temp.os != "SNMP") {
+							this.rowdata.push(temp)
+						}
+					}
 					this.errormsg = null
 					this.errored = false
 				})

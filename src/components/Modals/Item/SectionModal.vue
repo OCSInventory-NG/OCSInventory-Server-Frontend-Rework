@@ -99,7 +99,8 @@
 							<v-select
 								id="retrival_method"
 								v-model="row.retrival_method" 
-								:options="methodoptions" 
+								:options="(routetype != 'snmp' && routetypemut != 'snmp') ?
+									methodoptions : snmpretrivalmethodoptions"
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
@@ -108,7 +109,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.target')" 
@@ -122,7 +123,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
 					<b-col>
 						<b-form-group
 							:label="$t('template.retrival_output')" 
@@ -149,7 +150,11 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<div v-if="outputoptionoptions[row.retrival_output]">
+				<div 
+					v-if="outputoptionoptions[row.retrival_output]
+						&& routetype != 'snmp'
+						&& routetypemut != 'snmp'"
+				>
 					<b-row>
 						<b-col>
 							<h4>{{ $t('template.retrieval_output_options') }}</h4>
@@ -236,7 +241,8 @@ export default {
 		rowsectiondata: { type: Object, default: null },
 		template: { type: Number, required: true },
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
+		routetype: { type: String, default: "assets" }
 	},
 	data() {
 		return {
@@ -250,6 +256,17 @@ export default {
 				template: null,
 				options: {}
 			},
+			snmprow: {
+				id: null,
+				name: null,
+				retrival_method: "SNMP_GET",
+				retrival_output: "JSON",
+				target: "SNMP",
+				fields: [],
+				template: null,
+				options: {}
+			},
+			routetypemut: "assets",
 			errormsg: null,
 			errored: false,
 			loading: true,
@@ -288,6 +305,10 @@ export default {
 					{ id: "separator", type: "text", default: null },
 				]
 			},
+			snmpretrivalmethodoptions: [
+				{ value: 'SNMP_GET', text: this.$t('template.SNMP_GET') },
+				{ value: 'SNMP_WALK', text: this.$t('template.SNMP_WALK') }
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -303,8 +324,16 @@ export default {
 			}, 500)
 		}
 	},
+	created() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetypemut = "snmp"
+		}
+	},
 	mounted() {
 		if(!this.update) {
+			if(this.routetype == "snmp" || this.routetypemut == "snmp") {
+				this.row = this.snmprow
+			}
 			this.row.template = this.template
 			this.loading = false
 		} else {

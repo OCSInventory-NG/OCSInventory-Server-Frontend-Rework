@@ -1,5 +1,5 @@
 <template>
-	<div id="template-modal">
+	<div id="snmp-template-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('template.addtemplate')"
+						:title="$t('network.addsnmptemplate')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="templatemodal = !templatemodal"
+						@click="snmptemplatemodal = !snmptemplatemodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('template.addtemplate') }}
+						{{ $t('network.addsnmptemplate') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('template.edittemplate')"
+				:title="$t('network.editsnmptemplate')"
 				class="btn btn-ghost-dark"
 				@click="loadData()"
 			>
@@ -32,15 +32,15 @@
 			</button>
 		</div>
 		<b-modal 
-			id="templatemodal" 
-			v-model="templatemodal"
-			:title="(!update) ? $t('template.addtemplate') : $t('template.edittemplate')"
+			id="snmptemplatemodal" 
+			v-model="snmptemplatemodal"
+			:title="(!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('template.addtemplate') : $t('template.edittemplate') }}
+					{{ (!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -79,31 +79,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
-							label-for="name"
+							:label="$t('network.name')" 
+							label-for="templatename"
 						>
 							<b-form-input
-								id="name"
+								id="templatename"
 								v-model="row.name"
 								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('inventory.os')" 
-							label-for="os"
-						>
-							<v-select
-								id="os"
-								v-model="row.os" 
-								:options="options" 
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -138,7 +120,7 @@
 import axios from 'axios'
 
 export default {
-	name: "TemplateModal",
+	name: "SnmpTemplateModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
@@ -147,32 +129,27 @@ export default {
 		return {
 			row: {
 				name: null,
-				os: 'WIN',
+				os: 'SNMP',
 				sections: []
 			},
+			loading: true,
 			errormsg: null,
 			errored: false,
-			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			templatemodal: false,
-			options: [
-				{ value: 'WIN', text: 'Windows' },
-				{ value: 'LIN', text: 'Linux' },
-				{ value: 'MAC', text: 'MacOS' }
-			],
+			snmptemplatemodal: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
 		}
 	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.templatemodal = false
+				this.snmptemplatemodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -186,14 +163,14 @@ export default {
 	methods: {
 		loadData() {
 			this.loading = true
-			this.templatemodal = true
+			this.snmptemplatemodal = true
 		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"templates/", this.row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

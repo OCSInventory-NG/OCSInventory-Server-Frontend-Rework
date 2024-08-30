@@ -77,15 +77,15 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("user_view_user")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_view_user")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("user_add_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_add_user")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("user_change_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_change_user")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("user_delete_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_delete_user")) {
 				this.candelete = true
 			}
 			this.getHeader()

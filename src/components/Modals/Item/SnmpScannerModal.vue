@@ -1,5 +1,5 @@
 <template>
-	<div id="ldap-modal">
+	<div id="snmp-scanner-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('authentication.addldap')"
+						:title="$t('network.addsnmpscanner')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="ldapmodal = !ldapmodal"
+						@click="snmpscannermodal = !snmpscannermodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('authentication.addldap') }}
+						{{ $t('network.addsnmpscanner') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('authentication.editldap')"
+				:title="$t('network.editsnmpscanner')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,16 +32,16 @@
 			</button>
 		</div>
 		<b-modal 
-			id="ldapmodal" 
-			v-model="ldapmodal"
-			:title="(!update) ? $t('authentication.addldap') : $t('authentication.editldap')"
+			id="snmpscannermodal" 
+			v-model="snmpscannermodal"
+			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('authentication.addldap') : $t('authentication.editldap') }}
+					{{ (!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -80,12 +80,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							label="SERVER_URI" 
-							label-for="SERVER_URI"
+							:label="$t('network.identifier')" 
+							label-for="identifier"
 						>
 							<b-form-input
-								id="SERVER_URI"
-								v-model="row.config.SERVER_URI"
+								id="identifier"
+								v-model="row.identifier"
+								required
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
@@ -93,12 +95,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							label="BIND_DN" 
-							label-for="BIND_DN"
+							:label="$t('network.ip')" 
+							label-for="ip"
 						>
 							<b-form-input
-								id="BIND_DN"
-								v-model="row.config.BIND_DN"
+								id="ip"
+								v-model="row.ip"
+								required
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
@@ -106,12 +110,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							label="BIND_PASSWORD" 
-							label-for="BIND_PASSWORD"
+							:label="$t('network.subnets')" 
+							label-for="subnetstoscan"
 						>
-							<b-form-input
-								id="BIND_PASSWORD"
-								v-model="row.config.BIND_PASSWORD"
+							<b-form-textarea
+								id="subnetstoscan"
+								v-model="row.subnets"
 							/>
 						</b-form-group>
 					</b-col>
@@ -119,12 +123,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							label="BASE_DN" 
-							label-for="BASE_DN"
+							:label="$t('network.notes')" 
+							label-for="notes"
 						>
 							<b-form-input
-								id="BASE_DN"
-								v-model="row.config.BASE_DN"
+								id="notes"
+								v-model="row.notes"
 							/>
 						</b-form-group>
 					</b-col>
@@ -132,45 +136,19 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							label="USER_LOGIN_FIELD" 
-							label-for="USER_LOGIN_FIELD"
-						>
-							<b-form-input
-								id="USER_LOGIN_FIELD"
-								v-model="row.config.USER_LOGIN_FIELD"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							label="PROTOCOL_VERSION" 
-							label-for="PROTOCOL_VERSION"
+							:label="$t('network.snmpcommunity')" 
+							label-for="configs"
 						>
 							<v-select
-								id="PROTOCOL_VERSION"
-								v-model="row.config.PROTOCOL_VERSION" 
-								:options="options" 
+								id="configs"
+								v-model="row.configs"
+								:options="configs"
 								:reduce="text => text.value"
-								:clearable="false"
 								label="text"
 								class="mb-3"
+								multiple
 							/>
 						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-checkbox
-							id="enabled"
-							v-model="row.enabled"
-							name="enabled"
-							:value="true"
-							unchecked
-						>
-							{{ $t('authentication.enabled') }}
-						</b-form-checkbox>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -203,40 +181,31 @@
 import axios from 'axios'
 
 export default {
-	name: "LdapModal",
+	name: "SnmpScannerModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null },
-		authid: { type: Number, default: 2 }
+		id: { type: String, default: null }
 	},
 	data() {
 		return {
 			row: {
-				auth_method: this.authid,
-				enabled: true,
-				priority: 1,
-				config: {
-					SERVER_URI: null,
-					BIND_DN: null,
-					BIND_PASSWORD: null,
-					BASE_DN: null,
-					USER_LOGIN_FIELD: null,
-					MIRROR_GROUPS: false,
-					PROTOCOL_VERSION: 3
-				}
+				identifier: null,
+				ip: null,
+				subnets: null,
+				notes: null,
+				configs: []
 			},
 			errormsg: null,
 			errored: false,
+			successmsg: null,
+			successed: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			ldapmodal: false,
-			options: [
-				{ value: 2, text: "v2" },
-				{ value: 3, text: "v3" }
-			],
+			snmpscannermodal: false,
+			configs: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -246,27 +215,51 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.ldapmodal = false
+				this.snmpscannermodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
 	mounted() {
-		if(!this.update) {
-			this.loading = false
-		}
+		this.getCommunities()
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.ldapmodal = true
-			this.getLdapConfig(id)
+			this.snmpscannermodal = true
+			this.getSnmpScanner(id)
 		},
-		getLdapConfig(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_config/"+id, { headers: this.header })
+		getSnmpScanner(id) {
+			this.row = []
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
+					this.row.subnets = this.row.subnets.join(",")
+					var configs = this.row.configs
+					this.row.configs = []
+					for (const config of configs) {
+						this.row.configs.push(config.id)
+					}
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
+		},
+		getCommunities() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+				.then(response => {
+					this.configs = []
+					for (const config of response.data) {
+						this.configs.push({
+							value: config.id,
+							text: config.name
+						})
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -279,9 +272,16 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
+
+			if(this.row.subnets != null && this.row.subnets.trim() != "") {
+				this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
+			} else {
+				this.row.subnets = []
+			}
+
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"auth_config/", this.row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerror = false
@@ -294,22 +294,20 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				delete this.row.mappings
-			
-				axios.patch(this.$config.BACKEND_API_ROUTE+"auth_config/"+this.row.id+"/", this.row,
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
-						this.createerrormsg = null
 						this.createerror = false
+						this.createerrormsg = null
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
 						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
 					})
 					.finally(() => this.loadingcreate = false)
-			}			
+			}
 		}
 	}
 }

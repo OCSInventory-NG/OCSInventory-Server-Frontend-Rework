@@ -258,7 +258,9 @@ export default {
 			axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
-						this.templates[template["os"]].push(template["id"])
+						if(template.os != "SNMP") {
+							this.templates[template.os].push(template.id)
+						}
 					})
 					this.errormsgAsset = null
 					this.erroredasset = false

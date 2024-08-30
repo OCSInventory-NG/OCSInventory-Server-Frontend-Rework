@@ -95,7 +95,9 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row 
+					v-if="routetypemut != 'snmp' && routetype != 'snmp'"
+				>
 					<b-col>
 						<b-form-checkbox
 							id="override_target"
@@ -261,6 +263,7 @@ import axios from 'axios'
 export default {
 	name: "FieldModal",
 	props: {
+		routetype: { type: String, default: "assets" },
 		rowfielddata: { type: Object, default: null },
 		section: { type: Number, required: true },
 		update: { type: Boolean, default: false }
@@ -278,6 +281,7 @@ export default {
 				options: {},
 				section: null
 			},
+			routetypemut: "assets",
 			errormsg: null,
 			errored: false,
 			loading: true,
@@ -329,6 +333,11 @@ export default {
 				this.createwithsuccess = false
 				this.$emit("reloadTemplate")
 			}, 500)
+		}
+	},
+	created() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetypemut = "snmp"
 		}
 	},
 	mounted() {

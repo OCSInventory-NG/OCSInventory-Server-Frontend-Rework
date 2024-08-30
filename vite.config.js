@@ -10,7 +10,7 @@ import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers'
 // https://vitejs.dev/config/
 export default defineConfig({
 	server: {
-		host: '127.0.0.1',
+		host: '172.18.25.200',
 		port: 3000
 	},
 	plugins: [
