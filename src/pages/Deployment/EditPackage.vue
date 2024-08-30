@@ -102,7 +102,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -117,7 +117,7 @@ export default {
 				})
 		},
 		getPackage(reload = false) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
 				.then(response => {
 					if(!reload) {
 						this.rowpackagedata = response.data

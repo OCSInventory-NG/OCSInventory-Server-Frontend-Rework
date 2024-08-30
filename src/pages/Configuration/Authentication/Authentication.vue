@@ -154,7 +154,7 @@ export default {
 	},
 	methods: {
 		getAuthMethod() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/", { headers: this.header })
 				.then(response => {
 					this.authmethods = response.data
 					this.authmethods.forEach(authmethod => {
@@ -184,7 +184,7 @@ export default {
 				enabled: state
 			}
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
 					this.successmsg = "success"
 					this.successed = true

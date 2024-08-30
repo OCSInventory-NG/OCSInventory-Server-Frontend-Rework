@@ -152,7 +152,7 @@ export default {
 			this.loadingdelete = true
 			
 			if(!this.multiple) {
-				axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null
 						this.deleteerror = false
@@ -165,7 +165,7 @@ export default {
 					})
 					.finally(() => this.loadingdelete = false)
 			} else {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.parameter+"/?delete=true", this.rows,
+				axios.post(this.$config.BACKEND_API_ROUTE+this.parameter+"/?delete=true", this.rows,
 					{ headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null

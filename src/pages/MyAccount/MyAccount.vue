@@ -169,7 +169,7 @@ export default {
 		}
 	},
 	mounted() {
-		axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+		axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errormsg = null
@@ -202,7 +202,7 @@ export default {
 				}
 			}
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
 				{ headers: this.header })
 				.then(() => {
 					this.successmsg = "success"

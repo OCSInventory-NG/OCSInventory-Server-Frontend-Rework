@@ -161,7 +161,7 @@ export default {
 	},
 	methods: {
 		getOidcConfiguration() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
 					this.errormsg = null
@@ -179,7 +179,7 @@ export default {
 
 			delete this.oidcdata.mappings
 			
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
 				{ headers: this.header })
 				.then(() => {
 					this.successmsg = "success"

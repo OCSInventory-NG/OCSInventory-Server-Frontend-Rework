@@ -193,7 +193,7 @@ export default {
 			})
 
 			if(jsonAdd.length > 0) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
 					.then(() => {
 						this.errormsg = null
 						this.errored = false
@@ -212,7 +212,7 @@ export default {
 		},
 		onUpdate(input) {
 			if(input.id) {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+input.id+"/", input, 
+				axios.patch(this.$config.BACKEND_API_ROUTE+this.route+"/"+input.id+"/", input, 
 					{ headers: this.header })
 					.then(() => {
 						this.errormsg = null
@@ -228,7 +228,7 @@ export default {
 			this.loading = true
 			this.doallaction = true
 			
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
 					if(response.data.length > 0) {
 						this.datavalues = []
@@ -250,7 +250,7 @@ export default {
 		},
 		removeField(index, fieldType) {
 			if(typeof fieldType[index].id !== 'undefined') {
-				axios.delete(import.meta.env.VITE_APP_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
+				axios.delete(this.$config.BACKEND_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
 					.then(() => {
 						this.errormsg = null
 						this.errored = false

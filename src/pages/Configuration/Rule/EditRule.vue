@@ -129,7 +129,7 @@ export default {
 	},
 	methods: {
 		getTriggerModels() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/triggers/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"automation/triggers/", { headers: this.header })
 				.then(response => {
 					this.triggers = response.data
 					this.getRuleInfo()
@@ -140,7 +140,7 @@ export default {
 				})
 		},
 		getRuleInfo() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rule = response.data
 					this.trigger = response.data.trigger

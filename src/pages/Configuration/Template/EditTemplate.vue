@@ -92,7 +92,7 @@ export default {
 	},
 	methods: {
 		getTemplate() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections

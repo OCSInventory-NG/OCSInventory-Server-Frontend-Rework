@@ -268,7 +268,7 @@ export default {
 	methods: {
 		// Get all config
 		getConfig() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					for(const config of response.data) {
 						if(config.name != "snmp") {
@@ -288,7 +288,7 @@ export default {
 
 			var configToUpdate = this.configs[this.activetab].name
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+			axios.patch(this.$config.BACKEND_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
 				{ headers: this.header })
 				.then(() => {
 					this.successmsg = "success"

@@ -152,7 +152,7 @@ export default {
 	},
 	methods: {
 		getAccountinfoConfig() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -184,7 +184,7 @@ export default {
 			return array
 		},
 		getAccountinfoData() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data?object_slug="
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
@@ -220,7 +220,7 @@ export default {
 			})
 
 			if(this.create) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
 						this.successmsg = "success"
 						this.successed = true
@@ -234,7 +234,7 @@ export default {
 						this.successed = false
 					})
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
 						this.successmsg = "success"

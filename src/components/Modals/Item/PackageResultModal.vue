@@ -169,7 +169,7 @@ export default {
 		getHeader() {
 			this.loading = true
 			this.packageresultmodal = true
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") {
@@ -186,7 +186,7 @@ export default {
 				})	
 		},
 		getPackages() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"deployment/packages/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						delete packages.result
@@ -227,7 +227,7 @@ export default {
 			}
 
 			if(row.length > 0) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"deployment/results/", row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/results/", row, { headers: this.header })
 					.then(() => {
 						this.successed = true
 						this.errored = null

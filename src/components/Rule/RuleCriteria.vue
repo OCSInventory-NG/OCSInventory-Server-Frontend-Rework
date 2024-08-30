@@ -280,7 +280,7 @@ export default {
 	},
 	methods: {
 		getModelField() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
 					this.loadingfield = true
 
@@ -492,7 +492,7 @@ export default {
 
 			this.logicupdate.logic = logicTmp
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
+			axios.patch(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
 				{ headers: this.header })
 				.then(() => {
 					this.successmsg = "success"

@@ -98,7 +98,7 @@ export default {
 	methods: {
 		// Retrieve networks group
 		getNetGroup() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netgroups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroupdata = response.data
 					this.errormsg = null
@@ -115,7 +115,7 @@ export default {
 			this.networkdata = []
 			this.netgroupdata = []
 			this.rowdata = []
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networkdata = response.data
 					this.errormsg = null

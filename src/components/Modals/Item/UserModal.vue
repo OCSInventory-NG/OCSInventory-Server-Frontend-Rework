@@ -268,7 +268,7 @@ export default {
 			this.getUser(id)
 		},
 		getUser(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/"+id+"/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -281,7 +281,7 @@ export default {
 				})
 		},
 		getGroups() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.groups = []
 					response.data.forEach(groupDetails => {
@@ -300,7 +300,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"users/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"users/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -317,7 +317,7 @@ export default {
 					delete this.row.password
 				}
 
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(this.$config.BACKEND_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

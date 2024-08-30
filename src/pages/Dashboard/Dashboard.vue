@@ -212,7 +212,7 @@ export default {
 	},
 	methods: {
 		getNetworks() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"networks/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks.total = response.data.length
 					response.data.forEach(network => {
@@ -232,7 +232,7 @@ export default {
 				})
 		},
 		getNetdevices() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/", { headers: this.header })
 				.then(response => {
 					this.networks.devices.total = response.data.length
 					response.data.forEach(device => {
@@ -255,7 +255,7 @@ export default {
 		},
 		// Retrieve templates ID and sort by type
 		getTemplates() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
 						if(template.os != "SNMP") {
@@ -273,7 +273,7 @@ export default {
 		},
 		// Count assets and sort by template types
 		getCount() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					var now = new Date().toJSON().slice(0,10)
 					this.total.total = response.data.length

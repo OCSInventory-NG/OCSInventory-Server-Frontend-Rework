@@ -97,7 +97,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -112,7 +112,7 @@ export default {
 				})
 		},
 		getPermissions() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -165,7 +165,7 @@ export default {
 				})
 		},
 		getGroups() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()

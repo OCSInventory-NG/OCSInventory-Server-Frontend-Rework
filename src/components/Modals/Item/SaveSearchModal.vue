@@ -346,7 +346,7 @@ export default {
 			this.getSavedSearch(id)
 		},
 		getSavedSearch(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
 					this.savesearch = response.data
 					this.errormsg = null
@@ -368,7 +368,7 @@ export default {
 			this.optsearch = []
 			this.updatesearch = []
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"search/save/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					if(searchaction == undefined) {
 						this.rowsavesearchheader = [
@@ -411,7 +411,7 @@ export default {
 			this.loading = true
 			this.savesearchmodal = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"myaccount/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
 					this.errormsg = null
@@ -429,7 +429,7 @@ export default {
 		getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/"+group, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -457,7 +457,7 @@ export default {
 				this.savesearch.search = this.rowsearch
 
 				if(this.searchaction == "create") {
-					axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
+					axios.post(this.$config.BACKEND_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null
@@ -470,7 +470,7 @@ export default {
 						})
 						.finally(() => { this.loadingcreate = false })
 				} else {
-					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
+					axios.patch(this.$config.BACKEND_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
 						{ headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
@@ -488,7 +488,7 @@ export default {
 				delete this.savesearch.search
 				delete this.savesearch.user
 
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch,
+				axios.patch(this.$config.BACKEND_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
