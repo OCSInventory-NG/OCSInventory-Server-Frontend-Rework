@@ -137,11 +137,11 @@ export default {
 		}
 	},
 	methods: {
-		getTemplate() {
+		async getTemplate() {
 			this.loading = true
 			this.row = this.item
 			this.assigntemplatemodal = true
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os!=SNMP", { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os!=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					response.data.forEach(template => {

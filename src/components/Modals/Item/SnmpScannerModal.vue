@@ -230,9 +230,9 @@ export default {
 			this.snmpscannermodal = true
 			this.getSnmpScanner(id)
 		},
-		getSnmpScanner(id) {
+		async getSnmpScanner(id) {
 			this.row = []
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")
@@ -250,8 +250,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		getCommunities() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+		async getCommunities() {
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
 				.then(response => {
 					this.configs = []
 					for (const config of response.data) {
