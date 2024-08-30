@@ -49,13 +49,10 @@ loadConfig().then((config) => {
 		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize
+		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders
 	})
 
 	router.isReady()
-
-	console.log(app.config)
-	console.log(config)
 
 	app.config.globalProperties.$config = config;
 	app.mount('#app')
