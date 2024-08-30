@@ -189,7 +189,7 @@ export default {
 			errorCode: null,
 			errored: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			actionupdate: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -514,7 +514,7 @@ export default {
 					axios.patch(this.$config.BACKEND_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
-							this.succesMsg = "success"
+							this.successmsg = "success"
 							this.successed = true
 							this.errormsg = null
 							this.errored = false
@@ -522,7 +522,7 @@ export default {
 						.catch(e => {
 							this.errormsg = e.message
 							this.errored = true
-							this.succesMsg = null
+							this.successmsg = null
 							this.successed = false
 						})
 				} else {
@@ -533,7 +533,7 @@ export default {
 					axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
-							this.succesMsg = "success"
+							this.successmsg = "success"
 							this.successed = true
 							this.errormsg = null
 							this.errored = false
@@ -541,7 +541,7 @@ export default {
 						.catch(e => {
 							this.errormsg = e.message
 							this.errored = true
-							this.succesMsg = null
+							this.successmsg = null
 							this.successed = false
 						})
 				}
@@ -550,7 +550,7 @@ export default {
 			actionremove.forEach(id => {
 				axios.delete(this.$config.BACKEND_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -558,7 +558,7 @@ export default {
 					.catch(e => {
 						this.errormsg = e.message
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			})

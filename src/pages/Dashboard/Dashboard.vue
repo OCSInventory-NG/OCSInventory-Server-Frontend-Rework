@@ -24,7 +24,7 @@
 					</div>
 
 					<div v-else>
-						<div class="row row-deck row-cards">
+						<div class="row row-deck row-cards justify-content-center">
 							<Counter 
 								firsttitle="dashboard.total"
 								:firstcount="total.total"
@@ -48,6 +48,12 @@
 								:firstcount="total.macos"
 								secondtitle="dashboard.contacted"
 								:secondcount="contacted.macos"
+							/>
+							<Counter 
+								firsttitle="dashboard.legacy"
+								:firstcount="total.legacy"
+								secondtitle="dashboard.contacted"
+								:secondcount="contacted.legacy"
 							/>
 						</div>
 						<div class="row">
@@ -127,19 +133,22 @@ export default {
 			templates: {
 				WIN: [],
 				LIN: [],
-				MAC: []
+				MAC: [],
+				LEG: [],
 			},
 			total: {
 				total: 0,
 				windows: 0,
 				linux: 0,
 				macos: 0,
+				legacy: 0,
 			},
 			contacted: {
 				total: 0,
 				windows: 0,
 				linux: 0,
 				macos: 0,
+				legacy: 0,
 			},
 			ostemp: {},
 			oscount: {
@@ -249,7 +258,9 @@ export default {
 			axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(template => {
-						this.templates[template["os"]].push(template["id"])
+						if(template.os != "SNMP") {
+							this.templates[template.os].push(template.id)
+						}
 					})
 					this.errormsgAsset = null
 					this.erroredasset = false
@@ -280,6 +291,10 @@ export default {
 						if(this.templates.MAC.includes(asset.template)) {
 							this.total.macos += 1
 							if(asset.last_update.slice(0,10) == now) this.contacted.macos += 1
+						}
+						if(this.templates.LEG.includes(asset.template)) {
+							this.total.legacy += 1
+							if(asset.last_update.slice(0,10) == now) this.contacted.legacy += 1
 						}
 						// Counter operating system
 						this.ostemp[asset.osname] = (this.ostemp[asset.osname]) ? this.ostemp[asset.osname]+1 : 1

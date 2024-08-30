@@ -89,6 +89,23 @@ const routes = [
 		}
 	},
 	{
+		path: '/configurations/snmp',
+		name: 'Snmp',
+		component: () => import('@/pages/Configuration/Snmp/Snmp.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/snmp/:id',
+		name: 'EditSnmpTemplate',
+		component: () => import('@/pages/Configuration/Template/EditTemplate.vue'),		
+		props: true,
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/configurations/authentication',
 		name: 'Authentication',
 		component: () => import('@/pages/Configuration/Authentication/Authentication.vue'),

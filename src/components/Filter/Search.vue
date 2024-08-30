@@ -284,7 +284,7 @@ export default {
 	data() {
 		return {
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			loading: true,

@@ -34,7 +34,7 @@ export default {
 		firstcount: { type: Number, default: null },
 		secondtitle: { type: String, default: null },
 		secondcount: { type: Number, default: null },
-		classstyle: { type: String, default: "col-sm-6 col-lg-3" }
+		classstyle: { type: String, default: "col-sm-6 col-lg-2" }
 	}
 }
 </script>

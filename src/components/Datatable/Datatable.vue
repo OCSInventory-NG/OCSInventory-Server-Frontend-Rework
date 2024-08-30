@@ -47,7 +47,7 @@
 					</b-button-group>
 				</div>
 
-				<!-- Export template -->
+				<!-- Import template -->
 				<div
 					v-if="importtemplate"
 					class="col-1"
@@ -272,6 +272,16 @@
 								/>
 							</button>
 							<button 
+								v-if="caneditsnmptemplate"
+								:title="$t('template.edittemplate')"
+								class="btn btn-ghost-dark"
+								@click="goToEditSnmpTemplate(row.item.id)"
+							>
+								<font-awesome-icon 
+									:icon="['fas', 'pencil']"
+								/>
+							</button>
+							<button 
 								v-if="canviewaction"
 								:title="$t('deployment.manageaction')"
 								class="btn btn-ghost-dark"
@@ -302,7 +312,7 @@
 								/>
 							</button>
 							<!-- Do all actions button -->
-							<DoAllActionsItemModal 
+							<DoAllActionsItemModal
 								v-if="canaddvalue && datatypes.includes(row.item.datatype)"
 								:id="row.item.id"
 								:route="adddvalueroute"
@@ -312,19 +322,22 @@
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Edit button -->
-							<component 
+							<component
 								:is="editcomponent"
 								v-if="canedit"
-								v-bind="{ id: row.item.id }"
+								v-bind="{ id: row.item.id || row.item.identifier }"
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<!-- Delete button -->
-							<DeleteItemModal 
+							<DeleteItemModal
 								v-if="candelete"
-								:id="row.item.id"
+								:id="row.item.id || row.item.identifier"
 								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
-								:name="row.item.name || row.item.username || $t('generic.removeselection')"
+								:name="row.item.name 
+									|| row.item.username 
+									|| row.item.identifier 
+									|| $t('generic.removeselection')"
 								:parameter="deleterte"
 								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
@@ -344,6 +357,17 @@
 					:per-page="perPage"
 					align="right"
 					size="sm"
+				/>
+			</b-col>
+			<b-col align="right">
+				<!-- Delete button -->
+				<DeleteItemModal
+					v-if="candelete"
+					:ids="selectedids"
+					:name="$t('generic.removeselection')"
+					:parameter="deleterte"
+					:multiple="true"
+					@reloadDatatable="reloadDatatable"
 				/>
 			</b-col>
 		</b-row>
@@ -366,6 +390,9 @@ import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
+import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
+import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
+import EditTemplate from '@/pages/Configuration/Template/EditTemplate.vue'
 
 export default {
 	name: 'Datatable',
@@ -385,6 +412,9 @@ export default {
 		RuleModal,
 		PackageModal,
 		PackageResultModal,
+		SnmpModal,
+		SnmpScannerModal,
+		EditTemplate
 	},
 	props: {
 		title: { type: String, default: '' },
@@ -394,9 +424,10 @@ export default {
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: false },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
+		caneditsnmptemplate: { type: Boolean, default: false },
 		importtemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
@@ -437,6 +468,7 @@ export default {
 			// Select row parameter
 			selectMode: 'multi',
 			selected: [],
+			selectedids: [],
 			isChecked: false,
 			// Sort datatable parameters
 			sortDesc: null,
@@ -564,6 +596,7 @@ export default {
 		},
 		onRowSelected(item) {
 			this.selected.push(item)
+			this.selectedids.push(item.id)
 			this.attributePackage()
 		},
 		onRowUnselected(item) {
@@ -571,6 +604,10 @@ export default {
 				this.selected.findIndex(
 					v => v.id === item.id
 				),
+				1
+			)
+			this.selectedids.splice(
+				this.selectedids.indexOf(item.id),
 				1
 			)
 			this.attributePackage()
@@ -586,6 +623,9 @@ export default {
 		},
 		goToEditTemplate(id){
 			this.$router.push('/configurations/templates/'+id); 
+		},
+		goToEditSnmpTemplate(id){
+			this.$router.push('/configurations/snmp/'+id); 
 		},
 		goToEditPackage(id){
 			this.$router.push('/deployment/packages/'+id); 

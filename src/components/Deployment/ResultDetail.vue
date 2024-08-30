@@ -53,7 +53,7 @@ export default {
 			rows: [],
 			loading: true,
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			parameter: null,
