@@ -67,7 +67,7 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("search_change_search")) {
 			this.canedit = true
 		}
@@ -75,11 +75,11 @@ export default {
 			this.candelete = true
 		}
 
-		this.getHeader()
+		await this.getHeader()
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "search" && field != "last_updated") {
@@ -95,10 +95,10 @@ export default {
 					this.errored = true
 				})
 		},
-		getSavedSearches() {
+		async getSavedSearches() {
 			this.rowdata = []
 			this.loading = true
-			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					for (const search of response.data) {
 						delete search.search
@@ -118,9 +118,9 @@ export default {
 					this.errored = true
 				})
 		},
-		getUserName() {
+		async getUserName() {
 			for (const search of this.rowdata) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"users/"+search.user, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+search.user, { headers: this.header })
 					.then(response => {
 						if(response.data.first_name != "") {
 							search.user = response.data.last_name.concat(" ", response.data.first_name)
@@ -135,13 +135,13 @@ export default {
 			}
 			this.getGroups()
 		},
-		getGroups() {
+		async getGroups() {
 			for (const [key, search] of Object.entries(this.rowdata)) {
 				this.groups[key] = []
 				if(search.groups) {
 					for (const group of search.groups) {
 						this.loading = true
-						axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+						await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 							.then(response => {
 								this.loading = true
 								this.groups[key].push(response.data.name)
@@ -158,8 +158,8 @@ export default {
 
 			this.loading = false
 		},
-		reloadDatatable() {
-			this.getSavedSearches()
+		async reloadDatatable() {
+			await this.getSavedSearches()
 		}
 	}
 }

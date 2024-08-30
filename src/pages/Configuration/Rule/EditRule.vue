@@ -124,12 +124,12 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
-		this.getTriggerModels()
+	async mounted() {
+		await this.getTriggerModels()
 	},
 	methods: {
-		getTriggerModels() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"automation/triggers/", { headers: this.header })
+		async getTriggerModels() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/triggers/", { headers: this.header })
 				.then(response => {
 					this.triggers = response.data
 					this.getRuleInfo()
@@ -139,8 +139,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getRuleInfo() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
+		async getRuleInfo() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rule = response.data
 					this.trigger = response.data.trigger
@@ -155,8 +155,8 @@ export default {
 					this.errored = true
 				})
 		},
-		reloadRule() {
-			this.getRuleInfo()
+		async reloadRule() {
+			await this.getRuleInfo()
 		}
 	}
 }

@@ -75,7 +75,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
@@ -88,15 +88,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("template_delete_template")) {
 				this.candelete = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -110,8 +110,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getTemplates() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
+		async getTemplates() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
@@ -123,8 +123,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
-			this.getTemplates()
+		async reloadDatatable() {
+			await this.getTemplates()
 		}
 	}
 }

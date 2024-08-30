@@ -88,8 +88,8 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
-		this.getHeader()
+	async mounted() {
+		await this.getHeader()
 		if(localStorage.getItem('permissions').split(",").includes("action_add_deploymentaction")) {
 			this.canaddaction = true
 		}
@@ -101,8 +101,8 @@ export default {
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -116,8 +116,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getPackage(reload = false) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
+		async getPackage(reload = false) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
 				.then(response => {
 					if(!reload) {
 						this.rowpackagedata = response.data
@@ -132,13 +132,13 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
+		async reloadDatatable() {
 			this.loading = true
-			this.getPackage(true)
+			await this.getPackage(true)
 		},
-		reloadPackage() {
+		async reloadPackage() {
 			this.loading = true
-			this.getPackage()
+			await this.getPackage()
 		}
 	}
 }

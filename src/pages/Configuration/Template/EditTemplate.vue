@@ -79,12 +79,12 @@ export default {
 			setTimeout(() => this.successed = false, 10000)
 		}
 	},
-	mounted() {
-		this.getTemplate()
+	async mounted() {
+		await this.getTemplate()
 	},
 	methods: {
-		getTemplate() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
+		async getTemplate() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections
@@ -97,9 +97,9 @@ export default {
 					this.errored = true
 				})
 		},
-		reloadTemplate() {
+		async reloadTemplate() {
 			this.loading = true
-			this.getTemplate()
+			await this.getTemplate()
 		}
 	}
 }

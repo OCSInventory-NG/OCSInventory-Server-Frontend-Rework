@@ -253,13 +253,13 @@ export default {
 			setTimeout(() => this.errored = false, 5000)
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
 				this.canedit = true
 			}
-			this.getConfig()
+			await this.getConfig()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -267,8 +267,8 @@ export default {
 	},
 	methods: {
 		// Get all config
-		getConfig() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"config", { headers: this.header })
+		async getConfig() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 					this.loading = false
