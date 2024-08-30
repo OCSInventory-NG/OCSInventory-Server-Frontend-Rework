@@ -119,7 +119,7 @@ export default {
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			oidcdata: [],
 			canaddmapping: false,
 			header: {
@@ -182,7 +182,7 @@ export default {
 			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.oidcdata.id+"/", this.oidcdata,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -190,7 +190,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

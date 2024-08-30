@@ -70,7 +70,7 @@ export default {
 			rowpackagedata: [],
 			rowactiondata: [],
 			rowheader: [],
-			succesMsg: null,
+			successmsg: null,
 			successed: false,
 			loading: true,
 			errored: false,

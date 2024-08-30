@@ -103,7 +103,7 @@ export default {
 			loading: true,
 			errored: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			trigger: null,
 			triggers: {},
 			logic: {},

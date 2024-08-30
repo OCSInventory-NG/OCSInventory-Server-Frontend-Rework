@@ -108,7 +108,7 @@ import axios from 'axios'
 export default {
 	name: 'DeleteItemModal',
 	props: {
-		id: { type: Number, default: null },
+		id: { type: [String, Number], default: null },
 		ids: { type: Array, default: null },
 		name: { type: String, default: '' },
 		parameter: { type: String, default: '' },

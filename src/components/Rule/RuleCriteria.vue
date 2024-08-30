@@ -209,7 +209,7 @@ export default {
 			errorCode: null,
 			errored: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			logicupdate: {
 				logic: {}
 			},
@@ -495,7 +495,7 @@ export default {
 			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -504,7 +504,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

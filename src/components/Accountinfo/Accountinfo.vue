@@ -131,7 +131,7 @@ export default {
 			rowdata: [],
 			loading: true,
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			create: true,
@@ -222,7 +222,7 @@ export default {
 			if(this.create) {
 				axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -230,14 +230,14 @@ export default {
 					.catch(e => {
 						this.errormsg = e.message
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			} else {
 				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -245,7 +245,7 @@ export default {
 					.catch(e => {
 						this.errormsg = e
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			}

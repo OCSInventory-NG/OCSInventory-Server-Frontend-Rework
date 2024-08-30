@@ -134,7 +134,7 @@ export default {
 						this.noresult = this.$t("search.no_result")
 					}
 
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -142,7 +142,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e.response.data.error
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

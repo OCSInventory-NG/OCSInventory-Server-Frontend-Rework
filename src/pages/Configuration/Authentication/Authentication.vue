@@ -120,7 +120,7 @@ export default {
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			authmethods: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -186,7 +186,7 @@ export default {
 
 			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -209,7 +209,7 @@ export default {
 					})
 					
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}
