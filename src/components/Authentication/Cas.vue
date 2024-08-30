@@ -138,7 +138,7 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
@@ -147,7 +147,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			this.getCasConfiguration()
+			await this.getCasConfiguration()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -155,8 +155,8 @@ export default {
 		}
 	},
 	methods: {
-		getCasConfiguration() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+		async getCasConfiguration() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
 					this.errormsg = null

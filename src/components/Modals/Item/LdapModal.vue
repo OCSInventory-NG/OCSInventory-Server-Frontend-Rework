@@ -262,8 +262,8 @@ export default {
 			this.ldapmodal = true
 			this.getLdapConfig(id)
 		},
-		getLdapConfig(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_config/"+id, { headers: this.header })
+		async getLdapConfig(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

@@ -227,8 +227,8 @@ export default {
 			this.automaticactionmodal = true
 			this.getScheduler(id)
 		},
-		getScheduler(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
+		async getScheduler(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

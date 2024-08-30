@@ -70,12 +70,12 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		this.getHeader()
+	async mounted() {
+		await this.getHeader()
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "package") {
@@ -103,7 +103,7 @@ export default {
 					this.errored = true
 				})
 		},
-		getResult() {
+		async getResult() {
 			this.rowdata = []
 			if(this.group) {
 				this.parameter = "group=" + this.group
@@ -111,7 +111,7 @@ export default {
 				this.parameter = "asset=" + this.id
 			}
 
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
 				.then(response => {
 					if(this.group) {
 						this.calculForGroup(response.data)
@@ -181,9 +181,9 @@ export default {
 
 			this.loading = false
 		},
-		reloadDatatable() {
+		async reloadDatatable() {
 			this.loading = true
-			this.getResult()
+			await this.getResult()
 		}
 	}
 }

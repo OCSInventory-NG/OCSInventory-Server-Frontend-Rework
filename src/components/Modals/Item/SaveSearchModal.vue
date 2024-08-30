@@ -345,8 +345,8 @@ export default {
 			this.savesearchmodal = true
 			this.getSavedSearch(id)
 		},
-		getSavedSearch(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
+		async getSavedSearch(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
 					this.savesearch = response.data
 					this.errormsg = null
@@ -358,7 +358,7 @@ export default {
 					this.errored = true
 				})
 		},
-		getMySearches(searchaction) {
+		async getMySearches(searchaction) {
 			if(searchaction == undefined) {
 				this.usesavesearchmodal = true
 				this.loading = true
@@ -368,7 +368,7 @@ export default {
 			this.optsearch = []
 			this.updatesearch = []
 
-			axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
 				.then(response => {
 					if(searchaction == undefined) {
 						this.rowsavesearchheader = [
@@ -407,11 +407,11 @@ export default {
 			this.savesearch = this.updatesearch[id]
 			this.loading = false 
 		},
-		getMyInfo() {
+		async getMyInfo() {
 			this.loading = true
 			this.savesearchmodal = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.rowuser = response.data
 					this.errormsg = null
@@ -426,10 +426,10 @@ export default {
 					this.errored = true
 				})
 		},
-		getGroups(groups) {
+		async getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,

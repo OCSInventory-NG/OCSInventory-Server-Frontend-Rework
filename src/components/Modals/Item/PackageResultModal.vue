@@ -185,8 +185,8 @@ export default {
 					this.errored = true
 				})	
 		},
-		getPackages() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getPackages() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						delete packages.result

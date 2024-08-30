@@ -192,8 +192,8 @@ export default {
 			this.groupmodal = true
 			this.getPermissions(id)
 		},
-		getPermissions(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
+		async getPermissions(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -245,8 +245,8 @@ export default {
 					this.getGroup(id)
 				})
 		},
-		getGroup(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+id+"/", { headers: this.header })
+		async getGroup(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
