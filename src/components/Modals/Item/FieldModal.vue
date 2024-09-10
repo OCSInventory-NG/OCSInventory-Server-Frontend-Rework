@@ -95,7 +95,9 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row 
+					v-if="routetypemut != 'snmp' && routetype != 'snmp'"
+				>
 					<b-col>
 						<b-form-checkbox
 							id="override_target"
@@ -261,6 +263,7 @@ import axios from 'axios'
 export default {
 	name: "FieldModal",
 	props: {
+		routetype: { type: String, default: "assets" },
 		rowfielddata: { type: Object, default: null },
 		section: { type: Number, required: true },
 		update: { type: Boolean, default: false }
@@ -278,6 +281,7 @@ export default {
 				options: {},
 				section: null
 			},
+			routetypemut: "assets",
 			errormsg: null,
 			errored: false,
 			loading: true,
@@ -331,6 +335,11 @@ export default {
 			}, 500)
 		}
 	},
+	created() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetypemut = "snmp"
+		}
+	},
 	mounted() {
 		if(!this.update) {
 			this.row.section = this.section
@@ -358,7 +367,7 @@ export default {
 			}
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"fields/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"fields/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerror = false
@@ -371,7 +380,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(this.$config.BACKEND_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

@@ -146,7 +146,7 @@ export default {
 			this.getMappingConfig(id)
 		},
 		getMappingConfig(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 
@@ -214,7 +214,7 @@ export default {
 
 			if(jsonToUpdate.length) {
 				jsonToUpdate.forEach(data => {
-					axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
+					axios.patch(this.$config.BACKEND_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null
@@ -230,7 +230,7 @@ export default {
 			}
 
 			if(jsonToAdd.length) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -246,7 +246,7 @@ export default {
 
 			if(jsonToDelete.length) {
 				jsonToDelete.forEach(data => {
-					axios.delete(import.meta.env.VITE_APP_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
+					axios.delete(this.$config.BACKEND_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
 						.then(() => {
 							this.createwithsuccess = true
 							this.createerrormsg = null

@@ -77,15 +77,15 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("user_view_user")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_view_user")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("user_add_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_add_user")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("user_change_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_change_user")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("user_delete_user")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_delete_user")) {
 				this.candelete = true
 			}
 			this.getHeader()
@@ -96,7 +96,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "user_permissions" && field != "password") {
@@ -114,7 +114,7 @@ export default {
 		},
 		getGroups() {
 			this.groups = []
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -132,7 +132,7 @@ export default {
 				})
 		},
 		getUsers() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"users/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null

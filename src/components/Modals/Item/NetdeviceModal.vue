@@ -152,7 +152,7 @@ export default {
 		},
 		// Retrieve networks info by id
 		getNetdevice(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -169,7 +169,7 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 			
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
+			axios.patch(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerrormsg = null

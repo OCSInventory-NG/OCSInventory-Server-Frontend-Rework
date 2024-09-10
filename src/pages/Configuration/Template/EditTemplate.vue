@@ -37,9 +37,11 @@
 							</b-row>
 							<SectionModal
 								:template="parseInt(id)"
+								:routetype="routetype"
 								@reloadTemplate="reloadTemplate"
 							/>
 							<SectionCollapse
+								:routetype="routetype"
 								:rowsectiondata="rowsectiondata"
 								@reloadTemplate="reloadTemplate"
 							/>
@@ -64,10 +66,11 @@ export default {
 			errormsg: null,
 			rowtemplatedata: [],
 			rowsectiondata: [],
-			succesMsg: null,
+			successmsg: null,
 			successed: false,
 			loading: true,
 			errored: false,
+			routetype: "assets",
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -79,12 +82,17 @@ export default {
 			setTimeout(() => this.successed = false, 10000)
 		}
 	},
+	beforeMount() {
+		if(this.$route.path.includes("snmp")) {
+			this.routetype = "snmp"
+		}
+	},
 	mounted() {
 		this.getTemplate()
 	},
 	methods: {
 		getTemplate() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections

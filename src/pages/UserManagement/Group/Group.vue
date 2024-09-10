@@ -78,15 +78,15 @@ export default {
 		}
 	},
 	created() {
-		if(localStorage.getItem('permissions').split(",").includes("group_view_group")) {
+		if(localStorage.getItem('permissions').split(",").includes("auth_view_group")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("group_add_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_add_group")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("group_change_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_change_group")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("group_delete_group")) {
+			if(localStorage.getItem('permissions').split(",").includes("auth_delete_group")) {
 				this.candelete = true
 			}
 			this.getHeader()
@@ -97,7 +97,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -112,7 +112,7 @@ export default {
 				})
 		},
 		getPermissions() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"permissions", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -165,7 +165,7 @@ export default {
 				})
 		},
 		getGroups() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"groups/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()

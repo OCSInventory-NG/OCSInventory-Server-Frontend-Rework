@@ -1,5 +1,5 @@
 <template>
-	<div id="user-modal">
+	<div id="snmp-scanner-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('user.adduser')"
+						:title="$t('network.addsnmpscanner')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="usermodal = !usermodal"
+						@click="snmpscannermodal = !snmpscannermodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('user.adduser') }}
+						{{ $t('network.addsnmpscanner') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('user.edituser')"
+				:title="$t('network.editsnmpscanner')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,15 +32,16 @@
 			</button>
 		</div>
 		<b-modal 
-			id="usermodal" 
-			v-model="usermodal"
-			:title="(!update) ? $t('user.adduser') : $t('user.edituser')"
+			id="snmpscannermodal" 
+			v-model="snmpscannermodal"
+			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('user.adduser') : $t('user.edituser') }}
+					{{ (!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -78,32 +79,15 @@
 			>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('user.user_informations') }}</h4>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
 						<b-form-group
-							:label="$t('user.username')" 
-							label-for="username"
+							:label="$t('network.identifier')" 
+							label-for="identifier"
 						>
 							<b-form-input
-								id="username"
-								v-model="row.username"
+								id="identifier"
+								v-model="row.identifier"
 								required
-							/>
-						</b-form-group>
-					</b-col>
-					<b-col>
-						<b-form-group
-							:label="$t('user.password')" 
-							label-for="password"
-						>
-							<b-form-input
-								id="password"
-								v-model="row.password"
-								type="password"
-								:required="(!update) ? true : false"
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
@@ -111,76 +95,60 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.email')" 
-							label-for="email"
+							:label="$t('network.ip')" 
+							label-for="ip"
 						>
 							<b-form-input
-								id="email"
-								v-model="row.email"
+								id="ip"
+								v-model="row.ip"
 								required
+								:disabled="(!update) ? false : true"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
-					<b-col>
-						<b-form-group 
-							:label="$t('user.first_name')" 
-							label-for="first_name"
-						>
-							<b-form-input
-								id="first_name"
-								v-model="row.first_name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
 					<b-col>
 						<b-form-group
-							:label="$t('user.last_name')" 
-							label-for="last_name"
+							:label="$t('network.subnets')" 
+							label-for="subnetstoscan"
 						>
-							<b-form-input
-								id="last_name"
-								v-model="row.last_name"
-								required
+							<b-form-textarea
+								id="subnetstoscan"
+								v-model="row.subnets"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col>
-						<b-form-checkbox
-							id="is_staff"
-							v-model="row.is_staff"
-							name="is_staff"
-							value="true"
-							unchecked-value="false"
+						<b-form-group
+							:label="$t('network.notes')" 
+							label-for="notes"
 						>
-							{{ $t('user.is_staff') }}
-						</b-form-checkbox>
+							<b-form-input
+								id="notes"
+								v-model="row.notes"
+							/>
+						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col>
-						<h4>{{ $t('title.groups') }}</h4>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col
-						v-for="group in groups"
-						:key="group.id"
-						cols="4"
-					>
-						<b-form-checkbox
-							:id="group.code"
-							v-model="row.groups"
-							:name="group.code"
-							:value="group.id"
-							unchecked
+						<b-form-group
+							:label="$t('network.snmpcommunity')" 
+							label-for="configs"
 						>
-							{{ group.name }}
-						</b-form-checkbox>
+							<v-select
+								id="configs"
+								v-model="row.configs"
+								:options="configs"
+								:reduce="text => text.value"
+								label="text"
+								class="mb-3"
+								multiple
+							/>
+						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -213,33 +181,31 @@
 import axios from 'axios'
 
 export default {
-	name: "UserModal",
+	name: "SnmpScannerModal",
 	props: {
-		groupsprop: { type: Array, default: null },
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: String, default: null }
 	},
 	data() {
 		return {
 			row: {
-				username: null,
-				password: null,
-				email: null,
-				first_name: null,
-				last_name: null,
-				is_staff: false,
-				groups: [],
-				user_permissions: []
+				identifier: null,
+				ip: null,
+				subnets: null,
+				notes: null,
+				configs: []
 			},
 			errormsg: null,
 			errored: false,
+			successmsg: null,
+			successed: false,
 			loading: true,
 			loadingcreate: false,
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			usermodal: false,
-			groups: [],
+			snmpscannermodal: false,
+			configs: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -249,84 +215,96 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.usermodal = false
+				this.snmpscannermodal = false
 				this.createwithsuccess = false
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
 	mounted() {
-		if(!this.update) {
-			this.groups = this.groupsprop
-			this.loading = false
-		}
+		this.getCommunities()
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.usermodal = true
-			this.getUser(id)
+			this.snmpscannermodal = true
+			this.getSnmpScanner(id)
 		},
-		getUser(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })
+		getSnmpScanner(id) {
+			this.row = []
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
+					this.row.subnets = this.row.subnets.join(",")
+					var configs = this.row.configs
+					this.row.configs = []
+					for (const config of configs) {
+						this.row.configs.push(config.id)
+					}
 					this.errormsg = null
 					this.errored = false
-					this.getGroups()
 				})
 				.catch(e => {
-					this.errormsg = e
+					this.errormsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
-		getGroups() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
+		getCommunities() {
+			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
 				.then(response => {
-					this.groups = []
-					response.data.forEach(groupDetails => {
-						this.groups.push({
-							id: groupDetails.id,
-							code: "group_"+groupDetails.id,
-							name: groupDetails.name
+					this.configs = []
+					for (const config of response.data) {
+						this.configs.push({
+							value: config.id,
+							text: config.name
 						})
-					})
-
-					this.loading = false
+					}
+					this.errormsg = null
+					this.errored = false
 				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loading = false)
 		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
+
+			if(this.row.subnets != null && this.row.subnets.trim() != "") {
+				this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
+			} else {
+				this.row.subnets = []
+			}
+
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"users/", this.row, { headers: this.header })
+				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
-						this.createerrormsg = null
 						this.createerror = false
+						this.createerrormsg = null
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
 						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				if(this.row.password == "") {
-					delete this.row.password
-				}
-
-				axios.patch(this.$config.BACKEND_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
-						this.createerrormsg = null
 						this.createerror = false
+						this.createerrormsg = null
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
-						this.createerror = true
 						this.createwithsuccess = false
+						this.createerror = true
+						this.createerrormsg = e.message
 					})
 					.finally(() => this.loadingcreate = false)
 			}
