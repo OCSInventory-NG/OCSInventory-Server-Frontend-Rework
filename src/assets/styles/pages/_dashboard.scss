@@ -4,14 +4,17 @@
 
 .donut-card {
   border: 0;
-  margin-top: 20px;
+}
+
+.line-card {
+  padding-bottom: 0.4rem!important;
 }
 
 .badge {
   color: #fff;
 }
 
-.vgl-layout::before {
+.display-grid::before {
   position: absolute;
   width: calc(100% - 5px);
   height: calc(100% - 5px);
