@@ -16,8 +16,6 @@ import "vue-select/dist/vue-select.css"
 
 /***** Grid layout plus *****/
 import { GridLayout, GridItem } from 'grid-layout-plus'
-app.component('GridLayout', GridLayout)
-app.component('GridItem', GridItem)
 
 /***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -51,6 +49,8 @@ loadConfig().then((config) => {
 	app.component("VSelect", vSelect)
 	app.component('FontAwesomeIcon', FontAwesomeIcon)
 	app.component('FontAwesomeLayers', FontAwesomeLayers)
+	app.component('GridLayout', GridLayout)
+	app.component('GridItem', GridItem)
 	library.add({ 
 		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
