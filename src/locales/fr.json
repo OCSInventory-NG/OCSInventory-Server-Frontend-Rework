@@ -129,17 +129,18 @@
   "dashboard": {
     "contacted": "Contactés aujourd'hui",
     "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
-    "legacy": "Legacy",
-    "linux": "Linux",
-    "macos": "MacOS",
     "nbassets": "Nombre d'actifs",
-    "nbdevicebynetwork": "Nombre d'équipements par réseau",
-    "nbnetwork": "Nombre d'équipements",
-    "osassets": "Systèmes d'exploitation disponibles",
-    "total": "Total",
-    "totalnetwork": "Nombre de réseaux",
+    "nb_netdevices": "Nombre d'équipements",
+    "networks": "Nombre d'équipements par réseau",
+    "oscount": "Systèmes d'exploitation disponibles",
+    "nb_networks": "Nombre de réseaux",
     "totalnetworkdevices": "Nombre d'équipements réseau",
-    "windows": "Windows"
+    "total_ALL": "Total",
+    "total_LEG": "Legacy",
+    "total_LIN": "Linux",
+    "total_MAC": "MacOS",
+    "total_SNMP": "SNMP",
+    "total_WIN": "Windows"
   },
   "deployment": {
     "actions": "Actions",
