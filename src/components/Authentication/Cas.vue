@@ -119,7 +119,7 @@ export default {
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			casdata: [],
 			canaddmapping: false,
 			header: {
@@ -156,7 +156,7 @@ export default {
 	},
 	methods: {
 		getCasConfiguration() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
 					this.errormsg = null
@@ -174,10 +174,10 @@ export default {
 
 			delete this.casdata.mappings
 			
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -185,7 +185,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

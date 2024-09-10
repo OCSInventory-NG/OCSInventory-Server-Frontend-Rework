@@ -1,31 +1,17 @@
 import { createApp } from 'vue'
 import App from '@/App.vue'
-
-const app = createApp(App)
-
 /***** Bootstrap *****/
 import { createBootstrap } from 'bootstrap-vue-next'
-app.use(createBootstrap())
-
 /***** Vue Router *****/
 import router from '@/route'
-app.use(router)
-
 /***** I18n *****/
 import i18n from '@/i18n'
-app.use(i18n)
-
 /***** Apex Charts *****/
 import VueApexCharts from 'vue3-apexcharts'
-app.use(VueApexCharts)
-
 /***** Vue Json Excel 3 *****/
 import JsonExcel from 'vue-json-excel3'
-app.component("DownloadExcel", JsonExcel)
-
 /***** Vue select *****/
 import vSelect from "vue-select"
-app.component("VSelect", vSelect)
 import "vue-select/dist/vue-select.css"
 
 /***** Grid layout plus *****/
@@ -45,16 +31,37 @@ import {
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
 } from '@fortawesome/free-regular-svg-icons'
-app.component('FontAwesomeIcon', FontAwesomeIcon)
-app.component('FontAwesomeLayers', FontAwesomeLayers)
-library.add({ 
-	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
-	faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
-	faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-	faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize,
-	faSliders
+
+async function loadConfig() {
+	const response = await fetch('/config/config.json');
+	if (!response.ok) {
+		throw new Error('Failed to load config');
+	}
+	return response.json();
+}
+
+loadConfig().then((config) => {
+	const app = createApp(App)
+
+	app.use(createBootstrap())
+	app.use(router)
+	app.use(i18n)
+	app.use(VueApexCharts)
+	app.component("DownloadExcel", JsonExcel)
+	app.component("VSelect", vSelect)
+	app.component('FontAwesomeIcon', FontAwesomeIcon)
+	app.component('FontAwesomeLayers', FontAwesomeLayers)
+	library.add({ 
+		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
+		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
+		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders
+	})
+
+	router.isReady()
+
+	app.config.globalProperties.$config = config;
+	app.mount('#app')
+}).catch((error) => {
+	console.error('Error loading config:', error);
 })
-
-router.isReady()
-
-app.mount('#app')

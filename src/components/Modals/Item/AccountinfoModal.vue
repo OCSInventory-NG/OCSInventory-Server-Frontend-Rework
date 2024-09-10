@@ -229,7 +229,7 @@ export default {
 			this.getAccountinfo(id)
 		},
 		getAccountinfo(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -246,7 +246,7 @@ export default {
 			this.loadingcreate = true
 			
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -264,7 +264,7 @@ export default {
 					description: this.row.description
 				}
 
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update,
+				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

@@ -284,7 +284,7 @@ export default {
 	data() {
 		return {
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
@@ -446,7 +446,7 @@ export default {
 			this.fieldopt[masterindex][index] = []
 
 			if(route == "accountinfo/config?datatarget=ASSET") {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
@@ -471,7 +471,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else if(route == "templates") {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+route, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingtemplate = true
 						if(!Array.isArray(this.templateopt[masterindex])) {
@@ -497,7 +497,7 @@ export default {
 						this.errored = true
 					})
 			} else if (section) {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+"fields?section="+route, { headers: this.header })
+				axios.get(this.$config.BACKEND_API_ROUTE+"fields?section="+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -520,7 +520,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else {
-				axios.options(import.meta.env.VITE_APP_API_ROUTE+route+"/", { headers: this.header })
+				axios.options(this.$config.BACKEND_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -569,7 +569,7 @@ export default {
 			
 		},
 		getSections(templateId, masterindex, index) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"sections?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
 					if(!Array.isArray(this.sectionopt[masterindex])) {
@@ -643,7 +643,7 @@ export default {
 			})
 
 			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingadmin = true

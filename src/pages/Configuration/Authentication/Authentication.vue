@@ -120,7 +120,7 @@ export default {
 			canview: false,
 			canedit: false,
 			successed: false,
-			succesMsg: null,
+			successmsg: null,
 			authmethods: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -154,7 +154,7 @@ export default {
 	},
 	methods: {
 		getAuthMethod() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"auth_method/", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/", { headers: this.header })
 				.then(response => {
 					this.authmethods = response.data
 					this.authmethods.forEach(authmethod => {
@@ -184,9 +184,9 @@ export default {
 				enabled: state
 			}
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
+			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -209,7 +209,7 @@ export default {
 					})
 					
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

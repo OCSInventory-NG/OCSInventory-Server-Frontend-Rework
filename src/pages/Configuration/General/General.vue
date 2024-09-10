@@ -228,7 +228,7 @@ export default {
 		return {
 			configs: [],
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			loading: true,
@@ -268,9 +268,13 @@ export default {
 	methods: {
 		// Get all config
 		getConfig() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config", { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"config", { headers: this.header })
 				.then(response => {
-					this.configs = response.data
+					for(const config of response.data) {
+						if(config.name != "snmp") {
+							this.configs.push(config)
+						}
+					}
 					this.loading = false
 				})
 				.catch(e => {
@@ -284,10 +288,10 @@ export default {
 
 			var configToUpdate = this.configs[this.activetab].name
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
+			axios.patch(this.$config.BACKEND_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
 				{ headers: this.header })
 				.then(() => {
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -295,7 +299,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

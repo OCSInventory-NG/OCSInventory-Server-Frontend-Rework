@@ -130,7 +130,7 @@ export default {
 		onSubmit() {
 			this.loadingimport = true
 			
-			axios.post(import.meta.env.VITE_APP_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
+			axios.post(this.$config.BACKEND_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
 				.then(() => {
 					this.errormsg = null
 					this.errored = false

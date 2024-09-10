@@ -96,7 +96,7 @@ export default {
 	},
 	methods: {
 		getHeader() {
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/", { headers: this.header })
+			axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -117,7 +117,7 @@ export default {
 		reloadDatatable(search) {
 			this.rowsearch = search
 			
-			axios.post(import.meta.env.VITE_APP_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
+			axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					this.assetids = []
@@ -134,7 +134,7 @@ export default {
 						this.noresult = this.$t("search.no_result")
 					}
 
-					this.succesMsg = "success"
+					this.successmsg = "success"
 					this.successed = true
 					this.errormsg = null
 					this.errored = false
@@ -142,7 +142,7 @@ export default {
 				.catch(e => {
 					this.errormsg = e.response.data.error
 					this.errored = true
-					this.succesMsg = null
+					this.successmsg = null
 					this.successed = false
 				})
 		}

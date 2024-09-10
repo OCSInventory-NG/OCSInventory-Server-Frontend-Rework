@@ -131,7 +131,7 @@ export default {
 			rowdata: [],
 			loading: true,
 			errormsg: null,
-			succesMsg: null,
+			successmsg: null,
 			errored: false,
 			successed: false,
 			create: true,
@@ -152,7 +152,7 @@ export default {
 	},
 	methods: {
 		getAccountinfoConfig() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -184,7 +184,7 @@ export default {
 			return array
 		},
 		getAccountinfoData() {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data?object_slug="
+			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
@@ -220,9 +220,9 @@ export default {
 			})
 
 			if(this.create) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -230,14 +230,14 @@ export default {
 					.catch(e => {
 						this.errormsg = e.message
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
+				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
-						this.succesMsg = "success"
+						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -245,7 +245,7 @@ export default {
 					.catch(e => {
 						this.errormsg = e
 						this.errored = true
-						this.succesMsg = null
+						this.successmsg = null
 						this.successed = false
 					})
 			}

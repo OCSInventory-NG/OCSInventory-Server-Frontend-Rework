@@ -169,7 +169,7 @@ export default {
 			this.translationkey = "network."
 		}
 
-		axios.get(import.meta.env.VITE_APP_API_ROUTE+extendedRoute, { headers: this.header })
+		axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data
