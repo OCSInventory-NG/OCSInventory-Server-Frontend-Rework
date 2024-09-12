@@ -3,7 +3,7 @@
 		<button 
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
-			class="btn btn-ghost-danger"
+			:class="'btn ' + customclass"
 			@click="deleteact = !deleteact"
 		>
 			<font-awesome-icon 
@@ -112,7 +112,8 @@ export default {
 		ids: { type: Array, default: null },
 		name: { type: String, default: '' },
 		parameter: { type: String, default: '' },
-		multiple: { type: Boolean, default: false }
+		multiple: { type: Boolean, default: false },
+		customclass: { type: String, default: 'btn-ghost-danger' }
 	},
 	data() {
 		return {
@@ -142,6 +143,7 @@ export default {
 				this.deletewithsuccess = false
 				this.$emit('reloadDatatable')
 				this.$emit('reloadTemplate')
+				this.$emit('reloadDashboard')
 			}, 500)
 		}
 	},
