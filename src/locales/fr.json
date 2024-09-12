@@ -133,11 +133,15 @@
     "uuid": "UUID"
   },
   "dashboard": {
+    "adddashboardlayout": "Ajouter un nouveau tableau de bord",
     "contacted": "Contactés aujourd'hui",
+    "deletedashboardlayout": "Supprimer le tableau de bord",
+    "editdashboardlayout": "Éditer le tableau de bord",
     "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
     "nbassets": "Nombre d'actifs",
     "nb_netdevices": "Nombre d'équipements",
     "networks": "Nombre d'équipements par réseau",
+    "nodashboard": "Aucun tableau de bord de configuré",
     "oscount": "Systèmes d'exploitation disponibles",
     "nb_networks": "Nombre de réseaux",
     "totalnetworkdevices": "Nombre d'équipements réseau",
@@ -324,6 +328,7 @@
     "accountinfovalue": "Données administratives - Valeurs",
     "action": "Règles - Actions",
     "assetgroup": "Groupes d'actifs",
+    "dashboardlayout": "Tableau de bord - Disposition",
     "deploymentaction": "Déploiement - Actions",
     "authconfig": "Authentification - Configuration",
     "authmapping": "Authentification - Mappages",

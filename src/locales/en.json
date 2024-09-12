@@ -133,7 +133,10 @@
     "uuid": "UUID"
   },
   "dashboard": {
+    "adddashboardlayout": "Add a new dashboard",
     "contacted": "Contacted today",
+    "deletedashboardlayout": "Remove the dashboard",
+    "editdashboardlayout": "Edit the dashboard",
     "lastcontacted": "Assets last contacted in the last 7 days",
     "nbassets": "Assets number",
     "nb_netdevices": "Devices number",
@@ -323,6 +326,7 @@
     "accountinfovalue": "Administrative data - values",
     "action": "Rules - Actions",
     "assetgroup": "Assets groups",
+    "dashboardlayout": "Dashboard - Layout",
     "deploymentaction": "Deployment - Actions",
     "authconfig": "Authentication - Configuration",
     "authmapping": "Authentication - Mapping",
