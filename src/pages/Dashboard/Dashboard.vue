@@ -28,7 +28,7 @@
 						>
 							<b-row>
 								<b-col 
-									v-if="layouts[activeLayout].name"
+									v-if="layouts[activeLayout].id"
 									cols="2"
 								>
 									<v-select
@@ -40,72 +40,50 @@
 										class="mb-3 ocs-select"
 									/>
 								</b-col>
-								<b-col cols="1">
+								<b-col>
+									<b-spinner 
+										v-if="loadingsave"
+										variant="success"
+									/>
+									<font-awesome-icon 
+										v-if="savewithsuccess"
+										:icon="['fas', 'check']"
+										color="green"
+									/>
+									<font-awesome-icon 
+										v-if="saveerror"
+										:icon="['fas', 'xmark']"
+										color="red"
+									/>
+									&nbsp;
 									<button 
-										v-if="canadd"
-										:title="$t('dashboard.adddashboardlayout')"
+										v-if="canedit || canadd"
+										:title="$t('dashboard.editdashboardlayout')"
 										class="btn datatable-btn mr-1"
+										:disabled="edit"
 										@click="edit = !edit"
 									>
 										<font-awesome-icon 
-											:icon="['fas', 'plus']"
+											:icon="['fas', 'pencil']"
 										/>
 									</button>
 								</b-col>
 								<b-col 
-									v-if="layouts[activeLayout].name"
+									v-if="
+										layouts[activeLayout].id 
+											&& (
+												layouts[activeLayout].user == userid
+												|| (
+													layouts[activeLayout].groups.includes(groupids)
+													&& layouts[activeLayout].allow_group_modification == true
+												)
+											)
+									"
 									align="right"
 								>
 									<b-row>
-										<b-col>
-											<b-spinner 
-												v-if="loadingsave"
-												variant="success"
-											/>
-											<font-awesome-icon 
-												v-if="savewithsuccess"
-												:icon="['fas', 'check']"
-												color="green"
-											/>
-											<font-awesome-icon 
-												v-if="saveerror"
-												:icon="['fas', 'xmark']"
-												color="red"
-											/>
-											&nbsp;
-											<b-button 
-												v-if="edit"
-												type="submit"
-												variant="success"
-												@click="saveDashboard()"
-											>
-												{{ $t('generic.save') }}
-											</b-button>
-											&nbsp;
-											<b-button 
-												v-if="edit"
-												type="submit"
-												variant="danger"
-												@click="reloadDashboard()"
-											>
-												{{ $t('generic.cancel') }}
-											</b-button>
-											&nbsp;
-											<button 
-												v-if="canedit"
-												:title="$t('dashboard.editdashboardlayout')"
-												class="btn datatable-btn mr-1"
-												:disabled="edit"
-												@click="edit = !edit"
-											>
-												<font-awesome-icon 
-													:icon="['fas', 'pencil']"
-												/>
-											</button>
-										</b-col>
-										<b-col 
-											cols="1"
-											align="left"
+										<b-col
+											align="right"
 										>
 											<DeleteItemModal
 												v-if="candelete"
@@ -113,6 +91,7 @@
 												:name="layouts[activeLayout].name"
 												customclass="datatable-btn mr-1"
 												parameter="dashboard/layout"
+												:disabled="edit"
 												@reloadDashboard="reloadDashboard"
 											/>
 										</b-col>
@@ -121,11 +100,104 @@
 							</b-row>
 						</div>
 
-						<Alert 
-							v-if="!layouts[activeLayout].name"
-							:message="$t('dashboard.nodashboard')" 
-							variant="info"
-						/>
+						<div align="center">
+							<b-col cols="6">
+								<Alert 
+									v-if="!layouts[activeLayout].id && !edit"
+									:message="$t('dashboard.nodashboard')" 
+									variant="info"
+								/>
+							</b-col>
+						</div>
+
+						<div align="center">
+							<div 
+								v-if="edit"
+								class="multisearch-card col-6"
+							>
+								<b-row>
+									<b-col>
+										<b-form-group
+											:label="$t('search.name')" 
+											label-for="name"
+										>
+											<b-form-input
+												id="name"
+												v-model="emptylayout.name"
+												required
+											/>
+										</b-form-group>
+									</b-col>
+									<b-col>
+										<b-form-group
+											:label="$t('search.visibility')" 
+											label-for="visibility"
+										>
+											<v-select
+												id="visibility"
+												v-model="emptylayout.visibility" 
+												:options="optvisibility" 
+												:reduce="text => text.value"
+												:clearable="false"
+												label="text"
+												class="mb-3"
+											/>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row v-if="emptylayout.visibility == 'private_group'">
+									<b-col>
+										<b-form-group
+											:label="$t('search.groups')" 
+											label-for="groups"
+										>
+											<v-select 
+												v-model="emptylayout.groups"
+												:options="groups"
+												:reduce="text => text.value"
+												label="text"
+												multiple
+											/>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row v-if="emptylayout.visibility == 'private_group'">
+									<b-col>
+										<b-form-group
+											:label="$t('search.allow_group_modification')" 
+											label-for="allow_group_modification"
+										>
+											<label class="form-check form-switch">
+												<input 
+													v-model="emptylayout.allow_group_modification"
+													class="form-check-input"
+													type="checkbox"
+												>
+											</label>
+										</b-form-group>
+									</b-col>
+								</b-row>
+								<b-row>
+									<b-col>
+										<b-button 
+											type="submit"
+											variant="success"
+											@click="saveDashboard()"
+										>
+											{{ $t('generic.save') }}
+										</b-button>
+										&nbsp;
+										<b-button 
+											type="submit"
+											variant="danger"
+											@click="reloadDashboard()"
+										>
+											{{ $t('generic.cancel') }}
+										</b-button>
+									</b-col>
+								</b-row>
+							</div>
+						</div>
 
 						<GridLayout 
 							v-model:layout="layouts[activeLayout].layout"
@@ -219,6 +291,14 @@ export default {
 			errormsg: null,
 			loading: true,
 			errored: false,
+			emptylayout: {
+				visibility: "public",
+				user: null,
+				groups: [],
+				allow_group_modification: false,
+				name: null,
+				layout: []
+			},
 			layouts: [
 				{
 					layout: []
@@ -230,6 +310,14 @@ export default {
 			loadingsave: false,
 			savewithsuccess: false,
 			saveerror: false,
+			userid: null,
+			groupids: [],
+			groups: [],
+			optvisibility: [
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") }
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -247,6 +335,8 @@ export default {
 			this.candelete = true
 		}
 
+		await this.getUserAccount()
+		await this.getGroups()
 		await this.getLayouts()
 		if (!this.errored) {
 			await this.getChartData()
@@ -254,7 +344,38 @@ export default {
 		}
 	},
 	methods: {
+		async getUserAccount() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
+				.then(response => {
+					this.userid = response.data.id
+					this.groupids = response.data.groups
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		async getGroups() {
+			this.groups = []
+			for (const group of this.groupids) {
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+					.then(response => {
+						this.groups.push({
+							value: response.data.id,
+							text: response.data.name
+						})
+					})
+					.catch(e => {
+						this.errormsg = e.message
+						this.errored = true
+					})
+			}
+			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+		},
 		async getLayouts() {
+			this.layouts = []
 			const response = await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/", { headers: this.header })
 				.catch(e => {
 					this.errormsg = e.message
@@ -266,7 +387,23 @@ export default {
 				&& response.status == 200
 			) {
 				if(response.data.length) {
-					this.layouts = response.data
+					for (const layouts of response.data) {
+						if (
+							layouts.visibility == "public"
+							|| layouts.user == this.userid
+							|| layouts.groups.includes(this.groupids)
+						) {
+							this.layouts.push(layouts)
+						}
+					}
+				}
+
+				if (!this.layouts.length) {
+					this.layouts = [
+						{
+							layout: []
+						}
+					]
 				}
 			}
 		},
