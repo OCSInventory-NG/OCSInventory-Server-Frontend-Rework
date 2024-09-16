@@ -156,7 +156,7 @@ export default {
 			this.loadingdelete = true
 			
 			if(!this.multiple) {
-				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.id+"/", { headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null
 						this.deleteerror = false
