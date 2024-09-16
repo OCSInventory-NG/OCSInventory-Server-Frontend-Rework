@@ -4,6 +4,7 @@
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			:class="'btn ' + customclass"
+			:disabled="disabled"
 			@click="deleteact = !deleteact"
 		>
 			<font-awesome-icon 
@@ -113,7 +114,8 @@ export default {
 		name: { type: String, default: '' },
 		parameter: { type: String, default: '' },
 		multiple: { type: Boolean, default: false },
-		customclass: { type: String, default: 'btn-ghost-danger' }
+		customclass: { type: String, default: 'btn-ghost-danger' },
+		disabled: { type: Boolean, default: false },
 	},
 	data() {
 		return {
