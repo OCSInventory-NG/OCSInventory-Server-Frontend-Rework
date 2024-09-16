@@ -38,9 +38,10 @@
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
+										@option:selected="refreshActiveLayout()"
 									/>
 								</b-col>
-								<b-col>
+								<b-col cols="1">
 									<b-spinner 
 										v-if="loadingsave"
 										variant="success"
@@ -67,6 +68,18 @@
 											:icon="['fas', 'pencil']"
 										/>
 									</button>
+								</b-col>
+								<b-col v-if="edit">
+									<v-select
+										v-model="addchartid"
+										:options="optcharts"
+										:reduce="text => text.value"
+										:clearable="false"
+										:placeholder="$t('dashboard.chartplaceholder')"
+										label="text"
+										class="mb-3 ocs-select"
+										@option:selected="addItem()"
+									/>
 								</b-col>
 								<b-col 
 									v-if="
@@ -180,6 +193,26 @@
 								<b-row>
 									<b-col>
 										<b-button 
+											v-if="canadd"
+											type="submit"
+											variant="success"
+											@click="addDashboard()"
+										>
+											{{ $t('generic.saveas') }}
+										</b-button>
+										&nbsp;
+										<b-button
+											v-if="
+												canedit
+													&& layouts[activeLayout].id
+													&& (
+														layouts[activeLayout].user == userid
+														|| (
+															layouts[activeLayout].groups.includes(groupids)
+															&& layouts[activeLayout].allow_group_modification == true
+														)
+													)
+											"
 											type="submit"
 											variant="success"
 											@click="saveDashboard()"
@@ -199,7 +232,15 @@
 							</div>
 						</div>
 
+						<div
+							v-if="loadingchart"
+							class="ocs-loader"
+						>
+							<Loader />
+						</div>
+
 						<GridLayout 
+							v-else
 							v-model:layout="layouts[activeLayout].layout"
 							:row-height="30"
 							:static="true"
@@ -222,9 +263,9 @@
 								<Counter 
 									v-if="item.type == 'Counter'"
 									:firsttitle="'dashboard.'+item.name"
-									:firstcount="chartData[item.i].data.total"
+									:firstcount="chartData[activeLayout][item.i].data.total"
 									secondtitle="dashboard.contacted"
-									:secondcount="chartData[item.i].data.contacted"
+									:secondcount="chartData[activeLayout][item.i].data.contacted"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -232,8 +273,8 @@
 								<PieChart
 									v-if="item.type == 'DonutChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[item.i].data.options"
-									:series="chartData[item.i].data.series"
+									:options="chartData[activeLayout][item.i].data.options"
+									:series="chartData[activeLayout][item.i].data.series"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -241,8 +282,8 @@
 								<LineChart
 									v-if="item.type == 'LineChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[item.i].data.options"
-									:series="chartData[item.i].data.series"
+									:options="chartData[activeLayout][item.i].data.options"
+									:series="chartData[activeLayout][item.i].data.series"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -250,8 +291,8 @@
 								<BarChart
 									v-if="item.type == 'BarChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[item.i].data.options"
-									:series="chartData[item.i].data.series"
+									:options="chartData[activeLayout][item.i].data.options"
+									:series="chartData[activeLayout][item.i].data.series"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -305,14 +346,17 @@ export default {
 				}
 			],
 			edit: false,
-			activeLayout: null,
+			activeLayout: 0,
 			optlayouts: [],
+			optcharts: [],
 			loadingsave: false,
 			savewithsuccess: false,
 			saveerror: false,
 			userid: null,
 			groupids: [],
 			groups: [],
+			addchartid: null,
+			loadingchart: false,
 			optvisibility: [
 				{ value: "public", text: this.$t("search.public") },
 				{ value: "private_personal", text: this.$t("search.private_personal") },
@@ -324,7 +368,19 @@ export default {
 			}
 		}
 	},
+	watch: {
+		savewithsuccess: function() {
+			setTimeout(() => {
+				this.edit = false
+				this.savewithsuccess = false
+				this.reloadDashboard()
+			}, 500)
+		}
+	},
 	async beforeMount() {
+		if (localStorage.getItem('active_layout')) {
+			this.activeLayout = parseInt(localStorage.getItem('active_layout'))
+		}
 		if(localStorage.getItem('permissions').split(",").includes("layout_add_dashboardlayout")) {
 			this.canadd = true
 		}
@@ -337,6 +393,7 @@ export default {
 
 		await this.getUserAccount()
 		await this.getGroups()
+		await this.getChartsList()
 		await this.getLayouts()
 		if (!this.errored) {
 			await this.getChartData()
@@ -344,11 +401,31 @@ export default {
 		}
 	},
 	methods: {
+		async getChartsList() {
+			this.optcharts = []
+
+			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/", { headers: this.header })
+				.then(response => {
+					for (const chart of response.data) {
+						this.optcharts.push({
+							value: chart.name + ";" + chart.charttype,
+							text: this.$t('dashboard.' + chart.description)
+						})
+					}
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
 		async getUserAccount() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.userid = response.data.id
 					this.groupids = response.data.groups
+					this.emptylayout.user = this.userid
 					this.errormsg = null
 					this.errored = false
 				})
@@ -391,7 +468,10 @@ export default {
 						if (
 							layouts.visibility == "public"
 							|| layouts.user == this.userid
-							|| layouts.groups.includes(this.groupids)
+							|| (
+								layouts.visibility == "private_group"
+								&& layouts.groups.includes(this.groupids)
+							)
 						) {
 							this.layouts.push(layouts)
 						}
@@ -404,10 +484,16 @@ export default {
 							layout: []
 						}
 					]
+				} else {
+					if (!this.layouts[this.activeLayout]) {
+						this.activeLayout = 0
+					}
+					this.emptylayout = this.layouts[this.activeLayout]
 				}
 			}
 		},
 		async getChartData() {
+			this.loadingchart = true
 			var index = 0
 			this.optlayouts = []
 			this.chartData = []
@@ -416,11 +502,16 @@ export default {
 					value: index,
 					text: charts.name
 				})
+
+				if (!this.chartData[index]) {
+					this.chartData[index] = []
+				}
+
 				for (const chart of charts.layout) {
 					await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/chart/"+chart.name, { headers: this.header })
 						.then(response => {
 							this.loading = true
-							this.chartData.push({
+							this.chartData[index].push({
 								name: chart.name,
 								data: response.data
 							})
@@ -432,23 +523,25 @@ export default {
 							this.errored = true
 						})
 				}
-				this.activeLayout = index
+
 				index = index + 1
 			}
+
+			this.loadingchart = false
 		},
 		saveDashboard() {
 			this.loadingsave = true
 			var layoutId = this.layouts[this.activeLayout].id
-			var layout = this.layouts[this.activeLayout]
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/"+layoutId+"/", layout,
+			this.emptylayout.layout = this.layouts[this.activeLayout].layout
+
+			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/"+layoutId+"/", this.emptylayout,
 				{ headers: this.header })
 				.then(() => {
 					this.savewithsuccess = true
 					this.saveerror = false
 					this.errormsg = null
 					this.errored = false
-					this.edit = false
 				})
 				.catch(e => {
 					this.savewithsuccess = false
@@ -457,6 +550,33 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loadingsave = false)
+		},
+		addDashboard() {
+			this.loadingsave = true
+
+			this.emptylayout.layout = this.layouts[this.activeLayout].layout
+
+			axios.post(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/", this.emptylayout,
+				{ headers: this.header })
+				.then(() => {
+					this.savewithsuccess = true
+					this.saveerror = false
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.savewithsuccess = false
+					this.saveerror = true
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => this.loadingsave = false)
+		},
+		refreshActiveLayout() {
+			this.loadingchart = true
+			localStorage.setItem('active_layout', this.activeLayout)
+			this.emptylayout = this.layouts[this.activeLayout]
+			this.loadingchart = false
 		},
 		async reloadDashboard() {
 			this.loading = true
@@ -472,13 +592,59 @@ export default {
 
 			if (index > -1) {
 				this.layouts[this.activeLayout].layout.splice(index, 1)
-				this.chartData.splice(index, 1)
+				this.chartData[this.activeLayout].splice(index, 1)
 				for (const layout of this.layouts[this.activeLayout].layout) {
 					if (layout.i > index) {
 						layout.i = index
 						index = index + 1
 					}
 				}
+			}
+		},
+		async addItem() {
+			var chartInfo = this.addchartid.split(";")
+			var index = this.layouts[this.activeLayout].layout.length
+
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/chart/"+chartInfo[0], { headers: this.header })
+				.then(response => {
+					this.chartData[this.activeLayout].push({
+						name: chartInfo[0],
+						data: response.data
+					})
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+
+			if (chartInfo[1] == "Counter") {
+				this.layouts[this.activeLayout].layout.push({
+					x: 0,
+					y: 0,
+					w: 2,
+					h: 4,
+					i: index,
+					minw: 2,
+					minh: 4,
+					name: chartInfo[0],
+					type: "Counter",
+					resizable: true
+				})
+			} else {
+				this.layouts[this.activeLayout].layout.push({
+					x: 0,
+					y: 0,
+					w: 6,
+					h: 9,
+					i: index,
+					minw: 6,
+					minh: 9,
+					name: chartInfo[0],
+					type: chartInfo[1],
+					resizable: false
+				})
 			}
 		}
 	}
