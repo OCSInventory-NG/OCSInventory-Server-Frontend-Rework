@@ -373,7 +373,6 @@ export default {
 			setTimeout(() => {
 				this.edit = false
 				this.savewithsuccess = false
-				this.reloadDashboard()
 			}, 500)
 		}
 	},
@@ -497,6 +496,7 @@ export default {
 			var index = 0
 			this.optlayouts = []
 			this.chartData = []
+
 			for (const charts of this.layouts) {
 				this.optlayouts.push({
 					value: index,
@@ -555,6 +555,7 @@ export default {
 			this.loadingsave = true
 
 			this.emptylayout.layout = this.layouts[this.activeLayout].layout
+			delete this.emptylayout.id
 
 			axios.post(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/", this.emptylayout,
 				{ headers: this.header })
@@ -570,7 +571,10 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loadingsave = false)
+				.finally(() => {
+					this.loadingsave = false
+					this.reloadDashboard()
+				})
 		},
 		refreshActiveLayout() {
 			this.loadingchart = true
