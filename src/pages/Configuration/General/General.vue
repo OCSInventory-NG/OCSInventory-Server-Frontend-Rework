@@ -288,6 +288,12 @@ export default {
 
 			var configToUpdate = this.configs[this.activetab].name
 
+			for (const config of this.configs[this.activetab].value) {
+				if (config.type == "number input") {
+					config.value = parseInt(config.value)
+				}
+			}
+
 			axios.patch(this.$config.BACKEND_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
 				{ headers: this.header })
 				.then(() => {
