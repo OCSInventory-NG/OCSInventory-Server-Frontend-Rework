@@ -341,8 +341,8 @@ export default {
 			this.snmpmodal = true
 			this.getSnmpConfig(id)
 		},
-		getSnmpConfig(id) {
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+id, { headers: this.header })
+		async getSnmpConfig(id) {
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")

@@ -66,7 +66,7 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
 			if(localStorage.getItem('permissions').split(",").includes("netdevice_change_netdevice")) {
 				this.canedit = true
@@ -74,15 +74,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("netdevice_delete_netdevice")) {
 				this.candelete = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"netdevices", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"netdevices", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -97,11 +97,11 @@ export default {
 				})
 		},
 		// Retrieve netdevice
-		getNetdevice() {
+		async getNetdevice() {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?network="+this.$route.params.id
 
-			axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
@@ -113,8 +113,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
-			this.getNetdevice()
+		async reloadDatatable() {
+			await this.getNetdevice()
 		}
 	}
 }

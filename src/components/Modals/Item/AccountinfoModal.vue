@@ -228,8 +228,8 @@ export default {
 			this.accountinfomodal = true
 			this.getAccountinfo(id)
 		},
-		getAccountinfo(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
+		async getAccountinfo(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

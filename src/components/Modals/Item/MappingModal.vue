@@ -145,8 +145,8 @@ export default {
 			this.mappingmodal = true
 			this.getMappingConfig(id)
 		},
-		getMappingConfig(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+		async getMappingConfig(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 

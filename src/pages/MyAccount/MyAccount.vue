@@ -168,8 +168,8 @@ export default {
 			setTimeout(() => this.successed = false, 10000)
 		}
 	},
-	mounted() {
-		axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
+	async mounted() {
+		await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 			.then(response => {
 				this.rowdata = response.data
 				this.errormsg = null

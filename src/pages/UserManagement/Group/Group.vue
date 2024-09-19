@@ -77,7 +77,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_view_group")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_add_group")) {
@@ -89,15 +89,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("auth_delete_group")) {
 				this.candelete = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -111,8 +111,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getPermissions() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
+		async getPermissions() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
@@ -164,8 +164,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getGroups() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
+		async getGroups() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.permissionsTreatment()
@@ -205,8 +205,8 @@ export default {
 				rowDetails.permissions = tmpTradPermission.join('\n')
 			})
 		},
-		reloadDatatable() {
-			this.getGroups()
+		async reloadDatatable() {
+			await this.getGroups()
 		}
 	}
 }

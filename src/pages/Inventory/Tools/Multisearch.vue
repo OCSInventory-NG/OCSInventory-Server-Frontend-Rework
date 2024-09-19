@@ -85,9 +85,9 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -95,8 +95,8 @@ export default {
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
@@ -114,10 +114,10 @@ export default {
 					this.errored = true
 				})
 		},
-		reloadDatatable(search) {
+		async reloadDatatable(search) {
 			this.rowsearch = search
 			
-			axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
+			await axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					this.assetids = []

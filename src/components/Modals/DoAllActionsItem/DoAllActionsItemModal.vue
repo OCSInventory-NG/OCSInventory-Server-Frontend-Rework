@@ -224,11 +224,11 @@ export default {
 					})
 			}
 		},
-		getData() {
+		async getData() {
 			this.loading = true
 			this.doallaction = true
 			
-			axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
 				.then(response => {
 					if(response.data.length > 0) {
 						this.datavalues = []

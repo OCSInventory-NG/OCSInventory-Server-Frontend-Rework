@@ -256,7 +256,7 @@ export default {
 			}, 4000)
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
 			this.allconfigview = true
 			this.can.config.view = true
@@ -269,7 +269,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("config_delete_config")) {
 				this.can.config.delete = true
 			}
-			this.getSnmpConfig()
+			await this.getSnmpConfig()
 		}
 
 		if(localStorage.getItem('permissions').split(",").includes("snmp_config_view_snmpconfig")) {
@@ -284,7 +284,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("snmp_config_delete_snmpconfig")) {
 				this.can.community.delete = true
 			}
-			this.getSnmpCommunities()
+			await this.getSnmpCommunities()
 		}
 
 		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
@@ -299,7 +299,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("template_delete_template")) {
 				this.can.template.delete = true
 			}
-			this.getSnmpTemplateHeader()
+			await this.getSnmpTemplateHeader()
 		}
 
 		if(localStorage.getItem('permissions').split(",").includes("scanner_view_snmpscanner")) {
@@ -314,7 +314,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("scanner_delete_snmpscanner")) {
 				this.can.scanner.delete = true
 			}
-			this.getSnmpScannerHeader()
+			await this.getSnmpScannerHeader()
 		}
 		
 		if(!this.allconfigview) {
@@ -325,11 +325,11 @@ export default {
 		this.loading = false
 	},
 	methods: {
-		getSnmpConfig() {
+		async getSnmpConfig() {
 			this.loadingconfig = true
 			this.configs = []
 			
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"config/snmp", { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"config/snmp", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 				})
@@ -339,11 +339,11 @@ export default {
 				})
 				.finally(() => this.loadingconfig = false)
 		},
-		getSnmpCommunities() {
+		async getSnmpCommunities() {
 			this.loadingcommunity = true
 			this.rowsnmpcomm = []
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
 				.then(response => {
 					this.rowsnmpcomm = response.data
 					for (const community of this.rowsnmpcomm) {
@@ -356,11 +356,11 @@ export default {
 				})
 				.finally(() => this.loadingcommunity = false)
 		},
-		getSnmpTemplateHeader() {
+		async getSnmpTemplateHeader() {
 			this.loadingtemplate = true
 			this.rowtemplateheader = []
 
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+			await axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowtemplateheader.push(field)
@@ -374,10 +374,10 @@ export default {
 					this.errored = true
 				})
 		},
-		getSnmpTemplates() {
+		async getSnmpTemplates() {
 			this.rowtemplatedata = []
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os=SNMP", { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.errormsg = null
@@ -389,11 +389,11 @@ export default {
 				})
 				.finally(() => this.loadingtemplate = false)
 		},
-		getSnmpScannerHeader() {
+		async getSnmpScannerHeader() {
 			this.loadingscanner = true
 			this.rowscannerheader = []
 
-			axios.options(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.options(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field == "configs") {
@@ -411,10 +411,10 @@ export default {
 					this.errored = true
 				})
 		},
-		getSnmpScanners() {
+		async getSnmpScanners() {
 			this.rowscannerdata = []
 
-			axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
 				.then(response => {
 					this.rowscannerdata = response.data
 					for (const scan of this.rowscannerdata) {

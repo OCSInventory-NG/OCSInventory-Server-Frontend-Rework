@@ -104,6 +104,7 @@ export default {
 	name: "Inventory",
 	props: {
 		id: { type: String, default: "0" },
+		template: { type: Number, default: null }
 	},
 	data() {
 		return {
@@ -129,13 +130,15 @@ export default {
 			return this.sections && nestedLoaded.length !== 0
 		}
 	},
-	created() {
-		this.getSection()
-		this.getInventory()
+	async created() {
+		await this.getSection()
+		if (!this.errored) {
+			await this.getInventory()
+		}
 	},
 	methods: {
-		getInventory() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
+		async getInventory() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
 				.then(response => {
 					for (const inventory of response.data) {
 						var sectionName = this.allsections[inventory.template_section].name
@@ -183,20 +186,30 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		getSection() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"sections", { headers: this.header })
-				.then(response => {
+		async getSection() {
+			if (this.template != null) {
+				var templateFilter = "?template=" + this.template
+
+				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"sections"+templateFilter,
+					{ headers: this.header })
+					.catch(e => {
+						this.errormsg = e.message
+						this.errored = true
+					})
+
+				if (
+					response 
+					&& response.status == 200
+				) {
 					for (const section of response.data) {
 						this.allsections[section.id] = section
 						for (const field of section.fields) {
 							this.allfields[field.id] = field.name
 						}
 					}
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
+					this.errored = false
+				}
+			}
 		}
 	}
 }

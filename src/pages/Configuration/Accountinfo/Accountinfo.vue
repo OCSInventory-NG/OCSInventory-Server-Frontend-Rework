@@ -79,7 +79,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("accountinfo_view_accountinfoconfig")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfoconfig")) {
@@ -94,15 +94,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfovalue")) {
 				this.canaddvalue = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"accountinfo/config", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"accountinfo/config", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -116,8 +116,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getAccountinfoConfig() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", { headers: this.header })
+		async getAccountinfoConfig() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", { headers: this.header })
 				.then(response => {
 					this.config = response.data
 					this.accountinfovaluesTreatment()
@@ -141,9 +141,9 @@ export default {
 			this.rowdata = this.config
 			this.loading = false
 		},
-		reloadDatatable() {
+		async reloadDatatable() {
 			this.loading = true
-			this.getAccountinfoConfig()
+			await this.getAccountinfoConfig()
 		}
 	}
 }

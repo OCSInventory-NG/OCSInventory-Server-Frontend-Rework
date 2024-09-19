@@ -428,7 +428,7 @@ export default {
 
 			this.$emit('reloadDatatable', this.datavalues)
 		},
-		getFields(route, masterindex, index, section = false) {
+		async getFields(route, masterindex, index, section = false) {
 			if(!section) {
 				var component = route.split("/")[0]
 
@@ -446,7 +446,7 @@ export default {
 			this.fieldopt[masterindex][index] = []
 
 			if(route == "accountinfo/config?datatarget=ASSET") {
-				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 						this.fieldopt[masterindex][index] = []
@@ -471,7 +471,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else if(route == "templates") {
-				axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
 						this.loadingtemplate = true
 						if(!Array.isArray(this.templateopt[masterindex])) {
@@ -497,7 +497,7 @@ export default {
 						this.errored = true
 					})
 			} else if (section) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"fields?section="+route, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"fields?section="+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -520,7 +520,7 @@ export default {
 					})
 					.finally(() => this.loading = false)
 			} else {
-				axios.options(this.$config.BACKEND_API_ROUTE+route+"/", { headers: this.header })
+				await axios.options(this.$config.BACKEND_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -568,8 +568,8 @@ export default {
 			}
 			
 		},
-		getSections(templateId, masterindex, index) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+		async getSections(templateId, masterindex, index) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"sections?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
 					if(!Array.isArray(this.sectionopt[masterindex])) {
@@ -635,7 +635,7 @@ export default {
 			fieldType.splice(masterindex, 1)
 			this.fieldopt.splice(masterindex, 1)
 		},
-		setFieldType(input, masterindex, index) {
+		async setFieldType(input, masterindex, index) {
 			this.fieldopt[masterindex][index].forEach(element => {
 				if(element.value == input.field) {
 					input.fieldtype = element.fieldtype
@@ -643,7 +643,7 @@ export default {
 			})
 
 			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
+				await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
 					{ headers: this.header })
 					.then(response => {
 						this.loadingadmin = true

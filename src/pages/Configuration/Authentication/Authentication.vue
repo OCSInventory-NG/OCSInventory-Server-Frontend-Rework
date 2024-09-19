@@ -139,13 +139,13 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_method_view_authmethod")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_method_change_authmethod")) {
 				this.canedit = true
 			}
-			this.getAuthMethod()
+			await this.getAuthMethod()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -153,8 +153,8 @@ export default {
 		}
 	},
 	methods: {
-		getAuthMethod() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/", { headers: this.header })
+		async getAuthMethod() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/", { headers: this.header })
 				.then(response => {
 					this.authmethods = response.data
 					this.authmethods.forEach(authmethod => {

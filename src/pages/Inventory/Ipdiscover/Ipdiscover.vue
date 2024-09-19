@@ -78,7 +78,7 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("network_view_network")) {
 			if(localStorage.getItem('permissions').split(",").includes("network_change_network")) {
 				this.canedit = true
@@ -89,7 +89,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
-			this.getNetworks()
+			await this.getNetworks()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -97,8 +97,8 @@ export default {
 	},
 	methods: {
 		// Retrieve networks group
-		getNetGroup() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
+		async getNetGroup() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.netgroupdata = response.data
 					this.errormsg = null
@@ -111,11 +111,11 @@ export default {
 				})
 		},
 		// Retrieve networks
-		getNetworks() {
+		async getNetworks() {
 			this.networkdata = []
 			this.netgroupdata = []
 			this.rowdata = []
-			axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networkdata = response.data
 					this.errormsg = null
@@ -166,8 +166,8 @@ export default {
 
 			this.loading = false
 		},
-		reloadDatatable() {
-			this.getNetworks()
+		async reloadDatatable() {
+			await this.getNetworks()
 		}
 	}
 }

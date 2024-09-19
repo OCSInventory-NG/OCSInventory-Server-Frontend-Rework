@@ -147,12 +147,12 @@ export default {
 			setTimeout(() => this.successed = false, 10000)
 		}
 	},
-	mounted() {
-		this.getAccountinfoConfig()
+	async mounted() {
+		await this.getAccountinfoConfig()
 	},
 	methods: {
-		getAccountinfoConfig() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+		async getAccountinfoConfig() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -183,8 +183,8 @@ export default {
 
 			return array
 		},
-		getAccountinfoData() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data?object_slug="
+		async getAccountinfoData() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
