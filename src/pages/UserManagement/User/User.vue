@@ -76,7 +76,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_view_user")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_add_user")) {
@@ -88,15 +88,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("auth_delete_user")) {
 				this.candelete = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "user_permissions" && field != "password") {
@@ -112,9 +112,9 @@ export default {
 					this.errored = true
 				})
 		},
-		getGroups() {
+		async getGroups() {
 			this.groups = []
-			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(groupDetails => {
 						this.groups.push({
@@ -131,8 +131,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getUsers() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
+		async getUsers() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
@@ -154,9 +154,9 @@ export default {
 			})
 			this.loading = false
 		},
-		reloadDatatable() {
+		async reloadDatatable() {
 			this.loading = true
-			this.getGroups()
+			await this.getGroups()
 		}
 	}
 }

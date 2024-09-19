@@ -55,7 +55,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("result_view_result")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("result_add_result")) {

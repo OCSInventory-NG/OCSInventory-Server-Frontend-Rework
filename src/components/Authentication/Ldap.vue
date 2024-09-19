@@ -122,7 +122,7 @@ export default {
 			}
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
@@ -137,15 +137,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			this.getLdapConfiguration()
+			await this.getLdapConfiguration()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getLdapConfiguration() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
+		async getLdapConfiguration() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
 				.then(response => {
 					this.ldapdata = response.data
 					this.errormsg = null
@@ -186,13 +186,13 @@ export default {
 					this.successed = false
 				})
 		},
-		reloadDatatable() {
+		async reloadDatatable() {
 			this.loading = true
 			this.rowdata = []
-			this.getLdapConfig()
+			await this.getLdapConfig()
 		},
-		getLdapConfig() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
+		async getLdapConfig() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
 				.then(response => {
 					var tmpLdap = response.data
 

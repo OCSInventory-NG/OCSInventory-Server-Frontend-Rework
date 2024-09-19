@@ -151,8 +151,8 @@ export default {
 			this.getNetdevice(id)
 		},
 		// Retrieve networks info by id
-		getNetdevice(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
+		async getNetdevice(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

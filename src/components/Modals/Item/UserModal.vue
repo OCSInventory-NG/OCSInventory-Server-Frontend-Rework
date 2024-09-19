@@ -267,8 +267,8 @@ export default {
 			this.usermodal = true
 			this.getUser(id)
 		},
-		getUser(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })
+		async getUser(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -280,8 +280,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getGroups() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
+		async getGroups() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
 				.then(response => {
 					this.groups = []
 					response.data.forEach(groupDetails => {

@@ -75,7 +75,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("rule_view_rule")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("rule_add_rule")) {
@@ -90,37 +90,32 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("rule_view_action")) {
 				this.canviewaction = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			if(this.canview) {
-				axios.options(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
-					.then(response => {
-						Object.keys(response.data.actions.POST).forEach(field => {
-							if(!this.excludefields.includes(field)) {
-								this.rowheader.push(field)
-							}
-						})
-						this.errormsg = null
-						this.errored = false
-						this.getRules()
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						if(!this.excludefields.includes(field)) {
+							this.rowheader.push(field)
+						}
 					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-			} else {
-				this.errormsg = this.$t("message.dont_have_right_to_see")
-				this.errored = true
-			}
+					this.errormsg = null
+					this.errored = false
+					this.getRules()
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 		},
-		getRules() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
+		async getRules() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(element => {
 						element.trigger = this.$t("rule." + element.trigger)
@@ -135,8 +130,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
-			this.getRules()
+		async reloadDatatable() {
+			await this.getRules()
 		}
 	}
 }

@@ -199,8 +199,8 @@ export default {
 			this.netgroupmodal = true
 			this.getNetgroup(id)
 		},
-		getNetgroup(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
+		async getNetgroup(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
@@ -212,8 +212,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getNetworks() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
+		async getNetworks() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks = []
 					response.data.forEach(network => {

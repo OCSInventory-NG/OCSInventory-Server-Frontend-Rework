@@ -61,20 +61,20 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("history_view_history")) {
 			if(localStorage.getItem('permissions').split(",").includes("result_view_result")) {
 				this.canviewhistory = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") {
@@ -94,8 +94,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getPackages() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getPackages() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length

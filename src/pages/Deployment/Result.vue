@@ -170,12 +170,12 @@ export default {
 			}
 		}
 	},
-	created() {
-		this.getHeader()
+	async mounted() {
+		await this.getHeader()
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -190,8 +190,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getPackageResult() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
+		async getPackageResult() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/results/?package="+this.id, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 

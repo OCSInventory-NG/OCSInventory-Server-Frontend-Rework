@@ -75,7 +75,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("package_view_package")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("package_add_package")) {
@@ -90,15 +90,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("action_view_deploymentaction")) {
 				this.canviewaction = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "result") this.rowheader.push(field)
@@ -112,8 +112,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getPackages() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getPackages() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length
@@ -128,8 +128,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
-			this.getPackages()
+		async reloadDatatable() {
+			await this.getPackages()
 		}
 	}
 }

@@ -60,12 +60,12 @@ export default {
 			}
 		}
 	},
-	mounted() {
-		this.getHeader()
+	async mounted() {
+		await this.getHeader()
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"asset/logs", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/logs", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -81,11 +81,11 @@ export default {
 				})
 		},
 		// Retrieve logs
-		getLogs() {
+		async getLogs() {
 			var extendedRoute = "/"
 			if(this.$route.params.id) extendedRoute = "?asset="+this.$route.params.id
 
-			axios.get(this.$config.BACKEND_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null

@@ -73,7 +73,7 @@ export default {
 			}
 		}
 	},
-	created() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("netgroup_view_netgroup")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("netgroup_add_netgroup")) {
@@ -85,15 +85,15 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("netgroup_delete_netgroup")) {
 				this.candelete = true
 			}
-			this.getHeader()
+			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 		}
 	},
 	methods: {
-		getHeader() {
-			axios.options(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -107,8 +107,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getNetgroup() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
+		async getNetgroup() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
@@ -120,8 +120,8 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		reloadDatatable() {
-			this.getNetgroup()
+		async reloadDatatable() {
+			await this.getNetgroup()
 		}
 	}
 }

@@ -87,7 +87,7 @@
 								label="text"
 								class="mb-3"
 								required
-								@input="getMyAssetGroups()"
+								@option:selected="getMyAssetGroups()"
 							/>
 						</b-form-group>
 					</b-col>
@@ -107,7 +107,7 @@
 								label="text"
 								class="mb-3"
 								required
-								@input="setAssetGroupInfo(updategroupid)"
+								@option:selected="setAssetGroupInfo(updategroupid)"
 							/>
 						</b-form-group>
 					</b-col>
@@ -301,11 +301,11 @@ export default {
 			this.assetgroupmodal = true
 			this.getAssetGroupInfo(id)
 		},
-		getAssetGroupInfo() {
+		async getAssetGroupInfo() {
 			this.loading = true
 			this.assetgroupmodal = true
 
-			axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
 				.then(response => {
 					delete response.data.search
 					delete response.data.assets
@@ -321,8 +321,8 @@ export default {
 					this.errored = true
 				})
 		},
-		getUserName() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
+		async getUserName() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					if(response.data.first_name != "") {
@@ -337,11 +337,11 @@ export default {
 				})
 			this.getGroups(this.rowgroup.groups)
 		},
-		getUserInfo() {
+		async getUserInfo() {
 			this.loading = true
 			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			this.assetgroupmodal = true
-			axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					this.errormsg = null
@@ -356,10 +356,10 @@ export default {
 					this.errored = true
 				})
 		},
-		getGroups(groups) {
+		async getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -374,9 +374,10 @@ export default {
 			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			this.loading = false
 		},
-		getMyAssetGroups() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
+		async getMyAssetGroups() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
+					console.log(response.data)
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
 							value: assetgroup.id,

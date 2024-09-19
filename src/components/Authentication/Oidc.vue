@@ -143,7 +143,7 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
+	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
@@ -152,7 +152,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			this.getOidcConfiguration()
+			await this.getOidcConfiguration()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -160,8 +160,8 @@ export default {
 		}
 	},
 	methods: {
-		getOidcConfiguration() {
-			axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
+		async getOidcConfiguration() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
 					this.errormsg = null

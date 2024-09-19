@@ -207,8 +207,8 @@ export default {
 			this.rulemodal = true
 			this.getRules(id)
 		},
-		getRules(id) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+id, { headers: this.header })
+		async getRules(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
