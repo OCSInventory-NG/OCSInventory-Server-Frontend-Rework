@@ -4,9 +4,32 @@
 
 .donut-card {
   border: 0;
-  margin-top: 20px;
+}
+
+.line-card {
+  padding-bottom: .4rem;
 }
 
 .badge {
   color: #fff;
+}
+
+.counter {
+  height: 100%;
+}
+
+.display-grid::before {
+  background-image: linear-gradient(to right, rgb(214, 214, 214) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(214, 214, 214) 1px, transparent 1px);
+  background-repeat: repeat;
+  background-size: calc(calc(100% - 5px) / 12) 40px;
+  content: '';
+  height: calc(100% - 5px);
+  margin: 5px;
+  position: absolute;
+  width: calc(100% - 5px);
+}
+
+.vgl-layout {
+  min-height: 100px;
 }

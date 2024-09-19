@@ -1,5 +1,5 @@
 <template>
-	<div id="bar">
+	<div id="pie">
 		<div class="card donut-card">
 			<b-button 
 				v-if="edit"
@@ -12,25 +12,23 @@
 					size="1x"
 				/>
 			</b-button>
-			<div class="card-body line-card">
+			<div class="card-body">
 				<h3 class="card-title">
 					{{ $t(title) }}
 				</h3>
 				<apexchart 
-					type="bar" 
 					:options="chartOptions" 
 					:series="series"
-					height="274.69"
 					width="568"
+					type="pie" 
 				/>
 			</div>
 		</div>
 	</div>
 </template>
-
 <script>
 export default {
-	name: "BarChart",
+	name: "Pie",
 	props: {
 		options: { type: Object, default: null },
 		series: { type: Array, default: null },
@@ -42,24 +40,15 @@ export default {
 		return {
 			chartOptions: {
 				chart: {
-					height: 275,
 					width: 568,
-					type: 'bar'
-				},
-				plotOptions: {
-					bar: {
-						borderRadius: 10,
-						dataLabels: {
-							position: 'top'
-						},
-					}
+					type: 'pie'
 				},
 				responsive: [
 					{
-						breakpoint: 700,
+						breakpoint: 568,
 						options: {
 							chart: {
-								width: 300
+								width: 200
 							},
 							legend: {
 								show: false
@@ -71,7 +60,7 @@ export default {
 		}
 	},
 	async mounted() {
-		this.chartOptions.xaxis = this.options["xaxis"]
+		this.chartOptions.labels = this.options["labels"]
 	},
 	methods: {
 		removeItem() {

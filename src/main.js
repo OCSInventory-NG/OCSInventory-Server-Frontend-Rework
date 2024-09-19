@@ -13,6 +13,10 @@ import JsonExcel from 'vue-json-excel3'
 /***** Vue select *****/
 import vSelect from "vue-select"
 import "vue-select/dist/vue-select.css"
+
+/***** Grid layout plus *****/
+import { GridLayout, GridItem } from 'grid-layout-plus'
+
 /***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
@@ -45,6 +49,8 @@ loadConfig().then((config) => {
 	app.component("VSelect", vSelect)
 	app.component('FontAwesomeIcon', FontAwesomeIcon)
 	app.component('FontAwesomeLayers', FontAwesomeLayers)
+	app.component('GridLayout', GridLayout)
+	app.component('GridItem', GridItem)
 	library.add({ 
 		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,

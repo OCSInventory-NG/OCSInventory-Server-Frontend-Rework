@@ -3,7 +3,8 @@
 		<button 
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
-			class="btn btn-ghost-danger"
+			:class="'btn ' + customclass"
+			:disabled="disabled"
 			@click="deleteact = !deleteact"
 		>
 			<font-awesome-icon 
@@ -112,7 +113,9 @@ export default {
 		ids: { type: Array, default: null },
 		name: { type: String, default: '' },
 		parameter: { type: String, default: '' },
-		multiple: { type: Boolean, default: false }
+		multiple: { type: Boolean, default: false },
+		customclass: { type: String, default: 'btn-ghost-danger' },
+		disabled: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -142,6 +145,7 @@ export default {
 				this.deletewithsuccess = false
 				this.$emit('reloadDatatable')
 				this.$emit('reloadTemplate')
+				this.$emit('reloadDashboard')
 			}, 500)
 		}
 	},
@@ -152,7 +156,7 @@ export default {
 			this.loadingdelete = true
 			
 			if(!this.multiple) {
-				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.row.id+"/", { headers: this.header })
+				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.id+"/", { headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null
 						this.deleteerror = false

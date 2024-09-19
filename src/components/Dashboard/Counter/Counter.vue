@@ -1,6 +1,17 @@
 <template>
-	<div :class="classstyle">
-		<div class="card">
+	<div :class="classstyle + ' counter'">
+		<div class="card counter">
+			<b-button 
+				v-if="edit"
+				size="sm" 
+				variant="outline-danger" 
+				@click="removeItem()"
+			>
+				<font-awesome-icon 
+					:icon="['fas', 'xmark']"
+					size="1x"
+				/>
+			</b-button>
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div class="subheader">
@@ -34,7 +45,14 @@ export default {
 		firstcount: { type: Number, default: null },
 		secondtitle: { type: String, default: null },
 		secondcount: { type: Number, default: null },
-		classstyle: { type: String, default: "col-sm-6 col-lg-2" }
+		classstyle: { type: String, default: "" },
+		edit: { type: Boolean, default: false },
+		i: { type: Number, default: 0 }
+	},
+	methods: {
+		removeItem() {
+			this.$emit('removeItem', this.i)
+		}
 	}
 }
 </script>

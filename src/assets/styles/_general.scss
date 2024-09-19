@@ -27,6 +27,11 @@ h4 {
   margin-top: 15px;
 }
 
+.vs__dropdown-toggle {
+  background: $white !important;
+  background-color: $white;
+}
+
 @media (min-width: 1200px) {
   .container-xl {
     max-width: 1320px;
