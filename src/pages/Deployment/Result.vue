@@ -45,7 +45,7 @@
 							</div>
 							<div class="row">
 								<div class="col-lg-6">
-									<DonutChart 
+									<PieChart 
 										title="deployment.statistics"
 										:options="resultcount.options"
 										:series="resultcount.series"
@@ -118,12 +118,12 @@
 <script>
 import axios from 'axios'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
-import DonutChart from '@/components/Dashboard/Chart/Donut.vue'
+import PieChart from '@/components/Dashboard/Chart/Pie.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 
 export default {
 	name: "Result",
-	components: { Counter, DonutChart, BarChart },
+	components: { Counter, PieChart, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},
