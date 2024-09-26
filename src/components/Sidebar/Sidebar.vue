@@ -70,10 +70,6 @@
 						{ 
 							header: $t('title.history'), link: '/deployment/history', 
 							route:'History', column: 'general' 
-						},
-						{ 
-							header: $t('title.report'), link: '/deployment/report', 
-							route:'Report', column: 'general' 
 						}
 					]"
 					link="/deployment"
