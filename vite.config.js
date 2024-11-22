@@ -13,9 +13,9 @@ export default defineConfig({
 		host: '172.18.25.200',
 		port: 3000
 	},
-  build: {
-    assetsInclude: ['.htaccess'],
-  },
+	build: {
+		assetsInclude: ['.htaccess'],
+	},
 	plugins: [
 		vue(),
 		VueI18nPlugin({
