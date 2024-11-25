@@ -329,7 +329,7 @@ export default {
 			this.loadingconfig = true
 			this.configs = []
 			
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"config/snmp", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"config/snmp", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 				})
@@ -343,7 +343,7 @@ export default {
 			this.loadingcommunity = true
 			this.rowsnmpcomm = []
 
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config", { headers: this.header })
 				.then(response => {
 					this.rowsnmpcomm = response.data
 					for (const community of this.rowsnmpcomm) {
@@ -360,7 +360,7 @@ export default {
 			this.loadingtemplate = true
 			this.rowtemplateheader = []
 
-			await axios.options(import.meta.env.VITE_APP_API_ROUTE+"templates/", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowtemplateheader.push(field)
@@ -377,7 +377,7 @@ export default {
 		async getSnmpTemplates() {
 			this.rowtemplatedata = []
 
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os=SNMP", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates?os=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.errormsg = null
@@ -393,7 +393,7 @@ export default {
 			this.loadingscanner = true
 			this.rowscannerheader = []
 
-			await axios.options(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"snmp/scanner", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field == "configs") {
@@ -414,7 +414,7 @@ export default {
 		async getSnmpScanners() {
 			this.rowscannerdata = []
 
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner", { headers: this.header })
 				.then(response => {
 					this.rowscannerdata = response.data
 					for (const scan of this.rowscannerdata) {
@@ -438,7 +438,7 @@ export default {
 				.finally(() => this.loadingscanner = false)
 		},
 		enableSnmp() {
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"config/snmp/", this.configs,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"config/snmp/", this.configs,
 				{ headers: this.header })
 				.then(() => {
 					this.successmsg = this.$t("message.success_saved")
