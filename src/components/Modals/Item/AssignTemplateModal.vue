@@ -141,7 +141,7 @@ export default {
 			this.loading = true
 			this.row = this.item
 			this.assigntemplatemodal = true
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"templates?os!=SNMP", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates?os!=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					response.data.forEach(template => {
@@ -163,7 +163,7 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"asset/bases/"+this.row[0].id+"/", this.row[0],
+			axios.patch(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.row[0].id+"/", this.row[0],
 				{ headers: this.header })
 				.then(() => {
 					this.successed = true
