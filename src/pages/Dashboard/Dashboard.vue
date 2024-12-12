@@ -452,7 +452,7 @@ export default {
 		},
 		async getLayouts() {
 			this.layouts = []
-			const response = await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/", { headers: this.header })
+			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/layout/", { headers: this.header })
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
@@ -508,7 +508,7 @@ export default {
 				}
 
 				for (const chart of charts.layout) {
-					await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/chart/"+chart.name, { headers: this.header })
+					await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name, { headers: this.header })
 						.then(response => {
 							this.loading = true
 							this.chartData[index].push({
@@ -535,7 +535,7 @@ export default {
 
 			this.emptylayout.layout = this.layouts[this.activeLayout].layout
 
-			axios.patch(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/"+layoutId+"/", this.emptylayout,
+			axios.patch(this.$config.BACKEND_API_ROUTE+"dashboard/layout/"+layoutId+"/", this.emptylayout,
 				{ headers: this.header })
 				.then(() => {
 					this.savewithsuccess = true
@@ -557,7 +557,7 @@ export default {
 			this.emptylayout.layout = this.layouts[this.activeLayout].layout
 			delete this.emptylayout.id
 
-			axios.post(import.meta.env.VITE_APP_API_ROUTE+"dashboard/layout/", this.emptylayout,
+			axios.post(this.$config.BACKEND_API_ROUTE+"dashboard/layout/", this.emptylayout,
 				{ headers: this.header })
 				.then(() => {
 					this.savewithsuccess = true
@@ -609,7 +609,7 @@ export default {
 			var chartInfo = this.addchartid.split(";")
 			var index = this.layouts[this.activeLayout].layout.length
 
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"dashboard/chart/"+chartInfo[0], { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chartInfo[0], { headers: this.header })
 				.then(response => {
 					this.chartData[this.activeLayout].push({
 						name: chartInfo[0],
