@@ -243,14 +243,6 @@ const routes = [
 		meta: {
 			layout: AppLayout
 		}
-	},
-	{
-		path: '/deployment/report',
-		name: 'Report',
-		component: () => import('@/pages/Deployment/Report.vue'),
-		meta: {
-			layout: AppLayout
-		}
 	}
 ]
 
