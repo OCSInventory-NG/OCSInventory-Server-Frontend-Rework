@@ -15,6 +15,7 @@
     "allassetsincache": "All assets (cached)",
     "allow_group_modification": "Allow groups modification",
     "associatedsearch": "Related search",
+    "count": "Assets number",
     "create": "Create a new group",
     "description": "Description",
     "editassetgroup": "Edit the group",
