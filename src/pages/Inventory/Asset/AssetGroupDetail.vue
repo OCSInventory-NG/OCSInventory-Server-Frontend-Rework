@@ -209,7 +209,9 @@ export default {
 		async getAssetGroup() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
 				.then(response => {
-					this.assets = response.data.assets
+					this.rowdata = []
+					this.rowdata = response.data.asset_bases
+					delete response.data.asset_bases
 					delete response.data.assets
 					this.groupinfo = response.data
 					this.errormsg = null
@@ -240,6 +242,7 @@ export default {
 			this.groups = []
 			if(this.groupinfo.groups) {
 				for (const group of this.groupinfo.groups) {
+					this.loading = true
 					await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
 						.then(response => {
 							this.groups.push(response.data.name)
@@ -249,23 +252,8 @@ export default {
 							this.errormsg = e.message
 							this.errored = true
 						})
+						.finally(() => this.loading = false)
 				}
-			}
-			this.getAssets()
-		},
-		async getAssets() {
-			this.rowdata = []
-			for (const asset of this.assets) {
-				this.loading = true
-				await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+asset, { headers: this.header })
-					.then(response => {
-						this.rowdata.push(response.data)
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-					.finally(() => this.loading = false)
 			}
 			this.loading = false
 		},
