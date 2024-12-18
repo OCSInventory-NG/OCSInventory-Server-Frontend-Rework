@@ -1,6 +1,6 @@
 <template>
 	<div id="matrix">
-		<table class="table w-full">
+		<table class="table w-full table-fix-head">
 			<thead>
 				<tr align="center">
 					<th>{{ $t("generic.type") }}</th>

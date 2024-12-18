@@ -1,0 +1,13 @@
+// ===========================================
+//  MATRIX COMPONENT
+// ===========================================
+
+.table-fix-head {
+  overflow: auto;
+}
+
+.table-fix-head thead th { 
+  position: sticky;
+  top: -25px;
+  z-index: 1;
+}
