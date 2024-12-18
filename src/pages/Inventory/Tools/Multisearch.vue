@@ -49,7 +49,7 @@
 								:canaccessdetails="true"
 								:candeploy="true"
 								:multisearch="true"
-								title="assets"
+								title="asset"
 								translationkey="inventory."
 							/>
 							<AssetGroupModal 
