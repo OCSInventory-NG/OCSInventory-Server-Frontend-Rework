@@ -424,7 +424,7 @@ export default {
 		editcomponent: { type: String, default: '' },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: false },
+		usecheckbox: { type: Boolean, default: true },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
