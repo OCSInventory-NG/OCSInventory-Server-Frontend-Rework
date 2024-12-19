@@ -35,6 +35,7 @@
 								:candelete="candelete"
 								:rowheader="rowheader"
 								:candeploy="true"
+								:usecheckbox="true"
 								title="asset/bases"
 								translationkey="inventory."
 								@reloadDatatable="reloadDatatable"

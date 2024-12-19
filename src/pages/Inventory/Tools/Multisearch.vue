@@ -49,8 +49,11 @@
 								:canaccessdetails="true"
 								:candeploy="true"
 								:multisearch="true"
-								title="asset"
+								:candelete="candelete"
+								:usecheckbox="candelete"
+								title="asset/bases"
 								translationkey="inventory."
+								@reloadDatatable="reloadDatatable"
 							/>
 							<AssetGroupModal 
 								:assetrow="assetids"
@@ -79,6 +82,7 @@ export default {
 			loading: true,
 			errored: false,
 			noresult: null,
+			candelete: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -87,6 +91,9 @@ export default {
 	},
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
+			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
+				this.candelete = true
+			}
 			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
@@ -115,7 +122,7 @@ export default {
 				})
 		},
 		async reloadDatatable(search) {
-			this.rowsearch = search
+			this.rowsearch = search ?? JSON.parse(localStorage.getItem('multisearch'))
 			
 			await axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
