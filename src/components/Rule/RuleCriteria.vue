@@ -114,6 +114,17 @@
 										required
 									/>
 								</b-form-group>
+								<b-form-checkbox
+									v-if="input.operator == 'in'
+										|| input.operator == '=='
+										|| input.operator == '!='"
+									id="case_sensitive"
+									v-model="input.case_sensitive"
+									name="enabled"
+									:value="true"
+								>
+									{{ $t("rule.case_sensitive") }}
+								</b-form-checkbox>
 							</b-col>
 							<b-col cols="3">
 								<b-form-group>
@@ -263,6 +274,7 @@ export default {
 						field: "id",
 						operator: "==",
 						value: null,
+						case_sensitive: false
 					}
 				]
 			],

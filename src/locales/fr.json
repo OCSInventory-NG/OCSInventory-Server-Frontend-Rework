@@ -377,6 +377,7 @@
     "addorcondition": "Ajouter une condition OU",
     "addrule": "Ajouter une règle",
     "boolean": "est vrai",
+    "case_sensitive": "Sensible aux majuscules et minuscules",
     "contains": "contient",
     "data": "Valeur",
     "description": "Nom/Description",
