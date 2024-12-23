@@ -140,6 +140,11 @@ export default {
 			setTimeout(() => {
 				this.netdevicemodal = false
 				this.createwithsuccess = false
+				this.row = {
+					netname: null,
+					ip: null,
+					mac: null
+				}
 				this.$emit('reloadDatatable')
 			}, 500)
 		}

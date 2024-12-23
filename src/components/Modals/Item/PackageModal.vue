@@ -188,6 +188,11 @@ export default {
 			setTimeout(() => {
 				this.packagemodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					description: null,
+					target_os: 'WIN'
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

@@ -331,6 +331,17 @@ export default {
 			setTimeout(() => {
 				this.fieldmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					id: null,
+					name: null,
+					retrival_value: null,
+					override_target: false,
+					new_target: null,
+					retrival_method: null,
+					retrival_output: null,
+					options: {},
+					section: null
+				}
 				this.$emit("reloadTemplate")
 			}, 500)
 		}

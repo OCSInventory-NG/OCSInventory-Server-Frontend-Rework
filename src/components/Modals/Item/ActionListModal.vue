@@ -205,6 +205,14 @@ export default {
 			setTimeout(() => {
 				this.actionlistmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					id: null,
+					name: null,
+					priority: 1,
+					action_type: "EXEC",
+					command: null,
+					original_file_name: null
+				}
 				if(this.update) {
 					this.$emit('reloadDatatable')
 				} else {

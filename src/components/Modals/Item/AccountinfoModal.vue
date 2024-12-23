@@ -213,6 +213,12 @@ export default {
 			setTimeout(() => {
 				this.accountinfomodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					description: null,
+					datatype: 'TEXT',
+					datatarget: 'ASSET'
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

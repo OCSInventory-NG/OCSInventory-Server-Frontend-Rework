@@ -192,6 +192,13 @@ export default {
 			setTimeout(() => {
 				this.rulemodal = false
 				this.createwithsuccess = false
+				this.row = {
+					description: null,
+					trigger: 'inventory_received',
+					enabled: false,
+					logic: {},
+					actions: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

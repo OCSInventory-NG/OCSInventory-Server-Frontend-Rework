@@ -175,6 +175,10 @@ export default {
 			setTimeout(() => {
 				this.groupmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					permissions: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

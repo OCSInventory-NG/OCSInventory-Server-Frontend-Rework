@@ -103,6 +103,7 @@
 								id="password"
 								v-model="row.password"
 								type="password"
+								autocomplete="new-password"
 								:required="(!update) ? true : false"
 							/>
 						</b-form-group>
@@ -251,6 +252,16 @@ export default {
 			setTimeout(() => {
 				this.usermodal = false
 				this.createwithsuccess = false
+				this.row = {
+					username: null,
+					password: null,
+					email: null,
+					first_name: null,
+					last_name: null,
+					is_staff: false,
+					groups: [],
+					user_permissions: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

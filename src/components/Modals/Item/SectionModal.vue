@@ -320,6 +320,16 @@ export default {
 			setTimeout(() => {
 				this.sectionmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					id: null,
+					name: null,
+					retrival_method: 'FILE',
+					retrival_output: null,
+					target: null,
+					fields: [],
+					template: null,
+					options: {}
+				}
 				this.$emit("reloadTemplate")
 			}, 500)
 		}
