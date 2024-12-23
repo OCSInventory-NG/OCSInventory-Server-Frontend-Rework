@@ -405,14 +405,14 @@ export default {
 
 		Object.keys(this.datavalues).forEach(index => {
 			Object.keys(this.datavalues[index]).forEach(search => {
-				this.getFields(this.datavalues[index][search].route, index, search)
+				this.getFields(this.datavalues[index][search].route, index, search, false, true)
 				if(
 					this.datavalues[index][search].route == "templates"
 					&& this.datavalues[index][search].template != null
 					&& this.datavalues[index][search].section != null
 				) {
-					this.getSections(this.datavalues[index][search].template, index, search)
-					this.getFields(this.datavalues[index][search].section, index, search, true)
+					this.getSections(this.datavalues[index][search].template, index, search, true)
+					this.getFields(this.datavalues[index][search].section, index, search, true, true)
 				}
 				this.setFieldType(this.datavalues[index][search], index, search)
 			})
@@ -428,7 +428,14 @@ export default {
 
 			this.$emit('reloadDatatable', this.datavalues)
 		},
-		async getFields(route, masterindex, index, section = false) {
+		async getFields(route, masterindex, index, section = false, loadingdata = false) {
+			if(!loadingdata) {
+				this.datavalues[masterindex][index].field = ""
+				this.datavalues[masterindex][index].value = ""
+				this.datavalues[masterindex][index].operator = "iexact"
+				this.datavalues[masterindex][index].fieldtype = "string"
+			}
+
 			if(!section) {
 				var component = route.split("/")[0]
 
@@ -568,7 +575,7 @@ export default {
 			}
 			
 		},
-		async getSections(templateId, masterindex, index) {
+		async getSections(templateId, masterindex, index, loadingdata = false) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"sections?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
@@ -577,6 +584,11 @@ export default {
 					}
 
 					this.sectionopt[masterindex][index] = []
+
+					if(!loadingdata) {
+						this.datavalues[masterindex][index].section = null
+						this.datavalues[masterindex][index].field = ""
+					}
 
 					response.data.forEach(field => {
 						this.sectionopt[masterindex][index].push({

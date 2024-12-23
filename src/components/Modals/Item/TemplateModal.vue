@@ -174,6 +174,11 @@ export default {
 			setTimeout(() => {
 				this.templatemodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					os: 'WIN',
+					sections: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

@@ -217,6 +217,13 @@ export default {
 			setTimeout(() => {
 				this.snmpscannermodal = false
 				this.createwithsuccess = false
+				this.row = {
+					identifier: null,
+					ip: null,
+					subnets: null,
+					notes: null,
+					configs: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

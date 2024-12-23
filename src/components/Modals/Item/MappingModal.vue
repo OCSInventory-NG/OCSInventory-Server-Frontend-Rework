@@ -135,6 +135,12 @@ export default {
 			setTimeout(() => {
 				this.mappingmodal = false
 				this.createwithsuccess = false
+				this.rows = {
+					username: null,
+					last_name: null,
+					first_name: null,
+					email: null
+				}
 				this.$emit('reloadDatatable')
 			}, 500)
 		}

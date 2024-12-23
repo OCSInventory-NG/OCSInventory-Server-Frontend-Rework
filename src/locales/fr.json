@@ -15,6 +15,7 @@
     "allassetsincache": "Tous les actifs (cache)",
     "allow_group_modification": "Autoriser les groupes à modifier",
     "associatedsearch": "Recherche associée",
+    "count": "Nombre d'actifs",
     "create": "Créer un nouveau groupe",
     "description": "Description",
     "editassetgroup": "Éditer le groupe",

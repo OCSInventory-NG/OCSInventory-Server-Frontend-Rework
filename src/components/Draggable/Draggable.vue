@@ -124,6 +124,12 @@ export default {
 			event.preventDefault
 
 			this.rowdatas[event.newIndex].priority = event.newIndex + 1
+
+			// Prevent 400 bad request
+			if(this.rowdatas[event.newIndex].file) {
+				delete this.rowdatas[event.newIndex].file
+			}
+
 			axios.patch(
 				this.$config.BACKEND_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
 				this.rowdatas[event.newIndex],

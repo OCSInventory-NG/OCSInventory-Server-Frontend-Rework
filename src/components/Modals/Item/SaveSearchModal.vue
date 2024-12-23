@@ -333,6 +333,15 @@ export default {
 			setTimeout(() => {
 				this.savesearchmodal = false
 				this.createwithsuccess = false
+				this.savedsearch = {
+					search: {},
+					visibility: "private_personal",
+					name: null,
+					description: null,
+					allow_group_modification: false,
+					user: null,
+					groups: []
+				}
 				if(this.update) {
 					this.$emit("reloadDatatable")
 				}

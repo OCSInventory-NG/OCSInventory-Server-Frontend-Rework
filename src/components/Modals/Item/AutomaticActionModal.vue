@@ -212,6 +212,12 @@ export default {
 			setTimeout(() => {
 				this.automaticactionmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					description: null,
+					active: false,
+					recurence: "hourly"
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

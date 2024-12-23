@@ -94,6 +94,7 @@ export default {
 							this.rowheader.push(field)
 						}
 					})
+					this.rowheader.push("count")
 					this.errormsg = null
 					this.errored = false
 					this.getAssetGroups()
@@ -110,6 +111,7 @@ export default {
 						group.visibility = this.$t("assetgroup."+group.visibility)
 						group.is_dynamic = this.$t("generic."+group.is_dynamic)
 						group.allow_group_modification = this.$t("generic."+group.allow_group_modification)
+						group.count = group.assets.length
 					}
 					this.rowdata = response.data
 					this.errormsg = null
