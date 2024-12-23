@@ -174,6 +174,13 @@ export default {
 			setTimeout(() => {
 				this.networkmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					description: null,
+					netid: null,
+					mask: null,
+					group: null
+				}
 				this.$emit('reloadDatatable')
 			}, 500)
 		}

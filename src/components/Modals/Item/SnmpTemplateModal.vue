@@ -151,6 +151,11 @@ export default {
 			setTimeout(() => {
 				this.snmptemplatemodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					os: 'SNMP',
+					sections: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

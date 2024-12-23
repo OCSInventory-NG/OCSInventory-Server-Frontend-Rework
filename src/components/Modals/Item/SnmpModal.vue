@@ -326,6 +326,18 @@ export default {
 			setTimeout(() => {
 				this.snmpmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					version: "2c",
+					user: null,
+					level: null,
+					password: null,
+					auth_protocol: null,
+					priv_protocol: null,
+					retries: 1,
+					timeout: 30,
+					subnets: null
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

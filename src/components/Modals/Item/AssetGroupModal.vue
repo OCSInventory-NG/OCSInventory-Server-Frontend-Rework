@@ -289,6 +289,17 @@ export default {
 			setTimeout(() => {
 				this.assetgroupmodal = false
 				this.createwithsuccess = false
+				this.rowgroup = {
+					name: null,
+					description: null,
+					search: [],
+					is_dynamic: true,
+					assets: [],
+					visibility: "public",
+					allow_group_modification: false,
+					user: null,
+					groups: []
+				}
 				if(this.update) {
 					this.$emit("reloadDatatable")
 				}
