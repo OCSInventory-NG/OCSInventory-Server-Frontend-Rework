@@ -103,6 +103,7 @@
 								id="password"
 								v-model="row.password"
 								type="password"
+								autocomplete="new-password"
 								:required="(!update) ? true : false"
 							/>
 						</b-form-group>
