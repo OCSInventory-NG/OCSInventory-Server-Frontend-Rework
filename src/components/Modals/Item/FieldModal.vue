@@ -110,7 +110,7 @@
 						</b-form-checkbox>
 					</b-col>
 				</b-row>
-				<div v-if="row.override_target == 'true'">
+				<div v-if="row.override_target == true || row.override_target == 'true'">
 					<b-row>
 						<b-col>
 							<b-form-group
