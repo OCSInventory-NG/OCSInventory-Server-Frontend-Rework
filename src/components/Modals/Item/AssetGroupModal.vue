@@ -346,7 +346,7 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
-			this.getGroups(this.rowgroup.groups)
+			this.getGroups(this.user.groups)
 		},
 		async getUserInfo() {
 			this.loading = true
