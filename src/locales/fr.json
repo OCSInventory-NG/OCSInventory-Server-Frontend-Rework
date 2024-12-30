@@ -189,6 +189,7 @@
     "manageaction": "Gérer les actions",
     "name": "Nom",
     "nb": "Nombre",
+    "notified": "Notifié",
     "package": "Paquet",
     "path": "Chemin",
     "priority": "Priorité d'exécution",

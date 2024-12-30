@@ -217,7 +217,7 @@ export default {
 						package: pkg.id,
 						asset: asset.id,
 						name: pkg.name,
-						status: 0,
+						status: 1,
 						comment: "Waiting notification",
 						group: parseInt(this.group)
 					}

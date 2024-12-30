@@ -30,17 +30,22 @@
 								<Counter 
 									firsttitle="deployment.waiting"
 									:firstcount="count.waiting"
-									classstyle="col-sm-6 col-lg-4"
+									classstyle="col-sm-6 col-lg-3"
+								/>
+								<Counter 
+									firsttitle="deployment.notified"
+									:firstcount="count.notified"
+									classstyle="col-sm-6 col-lg-3"
 								/>
 								<Counter 
 									firsttitle="deployment.success"
 									:firstcount="count.success"
-									classstyle="col-sm-6 col-lg-4"
+									classstyle="col-sm-6 col-lg-3"
 								/>
 								<Counter 
 									firsttitle="deployment.error"
 									:firstcount="count.error"
-									classstyle="col-sm-6 col-lg-4"
+									classstyle="col-sm-6 col-lg-3"
 								/>
 							</div>
 							<div class="row">
@@ -82,6 +87,16 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											title="history-waiting"
+											translationkey="deployment."
+										/>
+									</b-tab>
+									<b-tab :title="$t('deployment.notified')">
+										<Datatable
+											id="deployment-notified-datatable"
+											:rowdata="rowdatanotified"
+											:rowheader="rowheader"
+											:usecheckbox="false"
+											title="history-notified"
 											translationkey="deployment."
 										/>
 									</b-tab>
@@ -133,6 +148,7 @@ export default {
 			rowheader: [],
 			rowdatawaiting: [],
 			rowdatasuccess: [],
+			rowdatanotified: [],
 			rowdataerror: [],
 			count: [],
 			errormsg: null,
@@ -197,12 +213,13 @@ export default {
 
 					this.count.error = 0
 					this.count.waiting = 0
+					this.count.notified = 0
 					this.count.success = 0
 
 					var tmpError = []
 
 					response.data.forEach(result => {
-						if(result.status == 2) {
+						if(result.status == 3) {
 							this.count.error += 1
 							this.rowdataerror.push(result)
 
@@ -211,9 +228,12 @@ export default {
 							} else {
 								tmpError[result.comment] = 1
 							}
-						} else if(result.status == 1) {
+						} else if(result.status == 0) {
 							this.count.success += 1
 							this.rowdatasuccess.push(result)
+						} else if(result.status == 2) {
+							this.count.notified += 1
+							this.rowdatanotified.push(result)
 						} else {
 							this.count.waiting += 1
 							this.rowdatawaiting.push(result)
@@ -244,10 +264,12 @@ export default {
 					})
 
 					this.resultcount.options.labels.push(this.$t("deployment.waiting"))
+					this.resultcount.options.labels.push(this.$t("deployment.notified"))
 					this.resultcount.options.labels.push(this.$t("deployment.success"))
 					this.resultcount.options.labels.push(this.$t("deployment.error"))
 
 					this.resultcount.series.push(this.count.waiting)
+					this.resultcount.series.push(this.count.notified)
 					this.resultcount.series.push(this.count.success)
 					this.resultcount.series.push(this.count.error)
 

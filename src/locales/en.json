@@ -189,6 +189,7 @@
     "manageaction": "Manage actions",
     "name": "Name",
     "nb": "Number",
+    "notified": "Notified",
     "package": "Package",
     "path": "Path",
     "priority": "Execution priority",
@@ -203,7 +204,7 @@
     "toperror": "Most encountered errors",
     "total": "Total number of machines",
     "viewhistory": "View results history",
-    "waiting": "In waiting"
+    "waiting": "Pending"
   },
   "generic": {
     "add": "Add",
