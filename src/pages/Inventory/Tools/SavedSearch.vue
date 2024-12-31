@@ -153,6 +153,9 @@ export default {
 							})
 							.finally(() => { this.loading = false })
 					}
+					if(this.rowdata[key].groups.length == 0) {
+						this.rowdata[key].groups = null
+					}
 				}
 			}
 
