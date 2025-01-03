@@ -37,13 +37,27 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:canedittemplate="canedit"
-								:candelete="candelete"
+								:candelete="false"
 								:canexport="false"
 								:importtemplate="importtemplate"
 								title="templates"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
-							/>
+							>
+								<template #cell(actions)="row">
+									<DeleteItemModal
+										v-if="row.row && row.row.item && row.row.item.candelete"
+										:id="row.row.item.id || row.row.item.identifier"
+										:name="row.row.item.name 
+											|| row.row.item.username 
+											|| row.row.item.identifier 
+											|| $t('generic.removeselection')"
+										:parameter="deleterte"
+										:multiple="false"
+										@reloadDatatable="reloadDatatable"
+									/>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>
@@ -72,7 +86,8 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			deleterte: "templates"
 		}
 	},
 	async mounted() {
@@ -115,6 +130,7 @@ export default {
 				.then(response => {
 					for (const temp of response.data) {
 						if(temp.os != "SNMP") {
+							if(temp.name !== "Legacy" && temp.os !== "LEG") temp.candelete = true
 							this.rowdata.push(temp)
 						}
 					}

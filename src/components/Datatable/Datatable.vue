@@ -342,6 +342,7 @@
 								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
 							/>
+							<slot name="cell(actions)" :row="row"></slot>
 						</b-button-group>
 					</b-button-toolbar>
 				</template>
@@ -577,7 +578,11 @@ export default {
 			visible: true,
 		}
 
-		if(this.canedit == true || this.candelete == true || this.canviewhistory) {
+		if(
+			this.canedit == true ||
+			this.canedittemplate == true ||
+			this.candelete == true ||
+			this.canviewhistory) {
 			this.fields.push(actions)
 		}
 	},
