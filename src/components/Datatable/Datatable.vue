@@ -342,7 +342,10 @@
 								:multiple="deletemultiple"
 								@reloadDatatable="reloadDatatable"
 							/>
-							<slot name="cell(actions)" :row="row"></slot>
+							<slot
+								name="cell(actions)"
+								:row="row"
+							/>
 						</b-button-group>
 					</b-button-toolbar>
 				</template>
