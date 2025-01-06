@@ -130,7 +130,10 @@ export default {
 				.then(response => {
 					for (const temp of response.data) {
 						if(temp.os != "SNMP") {
-							if(temp.name !== "Legacy" && temp.os !== "LEG") temp.candelete = true
+							if(temp.name !== "Legacy" && temp.os !== "LEG")
+							{
+								temp.candelete = true
+							} 
 							this.rowdata.push(temp)
 						}
 					}
