@@ -523,6 +523,9 @@ export default {
 
 		if(this.title == "assetgroups") {
 			this.deleterte = "asset/groups"
+		}
+		else if(this.title == "automaticaction") {
+			this.deleterte = "automation/scheduler"
 		} else {
 			this.deleterte = this.title
 		}
