@@ -107,6 +107,7 @@ export default {
 			if(this.$route.query.search) {
 				this.reloadDatatable(JSON.parse(this.$route.query.search).flat())
 			}
+			return
 		}
 	},
 	methods: {
