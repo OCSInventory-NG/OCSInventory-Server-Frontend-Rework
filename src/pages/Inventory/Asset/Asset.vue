@@ -100,6 +100,16 @@ export default {
 		async getAssets() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
 				.then(response => {
+					response.data.forEach(data => {
+						if(data.accountinfo) {
+							Object.keys(data.accountinfo).forEach(accountinfo => {
+								if(!this.rowheader.includes("Account info : " + accountinfo)) {
+									this.rowheader.push("Account info : " + accountinfo)
+								}
+								data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
+							})
+						}
+					})
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
