@@ -177,7 +177,7 @@ export default {
 			this.rowdata = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
 				.then(response => {
-						this.rowdata.push(response.data["search"])
+					this.rowdata.push(response.data["search"])
 
 					this.errormsg = null
 					this.errored = false

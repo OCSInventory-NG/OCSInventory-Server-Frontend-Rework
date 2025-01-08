@@ -89,6 +89,15 @@ export default {
 			}
 		}
 	},
+	computed: {
+		executeSavedSearch() {
+			if(this.$route.query.search) {
+				this.reloadDatatable(JSON.parse(this.$route.query.search).flat())
+				return 0
+			}
+			return 1
+		}
+	},
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
 			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
@@ -100,15 +109,6 @@ export default {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
-		}
-	},
-	computed: {
-		executeSavedSearch() {
-			if(this.$route.query.search) {
-				this.reloadDatatable(JSON.parse(this.$route.query.search).flat())
-				return 0
-			}
-			return 1
 		}
 	},
 	methods: {
