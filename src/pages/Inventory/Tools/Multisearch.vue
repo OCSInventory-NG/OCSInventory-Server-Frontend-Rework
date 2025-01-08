@@ -95,10 +95,18 @@ export default {
 				this.candelete = true
 			}
 			await this.getHeader()
+			this.executeSavedSearch
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+		}
+	},
+	computed: {
+		executeSavedSearch() {
+			if(this.$route.query.search) {
+				this.reloadDatatable(JSON.parse(this.$route.query.search).flat())
+			}
 		}
 	},
 	methods: {

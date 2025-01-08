@@ -428,6 +428,7 @@
     "create": "Create new search",
     "description": "Description",
     "editsavesearch": "Edit saved search",
+    "execute": "Execute saved search",
     "gotosavedsearches": "Manage saved searches",
     "gt": "is greater than",
     "gte": "is greater than or equal to",

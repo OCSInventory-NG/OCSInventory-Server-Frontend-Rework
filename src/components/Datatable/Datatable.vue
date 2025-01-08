@@ -261,6 +261,10 @@
 				<template #cell(actions)="row">
 					<b-button-toolbar>
 						<b-button-group class="mx-1">
+							<slot
+								name="cell(firstActions)"
+								:row="row"
+							/>
 							<button 
 								v-if="canedittemplate"
 								:title="$t('template.edittemplate')"

@@ -36,7 +36,19 @@
 								translationkey="search."
 								editcomponent="SaveSearchModal"
 								@reloadDatatable="reloadDatatable"
-							/>
+							>
+								<template #cell(firstActions)="row">
+									<button
+										:title="$t('search.execute')"
+										class="btn btn-ghost-warning rounded"
+										@click="executeSavedSearch(row.row.item.id)"
+									>
+										<font-awesome-icon 
+											:icon="['fas', 'wand-magic-sparkles']"
+										/>
+									</button>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>
@@ -160,6 +172,25 @@ export default {
 			}
 
 			this.loading = false
+		},
+		async executeSavedSearch(id) {
+			this.rowdata = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
+				.then(response => {
+						this.rowdata.push(response.data["search"])
+
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+			const serializedData = JSON.stringify(this.rowdata);	
+			this.$router.push({
+				name: 'Multisearch',
+				query: { search: serializedData },
+			});
 		},
 		async reloadDatatable() {
 			await this.getSavedSearches()
