@@ -174,7 +174,6 @@ export default {
 		},
 		async executeSavedSearch(id) {
 			this.rowdata.forEach(search => {
-				console.log(this.rowdata)
 				if(id == search.id) {
 					localStorage.setItem('multisearch', JSON.stringify(search.search))
 					localStorage.setItem('useSavedSearch', true)
