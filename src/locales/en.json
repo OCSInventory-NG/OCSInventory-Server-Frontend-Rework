@@ -379,6 +379,7 @@
     "addorcondition": "Add OR condition",
     "addrule": "Add rule",
     "boolean": "is true",
+    "case_sensitive": "Case sensitive",
     "contains": "contains",
     "data": "Value",
     "description": "Name/Description",

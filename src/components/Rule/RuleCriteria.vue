@@ -114,6 +114,17 @@
 										required
 									/>
 								</b-form-group>
+								<b-form-checkbox
+									v-if="input.operator == 'in'
+										|| input.operator == '=='
+										|| input.operator == '!='"
+									id="case_sensitive"
+									v-model="input.case_sensitive"
+									name="enabled"
+									:value="true"
+								>
+									{{ $t("rule.case_sensitive") }}
+								</b-form-checkbox>
 							</b-col>
 							<b-col cols="3">
 								<b-form-group>
@@ -263,6 +274,7 @@ export default {
 						field: "id",
 						operator: "==",
 						value: null,
+						case_sensitive: false
 					}
 				]
 			],
@@ -310,30 +322,39 @@ export default {
 
 			Object.keys(this.logic).forEach(key => {
 				if(!this.links.includes(key)) {
-					this.datavalues = [
-						[
-							{
-								field: this.logic[key][0].var 
-									?? this.logic[key][1].var,
-								operator: key,
-								value: (this.logic[key][1] && this.logic[key][1].var) ? 
-									this.logic[key][0] : ((this.logic[key][1]) ?
-										this.logic[key][1] : null)
-							}
+					if(key != "case_sensitive") {
+						this.datavalues = [
+							[
+								{
+									field: this.logic[key][0].var 
+										?? this.logic[key][1].var,
+									operator: key,
+									value: (this.logic[key][1] && this.logic[key][1].var) ? 
+										this.logic[key][0] : ((this.logic[key][1]) ?
+											this.logic[key][1] : null),
+								}
+							]
 						]
-					]
+					} else {
+						this.datavalues[0][0]["case_sensitive"] = this.logic[key]
+					}
 				} else if(key == "and") {
 					this.datavalues[masterindex] = []
 					Object.keys(this.logic[key]).forEach(and => {
 						Object.keys(this.logic[key][and]).forEach(operator => {
-							this.datavalues[masterindex].push({
-								field: this.logic[key][and][operator][0].var
-									?? this.logic[key][and][operator][1].var,
-								operator: operator,
-								value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var) ? 
-									this.logic[key][and][operator][0]  : ((this.logic[key][and][operator][1]) ?
-										this.logic[key][and][operator][1] : null)
-							})
+							if(operator != "case_sensitive") {
+								this.datavalues[masterindex].push({
+									field: this.logic[key][and][operator][0].var
+										?? this.logic[key][and][operator][1].var,
+									operator: operator,
+									value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var) ? 
+										this.logic[key][and][operator][0]  : ((this.logic[key][and][operator][1]) ?
+											this.logic[key][and][operator][1] : null)
+								})
+							} else {
+								this.datavalues[masterindex][this.datavalues[masterindex].length - 1]["case_sensitive"]
+									= this.logic[key][and][operator]
+							}
 						})
 					})
 				} else if(key == "or") {
@@ -344,27 +365,39 @@ export default {
 							if(key2 == "and") {
 								Object.keys(this.logic[key][or][key2]).forEach(and => {
 									Object.keys(this.logic[key][or][key2][and]).forEach(operator => {
-										this.datavalues[masterindex].push({
-											field: this.logic[key][or][key2][and][operator][0].var
-												?? this.logic[key][or][key2][and][operator][1].var,
-											operator: operator,
-											value: (this.logic[key][or][key2][and][operator][1] 
-											&& this.logic[key][or][key2][and][operator][1].var) ? 
-												this.logic[key][or][key2][and][operator][0]  : 
-												((this.logic[key][or][key2][and][operator][1]) ?
-													this.logic[key][or][key2][and][operator][1] : null)
-										})
+										if(operator != "case_sensitive") {
+											this.datavalues[masterindex].push({
+												field: this.logic[key][or][key2][and][operator][0].var
+													?? this.logic[key][or][key2][and][operator][1].var,
+												operator: operator,
+												value: (this.logic[key][or][key2][and][operator][1] 
+												&& this.logic[key][or][key2][and][operator][1].var) ? 
+													this.logic[key][or][key2][and][operator][0]  : 
+													((this.logic[key][or][key2][and][operator][1]) ?
+														this.logic[key][or][key2][and][operator][1] : null)
+											})
+										} else {
+											this.datavalues[masterindex][this.datavalues[masterindex].length - 1][
+												"case_sensitive"
+											] = this.logic[key][or][key2][and][operator]
+										}
 									})
 								})
 							} else {
-								this.datavalues[masterindex].push({
-									field: this.logic[key][or][key2][0].var
-										?? this.logic[key][or][key2][1].var,
-									operator: key2,
-									value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var) ? 
-										this.logic[key][or][key2][0] : ((this.logic[key][or][key2][1]) ?
-											this.logic[key][or][key2][1] : null)
-								})
+								if(key2 != "case_sensitive") {
+									this.datavalues[masterindex].push({
+										field: this.logic[key][or][key2][0].var
+											?? this.logic[key][or][key2][1].var,
+										operator: key2,
+										value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var) ? 
+											this.logic[key][or][key2][0] : ((this.logic[key][or][key2][1]) ?
+												this.logic[key][or][key2][1] : null)
+									})
+								} else {
+									this.datavalues[masterindex - 1][this.datavalues[masterindex - 1].length - 1][
+										"case_sensitive"
+									] = this.logic[key][or][key2]
+								}
 							}
 
 							masterindex++
@@ -382,7 +415,8 @@ export default {
 				{
 					field: "id",
 					operator: "==",
-					value: null
+					value: null,
+					case_sensitive: false
 				}
 			)
 		},
@@ -397,7 +431,8 @@ export default {
 				{
 					field: "id",
 					operator: "==",
-					value: null
+					value: null,
+					case_sensitive: false
 				}
 			)
 
@@ -411,21 +446,24 @@ export default {
 				object.push({
 					[logics[key].operator]: [
 						{ var: logics[key].field }
-					]
+					],
+					case_sensitive: logics[key].case_sensitive
 				})
 			} else if(logics[key].operator == "in") {
 				object.push({
 					[logics[key].operator]: [
 						logics[key].value,
 						{ var: logics[key].field }
-					]
+					],
+					case_sensitive: logics[key].case_sensitive
 				})
 			} else {
 				object.push({
 					[logics[key].operator]: [
 						{ var: logics[key].field },
 						logics[key].value
-					]
+					],
+					case_sensitive: logics[key].case_sensitive
 				})
 			}
 
@@ -436,16 +474,19 @@ export default {
 				object[logics[key].operator] = [
 					{ var: logics[key].field }
 				]
+				object["case_sensitive"] = logics[key].case_sensitive
 			} else if(logics[key].operator == "in") {
 				object[logics[key].operator] = [
 					logics[key].value,
 					{ var: logics[key].field }
 				]
+				object["case_sensitive"] = logics[key].case_sensitive
 			} else {
 				object[logics[key].operator] = [
 					{ var: logics[key].field },
 					logics[key].value
 				]
+				object["case_sensitive"] = logics[key].case_sensitive
 			}
 
 			return object
