@@ -39,7 +39,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								editcomponent="AutomaticActionModal"
-								title="automaticactions"
+								title="automation/scheduler"
 								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
 							/>
