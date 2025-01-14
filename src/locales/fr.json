@@ -428,6 +428,7 @@
     "create": "Créer une nouvelle recherche",
     "description": "Description",
     "editsavesearch": "Éditer la recherche sauvegardée",
+    "execute": "Éxecuter la recherche sauvegardée",
     "gotosavedsearches": "Gérer les recherches sauvegardées",
     "gt": "est supérieur à",
     "gte": "est supérieur ou égal à",
