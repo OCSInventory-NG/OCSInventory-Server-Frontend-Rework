@@ -251,6 +251,7 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "assign": "Assigner un groupe statique",
     "comment": "Commentaire",
     "CONFIG_ERR": "Erreur de mise à jour de la configuration",
     "CONFIG_UPDATE": "Mise à jour de la configuration de l'agent depuis les informations serveur",
@@ -268,6 +269,7 @@
     "INVENTORY_EXT_UPDATE": "Mise à jour de l'inventaire étendu",
     "last_update": "Dernière mise à jour",
     "name": "Nom",
+    "options": "Options",
     "os": "Système d'exploitation",
     "osname": "Nom OS",
     "osversion": "Version OS",
