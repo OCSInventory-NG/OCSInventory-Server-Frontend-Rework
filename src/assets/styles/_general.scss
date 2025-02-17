@@ -32,6 +32,15 @@ h4 {
   background-color: $white;
 }
 
+.vs--disabled .vs__selected {
+  color: #a1a1a1 !important;
+  width: 100%;
+}
+
+.vs--disabled .vs__search {
+  display: none;
+}
+
 @media (min-width: 1200px) {
   .container-xl {
     max-width: 1320px;
