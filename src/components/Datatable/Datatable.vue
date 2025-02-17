@@ -22,6 +22,23 @@
 					</span>
 				</div>
 
+				<!-- Reload datatable -->
+				<div
+					class="col-1" 
+				>
+					<b-button-group class="mr-1">
+						<button 
+							:title="$t('generic.reload')"
+							class="form-control btn datatable-btn"
+							@click="reloadDatatable"
+						>
+							<font-awesome-icon 
+								:icon="['fas', 'arrows-rotate']"
+							/>
+						</button>
+					</b-button-group>
+				</div>
+
 				<!-- Export Excel -->
 				<div
 					v-if="canexport"
