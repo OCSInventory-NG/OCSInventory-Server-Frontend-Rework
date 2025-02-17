@@ -51,3 +51,12 @@
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
+
+.vs--disabled .vs__selected {
+  color: #a1a1a1 !important;
+  width: 100%;
+}
+
+.vs--disabled .vs__search {
+  display: none;
+}
