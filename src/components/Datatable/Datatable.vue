@@ -199,6 +199,19 @@
 					</router-link>
 				</template>
 
+				<!-- Log assets redirection -->
+				<template 
+					v-if="canaccessdetails"
+					#cell(asset)="row"
+				>
+					<router-link  
+						:to="'/inventory/'+redirectto+'/'+row.item.asset"
+						class="ocs-link"
+					>
+						{{ row.item.asset }}
+					</router-link>
+				</template>
+
 				<!-- Netdevices redirection -->
 				<template 
 					v-if="canaccessdetails"
@@ -520,6 +533,9 @@ export default {
 	},
 	created() {
 		if(this.title == "asset/bases") {
+			this.redirectto = "asset"
+		}
+		else if(this.title == "inventory_logs") {
 			this.redirectto = "asset"
 		} else {
 			this.redirectto = this.title

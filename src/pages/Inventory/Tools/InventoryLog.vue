@@ -28,6 +28,7 @@
 						<div v-else>
 							<Datatable
 								id="logs-datatable"
+								:canaccessdetails="true"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:usecheckbox="false"
