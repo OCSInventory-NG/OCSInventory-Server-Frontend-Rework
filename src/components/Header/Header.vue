@@ -49,6 +49,14 @@
 						<p>{{ $t('title.myaccount') }}</p>
 					</b-dropdown-item-button>
 					<b-dropdown-divider />
+					<b-dropdown-item-button @click="savedSearch">
+						<font-awesome-icon 
+							:icon="['far', 'star']"
+							class="mr-3"
+						/>
+						<p>{{ $t('title.savedsearch') }}</p>
+					</b-dropdown-item-button>
+					<b-dropdown-divider />
 					<b-dropdown-item-button @click="logout">
 						<font-awesome-icon 
 							:icon="['fas', 'power-off']"
@@ -86,6 +94,9 @@ export default {
 		},
 		account() {
 			this.$router.push('/myaccount');
+		},
+		savedSearch() {
+			this.$router.push('/inventory/savedsearch');
 		},
 		showMenu() {
 			this.showmobilemenu = !this.showmobilemenu;
