@@ -242,6 +242,45 @@
 					</a>
 				</template>
 
+				<!-- Package redirection -->
+				<template 
+					v-if="canaccesspackagedetails"
+					#cell(name)="row"
+				>
+					<router-link  
+						:to="'/deployment/packages/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.name }}
+					</router-link>
+				</template>
+
+				<!-- Package asset redirection -->
+				<template 
+					v-if="canaccesspackagedetails"
+					#cell(asset)="row"
+				>
+					<router-link  
+						:to="'/inventory/asset/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.asset.name }}
+					</router-link>
+				</template>
+
+				<!-- Package asset group redirection -->
+				<template 
+					v-if="canaccesspackagedetails"
+					#cell(group)="row"
+				>
+					<router-link  
+						:to="'/inventory/assetgroups/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.group.name }}
+					</router-link>
+				</template>
+
 				<template #cell(error)="row">
 					<span style="color:#ff0000">
 						{{ row.item.error }}
@@ -455,6 +494,7 @@ export default {
 		canviewaction: { type: Boolean, default: false },
 		canaccesschild: { type: Boolean, default: false },
 		canaccessdetails: { type: Boolean, default: false },
+		canaccesspackagedetails: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
