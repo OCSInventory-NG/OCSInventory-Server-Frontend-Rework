@@ -242,19 +242,6 @@
 					</a>
 				</template>
 
-				<!-- Package redirection -->
-				<template 
-					v-if="canaccesspackagedetails"
-					#cell(name)="row"
-				>
-					<router-link  
-						:to="'/deployment/packages/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.name }}
-					</router-link>
-				</template>
-
 				<!-- Package asset redirection -->
 				<template 
 					v-if="canaccesspackagedetails"
