@@ -83,14 +83,24 @@ export default {
 		},
 		// Retrieve logs
 		async getLogs() {
-			var extendedRoute = "/"
-			if(this.$route.params.id) extendedRoute = "?asset="+this.$route.params.id
+			var extendedRoute = "?expand=asset"
+			if(this.$route.params.id) extendedRoute = "&asset="+this.$route.params.id
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/logs"+extendedRoute, { headers: this.header })
+			await axios.get(
+					this.$config.BACKEND_API_ROUTE+
+					"asset/logs"+
+					extendedRoute,
+					{ headers: this.header }
+				)
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
+					this.rowdata.forEach( result => {
+						if(result.asset != undefined) {
+							result.asset = result.asset.name
+						}
+					})
 				})
 				.catch(e => {
 					this.errormsg = e.message
