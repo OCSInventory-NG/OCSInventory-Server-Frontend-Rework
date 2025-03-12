@@ -124,8 +124,11 @@ export default {
 					} else {
 						this.rowdata = response.data
 					}
-
-					this.rowdata[0].group = this.rowdata[0].group.name
+					this.rowdata.forEach( result => {
+						if(result.group != undefined) {
+							result.group = result.group.name
+						}
+					})
 
 					this.errormsg = null
 					this.errored = false
