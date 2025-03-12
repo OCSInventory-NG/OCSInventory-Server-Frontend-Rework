@@ -111,13 +111,21 @@ export default {
 				this.parameter = "asset=" + this.id
 			}
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/results?"+this.parameter, { headers: this.header })
+			await axios.get(
+					this.$config.BACKEND_API_ROUTE+
+					"deployment/results?"+
+					this.parameter+
+					"&expand=group",
+					{ headers: this.header }
+				)
 				.then(response => {
 					if(this.group) {
 						this.calculForGroup(response.data)
 					} else {
 						this.rowdata = response.data
 					}
+
+					this.rowdata[0].group = this.rowdata[0].group.name
 
 					this.errormsg = null
 					this.errored = false
