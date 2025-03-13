@@ -205,10 +205,10 @@
 					#cell(asset)="row"
 				>
 					<router-link  
-						:to="'/inventory/'+redirectto+'/'+row.item.asset"
+						:to="'/inventory/'+redirectto+'/'+row.item.asset.id"
 						class="ocs-link"
 					>
-						{{ row.item.asset }}
+						{{ row.item.asset.name }}
 					</router-link>
 				</template>
 

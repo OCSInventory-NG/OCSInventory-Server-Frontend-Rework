@@ -96,11 +96,6 @@ export default {
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
-					this.rowdata.forEach( result => {
-						if(result.asset != undefined) {
-							result.asset = result.asset.name
-						}
-					})
 				})
 				.catch(e => {
 					this.errormsg = e.message
