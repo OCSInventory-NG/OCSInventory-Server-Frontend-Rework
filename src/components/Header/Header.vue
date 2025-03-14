@@ -30,6 +30,17 @@
 			<div class="navbar-nav flex-row order-md-last">
 				<Localeswitcher />
 
+				<button
+					class="btn btn-md btn-link nav-link"
+					@click="getMySearches()"
+				>
+					<font-awesome-icon 
+						:icon="['fas', 'star']"
+						transform="shrink-6"
+						size="2x"
+					/>
+				</button>
+
 				<BNavItemDropdown
 					id="setting-dropdown"
 					no-caret 
@@ -51,7 +62,7 @@
 					<b-dropdown-divider />
 					<b-dropdown-item-button @click="savedSearch">
 						<font-awesome-icon 
-							:icon="['far', 'star']"
+							:icon="['fas', 'star']"
 							class="mr-3"
 						/>
 						<p>{{ $t('title.savedsearch') }}</p>

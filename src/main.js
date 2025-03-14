@@ -24,10 +24,10 @@ import {
 	faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
-	faSliders, faWandMagicSparkles
+	faSliders, faStar as fasStar, faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
 import {
-	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
+	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar as farStar, faWindowMaximize
 } from '@fortawesome/free-regular-svg-icons'
 
 async function loadConfig() {
@@ -55,7 +55,7 @@ loadConfig().then((config) => {
 		faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles
+		faBars, faChartSimple, faFileLines, faFloppyDisk, fasStar, farStar, faWindowMaximize, faSliders, faWandMagicSparkles
 	})
 
 	router.isReady()
