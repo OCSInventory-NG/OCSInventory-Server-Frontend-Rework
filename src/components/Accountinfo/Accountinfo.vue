@@ -144,7 +144,7 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => {this.successed = false}, 5000)
 		}
 	},
 	async mounted() {
@@ -226,6 +226,9 @@ export default {
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
+						this.loading = true
+						this.rowdata = []
+						this.getAccountinfoConfig()
 					})
 					.catch(e => {
 						this.errormsg = e.message
@@ -243,7 +246,7 @@ export default {
 						this.errored = false
 					})
 					.catch(e => {
-						this.errormsg = e
+						this.errormsg = e.message
 						this.errored = true
 						this.successmsg = null
 						this.successed = false
