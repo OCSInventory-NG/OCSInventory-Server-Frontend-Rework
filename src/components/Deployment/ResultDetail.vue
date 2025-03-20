@@ -112,12 +112,12 @@ export default {
 			}
 
 			await axios.get(
-					this.$config.BACKEND_API_ROUTE+
+				this.$config.BACKEND_API_ROUTE+
 					"deployment/results?"+
 					this.parameter+
 					"&expand=group",
-					{ headers: this.header }
-				)
+				{ headers: this.header }
+			)
 				.then(response => {
 					if(this.group) {
 						this.calculForGroup(response.data)
