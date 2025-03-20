@@ -260,7 +260,8 @@
 					v-if="canaccesspackagedetails"
 					#cell(group)="row"
 				>
-					<router-link  
+					<router-link
+						v-if="row.item.group != null"
 						:to="'/inventory/assetgroups/'+row.item.id"
 						class="ocs-link"
 					>
