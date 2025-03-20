@@ -84,7 +84,7 @@ export default {
 		// Retrieve logs
 		async getLogs() {
 			var extendedRoute = "?expand=asset"
-			if(this.$route.params.id) extendedRoute = "&asset="+this.$route.params.id
+			if(this.$route.params.id) extendedRoute += "&asset="+this.$route.params.id
 
 			await axios.get(
 				this.$config.BACKEND_API_ROUTE+
