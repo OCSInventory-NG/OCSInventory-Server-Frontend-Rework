@@ -686,14 +686,14 @@ export default {
 
 			Object.keys(this.datavalues).forEach(index => {
 				Object.keys(this.datavalues[index]).forEach(search => {
-					this.getFields(this.datavalues[index][search].route, index, search)
+					this.getFields(this.datavalues[index][search].route, index, search, false, true)
 					if(
 						this.datavalues[index][search].route == "templates"
 						&& this.datavalues[index][search].template != null
 						&& this.datavalues[index][search].section != null
 					) {
-						this.getSections(this.datavalues[index][search].template, index, search)
-						this.getFields(this.datavalues[index][search].section, index, search, true)
+						this.getSections(this.datavalues[index][search].template, index, search, true)
+						this.getFields(this.datavalues[index][search].section, index, search, true, true)
 					}
 					this.setFieldType(this.datavalues[index][search], index, search)
 				})

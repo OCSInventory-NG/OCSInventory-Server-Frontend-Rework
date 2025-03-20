@@ -21,10 +21,10 @@ import { GridLayout, GridItem } from 'grid-layout-plus'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { 
-	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+	faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
-	faSliders
+	faSliders, faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -52,10 +52,10 @@ loadConfig().then((config) => {
 	app.component('GridLayout', GridLayout)
 	app.component('GridItem', GridItem)
 	library.add({ 
-		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+		faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders
+		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles
 	})
 
 	router.isReady()

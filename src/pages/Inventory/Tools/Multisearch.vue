@@ -95,6 +95,10 @@ export default {
 				this.candelete = true
 			}
 			await this.getHeader()
+			if(localStorage.getItem("useSavedSearch")) {
+				this.reloadDatatable()
+				localStorage.removeItem("useSavedSearch")
+			}
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true

@@ -260,6 +260,11 @@ export default {
 				this.row.original_file_name = this.row.file.name
 			}
 
+			if(!(this.row.file instanceof Object)) {
+				delete this.row.file
+				delete this.row.original_file_name 
+			}
+
 			let formdata = new FormData()
 
 			Object.keys(this.row).forEach(key => {
