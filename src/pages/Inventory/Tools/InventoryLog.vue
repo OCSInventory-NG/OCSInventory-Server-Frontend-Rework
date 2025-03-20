@@ -87,11 +87,11 @@ export default {
 			if(this.$route.params.id) extendedRoute = "&asset="+this.$route.params.id
 
 			await axios.get(
-					this.$config.BACKEND_API_ROUTE+
+				this.$config.BACKEND_API_ROUTE+
 					"asset/logs"+
 					extendedRoute,
-					{ headers: this.header }
-				)
+				{ headers: this.header }
+			)
 				.then(response => {
 					this.rowdata = response.data
 					this.errormsg = null
