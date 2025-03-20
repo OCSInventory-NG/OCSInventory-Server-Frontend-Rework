@@ -98,7 +98,7 @@ export default {
 				})
 		},
 		async getAssets() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true", { headers: this.header })
 				.then(response => {
 					response.data.forEach(data => {
 						if(data.accountinfo) {
