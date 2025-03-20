@@ -213,12 +213,12 @@ export default {
 		},
 		async getPackageResult() {
 			await axios.get(
-					this.$config.BACKEND_API_ROUTE+
+				this.$config.BACKEND_API_ROUTE+
 					"deployment/results/?package="+
 					this.id+
 					"&expand=asset,group",
-					{ headers: this.header }
-				)
+				{ headers: this.header }
+			)
 				.then(response => {
 					this.rowdata = response.data
 
