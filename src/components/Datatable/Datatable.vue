@@ -243,11 +243,9 @@
 				</template>
 
 				<!-- Package asset redirection -->
-				<template 
-					v-if="canaccesspackagedetails"
-					#cell(asset)="row"
-				>
-					<router-link  
+				<template #cell(asset)="row">
+					<router-link
+						v-if="canaccesspackagedetails"
 						:to="'/inventory/asset/'+row.item.id"
 						class="ocs-link"
 					>
@@ -256,11 +254,10 @@
 				</template>
 
 				<!-- Package asset group redirection -->
-				<template 
-					v-if="canaccesspackagedetails"
-					#cell(group)="row"
-				>
-					<router-link  
+				<template #cell(group)="row">
+					<router-link
+						v-if="canaccesspackagedetails
+							&& row.item.group != null"
 						:to="'/inventory/assetgroups/'+row.item.id"
 						class="ocs-link"
 					>
