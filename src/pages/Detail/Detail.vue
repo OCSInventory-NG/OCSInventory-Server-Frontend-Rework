@@ -45,7 +45,7 @@
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>
-											<AssignTemplateModal
+											<AssetOptionsModal
 												:item="deployment"
 												@reloadInventory="reloadInventory"
 											/>
