@@ -128,7 +128,7 @@
 				>
 					<b-col>
 						<b-form-file
-							id="file"
+							id="uploaded_file"
 							:placeholder="row.action_type == 'LAUNCH' ? 
 								$t('deployment.select_launch_file') : $t('deployment.select_store_file')"
 							@change="processFile($event)"
@@ -247,23 +247,25 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		processFile(event){
-			this.row.file = event.target.files[0];
+			this.row.uploaded_file = event.target.files[0];
 		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(!this.row.file) {
-				delete this.row.file
+			if(!this.row.uploaded_file) {
+				delete this.row.uploaded_file
 				this.row.original_file_name = null
 			} else {
-				this.row.original_file_name = this.row.file.name
+				this.row.original_file_name = this.row.uploaded_file.name
 			}
 
-			if(!(this.row.file instanceof Object)) {
-				delete this.row.file
+			if(!(this.row.uploaded_file instanceof Object)) {
+				delete this.row.uploaded_file
 				delete this.row.original_file_name 
 			}
+
+			delete this.row.file
 
 			let formdata = new FormData()
 
