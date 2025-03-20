@@ -190,6 +190,7 @@
     "name": "Nom",
     "nb": "Nombre",
     "notified": "Notifié",
+    "original_file_name": "Nom du fichier",
     "package": "Paquet",
     "path": "Chemin",
     "priority": "Priorité d'exécution",
