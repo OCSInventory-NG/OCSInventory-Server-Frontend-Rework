@@ -147,8 +147,8 @@
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sort-by="sortBy"
-				:sort-desc="sortDesc"
+				:sort-by="sortby"
+				:sort-desc="sortdesc"
 				:per-page="perPage"
 				:current-page="currentPage"
 				:filter="filter"
@@ -478,7 +478,10 @@ export default {
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
-		deleteids: { type: Array, default: null }
+		deleteids: { type: Array, default: null },
+		// Sort datatable parameters
+		sortby: { type: String, Default: null },
+		sortdesc: { type: String, Default: null }
 	},
 	data() {
 		return {
@@ -504,9 +507,6 @@ export default {
 			selected: [],
 			selectedids: [],
 			isChecked: false,
-			// Sort datatable parameters
-			sortDesc: null,
-			sortBy: null,
 			// Export parameters
 			json_fields: {},
 			json_data: [],
