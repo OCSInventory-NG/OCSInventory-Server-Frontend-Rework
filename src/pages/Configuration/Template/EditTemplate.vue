@@ -92,7 +92,7 @@ export default {
 	},
 	methods: {
 		async getTemplate() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"?expand=*", { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.rowsectiondata = response.data.sections
