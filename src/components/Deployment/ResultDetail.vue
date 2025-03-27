@@ -90,6 +90,7 @@ export default {
 						this.rowheader.push("name")
 						this.rowheader.push("total")
 						this.rowheader.push("waiting")
+						this.rowheader.push("notified")
 						this.rowheader.push("success")
 						this.rowheader.push("error")
 					}
@@ -143,18 +144,26 @@ export default {
 					tmprow[pkg.package].package = pkg.package
 					tmprow[pkg.package].name = pkg.name
 					tmprow[pkg.package].total = 1
-					if(pkg.status == 2) {
+					if(pkg.status == 3) {
 						tmprow[pkg.package].error = 1
 						tmprow[pkg.package].success = 0
 						tmprow[pkg.package].waiting = 0
-					} else if (pkg.status == 1) {
+						tmprow[pkg.package].notified = 0
+					} else if (pkg.status == 0) {
 						tmprow[pkg.package].error = 0
 						tmprow[pkg.package].succes = 1
 						tmprow[pkg.package].waiting = 0
+						tmprow[pkg.package].notified = 0
+					} else if (pkg.status == 2) {
+						tmprow[pkg.package].error = 0
+						tmprow[pkg.package].succes = 0
+						tmprow[pkg.package].waiting = 0
+						tmprow[pkg.package].notified = 1
 					} else {
 						tmprow[pkg.package].error = 0
 						tmprow[pkg.package].success = 0
 						tmprow[pkg.package].waiting = 1
+						tmprow[pkg.package].notified = 0
 					}
 					console.log(pkg)
 
@@ -162,10 +171,12 @@ export default {
 					this.rows[pkg.package].push(pkg.id)
 				} else {
 					tmprow[pkg.package].total += 1
-					if(pkg.status == 2) {
+					if(pkg.status == 3) {
 						tmprow[pkg.package].error += 1
-					} else if (pkg.status == 1) {
+					} else if (pkg.status == 0) {
 						tmprow[pkg.package].success += 1
+					} else if (pkg.status == 2) {
+						tmprow[pkg.package].notified += 1
 					} else {
 						tmprow[pkg.package].waiting += 1
 					}
