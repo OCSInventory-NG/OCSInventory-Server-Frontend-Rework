@@ -98,8 +98,11 @@ export default {
 				})
 		},
 		async getAssets() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?expand=template", { headers: this.header })
 				.then(response => {
+					for (const asset of response.data) {
+						asset.template = asset.template.name
+					}
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
