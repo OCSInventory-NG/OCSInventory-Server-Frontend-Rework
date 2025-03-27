@@ -165,8 +165,6 @@ export default {
 						tmprow[pkg.package].waiting = 1
 						tmprow[pkg.package].notified = 0
 					}
-					console.log(pkg)
-
 					this.rows[pkg.package] = []
 					this.rows[pkg.package].push(pkg.id)
 				} else {
