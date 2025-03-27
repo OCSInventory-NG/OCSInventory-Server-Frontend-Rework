@@ -103,7 +103,7 @@ export default {
 				})
 		},
 		async getAssetGroups() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/?expand=assets,user,groups",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/?expand=user,groups",
 				{ headers: this.header })
 				.then(response => {
 					for (const group of response.data) {
