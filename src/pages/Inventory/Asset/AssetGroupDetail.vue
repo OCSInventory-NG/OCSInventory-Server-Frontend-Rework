@@ -207,55 +207,29 @@ export default {
 				})
 		},
 		async getAssetGroup() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id+"?expand=assets,user,groups",
+				{ headers: this.header })
 				.then(response => {
 					this.rowdata = []
-					this.rowdata = response.data.asset_bases
-					delete response.data.asset_bases
+					this.rowdata = response.data.assets_expand
+					delete response.data.assets_expand
 					delete response.data.assets
 					this.groupinfo = response.data
+					this.groupinfo.user = (this.groupinfo.user.first_name != "") ?
+						this.groupinfo.user.last_name.concat(" ", this.groupinfo.user.first_name) :
+						this.groupinfo.user.username
+					this.groupinfo.groups = ""
+					for (const group of response.data.groups_expand) {
+						this.groupinfo.groups += group.name
+					}
 					this.errormsg = null
 					this.errored = false
-					this.getUserName()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-		},
-		async getUserName() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.groupinfo.user, { headers: this.header })
-				.then(response => {
-					if(response.data.first_name != "") {
-						this.groupinfo.user = response.data.last_name.concat(" ", response.data.first_name)
-					} else {
-						this.groupinfo.user = response.data.username
-					}
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-			this.getGroups()
-		},
-		async getGroups() {
-			this.groups = []
-			if(this.groupinfo.groups) {
-				for (const group of this.groupinfo.groups) {
-					this.loading = true
-					await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
-						.then(response => {
-							this.groups.push(response.data.name)
-							this.groupinfo.groups = this.groups.join(", ")
-						})
-						.catch(e => {
-							this.errormsg = e.message
-							this.errored = true
-						})
-						.finally(() => this.loading = false)
-				}
-			}
-			this.loading = false
+				.finally(() => this.loading = false)
 		},
 		reloadDeployment() {
 			this.reload = true
