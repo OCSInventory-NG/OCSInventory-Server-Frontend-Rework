@@ -293,6 +293,7 @@
     "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
     "no_inventory": "Aucune données d'inventaire disponible",
     "no_selection": "Aucune machine n'a été sélectionnée",
+    "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
     "success_saved": "Configuration sauvegardée avec succès !"
   },
   "network": {
@@ -351,6 +352,7 @@
     "authconfig": "Authentification - Configuration",
     "authmapping": "Authentification - Mappages",
     "authmethod": "Authentification - Méthodes",
+    "category": "Inventaire - Catégories",
     "config": "Configuration - Générale",
     "deploymenthistory": "Déploiement - Historique",
     "field": "Modèles - Champs",
@@ -461,12 +463,15 @@
     "visibility": "Visibilité"
   },
   "template": {
+    "addcategory": "Ajouter une nouvelle catégorie",
     "addfield": "Ajouter un nouveau champs",
     "addsection": "Ajouter une nouvelle section",
     "addtemplate": "Ajouter un nouveau modèle",
     "assign": "Assigner un modèle d'inventaire",
     "BASH": "Commande Bash",
+    "category": "Catégorie",
     "CMD": "Commande Cmd",
+    "editcategory": "Éditer la catégorie",
     "editfield": "Éditer le champs",
     "editsection": "Éditer la section",
     "edittemplate": "Éditer un modèle",
@@ -519,6 +524,8 @@
     "assetgroups": "Groupes d'actifs",
     "authentication": "Authentification",
     "automaticactions": "Actions automatiques",
+    "categories": "Catégories",
+    "category": "Catégories",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Tableau de bord",

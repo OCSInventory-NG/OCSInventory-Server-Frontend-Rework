@@ -365,7 +365,7 @@
 							/>
 							<!-- Delete button -->
 							<DeleteItemModal
-								v-if="candelete"
+								v-if="candelete && !row.item.is_protected"
 								:id="row.item.id || row.item.identifier"
 								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
 								:name="row.item.name 
@@ -427,6 +427,7 @@ import UserModal from '@/components/Modals/Item/UserModal.vue'
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import EditTemplate from '@/pages/Configuration/Template/EditTemplate.vue'
+import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
 
 export default {
 	name: 'Datatable',
@@ -448,7 +449,8 @@ export default {
 		PackageResultModal,
 		SnmpModal,
 		SnmpScannerModal,
-		EditTemplate
+		EditTemplate,
+		CategoryModal
 	},
 	props: {
 		title: { type: String, default: '' },

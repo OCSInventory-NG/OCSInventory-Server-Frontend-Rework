@@ -293,6 +293,7 @@
     "error_no_permissions": "You don't have any permissions, please contact your administrator",
     "no_inventory": "No inventory data available",
     "no_selection": "No machine has been selected",
+    "select_multi": "Hold CTRL to select/deselect entry",
     "success_saved": "Configuration successfully saved!"
   },
   "network": {
@@ -351,6 +352,7 @@
     "authconfig": "Authentication - Configuration",
     "authmapping": "Authentication - Mapping",
     "authmethod": "Authentication - Methods",
+    "category": "Inventory - Categories",
     "config": "Configuration - General",
     "deploymenthistory": "Deployment - History",
     "field": "Templates - Fields",
@@ -461,12 +463,15 @@
     "visibility": "Visibility"
   },
   "template": {
+    "addcategory": "Add new category",
     "addfield": "Add new field",
     "addsection": "Add new section",
     "addtemplate": "Add new template",
     "assign": "Assign inventory template",
     "BASH": "Bash Command",
+    "category": "Category",
     "CMD": "Cmd Command",
+    "editcategory": "Edit category",
     "editfield": "Edit field",
     "editsection": "Edit section",
     "edittemplate": "Edit template",
@@ -519,6 +524,8 @@
     "assetgroups": "Asset groups",
     "authentication": "Authentication",
     "automaticactions": "Automatic actions",
+    "categories": "Categories",
+    "category": "Categories",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Dashboard",
