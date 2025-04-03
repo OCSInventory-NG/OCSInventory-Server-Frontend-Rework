@@ -103,21 +103,21 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-                <b-row v-if="update">
+				<b-row v-if="update">
 					<b-col>
 						<b-form-group
 							:label="$t('template.sections')" 
 							label-for="sections"
 						>
-                            <p><i>{{ $t('message.select_multi') }}</i></p>
-                            <b-form-select
-                                v-model="row.sections"
-                                :options="sections"
-                                multiple
-                                :select-size="10"
-                            />
+							<p><i>{{ $t('message.select_multi') }}</i></p>
+							<b-form-select
+								v-model="row.sections"
+								:options="sections"
+								multiple
+								:select-size="10"
+							/>
 						</b-form-group>
-                        <br>
+						<br>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -160,7 +160,7 @@ export default {
 			row: {
 				name: null,
 				description: null,
-                sections: []
+				sections: []
 			},
 			errormsg: null,
 			errored: false,
@@ -170,7 +170,7 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			categorymodal: false,
-            sections: [],
+			sections: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -200,7 +200,7 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.categorymodal = true
-            this.getCategory(id)
+			this.getCategory(id)
 		},
 		async getCategory(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id, { headers: this.header })
@@ -208,34 +208,34 @@ export default {
 					this.row = response.data
 					this.errormsg = null
 					this.errored = false
-                    this.getTemplates()
+					this.getTemplates()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
 		},
-        async getTemplates() {
-            await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?expand=sections", { headers: this.header })
-                .then(response => {
-                    this.sections = []
-                    for (const template of response.data) {
-                        for (const section of template.sections) {
-                            this.sections.push({
-                                value: section.id,
-                                text: template.name.concat(" - ", section.name)
-                            })
-                        }
-                    }
-                })
-                .catch(e => {
+		async getTemplates() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?expand=sections", { headers: this.header })
+				.then(response => {
+					this.sections = []
+					for (const template of response.data) {
+						for (const section of template.sections) {
+							this.sections.push({
+								value: section.id,
+								text: template.name.concat(" - ", section.name)
+							})
+						}
+					}
+				})
+				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-                .finally(() => {
-                    this.loading = false
-                })
-        },
+				.finally(() => {
+					this.loading = false
+				})
+		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true

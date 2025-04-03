@@ -38,7 +38,7 @@
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
-                                editcomponent="CategoryModal"
+								editcomponent="CategoryModal"
 								title="categories"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
@@ -109,7 +109,7 @@ export default {
 				})
 		},
 		async getCategories() {
-            this.rowdata = []
+			this.rowdata = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
 				.then(response => {
 					this.rowdata = response.data
