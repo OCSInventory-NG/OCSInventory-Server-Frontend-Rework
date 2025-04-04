@@ -71,13 +71,10 @@
 									<b-tab
 										v-for="category in categories"
 										:key="category.id"
-										:title="category.name"
+										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										lazy
 									>
 										<div v-if="category.id == 1">
-											<div class="hr-text">
-												{{ $t("generic.information") }}
-											</div>
 											<div class="datagrid">
 												<div 
 													v-for="(value,key) in device"
@@ -121,6 +118,15 @@
 											<Inventory 
 												v-if="section.template == device.template"
 												:section="section"
+												:inventory="sections[section.id]"
+											/>
+										</div>
+										<div 
+											v-if="device.template == null && ![1, 2].includes(category.id)"
+										>
+											<Alert 
+												:message="$t('message.no_inventory')" 
+												variant="info"
 											/>
 										</div>
 									</b-tab>
@@ -142,7 +148,6 @@ export default {
 	data() {
 		return {
 			errormsg: null,
-			rowdata: [],
 			loading: true,
 			errored: false,
 			canedit: true,
@@ -154,6 +159,7 @@ export default {
 			deployment: [],
 			device: {},
 			categories: [],
+			sections: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -168,6 +174,7 @@ export default {
 			if(this.$route.params.id) this.id = this.$route.params.id
 			await this.getInventoryBase()
 			await this.getCategories()
+			await this.getInventoryCollection()
 		}
 		/*if(this.$route.params.type == 'netdevice') {
 			extendedRoute = "netdevices/"+this.$route.params.id
@@ -229,13 +236,31 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
+		},
+		async getInventoryCollection() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
+				{ headers: this.header })
+				.then(response => {
+					this.sections = []
+					for (const inventory of response.data) {
+						if (!this.sections[inventory.template_section]) {
+							this.sections[inventory.template_section] = []
+						}
+
+						this.sections[inventory.template_section].push(inventory.fields_expand)
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 				.finally(() => {this.loading = false})
 		},
 		reloadDeployment() {
 			this.reload = true
 		},
 		reloadInventory(item) {
-			this.rowdata = item[0]
+			this.device = item[0]
 		},
 		endReloadDeployment() {
 			this.reload = false
