@@ -36,8 +36,8 @@
 export default {
 	name: "Inventory",
 	props: {
-		section: { type: Object, default: {} },
-		inventory: { type: Array, default: [] }
+		section: { type: Object, default: null },
+		inventory: { type: Array, default: null }
 	},
 	data() {
 		return {

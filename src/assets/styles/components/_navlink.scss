@@ -50,25 +50,25 @@ a.nav-link-title.router-link-exact-active.router-link-active {
 }
 
 .card-body+.card-body {
-  border-top: none;
+  border-top: 0;
 }
 
 .card-header {
-  border-bottom: none;
+  border-bottom: 0;
 }
 
 .sticky-tabs {
-  position: sticky;
-  top: 0;
   height: 73vh;
   overflow-y: auto;
+  position: sticky;
+  top: 0;
 }
 
 .card-header-tabs .nav-link.active {
   background-color: #182433;
   color: $white;
-  width: 100%;
   text-decoration: solid underline #972081 .2rem;
+  width: 100%;
 }
 
 @media (max-width: 767.98px) {
@@ -85,8 +85,8 @@ a.nav-link-title.router-link-exact-active.router-link-active {
   }
 
   .sticky-tabs {
-    position: inherit;
     height: unset;
     overflow-y: unset;
+    position: inherit;
   }
 }
