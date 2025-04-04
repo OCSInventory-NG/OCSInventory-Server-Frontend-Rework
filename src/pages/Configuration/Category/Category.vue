@@ -97,7 +97,9 @@ export default {
 			await axios.options(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if (field != "inventory_sections") {
+							this.rowheader.push(field)
+						}
 					})
 					this.errormsg = null
 					this.errored = false

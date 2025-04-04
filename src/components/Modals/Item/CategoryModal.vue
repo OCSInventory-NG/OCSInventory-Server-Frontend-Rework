@@ -111,7 +111,7 @@
 						>
 							<p><i>{{ $t('message.select_multi') }}</i></p>
 							<b-form-select
-								v-model="row.sections"
+								v-model="row.inventory_sections"
 								:options="sections"
 								multiple
 								:select-size="10"
@@ -160,7 +160,7 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				sections: []
+				inventory_sections: []
 			},
 			errormsg: null,
 			errored: false,
@@ -185,7 +185,7 @@ export default {
 				this.row = {
 					name: null,
 					description: null,
-					sections: []
+					inventory_sections: []
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
