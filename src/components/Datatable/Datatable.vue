@@ -589,9 +589,6 @@ export default {
 		} else {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
-				if(data == "sections") {
-					visible = false
-				}
 
 				var array = {
 					key: data,
