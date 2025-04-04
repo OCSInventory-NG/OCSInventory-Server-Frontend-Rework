@@ -74,6 +74,15 @@
     "oidc_config": "Configuration OIDC",
     "priority": "PRIORITÉ"
   },
+  "category": {
+    "Administrative data": "Données administratives",
+    "Deployment": "Déploiement",
+    "Devices": "Périphériques",
+    "Hardware": "Matériel",
+    "Networks": "Réseaux",
+    "Others": "Autres",
+    "Softwares": "Logiciels"
+  },
   "configuration": {
     "agent": "Agent",
     "auto_retry": "Nouvelle tentative automatique",
