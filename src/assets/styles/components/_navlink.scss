@@ -49,6 +49,21 @@ a.nav-link-title.router-link-exact-active.router-link-active {
   padding-top: 5px;
 }
 
+.card-body+.card-body {
+  border-top: none;
+}
+
+.card-header {
+  border-bottom: none;
+}
+
+.sticky-tabs {
+  position: sticky;
+  top: 0;
+  height: 73vh;
+  overflow-y: auto;
+}
+
 @media (max-width: 767.98px) {
   .navbar-expand-md .navbar-collapse .dropdown-menu {
     background: 0 0;
@@ -60,5 +75,11 @@ a.nav-link-title.router-link-exact-active.router-link-active {
     padding: 0;
     position: static !important;
     transform: none !important;
+  }
+
+  .sticky-tabs {
+    position: inherit;
+    height: unset;
+    overflow-y: unset;
   }
 }
