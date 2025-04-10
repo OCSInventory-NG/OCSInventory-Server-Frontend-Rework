@@ -48,31 +48,31 @@
 						</b-col>
 
 						<b-col v-if="value.type=='TEXTAREA'">
-								<b-form-textarea
-									:id="'field_'+value.id"
-									v-model="value.value"
-									rows="3"
-									max-rows="6"
-								/>
+							<b-form-textarea
+								:id="'field_'+value.id"
+								v-model="value.value"
+								rows="3"
+								max-rows="6"
+							/>
 						</b-col>
 
 						<b-col v-if="value.type=='SELECT'">
-								<v-select
-									v-model="value.value"
-									:options="value.values"
-									label="text"
-								/>
+							<v-select
+								v-model="value.value"
+								:options="value.values"
+								label="text"
+							/>
 						</b-col>
 
 						<b-col 
 							v-if="value.type=='CHECKBOX'"
 							class="admin-checkbox"
 						>
-								<b-form-checkbox-group
-									:id="'field_'+value.id"
-									v-model="value.value"
-									:options="value.values"
-								/>
+							<b-form-checkbox-group
+								:id="'field_'+value.id"
+								v-model="value.value"
+								:options="value.values"
+							/>
 						</b-col>
 						<b-col class="col-2" />
 					</b-row>
