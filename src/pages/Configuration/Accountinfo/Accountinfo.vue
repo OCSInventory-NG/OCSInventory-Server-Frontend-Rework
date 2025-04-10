@@ -117,7 +117,8 @@ export default {
 				})
 		},
 		async getAccountinfoConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values",
+				{ headers: this.header })
 				.then(response => {
 					this.config = response.data
 					this.accountinfovaluesTreatment()
@@ -132,7 +133,7 @@ export default {
 		accountinfovaluesTreatment() {
 			Object.keys(this.config).forEach(key => {
 				var tmpValues = []
-				for (const accountvalue of this.config[key].accountinfo_values) {
+				for (const accountvalue of this.config[key].accountinfo_values_expand) {
 					tmpValues.push(accountvalue.value)
 				}
 				this.config[key].accountinfo_values = tmpValues.join('\n')

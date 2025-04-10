@@ -11,4 +11,17 @@
 .form-fieldset {
   background-color: #f0f0f0;
   border-color: #f2f3f4;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.admin-row {
+  margin-bottom: 10px;
+}
+
+.admin-checkbox {
+  align-self: flex-end;
+}
+
+.admin-btn {
+  flex-basis: content;
 }
