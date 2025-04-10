@@ -57,7 +57,7 @@
 						</b-col>
 
 						<b-col v-if="value.type=='SELECT'">
-								<v-select 
+								<v-select
 									v-model="value.value"
 									:options="value.values"
 									label="text"
