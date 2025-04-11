@@ -19,27 +19,27 @@ import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 
 const GlobalComponents = {
-    install(Vue) {
-        Vue.component('AccountinfoModal', AccountinfoModal)
-        Vue.component('AssetGroupModal', AssetGroupModal)
-        Vue.component('AutomaticActionModal', AutomaticActionModal)
-        Vue.component('CategoryModal', CategoryModal)
-        Vue.component('DeleteItemModal', DeleteItemModal)
-        Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
-        Vue.component('FieldModal', FieldModal)
-        Vue.component('GroupModal', GroupModal)
-        Vue.component('ImportTemplateModal', ImportTemplateModal)
-        Vue.component('NetdeviceModal', NetdeviceModal)
-        Vue.component('NetworkGroupModal', NetworkGroupModal)
-        Vue.component('NetworkModal', NetworkModal)
-        Vue.component('PackageModal', PackageModal)
-        Vue.component('PackageResultModal', PackageResultModal)
-        Vue.component('RuleModal', RuleModal)
-        Vue.component('SaveSearchModal', SaveSearchModal)
-        Vue.component('SnmpModal', SnmpModal)
-        Vue.component('SnmpScannerModal', SnmpScannerModal)
-        Vue.component('UserModal', UserModal)
-    }
+	install(Vue) {
+		Vue.component('AccountinfoModal', AccountinfoModal)
+		Vue.component('AssetGroupModal', AssetGroupModal)
+		Vue.component('AutomaticActionModal', AutomaticActionModal)
+		Vue.component('CategoryModal', CategoryModal)
+		Vue.component('DeleteItemModal', DeleteItemModal)
+		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
+		Vue.component('FieldModal', FieldModal)
+		Vue.component('GroupModal', GroupModal)
+		Vue.component('ImportTemplateModal', ImportTemplateModal)
+		Vue.component('NetdeviceModal', NetdeviceModal)
+		Vue.component('NetworkGroupModal', NetworkGroupModal)
+		Vue.component('NetworkModal', NetworkModal)
+		Vue.component('PackageModal', PackageModal)
+		Vue.component('PackageResultModal', PackageResultModal)
+		Vue.component('RuleModal', RuleModal)
+		Vue.component('SaveSearchModal', SaveSearchModal)
+		Vue.component('SnmpModal', SnmpModal)
+		Vue.component('SnmpScannerModal', SnmpScannerModal)
+		Vue.component('UserModal', UserModal)
+	}
 }
 
 export default GlobalComponents 
