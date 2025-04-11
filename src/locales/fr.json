@@ -300,7 +300,9 @@
     "deletevalid": "Êtes-vous sûr ?",
     "dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page",
     "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
+    "no_field": "Aucun champ disponible. Cliquez sur \"Ajouter un nouveau champ\" pour en créer un.",
     "no_inventory": "Aucune données d'inventaire disponible",
+    "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine n'a été sélectionnée",
     "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
     "success_saved": "Configuration sauvegardée avec succès !"
@@ -493,6 +495,7 @@
     "is_list": "Est une liste",
     "JSON": "Format JSON",
     "last_update": "Dernière mise à jour",
+    "LEG": "Legacy",
     "LIN": "Linux",
     "MAC": "MacOS",
     "multiple": "Multiple",

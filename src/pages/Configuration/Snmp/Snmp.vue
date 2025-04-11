@@ -363,7 +363,9 @@ export default {
 			await axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowtemplateheader.push(field)
+						if(field != "sections") {
+							this.rowtemplateheader.push(field)
+						}
 					})
 					this.errormsg = null
 					this.errored = false
