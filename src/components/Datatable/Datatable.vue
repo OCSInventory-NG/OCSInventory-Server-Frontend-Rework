@@ -216,9 +216,9 @@
 					</router-link>
 				</template>
 
-				<!-- Log assets redirection -->
+				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails"
+					v-if="canaccessdetails || canaccesspackagedetails"
 					#cell(asset)="row"
 				>
 					<router-link  
@@ -242,7 +242,7 @@
 					</router-link>
 				</template>
 
-				<!-- Netdevices redirection -->
+				<!-- Saved search redirection -->
 				<template 
 					v-if="title == 'usesavesearch'"
 					#cell(searchname)="row"
@@ -253,6 +253,24 @@
 					>
 						{{ row.item.searchname }}
 					</a>
+				</template>
+
+				<!-- Asset group redirection -->
+				<template
+					v-if="canaccesspackagedetails"
+					#cell(group)="row"
+				>
+					<router-link
+						v-if="row.item.group"
+						:to="'/inventory/assetgroups/'+row.item.group.id"
+						class="ocs-link"
+					>
+						{{ row.item.group.name }}
+					</router-link>
+
+					<span v-else>
+						N/A
+					</span>
 				</template>
 
 				<template #cell(error)="row">
@@ -468,6 +486,7 @@ export default {
 		canviewaction: { type: Boolean, default: false },
 		canaccesschild: { type: Boolean, default: false },
 		canaccessdetails: { type: Boolean, default: false },
+		canaccesspackagedetails: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
@@ -549,7 +568,7 @@ export default {
 		}
 	},
 	created() {
-		if(this.title == "asset/bases") {
+		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
 			this.redirectto = "asset"
 		}
 		else if(this.title == "inventory_logs") {
