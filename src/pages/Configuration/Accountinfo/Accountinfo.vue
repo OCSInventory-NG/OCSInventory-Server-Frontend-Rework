@@ -133,7 +133,7 @@ export default {
 		accountinfovaluesTreatment() {
 			Object.keys(this.config).forEach(key => {
 				var tmpValues = []
-				for (const accountvalue of this.config[key].accountinfo_values_expand) {
+				for (const accountvalue of this.config[key].accountinfo_values) {
 					tmpValues.push(accountvalue.value)
 				}
 				this.config[key].accountinfo_values = tmpValues.join('\n')

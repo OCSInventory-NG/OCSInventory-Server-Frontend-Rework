@@ -169,7 +169,7 @@ export default {
 							name: rowDetails.name,
 							type: rowDetails.datatype,
 							value: (rowDetails.datatype == "CHECKBOX") ? [] : null,
-							values: this.getAccountinfoValue(rowDetails.accountinfo_values_expand)
+							values: this.getAccountinfoValue(rowDetails.accountinfo_values)
 						})
 					})
 					this.errormsg = null

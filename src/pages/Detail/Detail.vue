@@ -112,7 +112,7 @@
 											/>
 										</div>
 										<div
-											v-for="section in category.inventory_sections_expand"
+											v-for="section in category.inventory_sections"
 											:key="section.id"
 										>
 											<Inventory 
@@ -221,9 +221,9 @@ export default {
 							allReadyPush = true
 						}
 
-						Object.keys(category.inventory_sections_expand).forEach(item => {
+						Object.keys(category.inventory_sections).forEach(item => {
 							this.loading = true
-							var section = category.inventory_sections_expand[item]
+							var section = category.inventory_sections[item]
 
 							if (!allReadyPush && section.template == this.device.template) {
 								this.categories.push(category)
@@ -247,7 +247,7 @@ export default {
 							this.sections[inventory.template_section] = []
 						}
 
-						this.sections[inventory.template_section].push(inventory.fields_expand)
+						this.sections[inventory.template_section].push(inventory.fields)
 					}
 				})
 				.catch(e => {
