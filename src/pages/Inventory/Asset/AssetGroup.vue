@@ -113,13 +113,14 @@ export default {
 						group.count = group.assets.length
 						group.user = (group.user.first_name != "") ? 
 							group.user.last_name.concat(" ", group.user.first_name) : group.user.username
-						group.groups = ""
 						// Group concat
-						if (group.groups_expand) {
-							for (const expand of group.groups_expand) {
-								group.groups += expand.name + "\n"
+						var tmpGroup = ""
+						if (group.groups) {
+							for (const expand of group.groups) {
+								tmpGroup += expand.name + "\n"
 							}
 						}
+						group.groups = tmpGroup
 					}
 					this.rowdata = response.data
 					this.errormsg = null

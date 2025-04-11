@@ -211,17 +211,19 @@ export default {
 				{ headers: this.header })
 				.then(response => {
 					this.rowdata = []
-					this.rowdata = response.data.assets_expand
-					delete response.data.assets_expand
+					this.rowdata = response.data.assets
 					delete response.data.assets
 					this.groupinfo = response.data
 					this.groupinfo.user = (this.groupinfo.user.first_name != "") ?
 						this.groupinfo.user.last_name.concat(" ", this.groupinfo.user.first_name) :
 						this.groupinfo.user.username
-					this.groupinfo.groups = ""
-					for (const group of response.data.groups_expand) {
-						this.groupinfo.groups += group.name
+					var tmpGroup = ""
+					if (response.data.groups) {
+						for (const expand of response.data.groups) {
+							tmpGroup += expand.name + "\n"
+						}
 					}
+					this.groupinfo.groups = tmpGroup
 					this.errormsg = null
 					this.errored = false
 				})

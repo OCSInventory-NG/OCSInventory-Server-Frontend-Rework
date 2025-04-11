@@ -119,10 +119,13 @@ export default {
 						search.user = (search.user.first_name != "") ?
 							search.user.last_name.concat(" ", search.user.first_name) :
 							search.user.username
-						search.groups = ""
-						for (const group of search.groups_expand) {
-							search.groups += group.name + "\n"
+						var tmpGroup = ""
+						if (search.groups) {
+							for (const expand of search.groups) {
+								tmpGroup += expand.name + "\n"
+							}
 						}
+						search.groups = tmpGroup
 						this.rowdata.push(search)
 					}
 
