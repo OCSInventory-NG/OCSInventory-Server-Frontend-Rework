@@ -409,49 +409,8 @@
 </template>
 
 <script>
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
-import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
-import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
-import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
-import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
-import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
-import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
-import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
-import GroupModal from '@/components/Modals/Item/GroupModal.vue'
-import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
-import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
-import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
-import PackageModal from '@/components/Modals/Item/PackageModal.vue'
-import RuleModal from '@/components/Modals/Item/RuleModal.vue'
-import UserModal from '@/components/Modals/Item/UserModal.vue'
-import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
-import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
-import EditTemplate from '@/pages/Configuration/Template/EditTemplate.vue'
-import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
-
 export default {
 	name: 'Datatable',
-	components: {
-		DeleteItemModal,
-		DoAllActionsItemModal,
-		ImportTemplateModal,
-		SaveSearchModal,
-		UserModal,
-		AccountinfoModal,
-		NetworkGroupModal,
-		AssetGroupModal,
-		AutomaticActionModal,
-		GroupModal,
-		NetdeviceModal,
-		NetworkModal,
-		RuleModal,
-		PackageModal,
-		PackageResultModal,
-		SnmpModal,
-		SnmpScannerModal,
-		EditTemplate,
-		CategoryModal
-	},
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
