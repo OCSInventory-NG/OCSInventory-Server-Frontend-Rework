@@ -41,8 +41,18 @@
 							</b-row>
 							<b-row class="text-center">
 								<b-col>
-									<p><span class="datagrid-title">{{ $t('inventory.os') }} :</span> {{ $t("template." + template.os) }}</p> 
-									<p><span class="datagrid-title">{{ $t('inventory.last_update') }}</span> : {{ template.last_update }}</p>
+									<p>
+										<span class="datagrid-title">
+											{{ $t('inventory.os') }} :
+										</span>
+										{{ $t("template." + template.os) }}
+									</p> 
+									<p>
+										<span class="datagrid-title">
+											{{ $t('inventory.last_update') }} :
+										</span>
+										{{ template.last_update }}
+									</p>
 								</b-col>
 							</b-row>
 							<div v-if="sections.length">
