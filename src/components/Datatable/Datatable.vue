@@ -216,9 +216,9 @@
 					</router-link>
 				</template>
 
-				<!-- Log assets redirection -->
+				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails"
+					v-if="canaccessdetails || canaccesspackagedetails"
 					#cell(asset)="row"
 				>
 					<router-link  
@@ -242,7 +242,7 @@
 					</router-link>
 				</template>
 
-				<!-- Netdevices redirection -->
+				<!-- Saved search redirection -->
 				<template 
 					v-if="title == 'usesavesearch'"
 					#cell(searchname)="row"
@@ -255,27 +255,14 @@
 					</a>
 				</template>
 
-				<!-- Package asset redirection -->
-				<template
-					v-if="canaccesspackagedetails"
-					#cell(asset)="row"
-				>
-					<router-link
-						:to="'/inventory/asset/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.asset.name }}
-					</router-link>
-				</template>
-
-				<!-- Package asset group redirection -->
+				<!-- Asset group redirection -->
 				<template
 					v-if="canaccesspackagedetails"
 					#cell(group)="row"
 				>
 					<router-link
 						v-if="row.item.group"
-						:to="'/inventory/assetgroups/'+row.item.id"
+						:to="'/inventory/assetgroups/'+row.item.group.id"
 						class="ocs-link"
 					>
 						{{ row.item.group.name }}
@@ -581,7 +568,7 @@ export default {
 		}
 	},
 	created() {
-		if(this.title == "asset/bases") {
+		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
 			this.redirectto = "asset"
 		}
 		else if(this.title == "inventory_logs") {
