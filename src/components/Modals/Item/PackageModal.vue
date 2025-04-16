@@ -193,7 +193,9 @@ export default {
 				this.row = {
 					name: null,
 					description: null,
-					target_os: 'WIN'
+					target_os: 'WIN',
+					actions_list: [],
+					result: []
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
