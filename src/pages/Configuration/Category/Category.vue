@@ -149,6 +149,7 @@ export default {
 				})
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getCategories()
 		}
 	}
