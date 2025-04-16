@@ -55,7 +55,7 @@
 import axios from 'axios'
 
 export default {
-	name: 'Template',
+	name: 'Category',
 	data() {
 		return {
 			errormsg: null,
