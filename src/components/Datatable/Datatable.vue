@@ -414,7 +414,7 @@
 			<b-col align="right">
 				<!-- Delete button -->
 				<DeleteItemModal
-					v-if="candelete"
+					v-if="candelete && !selected.some(item => item.is_protected)"
 					:ids="selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
