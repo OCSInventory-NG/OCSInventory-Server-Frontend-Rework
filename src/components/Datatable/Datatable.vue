@@ -365,7 +365,7 @@
 							/>
 							<!-- Delete button -->
 							<DeleteItemModal
-								v-if="candelete"
+								v-if="candelete && !row.item.is_protected"
 								:id="row.item.id || row.item.identifier"
 								:ids="(deletemultiple) ? deleteids[row.item.id] : []"
 								:name="row.item.name 
@@ -396,7 +396,7 @@
 			<b-col align="right">
 				<!-- Delete button -->
 				<DeleteItemModal
-					v-if="candelete"
+					v-if="candelete "
 					:ids="selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
