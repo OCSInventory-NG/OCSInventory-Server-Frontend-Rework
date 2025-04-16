@@ -49,6 +49,28 @@ a.nav-link-title.router-link-exact-active.router-link-active {
   padding-top: 5px;
 }
 
+.card-body+.card-body {
+  border-top: 0;
+}
+
+.card-header {
+  border-bottom: 0;
+}
+
+.sticky-tabs {
+  height: 73vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}
+
+.card-header-tabs .nav-link.active {
+  background-color: #182433;
+  color: $white;
+  text-decoration: solid underline #972081 .2rem;
+  width: 100%;
+}
+
 @media (max-width: 767.98px) {
   .navbar-expand-md .navbar-collapse .dropdown-menu {
     background: 0 0;
@@ -60,5 +82,11 @@ a.nav-link-title.router-link-exact-active.router-link-active {
     padding: 0;
     position: static !important;
     transform: none !important;
+  }
+
+  .sticky-tabs {
+    height: unset;
+    overflow-y: unset;
+    position: inherit;
   }
 }

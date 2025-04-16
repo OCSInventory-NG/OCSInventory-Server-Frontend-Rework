@@ -47,6 +47,10 @@ tbody, td, tfoot, th, thead, tr {
   box-shadow: none;
 }
 
+.markdown>table thead th, .table thead th {
+  background: #f0f0f0;
+}
+
 @media (max-width: 767.98px) {
   .responsive {
     display: block;

@@ -1,5 +1,5 @@
 <template>
-	<div id="action-list-modal">
+	<div id="category-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,22 +7,22 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('deployment.addaction')"
+						:title="$t('template.addcategory')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="actionlistmodal = !actionlistmodal"
+						@click="categorymodal = !categorymodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('deployment.addaction') }}
+						{{ $t('template.addcategory') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('deployment.editaction')"
+				:title="$t('template.editcategory')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -32,15 +32,15 @@
 			</button>
 		</div>
 		<b-modal 
-			id="actionlistmodal" 
-			v-model="actionlistmodal"
-			:title="(!update) ? $t('deployment.addaction') : $t('deployment.editaction')"
+			id="categorymodal" 
+			v-model="categorymodal"
+			:title="(!update) ? $t('template.addcategory') : $t('template.editcategory')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('deployment.addaction') : $t('deployment.editaction') }}
+					{{ (!update) ? $t('template.addcategory') : $t('template.editcategory') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -79,7 +79,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.name')" 
+							:label="$t('user.name')" 
 							label-for="name"
 						>
 							<b-form-input
@@ -93,46 +93,31 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('deployment.action_type')" 
-							label-for="action_type"
-						>
-							<v-select
-								id="action_type"
-								v-model="row.action_type" 
-								:options="actionoptions" 
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="row.action_type == 'STORE' ? 
-								$t('deployment.path') : $t('deployment.command')" 
-							label-for="command"
+							:label="$t('inventory.description')" 
+							label-for="description"
 						>
 							<b-form-input
-								id="command"
-								v-model="row.command"
-								required
+								id="name"
+								v-model="row.description"
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row
-					v-if="row.action_type == 'STORE' || row.action_type == 'LAUNCH'"
-				>
+				<b-row v-if="update">
 					<b-col>
-						<b-form-file
-							id="uploaded_file"
-							:placeholder="row.action_type == 'LAUNCH' ? 
-								$t('deployment.select_launch_file') : $t('deployment.select_store_file')"
-							@change="processFile($event)"
-						/>
+						<b-form-group
+							:label="$t('template.sections')" 
+							label-for="sections"
+						>
+							<p><i>{{ $t('message.select_multi') }}</i></p>
+							<b-form-select
+								v-model="row.inventory_sections"
+								:options="sections"
+								multiple
+								:select-size="10"
+							/>
+						</b-form-group>
+						<br>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -165,21 +150,17 @@
 import axios from 'axios'
 
 export default {
-	name: "ActionListModal",
+	name: "CategoryModal",
 	props: {
-		package: { type: String, default: null },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
 			row: {
-				id: null,
 				name: null,
-				priority: 1,
-				action_type: "EXEC",
-				command: null,
-				original_file_name: null
+				description: null,
+				inventory_sections: []
 			},
 			errormsg: null,
 			errored: false,
@@ -188,14 +169,10 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			actionlistmodal: false,
-			actionoptions: [
-				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
-				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
-				{ value: 'STORE', text: this.$t('deployment.STORE') }
-			],
+			categorymodal: false,
+			sections: [],
 			header: {
-				"Content-Type": "multipart/form-data;charset=utf-8",
+				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
@@ -203,78 +180,68 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.actionlistmodal = false
+				this.categorymodal = false
 				this.createwithsuccess = false
 				this.row = {
-					id: null,
 					name: null,
-					priority: 1,
-					action_type: "EXEC",
-					command: null,
-					original_file_name: null
+					description: null,
+					inventory_sections: []
 				}
-				if(this.update) {
-					this.$emit('reloadDatatable')
-				} else {
-					this.$emit('reloadPackage')
-				}
+				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
 	mounted() {
 		if(!this.update) {
-			this.row.package = this.package
 			this.loading = false
 		}
 	},
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.actionlistmodal = true
-			this.getAction(id)
+			this.categorymodal = true
+			this.getCategory(id)
 		},
-		async getAction(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/actions/"+id, { headers: this.header })
+		async getCategory(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null
 					this.errored = false
+					this.getTemplates()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
 		},
-		processFile(event){
-			this.row.uploaded_file = event.target.files[0];
+		async getTemplates() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?expand=sections", { headers: this.header })
+				.then(response => {
+					this.sections = []
+					for (const template of response.data) {
+						for (const section of template.sections) {
+							this.sections.push({
+								value: section.id,
+								text: template.name.concat(" - ", section.name)
+							})
+						}
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {
+					this.loading = false
+				})
 		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-
-			if(!this.row.uploaded_file) {
-				delete this.row.uploaded_file
-				this.row.original_file_name = null
-			} else {
-				this.row.original_file_name = this.row.uploaded_file.name
-			}
-
-			if(!(this.row.uploaded_file instanceof Object)) {
-				delete this.row.uploaded_file
-				delete this.row.original_file_name 
-			}
-
-			delete this.row.file
-
-			let formdata = new FormData()
-
-			Object.keys(this.row).forEach(key => {
-				formdata.append(key, this.row[key])
-			})
 			
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"categories/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -285,10 +252,11 @@ export default {
 						this.createerror = true
 						this.createwithsuccess = false
 					})
-					.finally(() => this.loadingcreate = false)
+					.finally(() => {
+						this.loadingcreate = false
+					})
 			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
-					{ headers: this.header })
+				axios.patch(this.$config.BACKEND_API_ROUTE+"categories/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
@@ -300,7 +268,7 @@ export default {
 						this.createwithsuccess = false
 					})
 					.finally(() => this.loadingcreate = false)
-			}			
+			}		
 		}
 	}
 }

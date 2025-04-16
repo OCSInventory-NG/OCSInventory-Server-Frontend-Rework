@@ -1,11 +1,17 @@
 <template>
-	<b-alert 
-		:model-value="!!message" 
-		class="alert-sm" 
-		:variant="variant"
-	>
-		{{ message }}
-	</b-alert>
+	<b-row>
+		<b-col cols="3" />
+		<b-col>
+			<b-alert
+				:model-value="!!message"
+				class="alert-sm alert-important"
+				:variant="variant"
+			>
+				{{ message }}
+			</b-alert>
+		</b-col>
+		<b-col cols="3" />
+	</b-row>
 </template>
 
 <script>
