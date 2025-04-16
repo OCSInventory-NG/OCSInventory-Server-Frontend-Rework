@@ -167,6 +167,7 @@ export default {
 			this.loading = false
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getNetworks()
 		}
 	}

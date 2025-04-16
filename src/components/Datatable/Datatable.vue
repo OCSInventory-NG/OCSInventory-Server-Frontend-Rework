@@ -627,6 +627,8 @@ export default {
 			this.attributePackage()
 		},
 		reloadDatatable() {
+			this.selectedids = []
+			this.selected = []
 			this.$emit('reloadDatatable')
 		},
 		attributePackage() {

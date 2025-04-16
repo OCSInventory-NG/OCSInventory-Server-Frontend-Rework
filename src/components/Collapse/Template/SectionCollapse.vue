@@ -166,6 +166,7 @@ export default {
 			this.$emit('reloadTemplate')
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+this.section.id,
 				{ headers: this.header })
 				.then(response => {
@@ -187,6 +188,7 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
+				.finally(() => {this.loading = false})
 		}
 	}
 }

@@ -117,15 +117,15 @@ export default {
 
 					this.errormsg = null
 					this.errored = false
-
-					this.loading = false
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
 		async reloadDatatable(search) {
+			this.loading = true
 			this.rowsearch = search ?? JSON.parse(localStorage.getItem('multisearch'))
 			
 			await axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
@@ -156,6 +156,7 @@ export default {
 					this.successmsg = null
 					this.successed = false
 				})
+				.finally(() => this.loading = false)
 		}
 	}
 }

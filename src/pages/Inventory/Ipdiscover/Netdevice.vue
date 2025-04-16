@@ -114,6 +114,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getNetdevice()
 		}
 	}
