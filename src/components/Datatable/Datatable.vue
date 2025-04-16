@@ -3,6 +3,7 @@
 		:id="id" 
 		class="datatable-custom"
 	>
+
 		<!-- Header datatable -->
 		<div class="header-table">
 			<div class="row responsive">
@@ -627,6 +628,8 @@ export default {
 			this.attributePackage()
 		},
 		reloadDatatable() {
+			this.selectedids = []
+			this.selected = []
 			this.$emit('reloadDatatable')
 		},
 		attributePackage() {
