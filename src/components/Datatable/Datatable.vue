@@ -3,7 +3,6 @@
 		:id="id" 
 		class="datatable-custom"
 	>
-
 		<!-- Header datatable -->
 		<div class="header-table">
 			<div class="row responsive">
