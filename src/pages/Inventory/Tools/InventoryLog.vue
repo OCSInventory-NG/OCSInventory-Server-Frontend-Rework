@@ -76,7 +76,6 @@ export default {
 					this.getLogs()
 				})
 				.catch(e => {
-					console.log(e)
 					this.errormsg = e.message
 					this.errored = true
 				})

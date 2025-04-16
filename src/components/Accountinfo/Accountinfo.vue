@@ -1,13 +1,5 @@
 <template>
-	<div id="Accountinfo">
-		<!-- Display success box message -->
-		<section v-if="successed">
-			<Alert 
-				:message="$t('message.success_saved')" 
-				variant="success"
-			/>
-		</section>
-		
+	<div id="Accountinfo">		
 		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
@@ -34,68 +26,62 @@
 						v-for="(value, key) in rowdata"
 						:id="value.id"
 						:key="key"
+						align-v="start"
+						class="col admin-row"
 					>
-						<b-col v-if="value.type=='TEXT'">
-							<b-form-group
-								:label="value.name" 
-								:label-for="'field_'+value.id"
-								class="form-label"
-							>
-								<b-form-input
-									:id="'field_'+value.id"
-									v-model="value.value"
-								/>
-							</b-form-group>
+						<b-col class="col-1" />
+						<label 
+							:for="'field_'+value.id"
+							class="col-form-label col-lg-2 me-sm-2"
+						>
+							{{ value.name }}
+						</label>
+						<b-col
+							v-if="value.type=='TEXT'"
+							class="col"
+						>
+							<b-form-input
+								:id="'field_'+value.id"
+								v-model="value.value"
+								class="mb-2 me-sm-2 mb-sm-0"
+							/>
 						</b-col>
 
 						<b-col v-if="value.type=='TEXTAREA'">
-							<b-form-group
-								:label="value.name" 
-								:label-for="'field_'+value.id"
-								class="form-label"
-							>
-								<b-form-textarea
-									:id="'field_'+value.id"
-									v-model="value.value"
-									rows="3"
-									max-rows="6"
-								/>
-							</b-form-group>
+							<b-form-textarea
+								:id="'field_'+value.id"
+								v-model="value.value"
+								rows="3"
+								max-rows="6"
+							/>
 						</b-col>
 
 						<b-col v-if="value.type=='SELECT'">
-							<b-form-group
-								:label="value.name" 
-								:label-for="'field_'+value.id"
-								class="form-label"
-							>
-								<v-select 
-									v-model="value.value"
-									:options="value.values"
-									label="text"
-								/>
-							</b-form-group>
+							<v-select
+								v-model="value.value"
+								:options="value.values"
+								label="text"
+							/>
 						</b-col>
 
-						<b-col v-if="value.type=='CHECKBOX'">
-							<b-form-group
-								:label="value.name" 
-								:label-for="'field_'+value.id"
-								class="form-label"
-							>
-								<b-form-checkbox-group
-									:id="'field_'+value.id"
-									v-model="value.value"
-									:options="value.values"
-								/>
-							</b-form-group>
+						<b-col 
+							v-if="value.type=='CHECKBOX'"
+							class="admin-checkbox"
+						>
+							<b-form-checkbox-group
+								:id="'field_'+value.id"
+								v-model="value.value"
+								:options="value.values"
+							/>
 						</b-col>
+						<b-col class="col-2" />
 					</b-row>
 					<b-row>
 						<b-col align-self="start" />
 						<b-col 
 							align-self="center"
 							align="center"
+							cols="2"
 						>
 							<b-button 
 								type="submit"
@@ -103,6 +89,26 @@
 							>
 								{{ $t('generic.update') }}
 							</b-button>
+						</b-col>
+						<b-col
+							cols="1"
+							align-self="center"
+							class="admin-btn"
+						>
+							<b-spinner 
+								v-if="loadingcreate"
+								variant="success"
+							/>
+							<font-awesome-icon 
+								v-if="successed"
+								:icon="['fas', 'check']"
+								color="green"
+							/>
+							<font-awesome-icon 
+								v-if="errored"
+								:icon="['fas', 'xmark']"
+								color="red"
+							/>
 						</b-col>
 						<b-col align-self="end" />
 					</b-row>
@@ -131,9 +137,9 @@ export default {
 			rowdata: [],
 			loading: true,
 			errormsg: null,
-			successmsg: null,
 			errored: false,
 			successed: false,
+			loadingcreate: false,
 			create: true,
 			accountid : null,
 			header: {
@@ -144,7 +150,9 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => {this.successed = false}, 5000)
+			setTimeout(() => {
+				this.successed = false
+			}, 500)
 		}
 	},
 	async mounted() {
@@ -152,7 +160,8 @@ export default {
 	},
 	methods: {
 		async getAccountinfoConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget="+this.type, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?expand=accountinfo_values&datatarget="+this.type,
+				{ headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
 						this.rowdata.push({
@@ -208,6 +217,7 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
 
 			var json = {
 				object_id: this.id,
@@ -222,7 +232,6 @@ export default {
 			if(this.create) {
 				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
 					.then(() => {
-						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -233,14 +242,13 @@ export default {
 					.catch(e => {
 						this.errormsg = e.message
 						this.errored = true
-						this.successmsg = null
 						this.successed = false
 					})
+					.finally(() => this.loadingcreate = false)
 			} else {
 				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
 					{ headers: this.header })
 					.then(() => {
-						this.successmsg = "success"
 						this.successed = true
 						this.errormsg = null
 						this.errored = false
@@ -248,9 +256,9 @@ export default {
 					.catch(e => {
 						this.errormsg = e.message
 						this.errored = true
-						this.successmsg = null
 						this.successed = false
 					})
+					.finally(() => this.loadingcreate = false)
 			}
 		}
 	}

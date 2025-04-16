@@ -74,6 +74,15 @@
     "oidc_config": "Configuration OIDC",
     "priority": "PRIORITÉ"
   },
+  "category": {
+    "Administrative data": "Données administratives",
+    "Deployment": "Déploiement",
+    "Devices": "Périphériques",
+    "Hardware": "Matériel",
+    "Networks": "Réseaux",
+    "Others": "Autres",
+    "Softwares": "Logiciels"
+  },
   "configuration": {
     "agent": "Agent",
     "auto_retry": "Nouvelle tentative automatique",
@@ -291,8 +300,11 @@
     "deletevalid": "Êtes-vous sûr ?",
     "dont_have_right_to_see": "Vous n'avez pas les droits pour voir cette page",
     "error_no_permissions": "Vous ne disposez d'aucune permission, merci de contacter votre administrateur",
+    "no_field": "Aucun champ disponible. Cliquez sur \"Ajouter un nouveau champ\" pour en créer un.",
     "no_inventory": "Aucune données d'inventaire disponible",
+    "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine n'a été sélectionnée",
+    "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
     "success_saved": "Configuration sauvegardée avec succès !"
   },
   "network": {
@@ -351,6 +363,7 @@
     "authconfig": "Authentification - Configuration",
     "authmapping": "Authentification - Mappages",
     "authmethod": "Authentification - Méthodes",
+    "category": "Inventaire - Catégories",
     "config": "Configuration - Générale",
     "deploymenthistory": "Déploiement - Historique",
     "field": "Modèles - Champs",
@@ -461,12 +474,15 @@
     "visibility": "Visibilité"
   },
   "template": {
+    "addcategory": "Ajouter une nouvelle catégorie",
     "addfield": "Ajouter un nouveau champs",
     "addsection": "Ajouter une nouvelle section",
     "addtemplate": "Ajouter un nouveau modèle",
     "assign": "Assigner un modèle d'inventaire",
     "BASH": "Commande Bash",
+    "category": "Catégorie",
     "CMD": "Commande Cmd",
+    "editcategory": "Éditer la catégorie",
     "editfield": "Éditer le champs",
     "editsection": "Éditer la section",
     "edittemplate": "Éditer un modèle",
@@ -479,6 +495,7 @@
     "is_list": "Est une liste",
     "JSON": "Format JSON",
     "last_update": "Dernière mise à jour",
+    "LEG": "Legacy",
     "LIN": "Linux",
     "MAC": "MacOS",
     "multiple": "Multiple",
@@ -519,6 +536,8 @@
     "assetgroups": "Groupes d'actifs",
     "authentication": "Authentification",
     "automaticactions": "Actions automatiques",
+    "categories": "Catégories",
+    "category": "Catégories",
     "config": "Configuration",
     "configurations": "Configurations",
     "dashboard": "Tableau de bord",
