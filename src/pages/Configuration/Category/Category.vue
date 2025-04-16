@@ -120,7 +120,7 @@ export default {
 				.then(response => {
 					for (const category of response.data) {
 						category.sections = ""
-						for (const section of category.inventory_sections_expand) {
+						for (const section of category.inventory_sections) {
 							category.sections += this.templates[section.template].concat(" - ", section.name) + "\n"
 						}
 						this.rowdata.push(category)
