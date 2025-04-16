@@ -1,21 +1,30 @@
 <template>
 	<div id="field-modal">
-		<b-button
+		<div 
 			v-if="!update"
-			:title="$t('template.addfield')"
-			variant="success"
-			class="add-button"
-			@click="fieldmodal = !fieldmodal"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'plus']"
-			/>
-		</b-button>
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('template.addfield')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="fieldmodal = !fieldmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('template.addfield') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
 		<div v-else>
 			<button 
 				:title="$t('template.editfield')"
 				class="btn btn-ghost-dark"
-				@click="loadData()"
+				@click="loadData(id)"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'pencil']"
@@ -28,6 +37,7 @@
 			:title="(!update) ? $t('template.addfield') : $t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -264,9 +274,9 @@ export default {
 	name: "FieldModal",
 	props: {
 		routetype: { type: String, default: "assets" },
-		rowfielddata: { type: Object, default: null },
-		section: { type: Number, required: true },
-		update: { type: Boolean, default: false }
+		section: { type: Number, default: null },
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
@@ -342,7 +352,7 @@ export default {
 					options: {},
 					section: null
 				}
-				this.$emit("reloadTemplate")
+				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
@@ -358,12 +368,24 @@ export default {
 		}
 	},
 	methods: {
-		loadData() {
+		loadData(id) {
 			this.loading = true
 			this.fieldmodal = true
-			this.row = this.rowfielddata
-			this.options = this.row.options
-			this.loading = false
+			this.getField(id)
+		},
+		async getField(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id, { headers: this.header })
+				.then(response => {
+					this.row = response.data
+					this.options = this.row.options
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
 		},
 		onSubmit(event) {
 			event.preventDefault()

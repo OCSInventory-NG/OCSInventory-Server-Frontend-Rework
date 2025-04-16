@@ -243,6 +243,14 @@ const routes = [
 		meta: {
 			layout: AppLayout
 		}
+	},
+	{
+		path: '/configurations/categories',
+		name: 'Category',
+		component: () => import('@/pages/Configuration/Category/Category.vue'),
+		meta: {
+			layout: AppLayout
+		}
 	}
 ]
 

@@ -27,24 +27,61 @@
 						</div>
 						<div v-else>
 							<b-row class="text-center">
-								<h2>{{ rowtemplatedata.name }}</h2>
+								<b-col cols="4" />
+								<b-col cols="4">
+									<h2>{{ template.name }}</h2>
+								</b-col>
+								<b-col cols="4">
+									<SectionModal
+										:template="parseInt(id)"
+										:routetype="routetype"
+										@reloadTemplate="reloadTemplate"
+									/>
+								</b-col>
 							</b-row>
 							<b-row class="text-center">
 								<b-col>
-									<p>{{ $t('inventory.os') }} : {{ $t("template." + rowtemplatedata.os) }}</p>
-									<p>{{ $t('inventory.last_update') }} : {{ rowtemplatedata.last_update }}</p>
+									<p>
+										<span class="datagrid-title">
+											{{ $t('inventory.os') }} :
+										</span>
+										{{ $t("template." + template.os) }}
+									</p> 
+									<p>
+										<span class="datagrid-title">
+											{{ $t('inventory.last_update') }} :
+										</span>
+										{{ template.last_update }}
+									</p>
 								</b-col>
 							</b-row>
-							<SectionModal
-								:template="parseInt(id)"
-								:routetype="routetype"
-								@reloadTemplate="reloadTemplate"
-							/>
-							<SectionCollapse
-								:routetype="routetype"
-								:rowsectiondata="rowsectiondata"
-								@reloadTemplate="reloadTemplate"
-							/>
+							<div v-if="sections.length">
+								<b-tabs
+									content-class="col-10"
+									pills
+									card
+									vertical
+								>
+									<b-tab
+										v-for="section in sections"
+										:key="section.id"
+										:title="section.name"
+										lazy
+									>
+										<SectionCollapse
+											:section="section"
+											:routetype="routetype"
+											@reloadTemplate="reloadTemplate"
+										/>
+									</b-tab>
+								</b-tabs>
+							</div>
+							<div v-else>
+								<Alert 
+									:message="$t('message.no_section')" 
+									variant="info"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -64,8 +101,8 @@ export default {
 	data() {
 		return {
 			errormsg: null,
-			rowtemplatedata: [],
-			rowsectiondata: [],
+			template: [],
+			sections: [],
 			successmsg: null,
 			successed: false,
 			loading: true,
@@ -89,25 +126,39 @@ export default {
 	},
 	async mounted() {
 		await this.getTemplate()
+		await this.getSections()
 	},
 	methods: {
 		async getTemplate() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"?expand=*", { headers: this.header })
 				.then(response => {
-					this.rowtemplatedata = response.data
-					this.rowsectiondata = response.data.sections
+					this.template = response.data
 					this.errormsg = null
 					this.errored = false
-					this.loading = false
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
 		},
+		async getSections() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+this.id+"&expand=fields",
+				{ headers: this.header })
+				.then(response => {
+					this.sections = response.data
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
+		},
 		async reloadTemplate() {
 			this.loading = true
 			await this.getTemplate()
+			await this.getSections()
 		}
 	}
 }

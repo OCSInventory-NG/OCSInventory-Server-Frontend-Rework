@@ -147,8 +147,8 @@
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sort-by="sortBy"
-				:sort-desc="sortDesc"
+				:sort-by="sortby"
+				:sort-desc="sortdesc"
 				:per-page="perPage"
 				:current-page="currentPage"
 				:filter="filter"
@@ -216,9 +216,9 @@
 					</router-link>
 				</template>
 
-				<!-- Log assets redirection -->
+				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails"
+					v-if="canaccessdetails || canaccesspackagedetails"
 					#cell(asset)="row"
 				>
 					<router-link  
@@ -242,7 +242,7 @@
 					</router-link>
 				</template>
 
-				<!-- Netdevices redirection -->
+				<!-- Saved search redirection -->
 				<template 
 					v-if="title == 'usesavesearch'"
 					#cell(searchname)="row"
@@ -253,6 +253,24 @@
 					>
 						{{ row.item.searchname }}
 					</a>
+				</template>
+
+				<!-- Asset group redirection -->
+				<template
+					v-if="canaccesspackagedetails"
+					#cell(group)="row"
+				>
+					<router-link
+						v-if="row.item.group"
+						:to="'/inventory/assetgroups/'+row.item.group.id"
+						class="ocs-link"
+					>
+						{{ row.item.group.name }}
+					</router-link>
+
+					<span v-else>
+						N/A
+					</span>
 				</template>
 
 				<template #cell(error)="row">
@@ -409,47 +427,8 @@
 </template>
 
 <script>
-import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
-import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
-import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
-import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
-import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
-import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
-import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
-import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
-import GroupModal from '@/components/Modals/Item/GroupModal.vue'
-import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
-import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
-import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
-import PackageModal from '@/components/Modals/Item/PackageModal.vue'
-import RuleModal from '@/components/Modals/Item/RuleModal.vue'
-import UserModal from '@/components/Modals/Item/UserModal.vue'
-import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
-import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
-import EditTemplate from '@/pages/Configuration/Template/EditTemplate.vue'
-
 export default {
 	name: 'Datatable',
-	components: {
-		DeleteItemModal,
-		DoAllActionsItemModal,
-		ImportTemplateModal,
-		SaveSearchModal,
-		UserModal,
-		AccountinfoModal,
-		NetworkGroupModal,
-		AssetGroupModal,
-		AutomaticActionModal,
-		GroupModal,
-		NetdeviceModal,
-		NetworkModal,
-		RuleModal,
-		PackageModal,
-		PackageResultModal,
-		SnmpModal,
-		SnmpScannerModal,
-		EditTemplate
-	},
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: Array, default: null },
@@ -468,6 +447,7 @@ export default {
 		canviewaction: { type: Boolean, default: false },
 		canaccesschild: { type: Boolean, default: false },
 		canaccessdetails: { type: Boolean, default: false },
+		canaccesspackagedetails: { type: Boolean, default: false },
 		titlevalue: { type: String, default: '' },
 		adddvalueroute: { type: String, default: '' },
 		reconciliationname: { type: String, default: '' },
@@ -478,7 +458,10 @@ export default {
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
-		deleteids: { type: Array, default: null }
+		deleteids: { type: Array, default: null },
+		// Sort datatable parameters
+		sortby: { type: String, Default: null },
+		sortdesc: { type: String, Default: null }
 	},
 	data() {
 		return {
@@ -504,9 +487,6 @@ export default {
 			selected: [],
 			selectedids: [],
 			isChecked: false,
-			// Sort datatable parameters
-			sortDesc: null,
-			sortBy: null,
 			// Export parameters
 			json_fields: {},
 			json_data: [],
@@ -549,7 +529,7 @@ export default {
 		}
 	},
 	created() {
-		if(this.title == "asset/bases") {
+		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
 			this.redirectto = "asset"
 		}
 		else if(this.title == "inventory_logs") {
@@ -587,9 +567,6 @@ export default {
 		} else {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
-				if(data == "sections") {
-					visible = false
-				}
 
 				var array = {
 					key: data,

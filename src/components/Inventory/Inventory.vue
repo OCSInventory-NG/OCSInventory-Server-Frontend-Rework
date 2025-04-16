@@ -8,7 +8,7 @@
 			/>
 		</section>
 
-		<!-- Display inventory -->
+		<!-- Display inventory section datatable -->
 		<section v-else>
 			<div 
 				v-if="loading"
@@ -16,200 +16,70 @@
 			>
 				<Loader />
 			</div>
-
 			<div v-else>
-				<div v-if="isDataLoaded">
-					<div v-if="sectionstitle.length > 0">
-						<div align="right">
-							<b-button
-								v-b-toggle="allcollapse"
-								variant="ghost-dark"
-								:title="$t('inventory.expandall')"
-							>
-								<font-awesome-icon 
-									:icon="['far', 'window-maximize']"
-									size="1x"
-								/>
-							</b-button>
-						</div><br>
-						<div
-							v-for="(section_name) in sectionstitle"
-							:key="section_name"
-						>
-							<div
-								class="accordion"
-								role="tablist"
-							>
-								<b-card
-									no-body
-									class="mb-1"
-								>
-									<b-card-header
-										header-tag="header"
-										class="p-1"
-										role="tab"
-									>
-										<b-button
-											v-b-toggle="'section-'+section_name"
-											block
-											class="section-btn"
-										>
-											{{ section_name }}
-										</b-button>
-									</b-card-header>
-
-									<b-collapse
-										:id="'section-'+section_name"
-										accordion="my-accordion"
-										role="tabpanel"
-									>
-										<b-card-body>
-											<b-card-text>
-												<Datatable
-													id="battery-datatable"
-													:rowdata="sections[section_name]"
-													:usecheckbox="false"
-													:rowheader="sectionsheader[section_name]"
-													title="section"
-												/>
-											</b-card-text>
-										</b-card-body>
-									</b-collapse>
-								</b-card>
-							</div>
-						</div>
-					</div>
-					<div v-else>
-						<Alert 
-							:message="$t('message.no_inventory')" 
-							variant="info"
-						/>
-					</div>
+				<div align="center">
+					<h2>{{ section.name }}</h2>
 				</div>
-				<div 
-					v-else
-					class="ocs-loader"
-				>
-					<Loader />
-				</div>
+				<Datatable
+					:id="section.name"
+					:rowdata="rowdata"
+					:usecheckbox="false"
+					:rowheader="rowheader"
+					:title="section.name"
+				/>
 			</div>
 		</section>
 	</div>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Inventory",
 	props: {
-		id: { type: String, default: "0" },
-		template: { type: Number, default: null }
+		section: { type: Object, default: () => {} },
+		inventory: { type: Array, default: () => [] }
 	},
 	data() {
 		return {
-			sections: [],
-			sectionsheader: [],
-			sectionstitle: [],
-			allsections: [],
-			allfields: [],
+			rowheader: [],
+			rowdata: [],
 			loading: true,
 			errored: false,
 			errormsg: null,
-			expandall: false,
-			allcollapse: [],
+			fields: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
 		}
 	},
-	computed: {
-		isDataLoaded() {
-			const nestedLoaded = this.sectionsheader.length !== 0
-			return this.sections && nestedLoaded.length !== 0
-		}
-	},
-	async created() {
-		await this.getSection()
-		if (!this.errored) {
-			await this.getInventory()
-		}
+	async mounted() {
+		await this.getHeader()
+		await this.processInventory()
 	},
 	methods: {
-		async getInventory() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.id, { headers: this.header })
-				.then(response => {
-					for (const inventory of response.data) {
-						var sectionName = this.allsections[inventory.template_section].name
-
-						if(!this.sectionstitle.includes(sectionName)) {
-							this.sectionstitle.push(sectionName)
-							this.allcollapse.push("section-"+sectionName)
-						}
-
-						if(!this.sections[sectionName]) {
-							this.sections[sectionName] = []
-						}
-
-						if(!this.sectionsheader[sectionName]) {
-							this.sectionsheader[sectionName] = []
-						}
-
-						var tmpRow = {}
-
-						for (const field of inventory.fields) {
-							var fieldName = this.allfields[field.template_field]
-
-							Object.assign(tmpRow, {
-								[fieldName]: field.value
-							})
-
-							if(!this.sectionsheader[sectionName].includes(fieldName)) {
-								this.sectionsheader[sectionName].push(fieldName)
-							}
-						}
-
-						const isEmpty = Object.values(tmpRow).every(x => x === null || x === '')
-
-						if(!isEmpty) {
-							this.sections[sectionName].push(tmpRow)
-						}
-					}
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async getSection() {
-			if (this.template != null) {
-				var templateFilter = "?template=" + this.template
-
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"sections"+templateFilter,
-					{ headers: this.header })
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-
-				if (
-					response 
-					&& response.status == 200
-				) {
-					for (const section of response.data) {
-						this.allsections[section.id] = section
-						for (const field of section.fields) {
-							this.allfields[field.id] = field.name
-						}
-					}
-					this.errored = false
+		async getHeader() {
+			this.rowheader = []
+			for (const field of this.section.fields) {
+				this.rowheader.push(field.name)
+				if (!this.fields[field.id]) {
+					this.fields[field.id] = []
 				}
+				this.fields[field.id] = field.name
 			}
+		},
+		async processInventory() {
+			this.rowdata = []
+			for (const rows of this.inventory) {
+				var entry = {}
+				for (const row of rows) {
+					Object.assign(entry, {
+						[this.fields[row.template_field]]: row.value
+					})
+				}
+				this.rowdata.push(entry)
+			}
+			this.loading = false
 		}
 	}
 }

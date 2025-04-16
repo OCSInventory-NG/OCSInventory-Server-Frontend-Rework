@@ -122,6 +122,10 @@
 							route:'Template', column: 'inventory' 
 						},
 						{ 
+							header: $t('title.category'), link: '/configurations/categories', 
+							route:'Category', column: 'inventory' 
+						},
+						{ 
 							header: $t('title.accountinfo'), link: '/configurations/accountinfo', 
 							route:'Accountinfo', column: 'inventory' 
 						},

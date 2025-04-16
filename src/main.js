@@ -17,6 +17,9 @@ import "vue-select/dist/vue-select.css"
 /***** Grid layout plus *****/
 import { GridLayout, GridItem } from 'grid-layout-plus'
 
+/***** Global components *****/
+import '@/components/global'
+
 /***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
@@ -29,6 +32,7 @@ import {
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
 } from '@fortawesome/free-regular-svg-icons'
+import GlobalComponents from '@/components/global'
 
 async function loadConfig() {
 	const response = await fetch('/config/config.json');
@@ -51,6 +55,7 @@ loadConfig().then((config) => {
 	app.component('FontAwesomeLayers', FontAwesomeLayers)
 	app.component('GridLayout', GridLayout)
 	app.component('GridItem', GridItem)
+	app.use(GlobalComponents)
 	library.add({ 
 		faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,

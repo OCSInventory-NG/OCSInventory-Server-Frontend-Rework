@@ -32,6 +32,8 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:usecheckbox="false"
+								sortby="timestamp"
+								sortdesc="desc"
 								title="inventory_logs"
 								translationkey="inventory."
 							/>
@@ -76,7 +78,6 @@ export default {
 					this.getLogs()
 				})
 				.catch(e => {
-					console.log(e)
 					this.errormsg = e.message
 					this.errored = true
 				})
