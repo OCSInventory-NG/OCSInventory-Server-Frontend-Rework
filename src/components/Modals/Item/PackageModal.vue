@@ -162,7 +162,9 @@ export default {
 			row: {
 				name: null,
 				description: null,
-				target_os: 'WIN'
+				target_os: 'WIN',
+				actions_list: [],
+				result: []
 			},
 			errormsg: null,
 			errored: false,
