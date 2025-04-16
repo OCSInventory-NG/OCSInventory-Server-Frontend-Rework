@@ -67,6 +67,7 @@ export default {
 			candelete: false,
 			canview: false,
 			exportemplate: false,
+			importtemplate: false,
 			rowdata: [],
 			rowheader: [],
 			header: {
@@ -131,6 +132,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getTemplates()
 		}
 	}

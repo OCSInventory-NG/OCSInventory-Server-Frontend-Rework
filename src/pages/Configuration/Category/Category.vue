@@ -55,7 +55,7 @@
 import axios from 'axios'
 
 export default {
-	name: 'Template',
+	name: 'Category',
 	data() {
 		return {
 			errormsg: null,
@@ -149,6 +149,7 @@ export default {
 				})
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getCategories()
 		}
 	}
