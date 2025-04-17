@@ -140,10 +140,10 @@
 				id="data-list"  
 				ref="selectableTable"
 				responsive
-				selectable
 				striped
 				hover
 				bordered
+				:selectable="usecheckbox"
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
