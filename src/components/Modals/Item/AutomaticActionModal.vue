@@ -125,17 +125,59 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('scheduler.recurence')" 
-							label-for="recurence"
+							:label="$t('scheduler.recurrence')" 
+							label-for="recurrence"
 						>
 							<v-select
-								id="recurence"
-								v-model="row.recurence" 
-								:options="recurences" 
+								id="recurrence"
+								v-model="row.recurrence" 
+								:options="recurrences" 
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
 								class="mb-3"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row v-if="row.recurrence == 'daily'">
+					<b-col>
+						<b-form-group
+							:label="$t('scheduler.hour')" 
+							label-for="hour"
+						>
+							<b-form-input
+								id="hour"
+								v-model="row.hour"
+								type="number"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row v-if="row.recurrence == 'weekly'">
+					<b-col>
+						<b-form-group
+							:label="$t('scheduler.day_of_week')" 
+							label-for="day_of_week"
+						>
+							<b-form-input
+								id="day_of_week"
+								v-model="row.day_of_week"
+								type="number"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row v-if="row.recurrence == 'monthly'">
+					<b-col>
+						<b-form-group
+							:label="$t('scheduler.day_of_month')" 
+							label-for="day_of_month"
+						>
+							<b-form-input
+								id="day_of_month"
+								v-model="row.day_of_month"
+								type="number"
 							/>
 						</b-form-group>
 					</b-col>
@@ -181,7 +223,10 @@ export default {
 				name: null,
 				description: null,
 				active: false,
-				recurence: "hourly"
+				recurrence: "daily",
+				hour: null,
+				day_of_week: null,
+				day_of_month: null
 			},
 			errormsg: null,
 			errored: false,
@@ -195,7 +240,7 @@ export default {
 				{ value: true, text: this.$t('generic.yes') },
 				{ value: false, text: this.$t('generic.no') }
 			],
-			recurences: [
+			recurrences: [
 				{ value: 'hourly', text: this.$t('scheduler.hourly') },
 				{ value: 'daily', text: this.$t('scheduler.daily') },
 				{ value: 'weekly', text: this.$t('scheduler.weekly') },
@@ -216,7 +261,10 @@ export default {
 					name: null,
 					description: null,
 					active: false,
-					recurence: "hourly"
+					recurrence: "daily",
+					hour: null,
+					day_of_week: null,
+					day_of_month: null
 				}
 				this.$emit("reloadDatatable")
 			}, 500)

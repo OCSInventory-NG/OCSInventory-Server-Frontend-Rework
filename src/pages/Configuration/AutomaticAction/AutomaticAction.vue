@@ -77,9 +77,6 @@ export default {
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("scheduler_view_scheduler")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("scheduler_add_scheduler")) {
-				this.canadd = true
-			}
 			if(localStorage.getItem('permissions').split(",").includes("scheduler_change_scheduler")) {
 				this.canedit = true
 			}
@@ -109,9 +106,14 @@ export default {
 				})
 		},
 		async getSchedulers() {
+			this.rowdata = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					for (const scheduler of response.data) {
+						scheduler.active = this.$t("generic."+scheduler.active)
+						scheduler.recurrence = this.$t("scheduler."+scheduler.recurrence)
+						this.rowdata.push(scheduler)
+					}
 					this.errormsg = null
 					this.errored = false
 				})

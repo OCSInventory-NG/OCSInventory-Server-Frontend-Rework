@@ -427,14 +427,17 @@
     "active": "Active",
     "addscheduler": "Ajouter une action automatique",
     "daily": "Tous les jours",
+    "day_of_month": "Jour du mois",
+    "day_of_week": "Jour de la semaine",
     "description": "Description",
     "editscheduler": "Éditer l'action automatique",
+    "hour": "Heure",
     "hourly": "Toutes les heures",
     "id": "ID",
     "last_execution": "Dernière exécution",
     "name": "Nom",
     "monthly": "Tous les mois",
-    "recurence": "Récurrence",
+    "recurrence": "Récurrence",
     "weekly": "Toutes les semaines"
   },
   "search": {
