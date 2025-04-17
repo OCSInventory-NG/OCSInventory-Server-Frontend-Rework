@@ -32,3 +32,12 @@ button.dropdown-item {
 [data-bs-theme=dark] .navbar-brand-autodark .navbar-brand-image {
   filter: none;
 }
+
+.navbar .navbar-nav {
+  align-items: center;
+
+  .shortcut {
+    margin-right: 10px;
+    padding-top: 5px;
+  }
+}
