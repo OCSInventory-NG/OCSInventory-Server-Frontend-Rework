@@ -75,37 +75,37 @@
 				/>
 			</b-col>
 		</b-row>
+		<div
+			v-if="loading"
+			class="ocs-loader"
+		>
+			<Loader />
+		</div>
 		<b-row  
-			v-if="rowdata.length"
+			v-else
 		>
 			<b-col>
-				<div 
-					v-if="loading"
-					class="ocs-loader"
-				>
-					<Loader />
-				</div>
 				<Datatable
-					v-else
+					v-if="rowdata.length"
 					id="fields-datatable"
 					:canedit="true"
 					:candelete="true"
 					:rowdata="rowdata"
-					:usecheckbox="false"
+					:usecheckbox="true"
 					:rowheader="rowheader"
 					title="fields"
 					translationkey="template."
 					editcomponent="FieldModal"
 					@reloadDatatable="reloadDatatable"
 				/>
+				<div v-else>
+					<Alert
+						:message="$t('message.no_field')"
+						variant="info"
+					/>
+				</div>
 			</b-col>
 		</b-row>
-		<div v-else>
-			<Alert 
-				:message="$t('message.no_field')" 
-				variant="info"
-			/>
-		</div>
 	</div>
 </template>
 
@@ -137,16 +137,21 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			this.loading = true
 			this.rowheader = []
-			for (const field of this.section.fields) {
-				if (this.routetype == "assets") {
-					const keys = Object.keys(field).filter(key => key !== 'section')
-					this.rowheader.push(...keys)
-				} else {
-					this.rowheader = ["id", "name", "retrival_value"]
-				}
-			}
+			await axios.options(this.$config.BACKEND_API_ROUTE+"fields/", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						if(field != "section") {
+							this.rowheader.push(field)
+						}
+					})
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 		},
 		async getFields() {
 			for (const field of this.section.fields) {
@@ -169,9 +174,6 @@ export default {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+this.section.id,
 				{ headers: this.header })
 				.then(response => {
-					if (this.routetype == "snmp") {
-						this.rowheader = ["id", "name", "retrival_value"]
-					}
 					this.rowdata = response.data
 					for (const field of this.rowdata) {
 						var options = ""
