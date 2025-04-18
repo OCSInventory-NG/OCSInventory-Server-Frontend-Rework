@@ -38,6 +38,7 @@
 								:rowheader="rowheader"
 								:candelete="candelete"
 								:canedit="canedit"
+								:usecheckbox="false"
 								editcomponent="AutomaticActionModal"
 								title="automation/scheduler"
 								translationkey="scheduler."
