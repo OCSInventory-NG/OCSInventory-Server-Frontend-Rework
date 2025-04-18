@@ -84,12 +84,16 @@
     "Softwares": "Logiciels"
   },
   "configuration": {
+    "accountinfo_generation": "Génération des données administratives",
     "agent": "Agent",
+    "Application log level": "Niveau de log du serveur",
+    "automation": "Action automatique",
     "auto_retry": "Nouvelle tentative automatique",
     "bandwidth": "Bande passante",
     "Bandwidth of the ARP scan": "Bande passante de l'analyse ARP",
     "blacklist": "Liste noire",
     "debug": "Débogage",
+    "DEBUG": "DEBUG",
     "deployment": "Déploiement",
     "deployment_timeout": "Délai de déploiement",
     "duplicate_reconciliation": "Réconciliation des dupliqués",
@@ -117,10 +121,12 @@
     "List of macaddresses to blacklist": "Liste des adresses MAC à mettre sur liste noire",
     "List of serialnumbers to blacklist": "Liste des numéros de série à mettre sur liste noire",
     "List of snmp configs": "Liste des configurations SNMP",
+    "log_level": "Niveau de log",
     "macaddresses": "Adresses MAC",
     "macaddresses_list": "Liste des adresses MAC",
     "max_retry": "Nombre maximum de tentatives",
     "Max retry number for a package to retry": "Nombre maximal de tentatives pour un paquet",
+    "Mode of administrative data generation": "Mode de génération des données administratives",
     "name": "Nom",
     "networkscan": "Analyse réseau",
     "nmap": "Nmap",
@@ -140,7 +146,9 @@
     "Timeout of command execution in seconds": "Délai d'expiration de l'exécution de la commande en secondes",
     "Timeout of deployment in seconds": "Délai d'expiration du déploiement en secondes",
     "Type of scan": "Type d'analyse réseau",
-    "uuid": "UUID"
+    "uuid": "UUID",
+    "uuid, name": "UUID, Nom",
+    "uuid, srcmac": "UUID, Adresse MAC"
   },
   "dashboard": {
     "adddashboardlayout": "Ajouter un nouveau tableau de bord",

@@ -84,7 +84,10 @@
     "Softwares": "Softwares"
   },
   "configuration": {
+    "accountinfo_generation": "Administrative data generation",
     "agent": "Agent",
+    "Application log level": "Server log level",
+    "automation": "Automatic action",
     "auto_retry": "Automatic retry",
     "bandwidth": "Bandwidth",
     "Bandwidth of the ARP scan": "ARP scan bandwidth",
@@ -108,6 +111,7 @@
     "frequency": "Frequency",
     "Frequency of inventory in hours": "Frequency of inventory in hours",
     "hours": "hours",
+    "INFO": "INFO",
     "inventory_checksum": "Inventory checksum",
     "ipaddresses": "IP addresses",
     "ipaddresses_list": "IP addresses list",
@@ -117,10 +121,12 @@
     "List of macaddresses to blacklist": "List of macaddresses to blacklist",
     "List of serialnumbers to blacklist": "List of serial numbers to blacklist",
     "List of snmp configs": "List of SNMP configs",
+    "log_level": "Log level",
     "macaddresses": "Macaddresses",
     "macaddresses_list": "Macaddresses list",
     "max_retry": "Max retry",
     "Max retry number for a package to retry": "Max retry number for a package to retry",
+    "Mode of administrative data generation": "Administrative data generation mode",
     "name": "Name",
     "networkscan": "Network scan",
     "nmap": "Nmap",
@@ -140,7 +146,9 @@
     "Timeout of command execution in seconds": "Timeout of command execution in seconds",
     "Timeout of deployment in seconds": "Timeout of deployment in seconds",
     "Type of scan": "Type of network scan",
-    "uuid": "UUID"
+    "uuid": "UUID",
+    "uuid, name": "UUID, Name",
+    "uuid, srcmac": "UUID, MAC address"
   },
   "dashboard": {
     "adddashboardlayout": "Add new dashboard",
