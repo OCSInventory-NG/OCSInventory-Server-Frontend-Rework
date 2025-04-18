@@ -160,10 +160,14 @@
 							:label="$t('scheduler.day_of_week')" 
 							label-for="day_of_week"
 						>
-							<b-form-input
+							<v-select
 								id="day_of_week"
-								v-model="row.day_of_week"
-								type="number"
+								v-model="row.day_of_week" 
+								:options="days" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
 							/>
 						</b-form-group>
 					</b-col>
@@ -245,6 +249,15 @@ export default {
 				{ value: 'daily', text: this.$t('scheduler.daily') },
 				{ value: 'weekly', text: this.$t('scheduler.weekly') },
 				{ value: 'monthly', text: this.$t('scheduler.monthly') }
+			],
+			days: [
+				{ value: 0, text: this.$t('scheduler.monday') },
+				{ value: 1, text: this.$t('scheduler.tuesday') },
+				{ value: 2, text: this.$t('scheduler.wednesday') },
+				{ value: 3, text: this.$t('scheduler.thursday') },
+				{ value: 4, text: this.$t('scheduler.friday') },
+				{ value: 5, text: this.$t('scheduler.saturday') },
+				{ value: 6, text: this.$t('scheduler.sunday') }
 			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
