@@ -1,6 +1,5 @@
 <template>
 	<div id="section-collapse">
-		{{ routetype }}
 		<div class="table-responsive">
 			<table class="table table-vcenter border">
 				<thead>
