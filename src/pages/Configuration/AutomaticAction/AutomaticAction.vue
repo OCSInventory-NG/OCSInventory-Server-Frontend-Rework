@@ -80,9 +80,6 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("scheduler_change_scheduler")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("scheduler_delete_scheduler")) {
-				this.candelete = true
-			}
 			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
