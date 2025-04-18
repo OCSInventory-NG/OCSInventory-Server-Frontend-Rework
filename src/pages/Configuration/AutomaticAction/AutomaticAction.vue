@@ -69,6 +69,15 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
+			days: [
+				this.$t('scheduler.monday'),
+				this.$t('scheduler.tuesday'),
+				this.$t('scheduler.wednesday'),
+				this.$t('scheduler.thursday'),
+				this.$t('scheduler.friday'),
+				this.$t('scheduler.saturday'),
+				this.$t('scheduler.sunday')
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -110,6 +119,7 @@ export default {
 					for (const scheduler of response.data) {
 						scheduler.active = this.$t("generic."+scheduler.active)
 						scheduler.recurrence = this.$t("scheduler."+scheduler.recurrence)
+						scheduler.day_of_week = this.days[scheduler.day_of_week]
 						this.rowdata.push(scheduler)
 					}
 					this.errormsg = null
