@@ -274,6 +274,7 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "asset": "Asset",
     "assign": "Assign static group",
     "comment": "Comment",
     "CONFIG_ERR": "Error related to configuration operations",

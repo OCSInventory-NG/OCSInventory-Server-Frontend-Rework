@@ -274,6 +274,7 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "asset": "Actif",
     "assign": "Assigner un groupe statique",
     "comment": "Commentaire",
     "CONFIG_ERR": "Erreur de mise à jour de la configuration",
