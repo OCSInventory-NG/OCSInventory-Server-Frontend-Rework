@@ -39,6 +39,8 @@
 								title="asset/bases"
 								translationkey="inventory."
 								@reloadDatatable="reloadDatatable"
+								sortby="last_update"
+								sortdesc="desc"
 							/>
 						</div>
 					</div>

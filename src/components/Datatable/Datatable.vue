@@ -147,8 +147,8 @@
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sort-by.sync="sortBy"
-				:sort-desc.sync="sortDesc"
+				:sort-by="sortby"
+				:sort-desc="sortdesc"
 				:per-page="perPage"
 				:current-page="currentPage"
 				:filter="filter"
@@ -460,7 +460,7 @@ export default {
 		deletemultiple: { type: Boolean, default: false },
 		deleteids: { type: Array, default: null },
 		// Sort datatable parameters
-		sortby: { type: String, Default: null},
+		sortby: { type: String, Default: null },
 		sortdesc: { type: String, Default: null }
 	},
 	data() {
@@ -503,9 +503,7 @@ export default {
 			datatypes: [
 				'SELECT',
 				'CHECKBOX'
-			],
-			sortBy: null,
-			sortDesc: false,
+			]
 		};
 	},
 	computed: {
@@ -602,13 +600,6 @@ export default {
 		this.totalRows = this.rowdata.length
 		// Initialize data to export
 		this.json_data = this.rowdata
-		// Sort assets by the last_update by default
-		const columnToSort = this.fields.find(f => f.key === "last_update")
-		if(columnToSort){
-			this.sortBy = "last_update"
-		} else {
-			this.sortBy = this.fields[0]?.key || null
-		}
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
