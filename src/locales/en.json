@@ -319,7 +319,8 @@
     "no_section": "No sections available. Click \"Add new section\" to create one.",
     "no_selection": "No machine has been selected",
     "select_multi": "Hold CTRL to select/deselect entry",
-    "success_saved": "Configuration successfully saved!"
+    "success_saved": "Configuration successfully saved!",
+    "superuser_disclaimer": "Warning: Grants unrestricted access."
   },
   "network": {
     "addnetgroup": "Add network group",
@@ -564,6 +565,7 @@
     "category": "Categories",
     "config": "Configuration",
     "configurations": "Configurations",
+    "dangerzone": "Danger zone",
     "dashboard": "Dashboard",
     "deployment": "Deployment",
     "details": "Details",
@@ -605,7 +607,7 @@
     "groups": "Groups",
     "id": "ID",
     "is_staff": "Super admin",
-    "is_superuser": "Super admin",
+    "is_superuser": "Privileged user",
     "last_name": "Last name",
     "name": "Name",
     "password": "Password",

@@ -319,7 +319,8 @@
     "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine n'a été sélectionnée",
     "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
-    "success_saved": "Configuration sauvegardée avec succès !"
+    "success_saved": "Configuration sauvegardée avec succès !",
+    "superuser_disclaimer": "Attention : Donne un accès sans restrictions."
   },
   "network": {
     "addnetgroup": "Ajouter un groupe Réseaux",
@@ -564,6 +565,7 @@
     "category": "Catégories",
     "config": "Configuration",
     "configurations": "Configurations",
+    "dangerzone": "Zone dangereuse",
     "dashboard": "Tableau de bord",
     "deployment": "Déploiement",
     "details": "Détails",
@@ -605,7 +607,7 @@
     "groups": "Groupes",
     "id": "ID",
     "is_staff": "Super admin",
-    "is_superuser": "Super admin",
+    "is_superuser": "Utilisateur privilégié",
     "last_name": "Nom",
     "name": "Nom",
     "password": "Mot de passe",
