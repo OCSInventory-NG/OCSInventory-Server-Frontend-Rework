@@ -499,7 +499,7 @@
   },
   "template": {
     "addcategory": "Ajouter une nouvelle catégorie",
-    "addfield": "Ajouter un nouveau champs",
+    "addfield": "Ajouter un nouveau champ",
     "addsection": "Ajouter une nouvelle section",
     "addtemplate": "Ajouter un nouveau modèle",
     "assign": "Assigner un modèle d'inventaire",
@@ -507,7 +507,7 @@
     "category": "Catégorie",
     "CMD": "Commande Cmd",
     "editcategory": "Éditer la catégorie",
-    "editfield": "Éditer le champs",
+    "editfield": "Éditer le champ",
     "editsection": "Éditer la section",
     "edittemplate": "Éditer un modèle",
     "export_template": "Exporter JSON",
