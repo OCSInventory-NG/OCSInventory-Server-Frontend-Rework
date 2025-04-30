@@ -182,7 +182,6 @@
 							:label="$t('message.superuser_disclaimer')" 
 							label-for="is_superuser"
 						>
-
 							<b-form-checkbox
 								id="is_superuser"
 								v-model="row.is_superuser"
