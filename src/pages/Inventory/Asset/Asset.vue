@@ -38,9 +38,9 @@
 								:usecheckbox="true"
 								title="asset/bases"
 								translationkey="inventory."
-								@reloadDatatable="reloadDatatable"
 								sortby="last_update"
 								sortdesc="desc"
+								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
 					</div>
