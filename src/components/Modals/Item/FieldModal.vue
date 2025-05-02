@@ -338,22 +338,24 @@ export default {
 	},
 	watch: {
 		createwithsuccess: function() {
-			setTimeout(() => {
-				this.fieldmodal = false
-				this.createwithsuccess = false
-				this.row = {
-					id: null,
-					name: null,
-					retrival_value: null,
-					override_target: false,
-					new_target: null,
-					retrival_method: null,
-					retrival_output: null,
-					options: {},
-					section: null
-				}
-				this.$emit("reloadDatatable")
-			}, 500)
+			if (this.createwithsuccess) {
+				setTimeout(() => {
+					this.fieldmodal = false
+					this.createwithsuccess = false
+					this.row = {
+						id: null,
+						name: null,
+						retrival_value: null,
+						override_target: false,
+						new_target: null,
+						retrival_method: null,
+						retrival_output: null,
+						options: {},
+						section: this.section
+					}
+					this.$emit("reloadDatatable")
+				}, 500)
+			}
 		}
 	},
 	created() {
@@ -411,7 +413,7 @@ export default {
 						this.createerror = true
 						this.createerrormsg = e.message
 					})
-					.finally(() => this.loadingcreate = false)
+					.finally(() => { this.loadingcreate = false })
 			} else {
 				axios.patch(this.$config.BACKEND_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
@@ -424,7 +426,7 @@ export default {
 						this.createerror = true
 						this.createwithsuccess = false
 					})
-					.finally(() => this.loadingcreate = false)
+					.finally(() => { this.loadingcreate = false })
 			}			
 		}
 	}
