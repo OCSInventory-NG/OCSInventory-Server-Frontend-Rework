@@ -126,8 +126,9 @@
 								<template #selection="{ values, isOpen }">
 									<span
 										v-if="values.length"
+										v-show="!isOpen"
 										class="multiselect__single"
-										v-show="!isOpen">{{ values.length }} {{ $t('generic.selectedoptions') }}
+									>{{ values.length }} {{ $t('generic.selectedoptions') }}
 									</span>
 								</template>
 							</multiselect>
