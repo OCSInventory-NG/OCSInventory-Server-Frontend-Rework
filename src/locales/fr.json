@@ -239,6 +239,7 @@
     "deleteselection": "Supprimer la sélection",
     "delete_msg2": "Supprimer",
     "description": "Description",
+    "deselected": "Cliquez pour désélectionner",
     "download": "Télécharger",
     "false": "Non",
     "id": "ID",
@@ -255,6 +256,9 @@
     "saveas": "Sauvegarder en temps que nouveau",
     "search": "Rechercher",
     "selected": "Sélectionné",
+    "selectedoptions": "option(s) sélectionnée(s)",
+    "selectlabel": "Cliquez pour sélectionner",
+    "selectplaceholder": "Sélectionnez des sections",
     "send": "Envoyer",
     "show_hide": "Afficher / Cacher",
     "true": "Oui",
@@ -318,7 +322,6 @@
     "no_inventory": "Aucune données d'inventaire disponible",
     "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine n'a été sélectionnée",
-    "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
     "success_saved": "Configuration sauvegardée avec succès !"
   },
   "network": {
