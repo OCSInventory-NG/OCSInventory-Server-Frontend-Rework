@@ -123,7 +123,7 @@
 								label="text"
 								track-by="value"
 							>
-								<template #selection="{ values, search, isOpen }">
+								<template #selection="{ values, isOpen }">
 									<span
 										v-if="values.length"
 										class="multiselect__single"
