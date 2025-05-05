@@ -106,16 +106,31 @@
 				<b-row v-if="update">
 					<b-col>
 						<b-form-group
-							:label="$t('template.sections')" 
+							:label="$t('template.sections')"
 							label-for="sections"
 						>
-							<p><i>{{ $t('message.select_multi') }}</i></p>
-							<b-form-select
-								v-model="row.inventory_sections"
+							<multiselect
+								v-model="selectedsections"
 								:options="sections"
-								multiple
-								:select-size="10"
-							/>
+								:multiple="true"
+								:close-on-select="false"
+								:clear-on-select="false"
+								:preserve-search="true"
+								:select-label="$t('generic.selectlabel')"
+								:deselect-label="$t('generic.deselected')"
+								:placeholder="$t('generic.selectplaceholder')"
+								:selected-label="$t('generic.selected')"
+								label="text"
+								track-by="value"
+							>
+								<template #selection="{ values, search, isOpen }">
+									<span
+										v-if="values.length"
+										class="multiselect__single"
+										v-show="!isOpen">{{ values.length }} {{ $t('generic.selectedoptions') }}
+									</span>
+								</template>
+							</multiselect>
 						</b-form-group>
 						<br>
 					</b-col>
@@ -171,6 +186,7 @@ export default {
 			createwithsuccess: false,
 			categorymodal: false,
 			sections: [],
+			selectedsections: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -219,12 +235,19 @@ export default {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?expand=sections", { headers: this.header })
 				.then(response => {
 					this.sections = []
+					this.selectedsections = []
 					for (const template of response.data) {
 						for (const section of template.sections) {
 							this.sections.push({
 								value: section.id,
 								text: template.name.concat(" - ", section.name)
 							})
+							if (this.row.inventory_sections.includes(section.id)) {
+								this.selectedsections.push({
+									value: section.id,
+									text: template.name.concat(" - ", section.name)
+								})
+							}
 						}
 					}
 				})
@@ -256,6 +279,12 @@ export default {
 						this.loadingcreate = false
 					})
 			} else {
+				this.row.inventory_sections = []
+
+				for (const selected of this.selectedsections) {
+					this.row.inventory_sections.push(selected.value)
+				}
+
 				axios.patch(this.$config.BACKEND_API_ROUTE+"categories/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
