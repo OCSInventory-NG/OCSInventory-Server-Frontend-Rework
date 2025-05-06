@@ -101,11 +101,16 @@ export default {
 			var search = null
 			var all = []
 
-			if(id !== "all_") {
-				search = '[id*="'+id+'"]'
-			} else {
+			// "All" for a line
+			if(id.match(/^[a-zA-Z]+_\d+$/)) {
+				search = `[id$="_${id.split('_')[0]}"]:not([value="all"])`
+			}
+			// "All" for a column
+			else if(id === "all_") {
 				search = '[id*="add_"],[id*="change_"],[id*="delete_"],[id*="view_"]'
 				all = document.querySelectorAll("input[value=all]");
+			} else {
+				search = '[id*="'+id+'"]'
 			}
 
 			var permissions = document.querySelectorAll(search);
@@ -119,19 +124,19 @@ export default {
 			})
 
 			permissions.forEach(permission => {
-				var index = this.selectedPermissionsArray.indexOf(parseInt(permission.value));
+				if(permission.value !== "all") {
+					var index = this.selectedPermissionsArray.indexOf(parseInt(permission.value));
 
-				if(checked) {
-					document.getElementById(permission.id).checked = true
-					if(permission.value !== "all") {
+					if(checked) {
+						document.getElementById(permission.id).checked = true
 						if (index === -1) {
 							this.selectedPermissionsArray.push(parseInt(permission.value))
 						}
-					}
-				} else {
-					document.getElementById(permission.id).checked = false
-					if (index !== -1) {
-						this.selectedPermissionsArray.splice(index, 1);
+					} else {
+						document.getElementById(permission.id).checked = false
+						if (index !== -1) {
+							this.selectedPermissionsArray.splice(index, 1);
+						}
 					}
 				}
 			})
