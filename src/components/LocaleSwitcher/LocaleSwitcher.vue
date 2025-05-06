@@ -6,7 +6,7 @@
 		<BFormSelect
 			v-model="$root.$i18n.locale" 
 			:options="supportedLocales"
-			@change="setLocale"
+			@input="setLocale"
 		/>
 	</div>
 </template>
@@ -23,8 +23,9 @@ export default {
 		}
 	},
 	methods: {
-		setLocale() {
-			localStorage.setItem('locale', this.$root.$i18n.locale)
+		setLocale(event) {
+			const locale = event?.target?.value || this.$root.$i18n.locale
+			localStorage.setItem('locale', locale)
 		}
 	}
 }
