@@ -186,8 +186,8 @@
 								id="is_superuser"
 								v-model="row.is_superuser"
 								name="is_superuser"
-								value="true"
-								unchecked-value="false"
+								:value="true"
+								:unchecked-value="false"
 							>
 								{{ $t('user.is_superuser') }}
 							</b-form-checkbox>
