@@ -526,6 +526,9 @@ export default {
 				this.selected = []
 			}
 			this.attributePackage()
+		},
+		'$root.$i18n.locale': function() {
+			this.updateColumnLabels()
 		}
 	},
 	created() {
@@ -657,6 +660,13 @@ export default {
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)
+		},
+		updateColumnLabels() {
+			this.fields.forEach(field => {
+				if (field.key !== 'selected' && field.key !== 'actions') {
+					field.label = (this.$te(this.translationkey+field.key)) ? this.$t(this.translationkey+field.key) : field.key
+				}
+			})
 		}
 	}
 }
