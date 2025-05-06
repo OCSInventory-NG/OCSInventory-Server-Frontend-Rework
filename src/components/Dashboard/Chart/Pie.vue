@@ -1,5 +1,5 @@
 <template>
-	<div id="pie">
+	<div id="pie" class="chart-container">
 		<div class="card donut-card">
 			<b-button 
 				v-if="edit"
@@ -19,13 +19,15 @@
 				<apexchart 
 					:options="chartOptions" 
 					:series="series"
+					type="pie"
+					height="300"
 					width="568"
-					type="pie" 
 				/>
 			</div>
 		</div>
 	</div>
 </template>
+
 <script>
 export default {
 	name: "Pie",
@@ -40,15 +42,16 @@ export default {
 		return {
 			chartOptions: {
 				chart: {
-					width: 568,
-					type: 'pie'
+					type: 'pie',
+					width: '100%',
+					height: 300
 				},
 				responsive: [
 					{
 						breakpoint: 568,
 						options: {
 							chart: {
-								width: 200
+								width: '100%'
 							},
 							legend: {
 								show: false

@@ -1,5 +1,5 @@
 <template>
-	<div id="line">
+	<div id="line" class="chart-container">
 		<div class="card donut-card">
 			<b-button 
 				v-if="edit"
