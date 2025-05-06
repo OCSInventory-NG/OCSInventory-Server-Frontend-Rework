@@ -1,5 +1,8 @@
 <template>
-	<div id="pie" class="chart-container">
+	<div
+		id="pie"
+		class="chart-container"
+	>
 		<div class="card donut-card">
 			<b-button 
 				v-if="edit"
