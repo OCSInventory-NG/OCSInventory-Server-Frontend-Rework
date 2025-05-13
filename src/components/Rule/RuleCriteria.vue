@@ -287,12 +287,12 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
-		this.getLogicRow()
+	async mounted() {
+		await this.getLogicRow()
 	},
 	methods: {
-		getModelField() {
-			axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
+		async getModelField() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
 					this.loadingfield = true
 
@@ -313,7 +313,7 @@ export default {
 				})
 				.finally(() => { this.loading = false })
 		},
-		getLogicRow() {
+		async getLogicRow() {
 			if(this.logic.lenth > 0) {
 				this.datavalues = []
 			}
@@ -393,14 +393,13 @@ export default {
 											this.logic[key][or][key2][0] : ((this.logic[key][or][key2][1]) ?
 												this.logic[key][or][key2][1] : null)
 									})
+									masterindex++
 								} else {
 									this.datavalues[masterindex - 1][this.datavalues[masterindex - 1].length - 1][
 										"case_sensitive"
 									] = this.logic[key][or][key2]
 								}
 							}
-
-							masterindex++
 						})
 					})
 				}
@@ -408,7 +407,7 @@ export default {
 
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
 
-			this.getModelField()
+			await this.getModelField()
 		},
 		addAndCondition(masterindex, index, fieldType) {
 			fieldType[masterindex].push(
