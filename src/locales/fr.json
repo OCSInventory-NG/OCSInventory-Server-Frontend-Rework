@@ -323,7 +323,7 @@
     "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine sélectionnée",
     "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
-    "success_saved": "Configuration sauvegardée avec succès !"
+    "success_saved": "Configuration sauvegardée avec succès !",
     "superuser_disclaimer": "Attention : Donne un accès sans restrictions."
   },
   "network": {
