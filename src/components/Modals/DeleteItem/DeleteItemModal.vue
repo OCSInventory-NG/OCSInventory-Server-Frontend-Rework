@@ -5,7 +5,7 @@
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			:class="'btn ' + customclass"
 			:disabled="disabled"
-			@click="deleteact = !deleteact"
+			@click="refreshIds()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'trash-can']"
@@ -58,6 +58,7 @@
 					:message="deleteerrormsg" 
 					variant="danger"
 				/>
+
 				<div class="text-center">
 					<font-awesome-icon 
 						:icon="['fas', 'triangle-exclamation']"
@@ -120,10 +121,10 @@ export default {
 	data() {
 		return {
 			row: {
-				id: this.id
+				id: null
 			},
 			rows: {
-				ids: this.ids
+				ids: []
 			},
 			loadingdelete: false,
 			deleteerror: false,
@@ -150,6 +151,11 @@ export default {
 		}
 	},
 	methods: {
+		refreshIds() {
+			this.rows.ids = this.ids
+			this.row.id = this.id
+			this.deleteact = true
+		},
 		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()

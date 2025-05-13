@@ -82,6 +82,7 @@ export default {
 						}
 					})
 					this.rowheader.push("waiting")
+					this.rowheader.push("notified")
 					this.rowheader.push("success")
 					this.rowheader.push("error")
 
@@ -101,15 +102,18 @@ export default {
 						packages.actions_list = packages.actions_list.length
 
 						packages.waiting = 0
+						packages.notified = 0
 						packages.success = 0
 						packages.error = 0
 
 						if(packages.result) {
 							packages.result.forEach(result => {
-								if(result.status == 2) {
+								if(result.status == 3) {
 									packages.error += 1
-								} else if(result.status == 1) {
+								} else if(result.status == 0) {
 									packages.success += 1
+								} else if(result.status == 2) {
+									packages.notified += 1
 								} else {
 									packages.waiting += 1
 								}

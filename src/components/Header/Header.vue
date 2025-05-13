@@ -28,6 +28,11 @@
 
 			<!-- USER SETTING / LOGOUT -->
 			<div class="navbar-nav flex-row order-md-last">
+				<SaveSearchModal
+					:navbar="true"
+					@useSaveSearch="useSaveSearch"
+				/>
+
 				<Localeswitcher />
 
 				<BNavItemDropdown
@@ -67,11 +72,8 @@
 </template>
 
 <script>
-import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher.vue'
-
 export default {
 	name: 'Header',
-	components: { Localeswitcher },
 	data() {
 		return {
 			showmobilemenu: false,
@@ -90,6 +92,13 @@ export default {
 		showMenu() {
 			this.showmobilemenu = !this.showmobilemenu;
 		},
+		useSaveSearch(search) {
+			localStorage.setItem('multisearch', JSON.stringify(search))
+			localStorage.setItem('useSavedSearch', true)
+			this.$router.push({
+				name: 'Multisearch',
+			});
+		}
 	}
 }
 </script>

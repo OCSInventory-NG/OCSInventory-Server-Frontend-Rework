@@ -6,14 +6,14 @@
 		<div>
 			<!-- Page header for asset -->
 			<PageHeader 
-				v-if="rowdata.name"
-				:page-title="rowdata.name"
+				v-if="device.name"
+				:page-title="device.name"
 			/>
 
 			<!-- Page header for netdevice -->
 			<PageHeader 
-				v-if="rowdata.netname"
-				:page-title="rowdata.netname"
+				v-if="device.netname"
+				:page-title="device.netname"
 			/>
 
 			<!-- Display details -->
@@ -44,81 +44,91 @@
 											<PackageResultModal
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
-											/>
-											<AssignTemplateModal
+											/>&nbsp;
+											<AssetOptionsModal
 												:item="deployment"
 												@reloadInventory="reloadInventory"
-											/>
+											/>&nbsp;&nbsp;
+											<router-link 
+												:to="'/inventory/inventory_logs/'+$route.params.id"
+												:title="$t('inventory.see_logs')"
+												class="btn datatable-btn mr-1"
+											>
+												<font-awesome-icon 
+													:icon="['far', 'file-lines']"
+												/>
+											</router-link>
 										</b-button-group>
 									</div>
-									<div class="col-1">
-										<router-link 
-											:to="'/inventory/inventory_logs/'+$route.params.id"
-											:title="$t('inventory.see_logs')"
-											class="btn datatable-btn mr-1"
-										>
-											<font-awesome-icon 
-												:icon="['far', 'file-lines']"
-											/>
-										</router-link>
-									</div>
+									<div class="col-1" />
 								</b-row>
-							</div>
-
-							<div class="hr-text">
-								{{ $t("generic.information") }}
-							</div>
-							<div class="datagrid">
-								<div 
-									v-for="(value,key) in rowdata"
-									:key="key"
-									class="datagrid-item"
-								>
-									<div class="datagrid-title">
-										{{ $t(translationkey+key) }}
-									</div>
-									<div class="datagrid-content">
-										{{ value }}
-									</div>
-								</div>
-							</div>
-							<br><br>
-							<div>
 								<b-tabs
-									content-class="mt-3"
-									fill
+									content-class="col-10 sticky-tabs"
+									pills
+									card
+									vertical
 								>
 									<b-tab
-										:title="$t('title.accountinfo')"
+										v-for="category in categories"
+										:key="category.id"
+										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
+										lazy
 									>
-										<fieldset class="form-fieldset">
-											<Accountinfo
-												:id="rowdata.id"
-												:type="type"
-												:canedit="canedit"
-												:slug="slug"
+										<div v-if="category.id == 1">
+											<div class="datagrid">
+												<div 
+													v-for="(value,key) in device"
+													:key="key"
+													class="datagrid-item"
+												>
+													<div class="datagrid-title">
+														{{ $t(translationkey+key) }}
+													</div>
+													<div class="datagrid-content">
+														{{ value }}
+													</div>
+												</div>
+											</div><br><br>
+											<div align="center">
+												<h2>{{ $t("title.accountinfo") }}</h2>
+											</div>
+											<fieldset class="form-fieldset">
+												<Accountinfo
+													:id="device.id"
+													:type="type"
+													:canedit="canedit"
+													:slug="slug"
+												/>
+											</fieldset><br>
+										</div>
+										<div v-if="category.id == 2">
+											<div align="center">
+												<h2>{{ $t("title.deployment") }}</h2>
+											</div>
+											<ResultDetail
+												:id="$route.params.id"
+												:reload="reload"
+												@endReloadDeployment="endReloadDeployment"
 											/>
-										</fieldset>
-									</b-tab>
-									<b-tab
-										v-if="type == 'ASSET'"
-										:title="$t('title.inventory')"
-										active
-									>
-										<Inventory
-											:id="$route.params.id"
-											:template="rowdata.template"
-										/>
-									</b-tab>
-									<b-tab 
-										v-if="type == 'ASSET'"
-										:title="$t('title.deployment')"
-									>
-										<ResultDetail
-											:id="$route.params.id"
-											:reload="reload"
-											@endReloadDeployment="endReloadDeployment"
-										/>
+										</div>
+										<div
+											v-for="section in category.inventory_sections"
+											:key="section.id"
+										>
+											<Inventory 
+												v-if="section.template == device.template"
+												:section="section"
+												:inventory="sections[section.id]"
+											/>
+										</div>
+										<div 
+											v-if="device.template == null && ![1, 2].includes(category.id)"
+										>
+											<Alert 
+												:message="$t('message.no_inventory')" 
+												variant="info"
+											/>
+										</div>
 									</b-tab>
 								</b-tabs>
 							</div>
@@ -138,7 +148,6 @@ export default {
 	data() {
 		return {
 			errormsg: null,
-			rowdata: [],
 			loading: true,
 			errored: false,
 			canedit: true,
@@ -148,6 +157,9 @@ export default {
 			id: null,
 			reload: false,
 			deployment: [],
+			device: {},
+			categories: [],
+			sections: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -155,22 +167,23 @@ export default {
 		}
 	},
 	async mounted() {
-		var extendedRoute = null
 		if(this.$route.params.type == 'asset') {
-			extendedRoute = "asset/bases/"+this.$route.params.id
 			this.type = "ASSET"
 			this.slug = "inventory_base.inventorybase"
 			this.translationkey = "inventory."
 			if(this.$route.params.id) this.id = this.$route.params.id
+			await this.getInventoryBase()
+			await this.getCategories()
+			await this.getInventoryCollection()
 		}
-		if(this.$route.params.type == 'netdevice') {
+		/*if(this.$route.params.type == 'netdevice') {
 			extendedRoute = "netdevices/"+this.$route.params.id
 			this.type = "IPDISCOVER"
 			this.slug = "netdevice.netdevice"
 			this.translationkey = "network."
-		}
+		}*/
 
-		await axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
+		/*await axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
 			.then(response => {
 				delete response.data.inventory_sections
 				this.rowdata = response.data
@@ -182,14 +195,72 @@ export default {
 			.catch(e => {
 				this.errormsg = e.message
 				this.errored = true
-			})
+			})*/
 	},
 	methods: {
+		async getInventoryBase() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id, { headers: this.header })
+				.then(response => {
+					this.device = response.data
+					this.deployment.push(response.data)
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		async getCategories() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories?expand=inventory_sections", { headers: this.header })
+				.then(response => {
+					response.data.sort((a, b) => a.id - b.id);
+					this.categories = []
+					for (const category of response.data) {
+						var allReadyPush = false
+						if (category.is_protected) {
+							this.categories.push(category)
+							allReadyPush = true
+						}
+
+						Object.keys(category.inventory_sections).forEach(item => {
+							this.loading = true
+							var section = category.inventory_sections[item]
+
+							if (!allReadyPush && section.template == this.device.template) {
+								this.categories.push(category)
+								allReadyPush = true
+							}
+						})
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		async getInventoryCollection() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
+				{ headers: this.header })
+				.then(response => {
+					this.sections = []
+					for (const inventory of response.data) {
+						if (!this.sections[inventory.template_section]) {
+							this.sections[inventory.template_section] = []
+						}
+
+						this.sections[inventory.template_section].push(inventory.fields)
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
+		},
 		reloadDeployment() {
 			this.reload = true
 		},
 		reloadInventory(item) {
-			this.rowdata = item[0]
+			this.device = item[0]
 		},
 		endReloadDeployment() {
 			this.reload = false

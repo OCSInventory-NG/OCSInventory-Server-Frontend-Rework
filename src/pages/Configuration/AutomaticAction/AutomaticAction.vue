@@ -38,8 +38,9 @@
 								:rowheader="rowheader"
 								:candelete="candelete"
 								:canedit="canedit"
+								:usecheckbox="false"
 								editcomponent="AutomaticActionModal"
-								title="automaticactions"
+								title="automation/scheduler"
 								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -68,6 +69,15 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
+			days: [
+				this.$t('scheduler.monday'),
+				this.$t('scheduler.tuesday'),
+				this.$t('scheduler.wednesday'),
+				this.$t('scheduler.thursday'),
+				this.$t('scheduler.friday'),
+				this.$t('scheduler.saturday'),
+				this.$t('scheduler.sunday')
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -77,14 +87,8 @@ export default {
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("scheduler_view_scheduler")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("scheduler_add_scheduler")) {
-				this.canadd = true
-			}
 			if(localStorage.getItem('permissions').split(",").includes("scheduler_change_scheduler")) {
 				this.canedit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("scheduler_delete_scheduler")) {
-				this.candelete = true
 			}
 			await this.getHeader()
 		} else {
@@ -109,9 +113,15 @@ export default {
 				})
 		},
 		async getSchedulers() {
+			this.rowdata = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					for (const scheduler of response.data) {
+						scheduler.active = this.$t("generic."+scheduler.active)
+						scheduler.recurrence = this.$t("scheduler."+scheduler.recurrence)
+						scheduler.day_of_week = this.days[scheduler.day_of_week]
+						this.rowdata.push(scheduler)
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -122,6 +132,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getSchedulers()
 		},
 	}

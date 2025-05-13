@@ -245,9 +245,9 @@ const routes = [
 		}
 	},
 	{
-		path: '/deployment/report',
-		name: 'Report',
-		component: () => import('@/pages/Deployment/Report.vue'),
+		path: '/configurations/categories',
+		name: 'Category',
+		component: () => import('@/pages/Configuration/Category/Category.vue'),
 		meta: {
 			layout: AppLayout
 		}

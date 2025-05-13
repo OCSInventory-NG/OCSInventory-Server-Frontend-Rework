@@ -103,6 +103,7 @@
 								id="password"
 								v-model="row.password"
 								type="password"
+								autocomplete="new-password"
 								:required="(!update) ? true : false"
 							/>
 						</b-form-group>
@@ -150,19 +151,6 @@
 				</b-row>
 				<b-row>
 					<b-col>
-						<b-form-checkbox
-							id="is_staff"
-							v-model="row.is_staff"
-							name="is_staff"
-							value="true"
-							unchecked-value="false"
-						>
-							{{ $t('user.is_staff') }}
-						</b-form-checkbox>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
 						<h4>{{ $t('title.groups') }}</h4>
 					</b-col>
 				</b-row>
@@ -181,6 +169,29 @@
 						>
 							{{ group.name }}
 						</b-form-checkbox>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<h4>{{ $t('title.dangerzone') }}</h4>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group 
+							:label="$t('message.superuser_disclaimer')" 
+							label-for="is_superuser"
+						>
+							<b-form-checkbox
+								id="is_superuser"
+								v-model="row.is_superuser"
+								name="is_superuser"
+								:value="true"
+								:unchecked-value="false"
+							>
+								{{ $t('user.is_superuser') }}
+							</b-form-checkbox>
+						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -227,7 +238,7 @@ export default {
 				email: null,
 				first_name: null,
 				last_name: null,
-				is_staff: false,
+				is_superuser: false,
 				groups: [],
 				user_permissions: []
 			},
@@ -251,6 +262,16 @@ export default {
 			setTimeout(() => {
 				this.usermodal = false
 				this.createwithsuccess = false
+				this.row = {
+					username: null,
+					password: null,
+					email: null,
+					first_name: null,
+					last_name: null,
+					is_superuser: false,
+					groups: [],
+					user_permissions: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

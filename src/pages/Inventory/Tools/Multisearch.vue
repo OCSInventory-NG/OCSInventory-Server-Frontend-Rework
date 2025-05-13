@@ -49,8 +49,11 @@
 								:canaccessdetails="true"
 								:candeploy="true"
 								:multisearch="true"
-								title="assets"
+								:candelete="candelete"
+								:usecheckbox="candelete"
+								title="asset/bases"
 								translationkey="inventory."
+								@reloadDatatable="reloadDatatable"
 							/>
 							<AssetGroupModal 
 								:assetrow="assetids"
@@ -79,6 +82,7 @@ export default {
 			loading: true,
 			errored: false,
 			noresult: null,
+			candelete: false,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -87,7 +91,14 @@ export default {
 	},
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
+			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
+				this.candelete = true
+			}
 			await this.getHeader()
+			if(localStorage.getItem("useSavedSearch")) {
+				this.reloadDatatable()
+				localStorage.removeItem("useSavedSearch")
+			}
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -106,16 +117,16 @@ export default {
 
 					this.errormsg = null
 					this.errored = false
-
-					this.loading = false
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
+				.finally(() => this.loading = false)
 		},
 		async reloadDatatable(search) {
-			this.rowsearch = search
+			this.loading = true
+			this.rowsearch = search ?? JSON.parse(localStorage.getItem('multisearch'))
 			
 			await axios.post(this.$config.BACKEND_API_ROUTE+"search/", this.rowsearch, { headers: this.header })
 				.then(response => {
@@ -145,6 +156,7 @@ export default {
 					this.successmsg = null
 					this.successed = false
 				})
+				.finally(() => this.loading = false)
 		}
 	}
 }

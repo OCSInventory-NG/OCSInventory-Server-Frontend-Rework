@@ -70,10 +70,6 @@
 						{ 
 							header: $t('title.history'), link: '/deployment/history', 
 							route:'History', column: 'general' 
-						},
-						{ 
-							header: $t('title.report'), link: '/deployment/report', 
-							route:'Report', column: 'general' 
 						}
 					]"
 					link="/deployment"
@@ -124,6 +120,10 @@
 						{ 
 							header: $t('title.templates'), link: '/configurations/templates', 
 							route:'Template', column: 'inventory' 
+						},
+						{ 
+							header: $t('title.category'), link: '/configurations/categories', 
+							route:'Category', column: 'inventory' 
 						},
 						{ 
 							header: $t('title.accountinfo'), link: '/configurations/accountinfo', 

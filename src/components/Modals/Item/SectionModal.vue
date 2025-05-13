@@ -197,7 +197,7 @@
 									:id="value.id"
 									v-model="options[value.id]"
 									:name="value.id"
-									value="true"
+									:value="true"
 									:unchecked-value="value.default"
 								>
 									{{ $t('template.'+value.id) }}
@@ -320,7 +320,21 @@ export default {
 			setTimeout(() => {
 				this.sectionmodal = false
 				this.createwithsuccess = false
-				this.$emit("reloadTemplate")
+				this.row = {
+					id: null,
+					name: null,
+					retrival_method: 'FILE',
+					retrival_output: null,
+					target: null,
+					fields: [],
+					template: null,
+					options: {}
+				}
+				if (!this.update) {
+					this.$emit("reloadTemplate")
+				} else {
+					this.$emit("reloadSection")
+				}
 			}, 500)
 		}
 	},

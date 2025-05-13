@@ -217,6 +217,13 @@ export default {
 			setTimeout(() => {
 				this.snmpscannermodal = false
 				this.createwithsuccess = false
+				this.row = {
+					identifier: null,
+					ip: null,
+					subnets: null,
+					notes: null,
+					configs: []
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
@@ -232,7 +239,7 @@ export default {
 		},
 		async getSnmpScanner(id) {
 			this.row = []
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")
@@ -251,7 +258,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async getCommunities() {
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config", { headers: this.header })
 				.then(response => {
 					this.configs = []
 					for (const config of response.data) {
@@ -280,7 +287,7 @@ export default {
 			}
 
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/", this.row,
+				axios.post(this.$config.BACKEND_API_ROUTE+"snmp/scanner/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
@@ -294,7 +301,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
+				axios.patch(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

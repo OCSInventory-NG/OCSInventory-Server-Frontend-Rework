@@ -187,7 +187,8 @@
 														:key="option"
 														:value="option"
 													>
-														{{ $t("configuration."+option) }}
+														{{ $te("configuration."+option) ?
+															$t("configuration."+option) : option }}
 													</b-form-select-option>
 												</b-form-select>
 											</div>

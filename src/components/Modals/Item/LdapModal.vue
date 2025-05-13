@@ -248,6 +248,20 @@ export default {
 			setTimeout(() => {
 				this.ldapmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					auth_method: this.authid,
+					enabled: true,
+					priority: 1,
+					config: {
+						SERVER_URI: null,
+						BIND_DN: null,
+						BIND_PASSWORD: null,
+						BASE_DN: null,
+						USER_LOGIN_FIELD: null,
+						MIRROR_GROUPS: false,
+						PROTOCOL_VERSION: 3
+					}
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}

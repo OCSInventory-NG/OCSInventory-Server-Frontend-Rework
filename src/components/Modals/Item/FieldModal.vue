@@ -1,21 +1,30 @@
 <template>
 	<div id="field-modal">
-		<b-button
+		<div 
 			v-if="!update"
-			:title="$t('template.addfield')"
-			variant="success"
-			class="add-button"
-			@click="fieldmodal = !fieldmodal"
+			class="page-header d-print-none"
 		>
-			<font-awesome-icon 
-				:icon="['fas', 'plus']"
-			/>
-		</b-button>
+			<div class="row">
+				<div class="col-auto ms-auto">
+					<b-button
+						:title="$t('template.addfield')"
+						variant="primary"
+						class="d-sm-inline-block btn-modal"
+						@click="fieldmodal = !fieldmodal"
+					>
+						<font-awesome-icon 
+							:icon="['fas', 'plus']"
+						/>
+						{{ $t('template.addfield') }}
+					</b-button>
+				</div>
+			</div>
+		</div>
 		<div v-else>
 			<button 
 				:title="$t('template.editfield')"
 				class="btn btn-ghost-dark"
-				@click="loadData()"
+				@click="loadData(id)"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'pencil']"
@@ -28,6 +37,7 @@
 			:title="(!update) ? $t('template.addfield') : $t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -110,7 +120,7 @@
 						</b-form-checkbox>
 					</b-col>
 				</b-row>
-				<div v-if="row.override_target == 'true'">
+				<div v-if="row.override_target == true || row.override_target == 'true'">
 					<b-row>
 						<b-col>
 							<b-form-group
@@ -264,9 +274,9 @@ export default {
 	name: "FieldModal",
 	props: {
 		routetype: { type: String, default: "assets" },
-		rowfielddata: { type: Object, default: null },
-		section: { type: Number, required: true },
-		update: { type: Boolean, default: false }
+		section: { type: Number, default: null },
+		update: { type: Boolean, default: false },
+		id: { type: Number, default: null }
 	},
 	data() {
 		return {
@@ -328,11 +338,24 @@ export default {
 	},
 	watch: {
 		createwithsuccess: function() {
-			setTimeout(() => {
-				this.fieldmodal = false
-				this.createwithsuccess = false
-				this.$emit("reloadTemplate")
-			}, 500)
+			if (this.createwithsuccess) {
+				setTimeout(() => {
+					this.fieldmodal = false
+					this.createwithsuccess = false
+					this.row = {
+						id: null,
+						name: null,
+						retrival_value: null,
+						override_target: false,
+						new_target: null,
+						retrival_method: null,
+						retrival_output: null,
+						options: {},
+						section: this.section
+					}
+					this.$emit("reloadDatatable")
+				}, 500)
+			}
 		}
 	},
 	created() {
@@ -347,12 +370,24 @@ export default {
 		}
 	},
 	methods: {
-		loadData() {
+		loadData(id) {
 			this.loading = true
 			this.fieldmodal = true
-			this.row = this.rowfielddata
-			this.options = this.row.options
-			this.loading = false
+			this.getField(id)
+		},
+		async getField(id) {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id, { headers: this.header })
+				.then(response => {
+					this.row = response.data
+					this.options = this.row.options
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
 		},
 		onSubmit(event) {
 			event.preventDefault()
@@ -378,7 +413,7 @@ export default {
 						this.createerror = true
 						this.createerrormsg = e.message
 					})
-					.finally(() => this.loadingcreate = false)
+					.finally(() => { this.loadingcreate = false })
 			} else {
 				axios.patch(this.$config.BACKEND_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
@@ -391,7 +426,7 @@ export default {
 						this.createerror = true
 						this.createwithsuccess = false
 					})
-					.finally(() => this.loadingcreate = false)
+					.finally(() => { this.loadingcreate = false })
 			}			
 		}
 	}

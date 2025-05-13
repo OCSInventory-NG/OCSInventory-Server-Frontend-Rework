@@ -1,12 +1,12 @@
 <template>
-	<div 
-		id="packages" 
+	<div
+		id="category" 
 		class="container-xl"
 	>
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="deployment"
+				page-title="category"
 			/>
 			<!-- Display Datatable -->
 			<div class="page-body">
@@ -28,20 +28,19 @@
 						</div>
 
 						<div v-else>
-							<PackageModal
+							<CategoryModal
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
 							<Datatable
-								id="packages-datatable"
+								id="categories-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
-								:candelete="candelete"
 								:canedit="canedit"
-								:canviewaction="canviewaction"
-								editcomponent="PackageModal"
-								title="deployment/packages"
-								translationkey="deployment."
+								:candelete="candelete"
+								editcomponent="CategoryModal"
+								title="categories"
+								translationkey="template."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -56,19 +55,19 @@
 import axios from 'axios'
 
 export default {
-	name: 'Packages',
+	name: 'Category',
 	data() {
 		return {
+			errormsg: null,
+			loading: true,
+			errored: false,
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canview: false,
-			canviewaction: false,
 			rowdata: [],
 			rowheader: [],
-			loading: true,
-			errormsg: null,
-			errored: false,
+			templates: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -76,20 +75,19 @@ export default {
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("package_view_package")) {
+		if(localStorage.getItem('permissions').split(",").includes("category_view_category")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("package_add_package")) {
+			if(localStorage.getItem('permissions').split(",").includes("category_add_category")) {
 				this.canadd = true
+				this.importtemplate = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("package_change_package")) {
+			if(localStorage.getItem('permissions').split(",").includes("category_change_category")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("package_delete_package")) {
+			if(localStorage.getItem('permissions').split(",").includes("category_delete_category")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("action_view_deploymentaction")) {
-				this.canviewaction = true
-			}
+			await this.getTemplates()
 			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
@@ -98,27 +96,35 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+			this.rowheader = []
+			await axios.options(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "result") this.rowheader.push(field)
+						if (!["inventory_sections", "is_protected"].includes(field) ) {
+							this.rowheader.push(field)
+						}
 					})
+					this.rowheader.push("sections")
 					this.errormsg = null
 					this.errored = false
-					this.getPackages()
+					this.getCategories()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
 		},
-		async getPackages() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+		async getCategories() {
+			this.rowdata = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories?expand=inventory_sections", { headers: this.header })
 				.then(response => {
-					response.data.forEach(packages => {
-						packages.actions_list = packages.actions_list.length
-					})
-					this.rowdata = response.data
+					for (const category of response.data) {
+						category.sections = ""
+						for (const section of category.inventory_sections) {
+							category.sections += this.templates[section.template].concat(" - ", section.name) + "\n"
+						}
+						this.rowdata.push(category)
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -128,9 +134,23 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
+		async getTemplates() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates", { headers: this.header })
+				.then(response => {
+					for (const template of response.data) {
+						this.templates[template.id] = template.name
+					}
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
 		async reloadDatatable() {
 			this.loading = true
-			await this.getPackages()
+			await this.getCategories()
 		}
 	}
 }

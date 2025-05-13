@@ -35,8 +35,11 @@
 								:candelete="candelete"
 								:rowheader="rowheader"
 								:candeploy="true"
+								:usecheckbox="true"
 								title="asset/bases"
 								translationkey="inventory."
+								sortby="last_update"
+								sortdesc="desc"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -97,8 +100,18 @@ export default {
 				})
 		},
 		async getAssets() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true", { headers: this.header })
 				.then(response => {
+					response.data.forEach(data => {
+						if(data.accountinfo) {
+							Object.keys(data.accountinfo).forEach(accountinfo => {
+								if(!this.rowheader.includes("Account info : " + accountinfo)) {
+									this.rowheader.push("Account info : " + accountinfo)
+								}
+								data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
+							})
+						}
+					})
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
@@ -110,6 +123,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getAssets()
 		},
 	}

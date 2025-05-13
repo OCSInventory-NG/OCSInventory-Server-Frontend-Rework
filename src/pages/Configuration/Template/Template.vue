@@ -67,6 +67,7 @@ export default {
 			candelete: false,
 			canview: false,
 			exportemplate: false,
+			importtemplate: false,
 			rowdata: [],
 			rowheader: [],
 			header: {
@@ -99,7 +100,9 @@ export default {
 			await axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if (!["sections", "is_protected"].includes(field) ) {
+							this.rowheader.push(field)
+						}
 					})
 					this.errormsg = null
 					this.errored = false
@@ -111,6 +114,7 @@ export default {
 				})
 		},
 		async getTemplates() {
+			this.rowdata = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					for (const temp of response.data) {
@@ -128,6 +132,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getTemplates()
 		}
 	}

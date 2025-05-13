@@ -289,6 +289,17 @@ export default {
 			setTimeout(() => {
 				this.assetgroupmodal = false
 				this.createwithsuccess = false
+				this.rowgroup = {
+					name: null,
+					description: null,
+					search: [],
+					is_dynamic: true,
+					assets: [],
+					visibility: "public",
+					allow_group_modification: false,
+					user: null,
+					groups: []
+				}
 				if(this.update) {
 					this.$emit("reloadDatatable")
 				}
@@ -335,7 +346,7 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
-			this.getGroups(this.rowgroup.groups)
+			this.getGroups(this.user.groups)
 		},
 		async getUserInfo() {
 			this.loading = true
@@ -375,9 +386,23 @@ export default {
 			this.loading = false
 		},
 		async getMyAssetGroups() {
+			this.rowgroup = {
+				name: null,
+				description: null,
+				search: [],
+				is_dynamic: true,
+				assets: [],
+				visibility: "public",
+				allow_group_modification: false,
+				user: null,
+				groups: []
+			}
+
+			this.optgroup = []
+			this.updategroupid = null
+
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
 				.then(response => {
-					console.log(response.data)
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
 							value: assetgroup.id,

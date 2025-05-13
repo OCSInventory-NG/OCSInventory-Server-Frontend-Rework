@@ -13,22 +13,29 @@ import JsonExcel from 'vue-json-excel3'
 /***** Vue select *****/
 import vSelect from "vue-select"
 import "vue-select/dist/vue-select.css"
+/***** Vue multiselect *****/
+import VueMultiselect from 'vue-multiselect'
+import "vue-multiselect/dist/vue-multiselect.min.css"
 
 /***** Grid layout plus *****/
 import { GridLayout, GridItem } from 'grid-layout-plus'
+
+/***** Global components *****/
+import '@/components/global'
 
 /***** Icons *****/
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { 
-	faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+	faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
-	faSliders
+	faSliders, faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
 } from '@fortawesome/free-regular-svg-icons'
+import GlobalComponents from '@/components/global'
 
 async function loadConfig() {
 	const response = await fetch('/config/config.json');
@@ -47,15 +54,17 @@ loadConfig().then((config) => {
 	app.use(VueApexCharts)
 	app.component("DownloadExcel", JsonExcel)
 	app.component("VSelect", vSelect)
+	app.component("Multiselect", VueMultiselect)
 	app.component('FontAwesomeIcon', FontAwesomeIcon)
 	app.component('FontAwesomeLayers', FontAwesomeLayers)
 	app.component('GridLayout', GridLayout)
 	app.component('GridItem', GridItem)
+	app.use(GlobalComponents)
 	library.add({ 
-		faHome, faCircle, faUsersCog, faAngleRight, faGear, faPowerOff, faUser, faPlus,
+		faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
-		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders
+		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles
 	})
 
 	router.isReady()

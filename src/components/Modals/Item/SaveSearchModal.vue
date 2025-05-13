@@ -2,13 +2,14 @@
 	<div id="save-search-modal">
 		<div 
 			v-if="!update"
-			class="page-header d-print-none"
+			:class="(!navbar) ? 'page-header d-print-none' : 'shortcut'"
 		>
 			<div 
-				class="col-auto ms-auto div-save-search" 
+				:class="(!navbar) ? 'col-auto ms-auto div-save-search' : ''"
 				align="right"
 			>
 				<b-button
+					v-if="!navbar"
 					:title="$t('search.savemysearch')"
 					class="btn btn-teal btn-save-search"
 					@click="getMyInfo()"
@@ -282,7 +283,8 @@ export default {
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
-		rowsearch: { type: Array, default: null }
+		rowsearch: { type: Array, default: null },
+		navbar: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -333,6 +335,15 @@ export default {
 			setTimeout(() => {
 				this.savesearchmodal = false
 				this.createwithsuccess = false
+				this.savedsearch = {
+					search: {},
+					visibility: "private_personal",
+					name: null,
+					description: null,
+					allow_group_modification: false,
+					user: null,
+					groups: []
+				}
 				if(this.update) {
 					this.$emit("reloadDatatable")
 				}
@@ -508,7 +519,8 @@ export default {
 			this.usesavesearchmodal = false
 		},
 		goToSavedSearches(){
-			this.$router.push('/inventory/savedsearch'); 
+			this.$router.push('/inventory/savedsearch');
+			this.usesavesearchmodal = false
 		}
 	}
 }

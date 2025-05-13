@@ -326,6 +326,18 @@ export default {
 			setTimeout(() => {
 				this.snmpmodal = false
 				this.createwithsuccess = false
+				this.row = {
+					name: null,
+					version: "2c",
+					user: null,
+					level: null,
+					password: null,
+					auth_protocol: null,
+					priv_protocol: null,
+					retries: 1,
+					timeout: 30,
+					subnets: null
+				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
@@ -342,7 +354,7 @@ export default {
 			this.getSnmpConfig(id)
 		},
 		async getSnmpConfig(id) {
-			await axios.get(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/"+id, { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")
@@ -366,7 +378,7 @@ export default {
 			}
 
 			if(!this.update) {
-				axios.post(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/", this.row,
+				axios.post(this.$config.BACKEND_API_ROUTE+"snmp/config/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
@@ -380,7 +392,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(import.meta.env.VITE_APP_API_ROUTE+"snmp/config/"+this.id+"/", this.row,
+				axios.patch(this.$config.BACKEND_API_ROUTE+"snmp/config/"+this.id+"/", this.row,
 					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true

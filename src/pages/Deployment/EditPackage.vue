@@ -77,6 +77,9 @@ export default {
 			canaddaction: false,
 			caneditaction: false,
 			candeleteaction: false,
+			excludedFields: [
+				"uploaded_file"
+			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -105,7 +108,9 @@ export default {
 			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if (!this.excludedFields.includes(field)) {
+							this.rowheader.push(field)
+						}
 					})
 					this.errormsg = null
 					this.errored = false
@@ -117,12 +122,20 @@ export default {
 				})
 		},
 		async getPackage(reload = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id+"?expand=actions_list",
+				{ headers: this.header })
 				.then(response => {
 					if(!reload) {
 						this.rowpackagedata = response.data
 					}
-					this.rowactiondata = response.data.actions_list
+					this.rowactiondata = []
+					for (const action of response.data.actions_list) {
+						if (action.file instanceof Object) {
+							action.file = action.file.name
+						}
+						this.rowactiondata.push(action)
+					}
+
 					this.errormsg = null
 					this.errored = false
 				})

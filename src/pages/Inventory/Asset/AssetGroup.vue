@@ -60,8 +60,6 @@ export default {
 			rowheader: [],
 			loading: true,
 			errored: false,
-			user: null,
-			groups: [],
 			canedit: false,
 			candelete: false,
 			header: {
@@ -94,6 +92,7 @@ export default {
 							this.rowheader.push(field)
 						}
 					})
+					this.rowheader.push("count")
 					this.errormsg = null
 					this.errored = false
 					this.getAssetGroups()
@@ -104,64 +103,37 @@ export default {
 				})
 		},
 		async getAssetGroups() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/?expand=user,groups",
+				{ headers: this.header })
 				.then(response => {
 					for (const group of response.data) {
 						group.visibility = this.$t("assetgroup."+group.visibility)
 						group.is_dynamic = this.$t("generic."+group.is_dynamic)
 						group.allow_group_modification = this.$t("generic."+group.allow_group_modification)
+						group.count = group.assets.length
+						group.user = (group.user.first_name != "") ? 
+							group.user.last_name.concat(" ", group.user.first_name) : group.user.username
+						// Group concat
+						var tmpGroup = ""
+						if (group.groups) {
+							for (const expand of group.groups) {
+								tmpGroup += expand.name + "\n"
+							}
+						}
+						group.groups = tmpGroup
 					}
 					this.rowdata = response.data
 					this.errormsg = null
 					this.errored = false
-					this.getUserName()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-		},
-		async getUserName() {
-			for (const group of this.rowdata) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+group.user, { headers: this.header })
-					.then(response => {
-						if(response.data.first_name != "") {
-							group.user = response.data.last_name.concat(" ", response.data.first_name)
-						} else {
-							group.user = response.data.username
-						}
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-			}
-			this.getGroups()
-		},
-		async getGroups() {
-			for (const [key, row] of Object.entries(this.rowdata)) {
-				this.groups[key] = []
-				if(row.groups) {
-					for (const group of row.groups) {
-						this.loading = true
-						await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
-							.then(response => {
-								this.loading = true
-								this.groups[key].push(response.data.name)
-								this.rowdata[key].groups = this.groups[key].join(", ")
-							})
-							.catch(e => {
-								this.errormsg = e.message
-								this.errored = true
-							})
-							.finally(() => { this.loading = false })
-					}
-				}
-			}
-
-			this.loading = false
+				.finally(() => { this.loading = false })
 		},
 		async reloadDatatable() {
+			this.loading = true
 			await this.getAssetGroups()
 		}
 	}
