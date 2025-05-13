@@ -13,6 +13,9 @@ import JsonExcel from 'vue-json-excel3'
 /***** Vue select *****/
 import vSelect from "vue-select"
 import "vue-select/dist/vue-select.css"
+/***** Vue multiselect *****/
+import VueMultiselect from 'vue-multiselect'
+import "vue-multiselect/dist/vue-multiselect.min.css"
 
 /***** Grid layout plus *****/
 import { GridLayout, GridItem } from 'grid-layout-plus'
@@ -51,6 +54,7 @@ loadConfig().then((config) => {
 	app.use(VueApexCharts)
 	app.component("DownloadExcel", JsonExcel)
 	app.component("VSelect", vSelect)
+	app.component("Multiselect", VueMultiselect)
 	app.component('FontAwesomeIcon', FontAwesomeIcon)
 	app.component('FontAwesomeLayers', FontAwesomeLayers)
 	app.component('GridLayout', GridLayout)
