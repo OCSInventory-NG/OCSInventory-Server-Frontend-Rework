@@ -322,7 +322,9 @@
     "no_inventory": "Aucune données d'inventaire disponible",
     "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine n'a été sélectionnée",
-    "success_saved": "Configuration sauvegardée avec succès !"
+    "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
+    "success_saved": "Configuration sauvegardée avec succès !",
+    "superuser_disclaimer": "Attention : Donne un accès sans restrictions."
   },
   "network": {
     "addnetgroup": "Ajouter un groupe Réseaux",
@@ -502,7 +504,7 @@
   },
   "template": {
     "addcategory": "Ajouter une nouvelle catégorie",
-    "addfield": "Ajouter un nouveau champs",
+    "addfield": "Ajouter un nouveau champ",
     "addsection": "Ajouter une nouvelle section",
     "addtemplate": "Ajouter un nouveau modèle",
     "assign": "Assigner un modèle d'inventaire",
@@ -510,7 +512,7 @@
     "category": "Catégorie",
     "CMD": "Commande Cmd",
     "editcategory": "Éditer la catégorie",
-    "editfield": "Éditer le champs",
+    "editfield": "Éditer le champ",
     "editsection": "Éditer la section",
     "edittemplate": "Éditer un modèle",
     "export_template": "Exporter JSON",
@@ -567,6 +569,7 @@
     "category": "Catégories",
     "config": "Configuration",
     "configurations": "Configurations",
+    "dangerzone": "Zone dangereuse",
     "dashboard": "Tableau de bord",
     "deployment": "Déploiement",
     "details": "Détails",
@@ -608,7 +611,7 @@
     "groups": "Groupes",
     "id": "ID",
     "is_staff": "Super admin",
-    "is_superuser": "Super admin",
+    "is_superuser": "Utilisateur privilégié",
     "last_name": "Nom",
     "name": "Nom",
     "password": "Mot de passe",

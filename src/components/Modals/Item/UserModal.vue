@@ -151,19 +151,6 @@
 				</b-row>
 				<b-row>
 					<b-col>
-						<b-form-checkbox
-							id="is_staff"
-							v-model="row.is_staff"
-							name="is_staff"
-							value="true"
-							unchecked-value="false"
-						>
-							{{ $t('user.is_staff') }}
-						</b-form-checkbox>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
 						<h4>{{ $t('title.groups') }}</h4>
 					</b-col>
 				</b-row>
@@ -182,6 +169,29 @@
 						>
 							{{ group.name }}
 						</b-form-checkbox>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<h4>{{ $t('title.dangerzone') }}</h4>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group 
+							:label="$t('message.superuser_disclaimer')" 
+							label-for="is_superuser"
+						>
+							<b-form-checkbox
+								id="is_superuser"
+								v-model="row.is_superuser"
+								name="is_superuser"
+								:value="true"
+								:unchecked-value="false"
+							>
+								{{ $t('user.is_superuser') }}
+							</b-form-checkbox>
+						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
@@ -228,7 +238,7 @@ export default {
 				email: null,
 				first_name: null,
 				last_name: null,
-				is_staff: false,
+				is_superuser: false,
 				groups: [],
 				user_permissions: []
 			},
@@ -258,7 +268,7 @@ export default {
 					email: null,
 					first_name: null,
 					last_name: null,
-					is_staff: false,
+					is_superuser: false,
 					groups: [],
 					user_permissions: []
 				}

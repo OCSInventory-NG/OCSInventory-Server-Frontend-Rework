@@ -146,6 +146,7 @@ export default {
 				{ headers: this.header })
 				.then(response => {
 					this.sections = response.data
+					this.sections.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
 					this.errormsg = null
 					this.errored = false
 				})

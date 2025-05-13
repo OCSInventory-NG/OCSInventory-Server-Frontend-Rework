@@ -197,7 +197,7 @@
 									:id="value.id"
 									v-model="options[value.id]"
 									:name="value.id"
-									value="true"
+									:value="true"
 									:unchecked-value="value.default"
 								>
 									{{ $t('template.'+value.id) }}
@@ -330,7 +330,11 @@ export default {
 					template: null,
 					options: {}
 				}
-				this.$emit("reloadTemplate")
+				if (!this.update) {
+					this.$emit("reloadTemplate")
+				} else {
+					this.$emit("reloadSection")
+				}
 			}, 500)
 		}
 	},
