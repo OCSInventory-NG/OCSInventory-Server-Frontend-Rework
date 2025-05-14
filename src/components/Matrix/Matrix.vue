@@ -25,7 +25,7 @@
 						align="center"
 					>
 						<input 
-							:id="tab.name"
+							:id="tab.name + '_' + uniqid"
 							v-model="selectedPermissionsArray"
 							type="checkbox" 
 							:value="tab.id" 
@@ -33,7 +33,7 @@
 					</td>
 					<td align="center">
 						<input 
-							:id="label.id"
+							:id="label.id + '_' + uniqid"
 							type="checkbox" 
 							value="all"
 							@click="selectAllPermission"
@@ -48,7 +48,7 @@
 						align="center"
 					>
 						<input 
-							:id="action+'_'"
+							:id="action + '_' + uniqid"
 							type="checkbox" 
 							value="all"
 							@click="selectAllPermission"
@@ -79,11 +79,13 @@ export default {
 		rowtab: { type: Array, default: null },
 		rowlabel: { type: Array, default: null },
 		rowpermissions: { type: Array, default: null },
+		id: { type: Number, default: 0 }
 	},
 	data() {
 		return {
 			headertab: ["add", "change", "delete", "view", "all"],
-			selectedPermissionsArray: []
+			selectedPermissionsArray: [],
+			uniqid: 0
 		}
 	},
 	watch: {
@@ -92,6 +94,9 @@ export default {
 		}
 	},
 	mounted() {
+		if (this.id) {
+			this.uniqid = this.id
+		}
 		this.selectedPermissionsArray = this.rowpermissions ?? []
 	},
 	methods: {
@@ -101,16 +106,14 @@ export default {
 			var search = null
 			var all = []
 
-			// "All" for a line
-			if(id.match(/^[a-zA-Z]+_\d+$/)) {
-				search = `[id$="_${id.split('_')[0]}"]:not([value="all"])`
-			}
-			// "All" for a column
-			else if(id === "all_") {
+			if (id === "all_" + this.uniqid) {
 				search = '[id*="add_"],[id*="change_"],[id*="delete_"],[id*="view_"]'
 				all = document.querySelectorAll("input[value=all]");
+			}
+			else if(id.match(/^[a-zA-Z]+_\d+$/)) {
+				search = `[id^="${id.split('_')[0]}_"]:not([value="all"])`
 			} else {
-				search = '[id*="'+id+'"]'
+				search = `[id$="_${id.split('_')[0]}_${this.uniqid}"]:not([value="all"])`
 			}
 
 			var permissions = document.querySelectorAll(search);

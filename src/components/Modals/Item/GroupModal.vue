@@ -108,6 +108,7 @@
 						:rowtab="permissions"
 						:rowlabel="permissionslabel"
 						:rowpermissions="row.permissions"
+						:id="id"
 						@permissions="row.permissions = $event"
 					/>
 				</b-row>
