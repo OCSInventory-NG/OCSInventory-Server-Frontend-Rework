@@ -21,7 +21,7 @@
 					:options="chartOptions" 
 					:series="series"
 					height="274.69"
-					width="100%"
+					width="568"
 				/>
 			</div>
 		</div>
@@ -43,6 +43,7 @@ export default {
 			chartOptions: {
 				chart: {
 					height: 275,
+					width: '100%',
 					type: 'line'
 				},
 				responsive: [
