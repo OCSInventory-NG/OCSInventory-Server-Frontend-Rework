@@ -154,9 +154,10 @@ export default {
 						this.errormsg = null
 						localStorage.setItem('permissions', tmpUser)
 						this.$router.push('/dashboard')
+					} else {
+						this.errored = true
+						this.errormsg = this.$t("message.error_no_permissions")
 					}
-					this.errored = true
-					this.errormsg = this.$t("message.error_no_permissions")
 				})
 				.catch(e => {
 					this.errored = true
