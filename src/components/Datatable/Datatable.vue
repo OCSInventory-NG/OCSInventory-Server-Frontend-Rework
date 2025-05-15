@@ -461,7 +461,8 @@ export default {
 		deleteids: { type: Array, default: null },
 		// Sort datatable parameters
 		sortby: { type: String, Default: null },
-		sortdesc: { type: String, Default: null }
+		sortdesc: { type: String, Default: null },
+		templateid: { type: Number, default: 0 }
 	},
 	data() {
 		return {
@@ -509,8 +510,9 @@ export default {
 	computed: {
 		// Initialize visible fields
 		visibleFields() {
-			localStorage.removeItem(this.title)
-			//localStorage.setItem(this.title, JSON.stringify(this.fields))
+			var key = this.title + "_" + this.templateid
+			localStorage.removeItem(key)
+			localStorage.setItem(key, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
 		}
 	},
