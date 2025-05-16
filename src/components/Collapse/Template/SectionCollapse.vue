@@ -93,15 +93,15 @@
 				v-else
 			>
 				<b-col>
-					<Datatable
+					<Draggable
 						v-if="rowdata.length"
 						id="fields-datatable"
 						:canedit="true"
 						:candelete="true"
 						:rowdata="rowdata"
-						:usecheckbox="true"
 						:rowheader="rowheader"
-						title="fields"
+						field="order"
+						apiroute="fields"
 						translationkey="template."
 						editcomponent="FieldModal"
 						@reloadDatatable="reloadDatatable"
