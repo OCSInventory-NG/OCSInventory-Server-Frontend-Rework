@@ -5,9 +5,9 @@
 				<thead>
 					<tr>
 						<th>{{ $t('user.name') }}</th>
-						<th>{{ $t('template.retrival_method') }}</th>
+						<th>{{ $t('template.retrieval_method') }}</th>
 						<th v-if="routetype != 'snmp'">
-							{{ $t('template.retrival_output') }}
+							{{ $t('template.retrieval_output') }}
 						</th>
 						<th v-if="routetype != 'snmp'">
 							{{ $t('template.target') }}
@@ -23,9 +23,9 @@
 				<tbody>
 					<tr>
 						<td>{{ section.name }}</td>
-						<td>{{ $t("template."+section.retrival_method) }}</td>
+						<td>{{ $t("template."+section.retrieval_method) }}</td>
 						<td v-if="routetype != 'snmp'">
-							{{ $t("template."+section.retrival_output) }}
+							{{ $t("template."+section.retrieval_output) }}
 						</td>
 						<td v-if="routetype != 'snmp'">
 							{{ section.target }}

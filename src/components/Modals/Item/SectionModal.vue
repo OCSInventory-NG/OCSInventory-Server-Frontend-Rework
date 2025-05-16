@@ -352,13 +352,13 @@ export default {
 			this.row.id = this.id
 			this.row.template = this.template
 
-			if(this.options == null && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+			if(this.options == null && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
 				this.options = {}
-				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
 					this.options[element.id] = element.default
-				})retrieval
+				})
 			}
-		}retrieval
+		}
 	},
 	methods: {
 		loadData() {
@@ -370,13 +370,13 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.outputoptionoptions[this.row.retrival_output] != undefined) {
+			if(this.outputoptionoptions[this.row.retrieval_output] != undefined) {
 				this.row.options = {}
-				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
 					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
-						this.options[element.id] : elementretrieval
+						this.options[element.id] : element.default
 				})
-			}retrieval
+			}
 			
 			if(!this.update) {
 				axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
