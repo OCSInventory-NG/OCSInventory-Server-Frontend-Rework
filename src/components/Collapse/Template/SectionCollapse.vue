@@ -12,9 +12,9 @@
 					<thead>
 						<tr>
 							<th>{{ $t('user.name') }}</th>
-							<th>{{ $t('template.retrival_method') }}</th>
+							<th>{{ $t('template.retrieval_method') }}</th>
 							<th v-if="routetype != 'snmp'">
-								{{ $t('template.retrival_output') }}
+								{{ $t('template.retrieval_output') }}
 							</th>
 							<th v-if="routetype != 'snmp'">
 								{{ $t('template.target') }}
@@ -30,9 +30,9 @@
 					<tbody>
 						<tr>
 							<td>{{ rowsection.name }}</td>
-							<td>{{ $t("template."+rowsection.retrival_method) }}</td>
+							<td>{{ $t("template."+rowsection.retrieval_method) }}</td>
 							<td v-if="routetype != 'snmp'">
-								{{ $t("template."+rowsection.retrival_output) }}
+								{{ $t("template."+rowsection.retrieval_output) }}
 							</td>
 							<td v-if="routetype != 'snmp'">
 								{{ rowsection.target }}

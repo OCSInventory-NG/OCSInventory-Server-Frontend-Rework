@@ -94,12 +94,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('template.retrival_value')" 
-							label-for="retrival_value"
+							:label="$t('template.retrieval_value')" 
+							label-for="retrieval_value"
 						>
 							<b-form-input
-								id="retrival_value"
-								v-model="row.retrival_value"
+								id="retrieval_value"
+								v-model="row.retrieval_value"
 								required
 							/>
 						</b-form-group>
@@ -124,12 +124,12 @@
 					<b-row>
 						<b-col>
 							<b-form-group
-								:label="$t('template.retrival_method')" 
-								label-for="retrival_method"
+								:label="$t('template.retrieval_method')" 
+								label-for="retrieval_method"
 							>
 								<v-select
-									id="retrival_method"
-									v-model="row.retrival_method" 
+									id="retrieval_method"
+									v-model="row.retrieval_method" 
 									:options="methodoptions" 
 									:reduce="text => text.value"
 									:clearable="false"
@@ -139,7 +139,7 @@
 									<template #search="{attributes, events}">
 										<input
 											class="vs__search"
-											:required="!row.retrival_method"
+											:required="!row.retrieval_method"
 											v-bind="attributes"
 											v-on="events"
 										>
@@ -164,12 +164,12 @@
 					<b-row>
 						<b-col>
 							<b-form-group
-								:label="$t('template.retrival_output')" 
-								label-for="retrival_output"
+								:label="$t('template.retrieval_output')" 
+								label-for="retrieval_output"
 							>
 								<v-select
-									id="retrival_output"
-									v-model="row.retrival_output" 
+									id="retrieval_output"
+									v-model="row.retrieval_output" 
 									:options="outputoptions" 
 									:reduce="text => text.value"
 									:clearable="false"
@@ -179,7 +179,7 @@
 									<template #search="{attributes, events}">
 										<input
 											class="vs__search"
-											:required="!row.retrival_output"
+											:required="!row.retrieval_output"
 											v-bind="attributes"
 											v-on="events"
 										>
@@ -188,14 +188,14 @@
 							</b-form-group>
 						</b-col>
 					</b-row>
-					<div v-if="outputoptionoptions[row.retrival_output]">
+					<div v-if="outputoptionoptions[row.retrieval_output]">
 						<b-row>
 							<b-col>
 								<h4>{{ $t('template.retrieval_output_options') }}</h4>
 							</b-col>
 						</b-row>
 						<div
-							v-for="(value, key) in outputoptionoptions[row.retrival_output]"
+							v-for="(value, key) in outputoptionoptions[row.retrieval_output]"
 							:key="key"
 						>
 							<b-row v-if="value.type == 'text'">
@@ -283,11 +283,11 @@ export default {
 			row: {
 				id: null,
 				name: null,
-				retrival_value: null,
+				retrieval_value: null,
 				override_target: false,
 				new_target: null,
-				retrival_method: null,
-				retrival_output: null,
+				retrieval_method: null,
+				retrieval_output: null,
 				options: {},
 				section: null
 			},
@@ -345,11 +345,11 @@ export default {
 					this.row = {
 						id: null,
 						name: null,
-						retrival_value: null,
+						retrieval_value: null,
 						override_target: false,
 						new_target: null,
-						retrival_method: null,
-						retrival_output: null,
+						retrieval_method: null,
+						retrieval_output: null,
 						options: {},
 						section: this.section
 					}
@@ -393,9 +393,9 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrival_output] != undefined) {
+			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
 				this.row.options = {}
-				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
+				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
 					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
 						this.options[element.id] : element.default
 				})
