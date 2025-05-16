@@ -93,14 +93,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('template.retrival_method')" 
-							label-for="retrival_method"
+							:label="$t('template.retrieval_method')" 
+							label-for="retrieval_method"
 						>
 							<v-select
-								id="retrival_method"
-								v-model="row.retrival_method" 
+								id="retrieval_method"
+								v-model="row.retrieval_method" 
 								:options="(routetype != 'snmp' && routetypemut != 'snmp') ?
-									methodoptions : snmpretrivalmethodoptions"
+									methodoptions : snmpretrievalmethodoptions"
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
@@ -126,12 +126,12 @@
 				<b-row v-if="routetype != 'snmp' && routetypemut != 'snmp'">
 					<b-col>
 						<b-form-group
-							:label="$t('template.retrival_output')" 
-							label-for="retrival_output"
+							:label="$t('template.retrieval_output')" 
+							label-for="retrieval_output"
 						>
 							<v-select
-								id="retrival_output"
-								v-model="row.retrival_output" 
+								id="retrieval_output"
+								v-model="row.retrieval_output" 
 								:options="outputoptions" 
 								:reduce="text => text.value"
 								:clearable="false"
@@ -141,7 +141,7 @@
 								<template #search="{attributes, events}">
 									<input
 										class="vs__search"
-										:required="!row.retrival_output"
+										:required="!row.retrieval_output"
 										v-bind="attributes"
 										v-on="events"
 									>
@@ -151,7 +151,7 @@
 					</b-col>
 				</b-row>
 				<div 
-					v-if="outputoptionoptions[row.retrival_output]
+					v-if="outputoptionoptions[row.retrieval_output]
 						&& routetype != 'snmp'
 						&& routetypemut != 'snmp'"
 				>
@@ -161,7 +161,7 @@
 						</b-col>
 					</b-row>
 					<div
-						v-for="(value, key) in outputoptionoptions[row.retrival_output]"
+						v-for="(value, key) in outputoptionoptions[row.retrieval_output]"
 						:key="key"
 					>
 						<b-row v-if="value.type == 'text'">
@@ -249,8 +249,8 @@ export default {
 			row: {
 				id: null,
 				name: null,
-				retrival_method: 'FILE',
-				retrival_output: null,
+				retrieval_method: 'FILE',
+				retrieval_output: null,
 				target: null,
 				fields: [],
 				template: null,
@@ -259,8 +259,8 @@ export default {
 			snmprow: {
 				id: null,
 				name: null,
-				retrival_method: "SNMP_GET",
-				retrival_output: "JSON",
+				retrieval_method: "SNMP_GET",
+				retrieval_output: "JSON",
 				target: "SNMP",
 				fields: [],
 				template: null,
@@ -305,7 +305,7 @@ export default {
 					{ id: "separator", type: "text", default: null },
 				]
 			},
-			snmpretrivalmethodoptions: [
+			snmpretrievalmethodoptions: [
 				{ value: 'SNMP_GET', text: this.$t('template.SNMP_GET') },
 				{ value: 'SNMP_WALK', text: this.$t('template.SNMP_WALK') }
 			],
@@ -323,8 +323,8 @@ export default {
 				this.row = {
 					id: null,
 					name: null,
-					retrival_method: 'FILE',
-					retrival_output: null,
+					retrieval_method: 'FILE',
+					retrieval_output: null,
 					target: null,
 					fields: [],
 					template: null,
@@ -356,9 +356,9 @@ export default {
 				this.options = {}
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
 					this.options[element.id] = element.default
-				})
+				})retrieval
 			}
-		}
+		}retrieval
 	},
 	methods: {
 		loadData() {
@@ -374,9 +374,9 @@ export default {
 				this.row.options = {}
 				this.outputoptionoptions[this.row.retrival_output].forEach(element => {
 					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
-						this.options[element.id] : element.default
+						this.options[element.id] : elementretrieval
 				})
-			}
+			}retrieval
 			
 			if(!this.update) {
 				axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
