@@ -464,7 +464,8 @@ export default {
 		// Sort datatable parameters
 		sortby: { type: String, Default: null },
 		sortdesc: { type: String, Default: null },
-		templateid: { type: Number, default: 0 }
+		templateid: { type: Number, default: 0 },
+		hiddenfields: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -577,6 +578,10 @@ export default {
 		} else {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
+
+				if (this.hiddenfields && this.hiddenfields.includes(data)) {
+					visible = false
+				}
 
 				var array = {
 					key: data,
