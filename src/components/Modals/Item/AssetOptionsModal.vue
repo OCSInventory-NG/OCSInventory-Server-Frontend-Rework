@@ -91,7 +91,7 @@
 						>
 							<v-select
 								id="template"
-								v-model="rowtmp[0].template" 
+								v-model="template"
 								:options="rowdatatmp" 
 								:reduce="text => text.value"
 								:clearable="false"
@@ -156,6 +156,7 @@ export default {
 			rowdatagrp: [],
 			rowtmp: [],
 			rowgrp: [],
+			template: null,
 			loading: false,
 			loadingcreate: false,
 			successed: false,
@@ -177,13 +178,14 @@ export default {
 				this.assetoptmodal = false
 				this.successed = false
 				this.selectedopt = null
-				this.$emit('reloadInventory', this.row)
+				this.$emit('reloadInventory')
 			}, 500)
 		}
 	},
 	async mounted() {
 		this.getTemplate()
 		this.getStaticGroup()
+		this.template = this.item[0].template ?? null
 	},
 	methods: {
 		async getTemplate() {
@@ -229,7 +231,11 @@ export default {
 			this.loadingcreate = true
 
 			if(this.selectedopt == "assign_temp") {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.rowtmp[0].id+"/", this.rowtmp[0],
+				var patch = {
+					template: this.template
+				}
+
+				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.item[0].id+"/", patch,
 					{ headers: this.header })
 					.then(() => {
 						this.successed = true
