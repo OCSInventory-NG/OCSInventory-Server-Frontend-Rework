@@ -4,6 +4,12 @@
 
 .donut-card {
   border: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  min-height: 300px;
+  position: relative;
+  width: 100%;
 }
 
 .line-card {
@@ -32,4 +38,19 @@
 
 .vgl-layout {
   min-height: 100px;
+}
+
+.chart-container {
+  margin: 0 auto;
+  max-width: 700px;
+  min-height: 350px;
+  width: 100%;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+:deep(.apexcharts-canvas) {
+  width: 100% !important;
 }
