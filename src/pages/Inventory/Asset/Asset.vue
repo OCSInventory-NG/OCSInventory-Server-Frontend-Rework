@@ -36,6 +36,7 @@
 								:rowheader="rowheader"
 								:candeploy="true"
 								:usecheckbox="true"
+								:hiddenfields="hiddenfields"
 								title="asset/bases"
 								translationkey="inventory."
 								sortby="last_update"
@@ -63,6 +64,7 @@ export default {
 			loading: true,
 			errored: false,
 			candelete: false,
+			hiddenfields: ["id", "uuid", "template"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')

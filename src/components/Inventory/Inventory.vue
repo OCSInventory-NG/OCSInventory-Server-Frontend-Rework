@@ -26,6 +26,7 @@
 					:usecheckbox="false"
 					:rowheader="rowheader"
 					:title="section.name"
+					:templateid="section.template"
 				/>
 			</div>
 		</section>

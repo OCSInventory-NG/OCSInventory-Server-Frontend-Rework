@@ -102,6 +102,7 @@
 							:key="field.key"
 							v-model="field.visible"
 							:active="!field.visible"
+							:disabled="field.disabled"
 							@click="field.visible = !field.visible"
 						>
 							<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
@@ -124,6 +125,7 @@
 						:clearable="false"
 						label="text"
 						class="datatable-btn"
+						@option:selected="updateRowPage()"
 					/>
 				</div>
 			</div>
@@ -461,7 +463,9 @@ export default {
 		deleteids: { type: Array, default: null },
 		// Sort datatable parameters
 		sortby: { type: String, Default: null },
-		sortdesc: { type: String, Default: null }
+		sortdesc: { type: String, Default: null },
+		templateid: { type: Number, default: 0 },
+		hiddenfields: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -509,8 +513,9 @@ export default {
 	computed: {
 		// Initialize visible fields
 		visibleFields() {
-			localStorage.removeItem(this.title)
-			//localStorage.setItem(this.title, JSON.stringify(this.fields))
+			var key = this.title + "_" + this.templateid
+			localStorage.removeItem(key)
+			localStorage.setItem(key, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
 		}
 	},
@@ -553,11 +558,14 @@ export default {
 				label: this.$t('generic.selected'), 
 				sortable: false ,
 				visible: true,
+				disabled: true
 			})
 		}
 
-		if(localStorage.getItem(this.title) != null && localStorage.getItem(this.title) != "") {
-			JSON.parse(localStorage.getItem(this.title)).forEach( visible => {
+		var key = this.title + "_" + this.templateid
+
+		if(localStorage.getItem(key) != null && localStorage.getItem(key) != "") {
+			JSON.parse(localStorage.getItem(key)).forEach( visible => {
 				if(visible.key != "selected" && visible.key != "actions") {
 					var arrayVisible = visible
 					// Initialize CSV export header
@@ -571,11 +579,16 @@ export default {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
 
+				if (this.hiddenfields && this.hiddenfields.includes(data)) {
+					visible = false
+				}
+
 				var array = {
 					key: data,
 					label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
 					sortable: true,
 					visible: visible,
+					disabled: false
 				}
 				
 				// Initialize CSV export header
@@ -592,10 +605,15 @@ export default {
 			label: this.$t('generic.actions'), 
 			sortable: false ,
 			visible: true,
+			disabled: true
 		}
 
 		if(this.canedit == true || this.candelete == true || this.canviewhistory) {
 			this.fields.push(actions)
+		}
+
+		if(localStorage.getItem("perPage") != null && localStorage.getItem("perPage") != "") {
+			this.perPage = localStorage.getItem("perPage")
 		}
 	},
 	mounted() {
@@ -667,6 +685,10 @@ export default {
 					field.label = (this.$te(this.translationkey+field.key)) ? this.$t(this.translationkey+field.key) : field.key
 				}
 			})
+		},
+		updateRowPage() {
+			localStorage.removeItem("perPage")
+			localStorage.setItem("perPage", this.perPage)
 		}
 	}
 }
