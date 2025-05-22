@@ -169,10 +169,12 @@ export default {
 		async getFields() {
 			for (const field of this.rowsection.fields) {
 				var options = ""
-				if (field.options) {
+				if (field.options && typeof field.options === 'object') {
 					for (const [key, value] of Object.entries(field.options)) {
 						options += key + " : " + value + "\n"
 					}
+				} else if (field.options != null) {
+					options = field.options
 				}
 				field.options = options.trim()
 			}
