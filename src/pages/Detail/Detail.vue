@@ -260,8 +260,11 @@ export default {
 		reloadDeployment() {
 			this.reload = true
 		},
-		reloadInventory(item) {
-			this.device = item[0]
+		async reloadInventory() {
+			this.loading = true
+			await this.getInventoryBase()
+			await this.getCategories()
+			await this.getInventoryCollection()
 		},
 		endReloadDeployment() {
 			this.reload = false

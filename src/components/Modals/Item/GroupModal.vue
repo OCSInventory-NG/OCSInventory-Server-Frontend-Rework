@@ -104,6 +104,7 @@
 				</b-row>
 				<b-row>
 					<Matrix 
+						:id="id"
 						v-model="row.permissions"
 						:rowtab="permissions"
 						:rowlabel="permissionslabel"

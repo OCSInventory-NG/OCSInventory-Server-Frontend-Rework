@@ -35,6 +35,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:rowheader="rowheader"
+								:hiddenfields="hiddenfields"
 								title="assetgroups"
 								translationkey="assetgroup."
 								editcomponent="AssetGroupModal"
@@ -62,6 +63,7 @@ export default {
 			errored: false,
 			canedit: false,
 			candelete: false,
+			hiddenfields: ["id", "allow_group_modification", "groups"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
