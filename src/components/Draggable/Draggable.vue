@@ -88,13 +88,15 @@ import draggable from 'vuedraggable'
 import axios from 'axios'
 import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
 import LdapModal from '@/components/Modals/Item/LdapModal.vue'
+import FieldModal from '@/components/Modals/Item/FieldModal.vue'
 
 export default {
 	name: "DraggableComponent",
 	components: { 
 		draggable,
 		ActionListModal,
-		LdapModal
+		LdapModal,
+		FieldModal
 	},
 	props: {
 		rowdata: { type: Array, default: null },
@@ -104,7 +106,8 @@ export default {
 		editcomponent: { type: String, default: "ActionListModal" },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		canaddmapping: { type: Boolean, default: false }
+		canaddmapping: { type: Boolean, default: false },
+		field: { type: String, default: 'priority' }
 	},
 	data() {
 		return {
@@ -117,13 +120,13 @@ export default {
 	},
 	mounted() {
 		this.rowdatas = this.rowdata
-		this.rowdatas.sort((a,b) => a.priority - b.priority)
+		this.rowdatas.sort((a,b) => a[this.field] - b[this.field])
 	},
 	methods: {
 		onEnd(event) {
 			event.preventDefault
 
-			this.rowdatas[event.newIndex].priority = event.newIndex + 1
+			this.rowdatas[event.newIndex][this.field] = event.newIndex + 1
 
 			// Prevent 400 bad request
 			if(this.rowdatas[event.newIndex].file) {
