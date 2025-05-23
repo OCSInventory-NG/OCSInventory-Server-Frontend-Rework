@@ -11,6 +11,10 @@
 a.nav-item.router-link-exact-active.router-link-active,
 a.nav-link-title.router-link-exact-active.router-link-active {
   text-decoration: solid underline #972081 .2rem;
+
+  .nav-link-icon {
+    color: #ffffffcc;
+  }
 }
 
 .nav-link-title {
@@ -18,7 +22,9 @@ a.nav-link-title.router-link-exact-active.router-link-active {
   padding-top: 5px;
 }
 
-.nav-link-title:hover, .nav-item:hover {
+.nav-link-title:hover, .nav-item:hover,
+.nav-link-icon:hover, .btn-link:hover,
+.nav-link-icon {
   color: #ffffffcc;
   text-decoration: none;
 }
@@ -82,6 +88,10 @@ a.nav-link-title.router-link-exact-active.router-link-active {
     padding: 0;
     position: static !important;
     transform: none !important;
+  }
+
+  .navbar .navbar-nav {
+    align-items: unset;
   }
 
   .sticky-tabs {

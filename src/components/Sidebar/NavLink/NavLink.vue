@@ -1,32 +1,35 @@
 <template>
 	<!-- Menu without children item -->
-	<router-link
+	<b-nav-item
 		v-if="!childrenLinks && isHeader"
-		:to="link" 
-		class="nav-item"
-		:class="{ active: isActive == header }"
 	>
-		<span class="nav-link-icon d-md-none d-lg-inline-block">
-			<font-awesome-layers 
-				style="font-size: 1.7em;"
-				class="icon-group"
-			>
-				<font-awesome-icon 
-					icon="circle" 
-					style="color: transparent; font-size: 1.4em;"
-					class="icon"
-				/>
-				<font-awesome-icon 
-					:icon="['fas', iconName]"
-					style="font-size: 1.2em;"
-					transform="shrink-6"
-				/>
-			</font-awesome-layers>
-		</span>
-		<span class="nav-link-title">
-			{{ header }} 
-		</span>
-	</router-link>
+		<router-link
+			:to="link" 
+			class="nav-item"
+			:class="{ active: isActive == header }"
+		>
+			<span class="nav-link-icon d-md-none d-lg-inline-block">
+				<font-awesome-layers 
+					style="font-size: 1.7em;"
+					class="icon-group"
+				>
+					<font-awesome-icon 
+						icon="circle" 
+						style="color: transparent; font-size: 1.4em;"
+						class="icon"
+					/>
+					<font-awesome-icon 
+						:icon="['fas', iconName]"
+						style="font-size: 1.2em;"
+						transform="shrink-6"
+					/>
+				</font-awesome-layers>
+			</span>
+			<span class="nav-link-title">
+				{{ header }} 
+			</span>
+		</router-link>
+	</b-nav-item>
 
 	<!-- Menu with children items -->
 	<b-nav-item-dropdown 
