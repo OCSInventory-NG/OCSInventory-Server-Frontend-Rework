@@ -73,6 +73,7 @@
 										:key="category.id"
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										lazy
+										@click="scrollToTop()"
 									>
 										<div v-if="category.id == 1">
 											<div class="datagrid">
@@ -267,6 +268,14 @@ export default {
 		},
 		endReloadDeployment() {
 			this.reload = false
+		},
+		scrollToTop(){
+			this.$nextTick(() => {
+				const scrollContainer = this.$el.querySelector('.tab-content.col-10.sticky-tabs');
+				if (scrollContainer) {
+					scrollContainer.scrollTop = 0;
+				}
+			});
 		}
 	}
 }
