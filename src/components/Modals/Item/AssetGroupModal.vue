@@ -7,7 +7,7 @@
 		>
 			<b-button
 				:title="$t('assetgroup.saveasgroup')"
-				class="d-none d-sm-inline-block btn-teal"
+				:class="cssclass + ' d-none d-sm-inline-block btn-teal'"
 				@click="getUserInfo()"
 			>
 				<font-awesome-icon 
@@ -249,7 +249,8 @@ export default {
 		assetrow: { type: Array, default: null},
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
-		datatable: { type: Boolean, default: false }
+		datatable: { type: Boolean, default: false },
+		cssclass: { type: String, default: null }
 	},
 	data() {
 		return {

@@ -24,7 +24,7 @@
 
 				<!-- Reload datatable -->
 				<div
-					class="col-1" 
+					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
 						<button 
@@ -42,7 +42,7 @@
 				<!-- Export Excel -->
 				<div
 					v-if="canexport"
-					class="col-1" 
+					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
 						<download-excel
@@ -67,7 +67,7 @@
 				<!-- Import template -->
 				<div
 					v-if="importtemplate"
-					class="col-1"
+					class="col-1 ocs-col-datatable"
 				>
 					<ImportTemplateModal
 						@reloadDatatable="reloadDatatable"
@@ -77,7 +77,7 @@
 				<!-- Attribute package -->
 				<div
 					v-if="candeploy"
-					class="col-1"
+					class="col-1 ocs-col-datatable"
 				>
 					<b-button-group class="mr-1">
 						<PackageResultModal
@@ -94,6 +94,7 @@
 						:assetrow="selected"
 						:search="[]"
 						:datatable="true"
+						cssclass="datatable-btn"
 					/>
 				</div>
 
