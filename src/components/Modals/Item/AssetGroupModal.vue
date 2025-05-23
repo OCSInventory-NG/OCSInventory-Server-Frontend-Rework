@@ -3,7 +3,7 @@
 		<div
 			v-if="!update"
 			class="col-auto ms-auto" 
-			align="center"
+			:align="(!datatable) ? 'center' : ''"
 		>
 			<b-button
 				:title="$t('assetgroup.saveasgroup')"
@@ -72,154 +72,162 @@
 				v-if="!loading"
 				@submit="onSubmit"
 			>
-				<b-row v-if="!update">
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.action')" 
-							label-for="action"
+				<div v-if="datatable && !assetrow.length">
+					<Alert 
+						:message="$t('message.no_selection')" 
+						variant="warning"
+					/>
+				</div>
+				<div v-else>
+					<b-row v-if="!update">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.action')" 
+								label-for="action"
+							>
+								<v-select 
+									id="action"
+									v-model="groupaction"
+									:options="(!datatable) ? optactions : optactionsdt"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3"
+									required
+									@option:selected="getMyAssetGroups()"
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="groupaction == 'update'">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.selectassetgroup')" 
+								label-for="assetgroups"
+							>
+								<v-select 
+									id="assetgroups"
+									v-model="updategroupid"
+									:options="optgroup"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3"
+									required
+									@option:selected="setAssetGroupInfo(updategroupid)"
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="!datatable || (datatable && groupaction != 'update')">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.name')" 
+								label-for="name"
+							>
+								<b-form-input
+									id="name"
+									v-model="rowgroup.name"
+									required
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="!datatable || (datatable && groupaction != 'update')">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.description')" 
+								label-for="description"
+							>
+								<b-form-input
+									id="description"
+									v-model="rowgroup.description"
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="!datatable">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.is_dynamic')" 
+								label-for="is_dynamic"
+							>
+								<label class="form-check form-switch">
+									<input 
+										v-model="rowgroup.is_dynamic"
+										class="form-check-input"
+										type="checkbox"
+									>
+								</label>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="!datatable || (datatable && groupaction != 'update')">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.visibility')" 
+								label-for="visibility"
+							>
+								<v-select 
+									v-model="rowgroup.visibility"
+									:options="optvisibility"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3"
+									required
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="rowgroup.visibility == 'private_group'">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.groups')" 
+								label-for="groups"
+							>
+								<v-select 
+									v-model="rowgroup.groups"
+									:options="groups"
+									:reduce="text => text.value"
+									label="text"
+									multiple
+								/>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row v-if="rowgroup.visibility == 'private_group'">
+						<b-col>
+							<b-form-group
+								:label="$t('assetgroup.allow_group_modification')" 
+								label-for="allow_group_modification"
+							>
+								<label class="form-check form-switch">
+									<input 
+										v-model="rowgroup.allow_group_modification"
+										class="form-check-input"
+										type="checkbox"
+									>
+								</label>
+							</b-form-group>
+						</b-col>
+					</b-row>
+					<b-row>
+						<b-col align-self="start" />
+						<b-col 
+							align-self="center"
+							align="center"
 						>
-							<v-select 
-								id="action"
-								v-model="groupaction"
-								:options="optactions"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-								required
-								@option:selected="getMyAssetGroups()"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row v-if="groupaction == 'update'">
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.selectassetgroup')" 
-							label-for="assetgroups"
-						>
-							<v-select 
-								id="assetgroups"
-								v-model="updategroupid"
-								:options="optgroup"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-								required
-								@option:selected="setAssetGroupInfo(updategroupid)"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.name')" 
-							label-for="name"
-						>
-							<b-form-input
-								id="name"
-								v-model="rowgroup.name"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.description')" 
-							label-for="description"
-						>
-							<b-form-input
-								id="description"
-								v-model="rowgroup.description"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.is_dynamic')" 
-							label-for="is_dynamic"
-						>
-							<label class="form-check form-switch">
-								<input 
-									v-model="rowgroup.is_dynamic"
-									class="form-check-input"
-									type="checkbox"
-								>
-							</label>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.visibility')" 
-							label-for="visibility"
-						>
-							<v-select 
-								v-model="rowgroup.visibility"
-								:options="optvisibility"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row v-if="rowgroup.visibility == 'private_group'">
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.groups')" 
-							label-for="groups"
-						>
-							<v-select 
-								v-model="rowgroup.groups"
-								:options="groups"
-								:reduce="text => text.value"
-								label="text"
-								multiple
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row v-if="rowgroup.visibility == 'private_group'">
-					<b-col>
-						<b-form-group
-							:label="$t('assetgroup.allow_group_modification')" 
-							label-for="allow_group_modification"
-						>
-							<label class="form-check form-switch">
-								<input 
-									v-model="rowgroup.allow_group_modification"
-									class="form-check-input"
-									type="checkbox"
-								>
-							</label>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col align-self="start" />
-					<b-col 
-						align-self="center"
-						align="center"
-					>
-						<b-button 
-							type="submit"
-							variant="success"
-						>
-							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
-						</b-button>
-					</b-col>
-					<b-col align-self="end" />
-				</b-row>
+							<b-button 
+								type="submit"
+								variant="success"
+							>
+								{{ (!update) ? $t('generic.add') : $t('generic.save') }}
+							</b-button>
+						</b-col>
+						<b-col align-self="end" />
+					</b-row>
+				</div>
 			</b-form>
 			<div 
 				v-if="loading"
@@ -240,7 +248,8 @@ export default {
 		search: { type: Array, default: null },
 		assetrow: { type: Array, default: null},
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
+		datatable: { type: Boolean, default: false }
 	},
 	data() {
 		return {
@@ -248,7 +257,7 @@ export default {
 				name: null,
 				description: null,
 				search: [],
-				is_dynamic: true,
+				is_dynamic: (this.datatable) ? false : true,
 				assets: [],
 				visibility: "public",
 				allow_group_modification: false,
@@ -272,6 +281,10 @@ export default {
 				{ value: "create", text: this.$t("assetgroup.create") },
 				{ value: "update", text: this.$t("assetgroup.update") }
 			],
+			optactionsdt : [
+				{ value: "create", text: this.$t("assetgroup.create") },
+				{ value: "update", text: this.$t("assetgroup.addingrp") }
+			],
 			optgroup: [],
 			user: [],
 			groups: [],
@@ -293,7 +306,7 @@ export default {
 					name: null,
 					description: null,
 					search: [],
-					is_dynamic: true,
+					is_dynamic: (this.datatable) ? false : true,
 					assets: [],
 					visibility: "public",
 					allow_group_modification: false,
@@ -390,7 +403,7 @@ export default {
 				name: null,
 				description: null,
 				search: [],
-				is_dynamic: true,
+				is_dynamic: (this.datatable) ? false : true,
 				assets: [],
 				visibility: "public",
 				allow_group_modification: false,
@@ -398,10 +411,16 @@ export default {
 				groups: []
 			}
 
+			var parameter = ""
+
+			if (this.datatable) {
+				parameter = "?is_dynamic=false"
+			}
+
 			this.optgroup = []
 			this.updategroupid = null
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter, { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
@@ -430,8 +449,17 @@ export default {
 			this.loadingcreate = true
 
 			if(!this.update) {
-				this.rowgroup.assets = this.assetrow
-				this.rowgroup.search = this.search
+				if (!this.datatable) {
+					this.rowgroup.assets = this.assetrow
+					this.rowgroup.search = this.search
+				} else {
+					for (const asset of this.assetrow) {
+						if (!this.rowgroup.assets.includes(asset.id)) {
+							this.rowgroup.assets.push(asset.id)
+						}
+					}
+				}
+
 				this.rowgroup.user = this.user.id
 
 				if(this.rowgroup.visibility != "private_group") {

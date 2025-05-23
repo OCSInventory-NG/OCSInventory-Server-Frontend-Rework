@@ -86,6 +86,17 @@
 					</b-button-group>
 				</div>
 
+				<div
+					v-if="title == 'asset/bases' && !multisearch"
+					class="col-1"
+				>
+					<AssetGroupModal
+						:assetrow="selected"
+						:search="[]"
+						:datatable="true"
+					/>
+				</div>
+
 				<!-- Show/Hide columns -->
 				<div 
 					v-if="canshowhide"
