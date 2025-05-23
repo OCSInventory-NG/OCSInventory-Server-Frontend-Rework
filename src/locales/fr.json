@@ -12,6 +12,7 @@
   },
   "assetgroup": {
     "action": "Action",
+    "addingrp": "Ajouter à un groupe existant",
     "allassetsincache": "Tous les actifs (cache)",
     "allow_group_modification": "Autoriser les groupes à modifier",
     "associatedsearch": "Recherche associée",

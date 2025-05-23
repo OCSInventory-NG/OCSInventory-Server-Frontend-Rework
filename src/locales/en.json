@@ -12,6 +12,7 @@
   },
   "assetgroup": {
     "action": "Action",
+    "addingrp": "Add to an existing group",
     "allassetsincache": "All assets (cached)",
     "allow_group_modification": "Allow modification by groups",
     "associatedsearch": "Related search",
