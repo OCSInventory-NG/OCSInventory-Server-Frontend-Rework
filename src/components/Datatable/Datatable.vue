@@ -115,7 +115,7 @@
 								<font-awesome-icon
 									v-if="!field.visible"
 									:icon="['fas', 'eye-slash']"
-										class="mr-3"
+									class="mr-3"
 								/>
 							</b-col>
 						</b-dropdown-item>
