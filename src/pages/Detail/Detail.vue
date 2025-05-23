@@ -73,7 +73,7 @@
 										:key="category.id"
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										lazy
-										@click=scrollToTop()
+										@click="scrollToTop()"
 									>
 										<div v-if="category.id == 1">
 											<div class="datagrid">
