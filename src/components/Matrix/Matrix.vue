@@ -115,9 +115,10 @@ export default {
 		toggleRow(labelId, checked) {
 			const permissionIds = this.rowtab[labelId].map(p => p.id);
 			if (checked) {
-				this.selectedPermissionsArray = [
-					...new Set([...this.selectedPermissionsArray, ...permissionIds])
-				];
+				const combined = this.selectedPermissionsArray.concat(permissionIds);
+				const uniqueSet = new Set(combined);
+				const uniqueArray = Array.from(uniqueSet);
+				this.selectedPermissionsArray = uniqueArray;
 			} else {
 				this.selectedPermissionsArray = this.selectedPermissionsArray.filter(id => !permissionIds.includes(id));
 			}
@@ -130,9 +131,10 @@ export default {
 				.map(p => p.id);
 
 			if (checked) {
-				this.selectedPermissionsArray = [
-					...new Set([...this.selectedPermissionsArray, ...permissionIds])
-				];
+				const combinedArray = this.selectedPermissionsArray.concat(permissionIds);
+				const uniqueSet = new Set(combinedArray);
+				const uniqueArray = Array.from(uniqueSet);
+				this.selectedPermissionsArray = uniqueArray;
 			} else {
 				this.selectedPermissionsArray = this.selectedPermissionsArray.filter(id => !permissionIds.includes(id));
 			}
