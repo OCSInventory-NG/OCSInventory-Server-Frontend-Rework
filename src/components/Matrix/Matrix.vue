@@ -51,7 +51,10 @@
 							:id="action + '_' + uniqid"
 							type="checkbox" 
 							:checked="action === 'all' ? isMatrixFullySelected : isColumnFullySelected(action)"
-							@change="action === 'all' ? toggleAll($event.target.checked) : toggleColumn(action, $event.target.checked)"
+							@change="
+								action === 'all'
+								? toggleAll($event.target.checked)
+								: toggleColumn(action, $event.target.checked)"
 						>
 					</td>
 				</tr>
