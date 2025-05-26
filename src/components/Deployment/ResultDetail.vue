@@ -23,7 +23,7 @@
 					:rowdata="rowdata"
 					:rowheader="rowheader"
 					:candelete="true"
-					:usecheckbox="false"
+					:usecheckbox="true"
 					:deletemultiple="(group) ? true : false"
 					:deleteids="rows"
 					title="deployment/results"
