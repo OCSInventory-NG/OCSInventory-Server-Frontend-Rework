@@ -53,8 +53,8 @@
 							:checked="action === 'all' ? isMatrixFullySelected : isColumnFullySelected(action)"
 							@change="
 								action === 'all'
-								? toggleAll($event.target.checked)
-								: toggleColumn(action, $event.target.checked)"
+									? toggleAll($event.target.checked)
+									: toggleColumn(action, $event.target.checked)"
 						>
 					</td>
 				</tr>
@@ -89,6 +89,13 @@ export default {
 			headertab: ["add", "change", "delete", "view", "all"],
 			selectedPermissionsArray: [],
 			uniqid: 0
+		}
+	},
+	computed: {
+		isMatrixFullySelected() {
+			return this.headertab
+				.filter(action => action !== 'all')
+				.every(action => this.isColumnFullySelected(action));
 		}
 	},
 	watch: {
@@ -148,13 +155,6 @@ export default {
 				.flatMap(label => this.rowtab[label.id])
 				.map(p => p.id);
 			this.selectedPermissionsArray = checked ? allIds : [];
-		}
-	},
-	computed: {
-		isMatrixFullySelected() {
-			return this.headertab
-				.filter(action => action !== 'all')
-				.every(action => this.isColumnFullySelected(action));
 		}
 	}
 }
