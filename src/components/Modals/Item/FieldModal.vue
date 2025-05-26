@@ -317,13 +317,10 @@ export default {
 			outputoptionoptions: {
 				"TBLE": [
 					{ id: "use_index", type: "checkbox", default: false },
-					{ id: "remove_line", type: "text", default: null },
-					{ id: "override_line_used", type: "number", default: null }
+					{ id: "remove_line", type: "text", default: null }
 				],
 				"JSON": [
-					{ id: "need_format", type: "checkbox", default: false },
-					{ id: "submap", type: "text", default: null },
-					{ id: "is_list", type: "checkbox", default: false }
+					{ id: "submap", type: "text", default: null }
 				],
 				"REGX": [
 					{ id: "multiple", type: "checkbox", default: false },
