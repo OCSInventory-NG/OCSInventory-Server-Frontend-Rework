@@ -35,8 +35,8 @@
 						<input 
 							:id="label.id + '_' + uniqid"
 							type="checkbox" 
-							value="all"
-							@click="selectAllPermission"
+							:checked="isRowFullySelected(label.id)"
+							@change="toggleRow(label.id, $event.target.checked)"
 						>
 					</td>
 				</tr>
@@ -50,8 +50,8 @@
 						<input 
 							:id="action + '_' + uniqid"
 							type="checkbox" 
-							value="all"
-							@click="selectAllPermission"
+							:checked="action === 'all' ? isMatrixFullySelected : isColumnFullySelected(action)"
+							@change="action === 'all' ? toggleAll($event.target.checked) : toggleColumn(action, $event.target.checked)"
 						>
 					</td>
 				</tr>
@@ -100,50 +100,57 @@ export default {
 		this.selectedPermissionsArray = this.rowpermissions ?? []
 	},
 	methods: {
-		selectAllPermission(line) {
-			var checked = line.srcElement.checked
-			var id = line.srcElement.id
-			var search = null
-			var all = []
+		isRowFullySelected(labelId) {
+			const permissionIds = this.rowtab[labelId].map(p => p.id);
+			return permissionIds.every(id => this.selectedPermissionsArray.includes(id));
+		},
 
-			if (id === "all_" + this.uniqid) {
-				search = '[id*="add_"],[id*="change_"],[id*="delete_"],[id*="view_"]'
-				all = document.querySelectorAll("input[value=all]");
-			}
-			else if(id.match(/^[a-zA-Z]+_\d+$/)) {
-				search = `[id^="${id.split('_')[0]}_"]:not([value="all"])`
+		isColumnFullySelected(action) {
+			return this.rowlabel.every(label => {
+				const permission = this.rowtab[label.id].find(p => p.name.includes(action));
+				return permission && this.selectedPermissionsArray.includes(permission.id);
+			});
+		},
+
+		toggleRow(labelId, checked) {
+			const permissionIds = this.rowtab[labelId].map(p => p.id);
+			if (checked) {
+				this.selectedPermissionsArray = [
+					...new Set([...this.selectedPermissionsArray, ...permissionIds])
+				];
 			} else {
-				search = `[id$="_${id.split('_')[0]}_${this.uniqid}"]:not([value="all"])`
+				this.selectedPermissionsArray = this.selectedPermissionsArray.filter(id => !permissionIds.includes(id));
 			}
+		},
 
-			var permissions = document.querySelectorAll(search);
+		toggleColumn(action, checked) {
+			const permissionIds = this.rowlabel
+				.map(label => this.rowtab[label.id].find(p => p.name.includes(action)))
+				.filter(Boolean)
+				.map(p => p.id);
 
-			all.forEach(check => {
-				if(checked) {
-					document.getElementById(check.id).checked = true
-				} else {
-					document.getElementById(check.id).checked = false
-				}
-			})
+			if (checked) {
+				this.selectedPermissionsArray = [
+					...new Set([...this.selectedPermissionsArray, ...permissionIds])
+				];
+			} else {
+				this.selectedPermissionsArray = this.selectedPermissionsArray.filter(id => !permissionIds.includes(id));
+			}
+		},
 
-			permissions.forEach(permission => {
-				if(permission.value !== "all") {
-					var index = this.selectedPermissionsArray.indexOf(parseInt(permission.value));
-
-					if(checked) {
-						document.getElementById(permission.id).checked = true
-						if (index === -1) {
-							this.selectedPermissionsArray.push(parseInt(permission.value))
-						}
-					} else {
-						document.getElementById(permission.id).checked = false
-						if (index !== -1) {
-							this.selectedPermissionsArray.splice(index, 1);
-						}
-					}
-				}
-			})
+		toggleAll(checked) {
+			const allIds = this.rowlabel
+				.flatMap(label => this.rowtab[label.id])
+				.map(p => p.id);
+			this.selectedPermissionsArray = checked ? allIds : [];
 		}
-	}	
+	},
+	computed: {
+		isMatrixFullySelected() {
+			return this.headertab
+				.filter(action => action !== 'all')
+				.every(action => this.isColumnFullySelected(action));
+		}
+	}
 }
 </script>
