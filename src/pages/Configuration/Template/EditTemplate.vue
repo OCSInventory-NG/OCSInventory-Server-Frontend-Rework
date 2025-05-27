@@ -30,18 +30,20 @@
 								<b-col cols="4" />
 								<b-col cols="4">
 									<div class="d-flex justify-content-center align-items-center">
-									<h2 class="mb-0 mr-2">{{ template.name }}</h2>
-									<RenameTemplateModal
-										:id="id"
-										@reloadDatatable="reloadTemplate"
-									/>
+										<h2 class="mb-0 mr-2">
+											{{ template.name }}
+										</h2>
+										<RenameTemplateModal
+											:id="id"
+											@reloadDatatable="reloadTemplate"
+										/>
 									</div>
 								</b-col>
 								<b-col cols="4">
 									<SectionModal
-									:template="parseInt(id)"
-									:routetype="routetype"
-									@reloadTemplate="reloadTemplate"
+										:template="parseInt(id)"
+										:routetype="routetype"
+										@reloadTemplate="reloadTemplate"
 									/>
 								</b-col>
 							</b-row>
