@@ -97,7 +97,6 @@
 </template>
 
 <script>
-import RenameTemplateModal from '@/components/Modals/Item/RenameTemplateModal.vue'
 import axios from 'axios'
 
 export default {
