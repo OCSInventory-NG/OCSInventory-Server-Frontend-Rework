@@ -512,6 +512,7 @@
     "CMD": "Cmd command",
     "editcategory": "Edit category",
     "editfield": "Edit field",
+    "editname": "Edit template name",
     "editsection": "Edit section",
     "edittemplate": "Edit template",
     "export_template": "Export JSON",

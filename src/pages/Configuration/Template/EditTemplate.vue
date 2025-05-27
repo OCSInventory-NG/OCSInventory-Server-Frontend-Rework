@@ -29,13 +29,19 @@
 							<b-row class="text-center">
 								<b-col cols="4" />
 								<b-col cols="4">
-									<h2>{{ template.name }}</h2>
+									<div class="d-flex justify-content-center align-items-center">
+									<h2 class="mb-0 mr-2">{{ template.name }}</h2>
+									<RenameTemplateModal
+										:id="id"
+										@reloadDatatable="reloadTemplate"
+									/>
+									</div>
 								</b-col>
 								<b-col cols="4">
 									<SectionModal
-										:template="parseInt(id)"
-										:routetype="routetype"
-										@reloadTemplate="reloadTemplate"
+									:template="parseInt(id)"
+									:routetype="routetype"
+									@reloadTemplate="reloadTemplate"
 									/>
 								</b-col>
 							</b-row>
@@ -91,6 +97,7 @@
 </template>
 
 <script>
+import RenameTemplateModal from '@/components/Modals/Item/RenameTemplateModal.vue'
 import axios from 'axios'
 
 export default {
@@ -130,7 +137,7 @@ export default {
 	},
 	methods: {
 		async getTemplate() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"?expand=*", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"/?expand=*", { headers: this.header })
 				.then(response => {
 					this.template = response.data
 					this.errormsg = null
@@ -160,6 +167,9 @@ export default {
 			this.loading = true
 			await this.getTemplate()
 			await this.getSections()
+		},
+		goToEditTemplateName(){
+			console.log(this.id);
 		}
 	}
 }
