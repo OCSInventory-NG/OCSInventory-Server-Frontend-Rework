@@ -103,12 +103,12 @@ export default {
 	name: "RenameTemplateModal",
 	props: {
 		routetype: { type: String, default: "assets" },
-		id: null,
-		name: null,
-		os: null,
-		is_protected: null,
-		last_update: null,
-		sections: null,
+		id: { type: String, default: null },
+		name: { type: String, default: null },
+		os: { type: String, default: null },
+		isProtected: { type: Boolean, default: null },
+		lastUpdate: { type: Date, default: null },
+		sections: { type: Map, default: null },
 	},
 	data() {
 		return {
