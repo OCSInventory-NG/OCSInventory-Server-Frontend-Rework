@@ -100,7 +100,6 @@
 </template>
 
 <script>
-import TemplateModal from '@/components/Modals/Item/TemplateModal.vue'
 import axios from 'axios'
 
 export default {

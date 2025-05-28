@@ -136,7 +136,6 @@
 
 <script>
 import axios from 'axios'
-import { get } from 'jquery'
 
 export default {
 	name: "TemplateModal",
@@ -153,7 +152,6 @@ export default {
 				os: null,
 				is_protected: null,
 				last_update: null,
-				sections: null,
 			},
 			errormsg: null,
 			errored: false,
@@ -186,7 +184,6 @@ export default {
 					os: null,
 					is_protected: null,
 					last_update: null,
-					sections: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -237,7 +234,10 @@ export default {
 						this.loadingcreate = false
 					})
 			}else{
-				axios.patch(this.$config.BACKEND_API_ROUTE + "templates/" + this.id + "/", {name: this.row.name}, { headers: this.header })
+				axios.patch(
+					this.$config.BACKEND_API_ROUTE + "templates/" + this.id + "/",
+					{name: this.row.name},
+					{ headers: this.header })
 				.then(() => {
 					this.createwithsuccess = true
 					this.createerror = false
