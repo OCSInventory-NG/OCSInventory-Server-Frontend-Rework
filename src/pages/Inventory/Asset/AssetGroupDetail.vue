@@ -122,16 +122,27 @@
 									<b-tab
 										:title="$t('assetgroup.allassetsincache')"
 									>
+										<div 
+											v-if="loadingasset"
+											class="ocs-loader"
+										>
+											<Loader />
+										</div>
 										<Datatable
+											v-else
 											id="assetgroupdetail-datatable"
 											:rowdata="rowdata"
 											:canaccessdetails="true"
 											:canedit="canedit"
 											:candelete="candelete"
 											:rowheader="rowheader"
-											:usecheckbox="false"
+											:usecheckbox="true"
+											:removefromgroup="true"
+											:assetgroupid="id"
+											:assets="rowdata"
 											title="asset"
 											translationkey="inventory."
+											@reloadDatatable="reloadDatatable()"
 										/>
 									</b-tab>
 									<b-tab
@@ -174,13 +185,15 @@ export default {
 			groupinfo: [],
 			rowheader: [],
 			loading: true,
+			loadingasset: false,
 			errored: false,
 			user: null,
 			groups: [],
 			assets: [],
 			canedit: false,
-			candelete: false,
+			candelete: true,
 			reload: false,
+			id: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -188,6 +201,7 @@ export default {
 		}
 	},
 	async mounted() {
+		this.id = this.$route.params.id
 		await this.getHeader()
 	},
 	methods: {
@@ -206,24 +220,28 @@ export default {
 					this.errored = true
 				})
 		},
-		async getAssetGroup() {
+		async getAssetGroup(reload = false) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id+"?expand=assets,user,groups",
 				{ headers: this.header })
 				.then(response => {
 					this.rowdata = []
 					this.rowdata = response.data.assets
 					delete response.data.assets
-					this.groupinfo = response.data
-					this.groupinfo.user = (this.groupinfo.user.first_name != "") ?
-						this.groupinfo.user.last_name.concat(" ", this.groupinfo.user.first_name) :
-						this.groupinfo.user.username
-					var tmpGroup = ""
-					if (response.data.groups) {
-						for (const expand of response.data.groups) {
-							tmpGroup += expand.name + "\n"
+
+					if (!reload) {
+						this.groupinfo = response.data
+						this.groupinfo.user = (this.groupinfo.user.first_name != "") ?
+							this.groupinfo.user.last_name.concat(" ", this.groupinfo.user.first_name) :
+							this.groupinfo.user.username
+						var tmpGroup = ""
+						if (response.data.groups) {
+							for (const expand of response.data.groups) {
+								tmpGroup += expand.name + "\n"
+							}
 						}
+						this.groupinfo.groups = tmpGroup
 					}
-					this.groupinfo.groups = tmpGroup
+
 					this.errormsg = null
 					this.errored = false
 				})
@@ -231,13 +249,20 @@ export default {
 					this.errormsg = e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
+				.finally(() => {
+					this.loading = false
+					this.loadingasset = false
+				})
 		},
 		reloadDeployment() {
 			this.reload = true
 		},
 		endReloadDeployment() {
 			this.reload = false
+		},
+		async reloadDatatable() {
+			this.loadingasset = true
+			await this.getAssetGroup(true)
 		}
 	}
 }

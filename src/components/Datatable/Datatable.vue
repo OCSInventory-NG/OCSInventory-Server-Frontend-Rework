@@ -406,6 +406,9 @@
 									|| $t('generic.removeselection')"
 								:parameter="deleterte"
 								:multiple="deletemultiple"
+								:removefromgroup="removefromgroup"
+								:assetgroupid="assetgroupid"
+								:assets="assets"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</b-button-group>
@@ -433,6 +436,9 @@
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
 					:multiple="true"
+					:removefromgroup="removefromgroup"
+					:assetgroupid="assetgroupid"
+					:assets="assets"
 					@reloadDatatable="reloadDatatable"
 				/>
 			</b-col>
@@ -477,7 +483,11 @@ export default {
 		sortby: { type: String, Default: null },
 		sortdesc: { type: String, Default: null },
 		templateid: { type: Number, default: 0 },
-		hiddenfields: { type: Array, default: null }
+		hiddenfields: { type: Array, default: null },
+		// Remove assets from group
+		removefromgroup: { type: Boolean, default: false },
+		assetgroupid: { type: [String, Number], default: null },
+		assets: { type: Array, default: () => [] }
 	},
 	data() {
 		return {

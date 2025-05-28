@@ -111,12 +111,16 @@ export default {
 	name: 'DeleteItemModal',
 	props: {
 		id: { type: [String, Number], default: null },
-		ids: { type: Array, default: null },
+		ids: { type: Array, default: () => [] },
 		name: { type: String, default: '' },
 		parameter: { type: String, default: '' },
 		multiple: { type: Boolean, default: false },
 		customclass: { type: String, default: 'btn-ghost-danger' },
 		disabled: { type: Boolean, default: false },
+		// Remove assets from group
+		removefromgroup: { type: Boolean, default: false },
+		assetgroupid: { type: [String, Number], default: null },
+		assets: { type: Array, default: () => [] }
 	},
 	data() {
 		return {
@@ -156,12 +160,13 @@ export default {
 			this.row.id = this.id
 			this.deleteact = true
 		},
-		// Submit group creation and call getGroups to reload datatable datas
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingdelete = true
-			
-			if(!this.multiple) {
+
+			if (this.removefromgroup) {
+				this.groupProcess()
+			} else if (!this.multiple) {
 				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.id+"/", { headers: this.header })
 					.then(() => {
 						this.deleteerrormsg = null
@@ -189,6 +194,33 @@ export default {
 					})
 					.finally(() => this.loadingdelete = false)
 			}
+		},
+		groupProcess() {
+			var assetList = []
+
+			for (const asset of this.assets) {
+				if (!this.ids.includes(asset.id) && asset.id != this.id) {
+					assetList.push(asset.id)
+				}
+			}
+
+			var json = {
+				assets: assetList
+			}
+
+			axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.assetgroupid+"/", json,
+				{ headers: this.header })
+				.then(() => {
+					this.deleteerrormsg = null
+					this.deleteerror = false
+					this.deletewithsuccess = true
+				})
+				.catch(e => {
+					this.deleteerrormsg = e.message
+					this.deleteerror = true
+					this.deletewithsuccess = false
+				})
+				.finally(() => this.loadingdelete = false)
 		}
 	}
 }
