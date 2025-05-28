@@ -33,8 +33,9 @@
 										<h2 class="mb-0 mr-2">
 											{{ template.name }}
 										</h2>
-										<RenameTemplateModal
+										<TemplateModal
 											:id="id"
+											:update="true"
 											@reloadDatatable="reloadTemplate"
 										/>
 									</div>
@@ -99,6 +100,7 @@
 </template>
 
 <script>
+import TemplateModal from '@/components/Modals/Item/TemplateModal.vue'
 import axios from 'axios'
 
 export default {

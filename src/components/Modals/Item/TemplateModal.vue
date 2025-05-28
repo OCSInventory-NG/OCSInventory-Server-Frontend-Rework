@@ -22,9 +22,9 @@
 		</div>
 		<div v-else>
 			<button 
-				:title="$t('template.edittemplate')"
+				:title="$t('template.editname')"
 				class="btn btn-ghost-dark"
-				@click="loadData()"
+				@click="loadData(id)"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'pencil']"
@@ -34,13 +34,13 @@
 		<b-modal 
 			id="templatemodal" 
 			v-model="templatemodal"
-			:title="(!update) ? $t('template.addtemplate') : $t('template.edittemplate')"
+			:title="(!update) ? $t('template.addtemplate') : $t('template.editname')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('template.addtemplate') : $t('template.edittemplate') }}
+					{{ (!update) ? $t('template.addtemplate') : $t('template.editname') }}
 					<b-spinner 
 						v-if="loadingcreate"
 						variant="success"
@@ -90,7 +90,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="!update">
 					<b-col>
 						<b-form-group
 							:label="$t('inventory.os')" 
@@ -136,6 +136,7 @@
 
 <script>
 import axios from 'axios'
+import { get } from 'jquery'
 
 export default {
 	name: "TemplateModal",
@@ -147,8 +148,12 @@ export default {
 		return {
 			row: {
 				name: null,
-				os: 'WIN',
-				sections: []
+				sections: [],
+				id: null,
+				os: null,
+				is_protected: null,
+				last_update: null,
+				sections: null,
 			},
 			errormsg: null,
 			errored: false,
@@ -176,8 +181,12 @@ export default {
 				this.createwithsuccess = false
 				this.row = {
 					name: null,
-					os: 'WIN',
-					sections: []
+					sections: [],
+					id: null,
+					os: null,
+					is_protected: null,
+					last_update: null,
+					sections: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -189,9 +198,24 @@ export default {
 		}
 	},
 	methods: {
-		loadData() {
+		loadData(id) {
 			this.loading = true
 			this.templatemodal = true
+			this.getTemplateName(id);
+		},
+		async getTemplateName(id){
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE + "templates/" + id + "/",
+					{ headers: this.header }
+				)
+				this.row = response.data
+			} catch (e) {
+				this.errored = true
+				this.errormsg = e.message
+			} finally {
+				this.loading = false
+			}
 		},
 		onSubmit(event) {
 			event.preventDefault()
@@ -212,6 +236,20 @@ export default {
 					.finally(() => {
 						this.loadingcreate = false
 					})
+			}else{
+				axios.patch(this.$config.BACKEND_API_ROUTE + "templates/" + this.id + "/", {name: this.row.name}, { headers: this.header })
+				.then(() => {
+					this.createwithsuccess = true
+					this.createerror = false
+				})
+				.catch(e => {
+					this.createerror = true
+					this.createerrormsg = e.message
+					this.createwithsuccess = false
+				})
+				.finally(() => {
+					this.loadingcreate = false
+				})
 			}			
 		}
 	}
