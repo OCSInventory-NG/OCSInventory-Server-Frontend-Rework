@@ -44,7 +44,7 @@
 									:clearable="false"
 									label="text"
 									class="mb-3 ocs-select"
-									@option:selected="getFields(index, input.model)"
+									@option:selected="getFields(index, input.model, true)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -262,7 +262,7 @@ export default {
 			setTimeout(() => this.successed = false, 5000)
 		}
 	},
-	mounted() {
+	async mounted() {
 		for (const trigger of this.triggers) {
 			if(trigger.trigger == this.trigger) {
 				this.actionstrigger = trigger.action_targets
@@ -282,7 +282,7 @@ export default {
 				}
 			]
 		} else {
-			this.actions.forEach(action => {
+			for (const action of this.actions) {
 				var model = (action.object_slug == null) ? this.defaultrouteopt[this.trigger] : action.object_slug
 				var field = action.field.split(":")
 				var regex = /\[|\]/g
@@ -292,26 +292,20 @@ export default {
 					object_slug: action.object_slug,
 					model: model,
 					field: (field.length > 1) ? field[1] : field[0],
-					fieldtype: action.description,
+					fieldtype: (field == "template") ? "field" : action.description,
 					action: "set",
 					value: (field.length == 2) ? action.value.replace(regex, "") : action.value,
 				})
-			})
+			}
 		}
 
-		Object.keys(this.datavalues).forEach(key => {
-			this.getFields(
-				key,
-				this.datavalues[key].model
-			)
-			this.setFieldType(
-				this.datavalues[key],
-				key
-			)
-		})
+		for (let key in this.datavalues) {
+			await this.getFields(key, this.datavalues[key].model)
+			await this.setFieldType(this.datavalues[key], key)
+		}
 	},
 	methods: {
-		async getFields(index, model) {
+		async getFields(index, model, reload = false) {
 			var route = this.routetargets[this.trigger][model].route
 			var component = this.routetargets[this.trigger][model].key
 
@@ -319,19 +313,26 @@ export default {
 				this.fieldopt[index] = []
 			}
 
+			if (reload) {
+				this.datavalues[index]["field"] = null
+				this.datavalues[index]["fieldtype"] = null
+				this.datavalues[index]["value"] = null
+			}
+
+			this.loadingfield = true
+
 			if(model == "accountinfo.accountinfoconfig") {
 				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
-						this.loadingfield = true
 						this.fieldopt[index] = []
 
-						response.data.forEach(field => {
+						for (const field of response.data) {
 							this.fieldopt[index].push({
-								value: field.id,
+								value: field.id.toString(),
 								text: field.name,
 								fieldtype: this.linktype[field.datatype]
 							})
-						})
+						}
 
 						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
 							1 : ((b.text > a.text) ? -1 : 0))
@@ -340,7 +341,6 @@ export default {
 						this.errormsg = e
 						this.errored = true
 					})
-					.finally(() => this.loadingfield = false)
 			} else {
 				await axios.options(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
 					.then(response => {
@@ -348,15 +348,15 @@ export default {
 
 						this.fieldopt[index] = []
 
-						Object.keys(response.data.actions.POST).forEach(field => {
+						for (const field in response.data.actions.POST) {
 							if( this.actionstrigger[model].includes(field)) {
 								this.fieldopt[index].push({
-									value: field,
+									value: field.toString(),
 									text: this.$t(component+"."+field),
 									fieldtype: response.data.actions.POST[field]["type"]
 								})
 							}
-						})
+						}
 
 						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
 							1 : ((b.text > a.text) ? -1 : 0))
@@ -368,33 +368,16 @@ export default {
 						this.errormsg = e
 						this.errored = true
 					})
-					.finally(() => this.loadingfield = false)
 			}
-		},
-		addAction(index, fieldType) {
-			fieldType.push(
-				{
-					id: null,
-					object_slug: null,
-					model: this.defaultrouteopt[this.trigger],
-					field: "id",
-					fieldtype: "string",
-					action: "set",
-					value: null,
-				}
-			)
-			this.getFields(index+1, this.defaultrouteopt[this.trigger])
-		},
-		removeAction(index, fieldType) {
-			fieldType.splice(index, 1)
-			this.fieldopt.splice(index, 1)
+
+			this.loadingfield = false
 		},
 		async setFieldType(input, index) {
-			this.fieldopt[index].forEach(element => {
+			for (const element of this.fieldopt[index]) {
 				if(element.value == input.field) {
 					input.fieldtype = element.fieldtype
 				}
-			})
+			}
 
 			if(input.fieldtype == "field") {
 				var route = input.field
@@ -408,12 +391,13 @@ export default {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
 
-						response.data.forEach(element => {
+						for (const element of response.data) {
 							this.selectfieldopt[index].push({
-								value: element.id,
+								value: element.id.toString(),
 								text: element.name
 							})
-						})
+						}
+
 						this.loadingselect = false
 					})
 					.catch(e => {
@@ -428,12 +412,12 @@ export default {
 
 						this.selectfieldopt[index] = []
 
-						response.data.forEach(element => {
+						for (const element of response.data) {
 							this.selectfieldopt[index].push({
-								value: element.id,
+								value: element.id.toString(),
 								text: element.value
 							})
-						})
+						}
 
 						this.loadingselect = false
 					})
@@ -443,13 +427,31 @@ export default {
 					})
 			}
 		},
-		onSubmit(event) {
+		addAction(index, fieldType) {
+			fieldType.push(
+				{
+					id: null,
+					object_slug: null,
+					model: this.defaultrouteopt[this.trigger],
+					field: null,
+					fieldtype: "string",
+					action: "set",
+					value: null,
+				}
+			)
+			this.getFields(index+1, this.defaultrouteopt[this.trigger])
+		},
+		removeAction(index, fieldType) {
+			fieldType.splice(index, 1)
+			this.fieldopt.splice(index, 1)
+		},
+		async onSubmit(event) {
 			event.preventDefault();
 
 			var actionremove = []
 			var actionupdateids = []
 			
-			this.datavalues.forEach(action => {
+			for (const action of this.datavalues) {
 				if(action.id != null) {
 					actionupdateids.push(action.id)
 				}
@@ -501,7 +503,7 @@ export default {
 						object_slug: null
 					})
 				}
-			})
+			}
 
 			for (const action of this.actions) {
 				if(!actionupdateids.includes(action.id)) {
@@ -509,9 +511,9 @@ export default {
 				}
 			}
 
-			this.actionupdate.forEach(action => {
+			for (const action of this.actionupdate) {
 				if(action.id != null) {
-					axios.patch(this.$config.BACKEND_API_ROUTE+"automation/action/"+action.id+"/", action, 
+					await axios.patch(this.$config.BACKEND_API_ROUTE+"automation/action/"+action.id+"/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.successmsg = "success"
@@ -530,7 +532,7 @@ export default {
 					delete action.object_id
 					delete action.object_slug
 
-					axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
+					await axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {
 							this.successmsg = "success"
@@ -545,10 +547,10 @@ export default {
 							this.successed = false
 						})
 				}
-			})
+			}
 
-			actionremove.forEach(id => {
-				axios.delete(this.$config.BACKEND_API_ROUTE+"automation/action/"+id, { headers: this.header })
+			for (const id of actionremove) {
+				await axios.delete(this.$config.BACKEND_API_ROUTE+"automation/action/"+id, { headers: this.header })
 					.then(() => {
 						this.successmsg = "success"
 						this.successed = true
@@ -561,7 +563,7 @@ export default {
 						this.successmsg = null
 						this.successed = false
 					})
-			})
+			}
 
 
 			this.$emit('reloadRule')
