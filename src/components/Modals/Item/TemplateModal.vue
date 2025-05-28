@@ -238,18 +238,18 @@ export default {
 					this.$config.BACKEND_API_ROUTE + "templates/" + this.id + "/",
 					{name: this.row.name},
 					{ headers: this.header })
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerror = true
-					this.createerrormsg = e.message
-					this.createwithsuccess = false
-				})
-				.finally(() => {
-					this.loadingcreate = false
-				})
+					.then(() => {
+						this.createwithsuccess = true
+						this.createerror = false
+					})
+					.catch(e => {
+						this.createerror = true
+						this.createerrormsg = e.message
+						this.createwithsuccess = false
+					})
+					.finally(() => {
+						this.loadingcreate = false
+					})
 			}			
 		}
 	}
