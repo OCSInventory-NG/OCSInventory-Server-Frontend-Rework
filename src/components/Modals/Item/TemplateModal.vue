@@ -141,7 +141,7 @@ export default {
 	name: "TemplateModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: [String, Number], default: null }
 	},
 	data() {
 		return {
