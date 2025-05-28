@@ -513,6 +513,7 @@
     "CMD": "Commande Cmd",
     "editcategory": "Modifier une catégorie",
     "editfield": "Modifier un champ",
+    "editname": "Modifier le nom du template",
     "editsection": "Modifier une section",
     "edittemplate": "Modifier un modèle",
     "export_template": "Exporter JSON",

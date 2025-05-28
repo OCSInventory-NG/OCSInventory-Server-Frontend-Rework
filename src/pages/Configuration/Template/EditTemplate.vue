@@ -29,7 +29,16 @@
 							<b-row class="text-center">
 								<b-col cols="4" />
 								<b-col cols="4">
-									<h2>{{ template.name }}</h2>
+									<div class="d-flex justify-content-center align-items-center">
+										<h2 class="mb-0 mr-2">
+											{{ template.name }}
+										</h2>
+										<TemplateModal
+											:id="id"
+											:update="true"
+											@reloadDatatable="reloadTemplate"
+										/>
+									</div>
 								</b-col>
 								<b-col cols="4">
 									<SectionModal
@@ -130,7 +139,7 @@ export default {
 	},
 	methods: {
 		async getTemplate() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"?expand=*", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"/?expand=*", { headers: this.header })
 				.then(response => {
 					this.template = response.data
 					this.errormsg = null
@@ -160,7 +169,7 @@ export default {
 			this.loading = true
 			await this.getTemplate()
 			await this.getSections()
-		}
+		},
 	}
 }
 </script>
