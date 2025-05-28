@@ -170,9 +170,6 @@ export default {
 			await this.getTemplate()
 			await this.getSections()
 		},
-		goToEditTemplateName(){
-			console.log(this.id);
-		}
 	}
 }
 </script>
