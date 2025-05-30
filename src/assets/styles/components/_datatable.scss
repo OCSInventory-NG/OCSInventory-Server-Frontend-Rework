@@ -51,6 +51,10 @@ tbody, td, tfoot, th, thead, tr {
   background: #f0f0f0;
 }
 
+.ocs-col-datatable {
+  width: 60px;
+}
+
 @media (max-width: 767.98px) {
   .responsive {
     display: block;

@@ -24,7 +24,7 @@
 
 				<!-- Reload datatable -->
 				<div
-					class="col-1" 
+					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
 						<button 
@@ -42,7 +42,7 @@
 				<!-- Export Excel -->
 				<div
 					v-if="canexport"
-					class="col-1" 
+					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
 						<download-excel
@@ -67,7 +67,7 @@
 				<!-- Import template -->
 				<div
 					v-if="importtemplate"
-					class="col-1"
+					class="col-1 ocs-col-datatable"
 				>
 					<ImportTemplateModal
 						@reloadDatatable="reloadDatatable"
@@ -77,13 +77,25 @@
 				<!-- Attribute package -->
 				<div
 					v-if="candeploy"
-					class="col-1"
+					class="col-1 ocs-col-datatable"
 				>
 					<b-button-group class="mr-1">
 						<PackageResultModal
 							:items="(multisearch && selected.length == 0) ? rowdata : selected"
 						/>
 					</b-button-group>
+				</div>
+
+				<div
+					v-if="title == 'asset/bases' && !multisearch"
+					class="col-1"
+				>
+					<AssetGroupModal
+						:assetrow="selected"
+						:search="[]"
+						:datatable="true"
+						cssclass="datatable-btn"
+					/>
 				</div>
 
 				<!-- Show/Hide columns -->
@@ -394,6 +406,9 @@
 									|| $t('generic.removeselection')"
 								:parameter="deleterte"
 								:multiple="deletemultiple"
+								:removefromgroup="removefromgroup"
+								:assetgroupid="assetgroupid"
+								:assets="assets"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</b-button-group>
@@ -421,6 +436,9 @@
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
 					:multiple="true"
+					:removefromgroup="removefromgroup"
+					:assetgroupid="assetgroupid"
+					:assets="assets"
 					@reloadDatatable="reloadDatatable"
 				/>
 			</b-col>
@@ -465,7 +483,11 @@ export default {
 		sortby: { type: String, Default: null },
 		sortdesc: { type: String, Default: null },
 		templateid: { type: Number, default: 0 },
-		hiddenfields: { type: Array, default: null }
+		hiddenfields: { type: Array, default: null },
+		// Remove assets from group
+		removefromgroup: { type: Boolean, default: false },
+		assetgroupid: { type: [String, Number], default: null },
+		assets: { type: Array, default: () => [] }
 	},
 	data() {
 		return {

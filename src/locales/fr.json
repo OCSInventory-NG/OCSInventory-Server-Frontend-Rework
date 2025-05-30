@@ -12,6 +12,7 @@
   },
   "assetgroup": {
     "action": "Action",
+    "addingrp": "Ajouter à un groupe existant",
     "allassetsincache": "Tous les actifs (cache)",
     "allow_group_modification": "Autoriser les groupes à modifier",
     "associatedsearch": "Recherche associée",
@@ -249,7 +250,7 @@
     "no": "Non",
     "none": "Aucun",
     "no_data": "Aucune donnée disponible",
-    "removeselection": "Supprimer la sélection",
+    "removeselection": "la sélection",
     "result": "Résultat(s)",
     "reload": "Rafraîchir le table de données",
     "save": "Sauvegarder",
