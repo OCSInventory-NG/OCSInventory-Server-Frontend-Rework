@@ -115,11 +115,21 @@
 							v-model="field.visible"
 							:active="!field.visible"
 							:disabled="field.disabled"
+							class="visible-select"
 							@click="field.visible = !field.visible"
 						>
-							<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
-							<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
-							<label v-else>{{ field.key }}</label>
+							<b-col>
+								<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
+								<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
+								<label v-else>{{ field.key }}</label>
+							</b-col>
+							<b-col align="right">
+								<font-awesome-icon
+									v-if="!field.visible"
+									:icon="['fas', 'eye-slash']"
+									class="mr-3"
+								/>
+							</b-col>
 						</b-dropdown-item>
 					</b-dropdown>
 				</div>
