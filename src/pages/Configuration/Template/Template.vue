@@ -40,6 +40,7 @@
 								:candelete="candelete"
 								:canexport="false"
 								:importtemplate="importtemplate"
+								:exporttemplate="exporttemplate"
 								title="templates"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
@@ -66,7 +67,7 @@ export default {
 			canedit: false,
 			candelete: false,
 			canview: false,
-			exportemplate: false,
+			exporttemplate: false,
 			importtemplate: false,
 			rowdata: [],
 			rowheader: [],
@@ -79,6 +80,7 @@ export default {
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
 			this.canview = true
+			this.exporttemplate = true
 			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true
