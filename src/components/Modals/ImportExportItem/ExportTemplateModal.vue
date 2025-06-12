@@ -56,11 +56,11 @@
 					:message="errormsg" 
 					variant="danger"
 				/>
-                <Alert
-                    v-if="!templatetoexport.length"
-                    :message="$t('message.no_template_selection')"
-                    variant="warning"
-                />
+				<Alert
+					v-if="!templatetoexport.length"
+					:message="$t('message.no_template_selection')"
+					variant="warning"
+				/>
 				<b-row v-else>
 					<b-col align-self="start" />
 					<b-col 
@@ -86,7 +86,7 @@ import axios from 'axios'
 
 export default {
 	name: 'ExportTemplateModal',
-    props: {
+	props: {
 		ids: { type: Array, default: () => [] },
 	},
 	data() {
@@ -96,7 +96,7 @@ export default {
 			exporttemplate: false,
 			loadingexport: false,
 			exportwithsuccess: false,
-            templatetoexport: [],
+			templatetoexport: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -112,7 +112,7 @@ export default {
 		}
 	},
 	methods: {
-        refreshIds() {
+		refreshIds() {
 			this.templatetoexport = this.ids
 			this.exporttemplate = true
 		},
@@ -122,35 +122,35 @@ export default {
 			this.errored = false
 			this.exportwithsuccess = false
 
-            for (const id of this.templatetoexport) {
-                try {
-                    const response = await axios.get(
-                        this.$config.BACKEND_API_ROUTE + 'templates/' + id + '?expand=*',
-                        { headers: this.header }
-                    )
+			for (const id of this.templatetoexport) {
+				try {
+					const response = await axios.get(
+						this.$config.BACKEND_API_ROUTE + 'templates/' + id + '?expand=*',
+						{ headers: this.header }
+					)
 
-                    const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' })
-                    const url = window.URL.createObjectURL(blob)
-                    const link = document.createElement('a')
-                    link.href = url
-                    link.download = response.data.name + '.json'
+					const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' })
+					const url = window.URL.createObjectURL(blob)
+					const link = document.createElement('a')
+					link.href = url
+					link.download = response.data.name + '.json'
 
-                    document.body.appendChild(link)
-                    link.click()
+					document.body.appendChild(link)
+					link.click()
 
-                    document.body.removeChild(link)
-                    window.URL.revokeObjectURL(url)
-                } catch (error) {
-                    this.errormsg = error.message
-                    this.errored = true
-                }
-            }
+					document.body.removeChild(link)
+					window.URL.revokeObjectURL(url)
+				} catch (error) {
+					this.errormsg = error.message
+					this.errored = true
+				}
+			}
 
-            if (!this.errored) {
-                this.exportwithsuccess = true
-                this.loadingexport = false
-            }
-        }
-    }
+			if (!this.errored) {
+				this.exportwithsuccess = true
+				this.loadingexport = false
+			}
+		}
+	}
 }
 </script>
