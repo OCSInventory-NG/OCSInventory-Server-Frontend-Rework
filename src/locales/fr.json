@@ -279,6 +279,7 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "agent": "Agent",
     "asset": "Actif",
     "assign": "Assigner un groupe statique",
     "comment": "Commentaire",
