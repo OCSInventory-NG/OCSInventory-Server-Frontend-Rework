@@ -169,6 +169,8 @@
 								id="day_of_month"
 								v-model="row.day_of_month"
 								type="number"
+								min="1"
+								max="31"
 							/>
 						</b-form-group>
 					</b-col>
