@@ -64,7 +64,7 @@ export default {
 			loading: true,
 			errored: false,
 			candelete: false,
-			hiddenfields: ["id", "uuid", "template"],
+			hiddenfields: ["id", "uuid", "template", "agent"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
