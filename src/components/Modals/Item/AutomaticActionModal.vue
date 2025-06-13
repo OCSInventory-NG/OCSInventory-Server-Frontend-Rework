@@ -136,6 +136,7 @@
 								:clearable="false"
 								label="text"
 								class="mb-3"
+								@option:selected="cleanRow()"
 							/>
 						</b-form-group>
 					</b-col>
@@ -149,7 +150,8 @@
 							<b-form-input
 								id="hour"
 								v-model="row.hour"
-								type="number"
+								type="time"
+								step="60"
 							/>
 						</b-form-group>
 					</b-col>
@@ -306,6 +308,11 @@ export default {
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
+		},
+		cleanRow() {
+			this.row.hour = null
+			this.row.day_of_week = null
+			this.row.day_of_month = null
 		},
 		onSubmit(event) {
 			event.preventDefault()
