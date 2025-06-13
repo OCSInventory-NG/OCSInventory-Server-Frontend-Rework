@@ -150,7 +150,7 @@ export default {
 				sections: [],
 				id: null,
 				os: null,
-				is_protected: null,
+				is_protected: false,
 				last_update: null,
 			},
 			errormsg: null,
@@ -182,7 +182,7 @@ export default {
 					sections: [],
 					id: null,
 					os: null,
-					is_protected: null,
+					is_protected: false,
 					last_update: null,
 				}
 				this.$emit("reloadDatatable")

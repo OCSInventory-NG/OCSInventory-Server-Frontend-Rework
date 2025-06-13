@@ -84,6 +84,16 @@
 					/>
 				</div>
 
+				<!-- Duplicate template -->
+				<div
+					v-if="duplicatetemplate"
+					class="col-1 ocs-col-datatable"
+				>
+					<DuplicateTemplateModal
+						@reloadDatatable="reloadDatatable"
+					/>
+				</div>
+
 				<!-- Attribute package -->
 				<div
 					v-if="candeploy"
@@ -483,6 +493,7 @@ export default {
 		caneditsnmptemplate: { type: Boolean, default: false },
 		importtemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
+		duplicatetemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
