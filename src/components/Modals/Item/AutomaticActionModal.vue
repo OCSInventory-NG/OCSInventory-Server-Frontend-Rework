@@ -141,21 +141,6 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-if="row.recurrence == 'daily'">
-					<b-col>
-						<b-form-group
-							:label="$t('scheduler.hour')" 
-							label-for="hour"
-						>
-							<b-form-input
-								id="hour"
-								v-model="row.hour"
-								type="time"
-								step="60"
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
 				<b-row v-if="row.recurrence == 'weekly'">
 					<b-col>
 						<b-form-group
@@ -184,6 +169,21 @@
 								id="day_of_month"
 								v-model="row.day_of_month"
 								type="number"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row v-if="row.recurrence != 'hourly'">
+					<b-col>
+						<b-form-group
+							:label="$t('scheduler.hour')" 
+							label-for="hour"
+						>
+							<b-form-input
+								id="hour"
+								v-model="row.hour"
+								type="time"
+								step="60"
 							/>
 						</b-form-group>
 					</b-col>
