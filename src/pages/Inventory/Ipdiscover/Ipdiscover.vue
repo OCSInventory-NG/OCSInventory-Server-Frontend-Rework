@@ -26,19 +26,32 @@
 							<Loader />
 						</div>
 						<div v-else>
-							<IpdiscoverCollapse 
-								v-for="(value, key) in rowdata"
-								:key="key"
-								:rowdata="value.networks"
-								:rowheader="rowheader"
-								:groupname="value.name"
-								:groupdescription="value.description"
-								:groupid="value.id"
-								:candelete="candelete"
-								:canedit="canedit"
-								:canaccesschild="canviewnetdevice"
-								@reloadDatatable="reloadDatatable"
-							/>
+							<b-tabs
+								content-class="col-10"
+								pills
+								card
+								vertical
+							>
+								<b-tab
+									v-for="netgroup in netgroups"
+									:key="netgroup.id"
+									:title="netgroup.name"
+									lazy
+								>
+									<Datatable
+										id="networks-datatable"
+										:rowdata="netgroup.networks"
+										:rowheader="rowheader"
+										title="networks"
+										:candelete="candelete"
+										:canedit="canedit"
+										:canaccesschild="true"
+										editcomponent="NetworkModal"
+										translationkey="network."
+										@reloadDatatable="reloadDatatable"
+									/>
+								</b-tab>
+							</b-tabs>
 						</div>
 					</div>
 				</div>
@@ -56,17 +69,8 @@ export default {
 		return {
 			errormsg: null,
 			rowdata: [],
-			rowheader: {
-				id: "id",
-				name: "name",
-				description: "description",
-				netid: "netid",
-				nettag: "nettag",
-				mask: "mask",
-				netdevices: "netdevices",
-			},
-			networkdata: [],
-			netgroupdata: [],
+			rowheader: [],
+			netgroups: [],
 			loading: true,
 			errored: false,
 			canedit: false,
@@ -89,6 +93,8 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
+			await this.getHeader()
+			await this.getNetgroups()
 			await this.getNetworks()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
@@ -96,78 +102,76 @@ export default {
 		}
 	},
 	methods: {
-		// Retrieve networks group
-		async getNetGroup() {
+		async getHeader() {
+			await axios.options(this.$config.BACKEND_API_ROUTE+"networks", { headers: this.header })
+				.then(response => {
+					Object.keys(response.data.actions.POST).forEach(field => {
+						if(field != "group") {
+							this.rowheader.push(field)
+						}
+					})
+
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		async getNetgroups() {
+			this.netgroups = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
 				.then(response => {
-					this.netgroupdata = response.data
-					this.errormsg = null
-					this.errored = false
-					this.dataFormatting()
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-		},
-		// Retrieve networks
-		async getNetworks() {
-			this.networkdata = []
-			this.netgroupdata = []
-			this.rowdata = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
-				.then(response => {
-					this.networkdata = response.data
-					this.errormsg = null
-					this.errored = false
-					this.getNetGroup()
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-		},
-		// End, formatting datas to be displayed
-		dataFormatting() {
-			// Create UNKNOWN group
-			this.rowdata.push({
-				id: null,
-				name: this.$t("network.unknown_network"),
-				description: "",
-				networks: []
-			})
-			// Insert existing group
-			this.netgroupdata.forEach(netgroup => {
-				this.rowdata.push({
-					id: netgroup.id,
-					name: netgroup.name,
-					description: netgroup.description,
-					networks: []
-				})
-			});
-			// Push networks in groups
-			this.rowdata.forEach(row => {
-				this.networkdata.forEach(network => {
-					if(network.group == row.id) {
-						row.networks.push({
-							id: network.id,
-							name: network.name,
-							description: network.description,
-							netid: network.netid,
-							nettag: network.nettag,
-							mask: network.mask,
-							netdevices: network.netdevices.length,
+					this.netgroups.push({
+						id: 0,
+						name: this.$t("network.unknown_network"),
+						description: "",
+						networks: []
+					})
+
+					for (const netgroup of response.data) {
+						this.netgroups.push({
+							id: netgroup.id,
+							name: netgroup.name,
+							description: netgroup.description,
+							networks: []
 						})
 					}
+
+					this.errormsg = null
+					this.errored = false
 				})
-			})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+		},
+		async getNetworks() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
+				.then(response => {
+					for (const network of response.data) {
+						const group = this.netgroups.find(g => g.id === network.group)
+						network.netdevices = network.netdevices.length
+						if (group) {
+							group.networks.push(network)
+						} else {
+							this.netgroups[0].networks.push(network)
+						}
+					}
 
-			this.rowheader = Object.values(this.rowheader)
-
-			this.loading = false
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(this.loading = false)
 		},
 		async reloadDatatable() {
 			this.loading = true
+			await this.getNetgroups()
 			await this.getNetworks()
 		}
 	}
