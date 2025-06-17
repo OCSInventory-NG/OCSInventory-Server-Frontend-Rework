@@ -75,6 +75,7 @@ export default {
 				this.candelete = true
 			}
 			await this.getHeader()
+			await this.getNetdevice()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -89,7 +90,6 @@ export default {
 					})
 					this.errormsg = null
 					this.errored = false
-					this.getNetdevice()
 				})
 				.catch(e => {
 					this.errormsg = e.message
@@ -98,12 +98,18 @@ export default {
 		},
 		// Retrieve netdevice
 		async getNetdevice() {
-			var extendedRoute = "/"
-			if(this.$route.params.id) extendedRoute = "?network="+this.$route.params.id
+			this.rowdata = []
+
+			var extendedRoute = "/?expand=network"
+			if(this.$route.params.id) extendedRoute = "?expand=network&network="+this.$route.params.id
 
 			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					for (const netdevice of response.data) {
+						netdevice.network = netdevice.network.name
+						this.rowdata.push(netdevice)
+					}
+
 					this.errormsg = null
 					this.errored = false
 				})
