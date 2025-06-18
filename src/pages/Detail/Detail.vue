@@ -42,6 +42,7 @@
 									>
 										<b-button-group class="mr-1">
 											<PackageResultModal
+												v-if="device.osname != 'SNMP'"
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>&nbsp;
@@ -50,6 +51,7 @@
 												@reloadInventory="reloadInventory"
 											/>&nbsp;&nbsp;
 											<router-link 
+												v-if="device.osname != 'SNMP'"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
 												:title="$t('inventory.see_logs')"
 												class="btn datatable-btn mr-1"
