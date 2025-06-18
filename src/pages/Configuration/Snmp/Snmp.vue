@@ -234,7 +234,7 @@ export default {
 			activetab: 0,
 			allconfigview: false,
 			rowsnmpcommheader: [
-				"name", "version", "user", "level", "password", "auth_protocol",
+				"name", "version", "user", "auth_level", "password", "auth_protocol",
 				"priv_protocol", "priv_password", "retries", "timeout", "subnets"
 			],
 			rowsnmpcomm: [],
