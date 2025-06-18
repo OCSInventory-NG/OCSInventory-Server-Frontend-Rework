@@ -416,7 +416,8 @@ export default {
 		async getSnmpScanners() {
 			this.rowscannerdata = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner?expand=configs",
+				{ headers: this.header })
 				.then(response => {
 					this.rowscannerdata = response.data
 					for (const scan of this.rowscannerdata) {
@@ -431,6 +432,7 @@ export default {
 						}
 
 						scan.snmpcommunity = communities.join('\n')
+						scan.assets = scan.assets.length
 					}
 				})
 				.catch(e => {
