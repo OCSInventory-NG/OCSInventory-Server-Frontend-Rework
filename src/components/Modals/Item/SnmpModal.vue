@@ -123,11 +123,11 @@
 					<b-col>
 						<b-form-group
 							:label="$t('network.level')" 
-							label-for="level"
+							label-for="auth_level"
 						>
 							<b-form-select
 								id="level"
-								v-model="row.level" 
+								v-model="row.auth_level" 
 								:options="loptions" 
 								class="mb-3 form-select"
 							/>
@@ -276,7 +276,7 @@ export default {
 				name: null,
 				version: "2c",
 				user: null,
-				level: null,
+				auth_level: null,
 				password: null,
 				auth_protocol: null,
 				priv_protocol: null,
