@@ -123,7 +123,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.level')" 
+							:label="$t('network.auth_level')"
 							label-for="auth_level"
 						>
 							<b-form-select
