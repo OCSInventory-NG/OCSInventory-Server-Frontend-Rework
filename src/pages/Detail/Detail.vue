@@ -104,7 +104,7 @@
 												/>
 											</fieldset><br>
 										</div>
-										<div v-if="category.id == 2">
+										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">
 												<h2>{{ $t("title.deployment") }}</h2>
 											</div>
@@ -114,19 +114,20 @@
 												@endReloadDeployment="endReloadDeployment"
 											/>
 										</div>
-										<div
-											v-for="section in category.inventory_sections"
-											:key="section.id"
-										>
-											<Inventory 
-												v-if="section.template == device.template"
-												:section="section"
-												:inventory="sections[section.id]"
-											/>
+										<div v-if="category.inventory_sections
+											&& category.inventory_sections.some(section => section.template == device.template)">
+											<div
+												v-for="section in category.inventory_sections"
+												:key="section.id"
+											>
+												<Inventory
+													v-if="section.template == device.template"
+													:section="section"
+													:inventory="sections[section.id]"
+												/>
+											</div>
 										</div>
-										<div 
-											v-if="device.template == null && ![1, 2].includes(category.id)"
-										>
+										<div v-else>
 											<Alert 
 												:message="$t('message.no_inventory')" 
 												variant="info"
