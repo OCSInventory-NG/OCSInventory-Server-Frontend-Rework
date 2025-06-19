@@ -310,13 +310,15 @@ export default {
 				{ value: "deployment/results", text: this.$t("title.deployment") },
 				{ value: "asset/logs", text: this.$t("title.inventory_logs") },
 				{ value: "templates", text: this.$t("title.inventory") },
+				{ value: "snmp/scanner", text: this.$t("network.snmpscanner") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
 				"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
 				"deployment/results": "results",
 				"asset/logs": "logs",
-				"templates": "inventory_sections"
+				"templates": "inventory_sections",
+				"snmp/scanner": "snmpscanner"
 			},
 			fieldopt: [],
 			operatoropt: {
@@ -441,6 +443,10 @@ export default {
 
 				if(component == "asset") {
 					component = "inventory"
+				}
+
+				if(component == "snmp") {
+					component = "network"
 				}
 
 				this.datavalues[masterindex][index].object = this.obj[route]

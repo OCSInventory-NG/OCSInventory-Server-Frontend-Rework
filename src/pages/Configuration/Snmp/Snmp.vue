@@ -175,6 +175,7 @@
 												title="snmp/scanner"
 												translationkey="network."
 												@reloadDatatable="reloadDatatable"
+												@assetsSearch="assetsSearch"
 											/>
 										</div>
 									</div>
@@ -461,6 +462,28 @@ export default {
 			this.getSnmpCommunities()
 			this.getSnmpTemplateHeader()
 			this.getSnmpScannerHeader()
+		},
+		assetsSearch(identifier) {
+			var search = [
+				[
+					{
+						object: "snmpscanner",
+						route: "snmp/scanner",
+						field: "identifier",
+						fieldtype: "string",
+						operator: "iexact",
+						value: identifier,
+						link: ""
+					}
+				]
+			]
+
+			localStorage.setItem('multisearch', JSON.stringify(search))
+			localStorage.setItem('useSavedSearch', true)
+
+			this.$router.push({
+				name: 'Multisearch',
+			});
 		}
 	}
 }
