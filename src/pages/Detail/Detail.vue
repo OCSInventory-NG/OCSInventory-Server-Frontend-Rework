@@ -114,8 +114,12 @@
 												@endReloadDeployment="endReloadDeployment"
 											/>
 										</div>
-										<div v-if="category.inventory_sections
-											&& category.inventory_sections.some(section => section.template == device.template)">
+										<div
+											v-if="category.inventory_sections
+												&& category.inventory_sections.some(
+													section => section.template == device.template
+												)"
+										>
 											<div
 												v-for="section in category.inventory_sections"
 												:key="section.id"
