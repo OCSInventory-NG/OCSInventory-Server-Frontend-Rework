@@ -114,7 +114,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/automaticactions',
+		path: '/configurations/automations',
 		name: 'AutomaticAction',
 		component: () => import('@/pages/Configuration/AutomaticAction/AutomaticAction.vue'),
 		meta: {

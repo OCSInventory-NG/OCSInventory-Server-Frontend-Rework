@@ -6,7 +6,7 @@
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="automaticactions"
+				page-title="automations"
 			/>
 			<!-- Display Datatable -->
 			<div class="page-body">

@@ -114,7 +114,7 @@
 							route:'Authentication', column: 'general'
 						},
 						{
-							header: $t('title.automaticactions'), link: '/configurations/automaticactions', 
+							header: $t('title.automations'), link: '/configurations/automations', 
 							route:'AutomaticAction', column: 'general'
 						},
 						{ 
