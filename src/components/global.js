@@ -1,6 +1,6 @@
 import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
 import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
-import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.vue'
+import AutomationModal from '@/components/Modals/Item/AutomationModal.vue'
 import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
@@ -23,7 +23,7 @@ const GlobalComponents = {
 	install(Vue) {
 		Vue.component('AccountinfoModal', AccountinfoModal)
 		Vue.component('AssetGroupModal', AssetGroupModal)
-		Vue.component('AutomaticActionModal', AutomaticActionModal)
+		Vue.component('AutomationModal', AutomationModal)
 		Vue.component('CategoryModal', CategoryModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)

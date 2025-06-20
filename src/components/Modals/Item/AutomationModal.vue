@@ -1,5 +1,5 @@
 <template>
-	<div id="automatic-action-modal">
+	<div id="automation-modal">
 		<div 
 			v-if="!update"
 			class="page-header d-print-none"
@@ -10,7 +10,7 @@
 						:title="$t('scheduler.addscheduler')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="automaticactionmodal = !automaticactionmodal"
+						@click="automationmodal = !automationmodal"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -32,8 +32,8 @@
 			</button>
 		</div>
 		<b-modal 
-			id="automaticactionmodal" 
-			v-model="automaticactionmodal"
+			id="automationmodal" 
+			v-model="automationmodal"
 			:title="(!update) ? $t('scheduler.addscheduler') : $t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
@@ -216,7 +216,7 @@
 import axios from 'axios'
 
 export default {
-	name: "AutomaticActionModal",
+	name: "AutomationModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
@@ -239,7 +239,7 @@ export default {
 			createerror: false,
 			createerrormsg: null,
 			createwithsuccess: false,
-			automaticactionmodal: false,
+			automationmodal: false,
 			active: [
 				{ value: true, text: this.$t('generic.yes') },
 				{ value: false, text: this.$t('generic.no') }
@@ -268,7 +268,7 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.automaticactionmodal = false
+				this.automationmodal = false
 				this.createwithsuccess = false
 				this.row = {
 					name: null,
@@ -291,7 +291,7 @@ export default {
 	methods: {
 		loadData(id) {
 			this.loading = true
-			this.automaticactionmodal = true
+			this.automationmodal = true
 			this.getScheduler(id)
 		},
 		async getScheduler(id) {

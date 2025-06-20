@@ -28,7 +28,7 @@
 						</div>
 
 						<div v-else>
-							<AutomaticActionModal
+							<AutomationModal
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -39,7 +39,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:usecheckbox="false"
-								editcomponent="AutomaticActionModal"
+								editcomponent="AutomationModal"
 								title="automation/scheduler"
 								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
@@ -56,7 +56,7 @@
 import axios from 'axios'
 
 export default {
-	name: "AutomaticAction",
+	name: "Automation",
 	data() {
 		return {
 			canadd: false,

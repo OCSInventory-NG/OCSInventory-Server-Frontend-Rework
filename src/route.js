@@ -115,8 +115,8 @@ const routes = [
 	},
 	{
 		path: '/configurations/automations',
-		name: 'AutomaticAction',
-		component: () => import('@/pages/Configuration/AutomaticAction/AutomaticAction.vue'),
+		name: 'Automation',
+		component: () => import('@/pages/Configuration/Automation/Automation.vue'),
 		meta: {
 			layout: AppLayout
 		}

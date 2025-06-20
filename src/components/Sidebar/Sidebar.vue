@@ -115,7 +115,7 @@
 						},
 						{
 							header: $t('title.automations'), link: '/configurations/automations', 
-							route:'AutomaticAction', column: 'general'
+							route:'Automation', column: 'general'
 						},
 						{ 
 							header: $t('title.templates'), link: '/configurations/templates', 
