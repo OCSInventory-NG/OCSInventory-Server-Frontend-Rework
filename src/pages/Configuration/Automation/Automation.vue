@@ -39,6 +39,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:usecheckbox="false"
+								:viewautomationhistory="true"
 								editcomponent="AutomationModal"
 								title="automation/scheduler"
 								translationkey="scheduler."
