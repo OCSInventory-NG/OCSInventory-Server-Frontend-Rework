@@ -86,7 +86,7 @@
 														{{ $t(translationkey+key) }}
 													</div>
 													<div class="datagrid-content">
-														{{ value }}
+														{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
 													</div>
 												</div>
 											</div><br><br>

@@ -85,6 +85,15 @@
 				</b-row>
 				<b-row v-if="selectedopt == 'assign_temp'">
 					<b-col>
+						<Alert
+							:message="$t('inventory.force_template')"
+							variant="warning"
+							:cols="false"
+						/>
+					</b-col>
+				</b-row>
+				<b-row v-if="selectedopt == 'assign_temp'">
+					<b-col>
 						<b-form-group
 							:label="$t('title.templates')" 
 							label-for="template"
@@ -164,7 +173,8 @@ export default {
 			selectedgrp: null,
 			options: [
 				{ value: 'assign_temp', text: this.$t('template.assign') },
-				{ value: 'assign_grp', text: this.$t('inventory.assign') }
+				{ value: 'assign_grp', text: this.$t('inventory.assign') },
+				{ value: 'reset_temp', text: this.$t('inventory.reset_template') }
 			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -230,9 +240,11 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.selectedopt == "assign_temp") {
+			if(this.selectedopt == "assign_temp" || this.selectedopt == "reset_temp") {
+
 				var patch = {
-					template: this.template
+					template: (this.selectedopt == "assign_temp") ? this.template : null,
+					is_template_forced: (this.selectedopt == "assign_temp") ? true : false
 				}
 
 				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.item[0].id+"/", patch,

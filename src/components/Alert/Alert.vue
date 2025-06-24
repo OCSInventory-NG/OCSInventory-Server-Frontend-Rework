@@ -1,6 +1,9 @@
 <template>
 	<b-row>
-		<b-col cols="3" />
+		<b-col
+			v-if="cols"
+			cols="3"
+		/>
 		<b-col>
 			<b-alert
 				:model-value="!!message"
@@ -10,7 +13,10 @@
 				{{ message }}
 			</b-alert>
 		</b-col>
-		<b-col cols="3" />
+		<b-col
+			v-if="cols"
+			cols="3"
+		/>
 	</b-row>
 </template>
 
@@ -19,7 +25,8 @@ export default {
 	name: 'Alert',
 	props: {
 		message: { type: String, default: null },
-		variant: { type: String, default: 'info'}
+		variant: { type: String, default: 'info'},
+		cols: { type: Boolean, default: true }
 	}
 }
 </script>
