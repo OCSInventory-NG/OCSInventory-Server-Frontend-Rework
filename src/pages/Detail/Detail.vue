@@ -133,6 +133,43 @@
 									</b-tab>
 								</b-tabs>
 							</div>
+							<div v-else>
+								<div class="hr-text">
+									{{ $t("generic.information") }}
+								</div>
+								<b-row>
+									<b-col cols="1" />
+									<b-col>
+										<div class="datagrid">
+											<div 
+												v-for="(value,key) in device"
+												:key="key"
+												class="datagrid-item"
+											>
+												<div class="datagrid-title">
+													{{ $t(translationkey+key) }}
+												</div>
+												<div class="datagrid-content">
+													{{ value }}
+												</div>
+											</div>
+										</div>
+									</b-col>
+									<b-col cols="1" />
+								</b-row>
+								<br><br>
+								<div align="center">
+									<h2>{{ $t("title.accountinfo") }}</h2>
+								</div>
+								<fieldset class="form-fieldset">
+									<Accountinfo
+										:id="device.id"
+										:type="type"
+										:canedit="canedit"
+										:slug="slug"
+									/>
+								</fieldset><br>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -177,28 +214,27 @@ export default {
 			await this.getCategories()
 			await this.getInventoryCollection()
 		}
-		/*if(this.$route.params.type == 'netdevice') {
-			extendedRoute = "netdevices/"+this.$route.params.id
+		if(this.$route.params.type == 'netdevice') {
 			this.type = "IPDISCOVER"
 			this.slug = "netdevice.netdevice"
 			this.translationkey = "network."
-		}*/
-
-		/*await axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
-			.then(response => {
-				delete response.data.inventory_sections
-				this.rowdata = response.data
-				this.deployment.push(response.data)
-				this.errormsg = null
-				this.errored = false
-				this.loading = false
-			})
-			.catch(e => {
-				this.errormsg = e.message
-				this.errored = true
-			})*/
+			await this.getNetdevice()
+		}
 	},
 	methods: {
+		async getNetdevice() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"?expand=network",
+				{ headers: this.header })
+				.then(response => {
+					this.device = response.data
+					this.device.network = this.device.network.name
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
+		},
 		async getInventoryBase() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id, { headers: this.header })
 				.then(response => {

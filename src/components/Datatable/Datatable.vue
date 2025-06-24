@@ -256,13 +256,13 @@
 				<!-- Netdevices redirection -->
 				<template 
 					v-if="canaccessdetails"
-					#cell(netname)="row"
+					#cell(ip)="row"
 				>
 					<router-link  
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
-						{{ row.item.netname }}
+						{{ row.item.ip }}
 					</router-link>
 				</template>
 
