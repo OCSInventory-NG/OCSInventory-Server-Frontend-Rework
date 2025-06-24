@@ -6,7 +6,7 @@
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="automaticactions"
+				page-title="automations"
 			/>
 			<!-- Display Datatable -->
 			<div class="page-body">
@@ -28,7 +28,7 @@
 						</div>
 
 						<div v-else>
-							<AutomaticActionModal
+							<AutomationModal
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -39,7 +39,8 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:usecheckbox="false"
-								editcomponent="AutomaticActionModal"
+								:viewautomationhistory="true"
+								editcomponent="AutomationModal"
 								title="automation/scheduler"
 								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
@@ -56,7 +57,7 @@
 import axios from 'axios'
 
 export default {
-	name: "AutomaticAction",
+	name: "Automation",
 	data() {
 		return {
 			canadd: false,

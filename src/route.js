@@ -114,9 +114,17 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/automaticactions',
-		name: 'AutomaticAction',
-		component: () => import('@/pages/Configuration/AutomaticAction/AutomaticAction.vue'),
+		path: '/configurations/automations',
+		name: 'Automation',
+		component: () => import('@/pages/Configuration/Automation/Automation.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/automations/history/:id?',
+		name: 'AutomationHistory',
+		component: () => import('@/pages/Configuration/Automation/AutomationHistory.vue'),
 		meta: {
 			layout: AppLayout
 		}
@@ -132,7 +140,7 @@ const routes = [
 	{
 		path: '/configurations/rules/:id',
 		name: 'EditRule',
-		component: () => import('@/pages/Configuration/Rule/EditRule.vue'),		
+		component: () => import('@/pages/Configuration/Rule/EditRule.vue'),
 		props: true,
 		meta: {
 			layout: AppLayout

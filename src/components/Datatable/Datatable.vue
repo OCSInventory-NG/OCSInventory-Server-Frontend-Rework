@@ -106,6 +106,22 @@
 					</b-button-group>
 				</div>
 
+				<!-- Scheduler history -->
+				<div
+					v-if="viewautomationhistory"
+					class="col-1 ocs-col-datatable"
+				>
+					<router-link 
+						:to="'/configurations/automations/history'"
+						:title="$t('scheduler.see_history')"
+						class="btn datatable-btn mr-1"
+					>
+						<font-awesome-icon 
+							:icon="['far', 'file-lines']"
+						/>
+					</router-link>
+				</div>
+
 				<div
 					v-if="title == 'asset/bases' && !multisearch"
 					class="col-1"
@@ -425,6 +441,16 @@
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
+							<router-link
+								v-if="viewautomationhistory"
+								:to="'/configurations/automations/history/'+row.item.id"
+								:title="$t('scheduler.see_history')"
+								class="btn btn-ghost-dark"
+							>
+								<font-awesome-icon 
+									:icon="['far', 'file-lines']"
+								/>
+							</router-link>
 							<!-- Delete button -->
 							<DeleteItemModal
 								v-if="candelete && !row.item.is_protected"
@@ -519,7 +545,8 @@ export default {
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
-		assets: { type: Array, default: () => [] }
+		assets: { type: Array, default: () => [] },
+		viewautomationhistory: { type: Boolean, default: false },
 	},
 	data() {
 		return {
