@@ -629,6 +629,54 @@ export default {
 					index === -1 ? this.fields.push(arrayVisible) : null
 				}
 			})
+
+			// Remove old fields
+			this.fields = this.fields.filter(field =>
+				field.key === 'selected' ||
+				field.key === 'actions' ||
+				this.rowheader.includes(field.key)
+			)
+
+			// Add new fields
+			this.rowheader.forEach(data => {
+				if (!this.fields.some(field => field.key === data)) {
+					var visible = true
+					if (this.hiddenfields && this.hiddenfields.includes(data)) {
+						visible = false
+					}
+					var array = {
+						key: data,
+						label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+						sortable: true,
+						visible: visible,
+						disabled: false
+					}
+					this.json_fields[data] = data
+					this.fields.push(array)
+				}
+			})
+
+			// Order fields
+			const orderedFields = []
+			const orderedJsonFields = {}
+
+			const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
+			orderedFields.push(...specialFields)
+
+			this.rowheader.forEach(key => {
+				const field = this.fields.find(f => f.key === key)
+				if (field) {
+					orderedFields.push(field)
+					orderedJsonFields[key] = this.json_fields[key]
+				}
+			})
+
+			this.fields = orderedFields
+			this.json_fields = orderedJsonFields
+
+			// Update local storage key
+			localStorage.removeItem(key)
+			localStorage.setItem(key, JSON.stringify(this.fields))
 		} else {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
