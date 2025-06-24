@@ -7,7 +7,7 @@
 			@click="importtemplate = !importtemplate"
 		>
 			<font-awesome-icon 
-				:icon="['fas', 'upload']"
+				:icon="['fas', 'download']"
 			/>
 		</b-button>
 

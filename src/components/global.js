@@ -4,9 +4,11 @@ import AutomaticActionModal from '@/components/Modals/Item/AutomaticActionModal.
 import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
+import DuplicateTemplateModal from '@/components/Modals/ImportExportItem/DuplicateTemplateModal.vue'
+import ExportTemplateModal from '@/components/Modals/ImportExportItem/ExportTemplateModal.vue'
 import FieldModal from '@/components/Modals/Item/FieldModal.vue'
 import GroupModal from '@/components/Modals/Item/GroupModal.vue'
-import ImportTemplateModal from '@/components/Modals/ImportItem/ImportTemplateModal.vue'
+import ImportTemplateModal from '@/components/Modals/ImportExportItem/ImportTemplateModal.vue'
 import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher.vue'
 import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
@@ -27,6 +29,8 @@ const GlobalComponents = {
 		Vue.component('CategoryModal', CategoryModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
+		Vue.component('DuplicateTemplateModal', DuplicateTemplateModal)
+		Vue.component('ExportTemplateModal', ExportTemplateModal)
 		Vue.component('FieldModal', FieldModal)
 		Vue.component('GroupModal', GroupModal)
 		Vue.component('ImportTemplateModal', ImportTemplateModal)

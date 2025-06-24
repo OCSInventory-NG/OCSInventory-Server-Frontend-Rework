@@ -53,11 +53,11 @@
 						>
 							<button 
 								id="export-row"
-								:title="$t('generic.download')"
+								:title="$t('generic.exportdata')"
 								class="form-control btn datatable-btn"
 							>
 								<font-awesome-icon 
-									:icon="['fas', 'download']"
+									:icon="['fas', 'upload']"
 								/>
 							</button>
 						</download-excel>
@@ -70,6 +70,26 @@
 					class="col-1 ocs-col-datatable"
 				>
 					<ImportTemplateModal
+						@reloadDatatable="reloadDatatable"
+					/>
+				</div>
+
+				<!-- Export template -->
+				<div
+					v-if="exporttemplate"
+					class="col-1 ocs-col-datatable"
+				>
+					<ExportTemplateModal
+						:ids="selectedids"
+					/>
+				</div>
+
+				<!-- Duplicate template -->
+				<div
+					v-if="duplicatetemplate"
+					class="col-1 ocs-col-datatable"
+				>
+					<DuplicateTemplateModal
 						@reloadDatatable="reloadDatatable"
 					/>
 				</div>
@@ -472,6 +492,8 @@ export default {
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
 		importtemplate: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: false },
+		duplicatetemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
