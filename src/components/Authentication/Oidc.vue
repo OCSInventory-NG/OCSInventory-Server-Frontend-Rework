@@ -161,7 +161,8 @@ export default {
 	},
 	methods: {
 		async getOidcConfiguration() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=OIDC", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=OIDC&expand=configs",
+				{ headers: this.header })
 				.then(response => {
 					this.oidcdata = response.data[0].configs[0] ?? []
 					this.errormsg = null

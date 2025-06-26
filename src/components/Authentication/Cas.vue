@@ -156,7 +156,8 @@ export default {
 	},
 	methods: {
 		async getCasConfiguration() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=CAS&expand=configs",
+				{ headers: this.header })
 				.then(response => {
 					this.casdata = response.data[0].configs[0] ?? []
 					this.errormsg = null
