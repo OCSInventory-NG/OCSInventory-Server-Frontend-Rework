@@ -115,6 +115,7 @@
 							<b-form-input
 								id="user"
 								v-model="row.user"
+								autocomplete="off"
 							/>
 						</b-form-group>
 					</b-col>
@@ -122,12 +123,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.level')" 
-							label-for="level"
+							:label="$t('network.auth_level')"
+							label-for="auth_level"
 						>
 							<b-form-select
 								id="level"
-								v-model="row.level" 
+								v-model="row.auth_level" 
 								:options="loptions" 
 								class="mb-3 form-select"
 							/>
@@ -144,6 +145,7 @@
 								id="password"
 								v-model="row.password"
 								type="password"
+								autocomplete="off"
 							/>
 						</b-form-group>
 					</b-col>
@@ -159,6 +161,7 @@
 								v-model="row.auth_protocol" 
 								:options="apoptions" 
 								class="mb-3 form-select"
+								autocomplete="off"
 							/>
 						</b-form-group>
 					</b-col>
@@ -174,6 +177,7 @@
 								v-model="row.priv_protocol" 
 								:options="ppoptions" 
 								class="mb-3 form-select"
+								autocomplete="off"
 							/>
 						</b-form-group>
 					</b-col>
@@ -188,6 +192,7 @@
 								id="priv_password"
 								v-model="row.priv_password"
 								type="password"
+								autocomplete="off"
 							/>
 						</b-form-group>
 					</b-col>
@@ -276,7 +281,7 @@ export default {
 				name: null,
 				version: "2c",
 				user: null,
-				level: null,
+				auth_level: null,
 				password: null,
 				auth_protocol: null,
 				priv_protocol: null,

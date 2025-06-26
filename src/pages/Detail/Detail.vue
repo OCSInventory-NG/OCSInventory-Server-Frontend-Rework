@@ -42,6 +42,7 @@
 									>
 										<b-button-group class="mr-1">
 											<PackageResultModal
+												v-if="device.osname != 'SNMP'"
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>&nbsp;
@@ -50,6 +51,7 @@
 												@reloadInventory="reloadInventory"
 											/>&nbsp;&nbsp;
 											<router-link 
+												v-if="device.osname != 'SNMP'"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
 												:title="$t('inventory.see_logs')"
 												class="btn datatable-btn mr-1"
@@ -102,7 +104,7 @@
 												/>
 											</fieldset><br>
 										</div>
-										<div v-if="category.id == 2">
+										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">
 												<h2>{{ $t("title.deployment") }}</h2>
 											</div>
@@ -113,18 +115,23 @@
 											/>
 										</div>
 										<div
-											v-for="section in category.inventory_sections"
-											:key="section.id"
+											v-if="category.inventory_sections
+												&& category.inventory_sections.some(
+													section => section.template == device.template
+												)"
 										>
-											<Inventory 
-												v-if="section.template == device.template"
-												:section="section"
-												:inventory="sections[section.id]"
-											/>
+											<div
+												v-for="section in category.inventory_sections"
+												:key="section.id"
+											>
+												<Inventory
+													v-if="section.template == device.template"
+													:section="section"
+													:inventory="sections[section.id]"
+												/>
+											</div>
 										</div>
-										<div 
-											v-if="device.template == null && ![1, 2].includes(category.id)"
-										>
+										<div v-else>
 											<Alert 
 												:message="$t('message.no_inventory')" 
 												variant="info"

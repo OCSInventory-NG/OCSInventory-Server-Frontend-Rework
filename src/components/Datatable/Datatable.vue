@@ -315,6 +315,19 @@
 					</a>
 				</template>
 
+				<!-- Scanner assets redirection -->
+				<template
+					v-if="title == 'snmp/scanner'"
+					#cell(assets)="row"
+				>
+					<a
+						class="ocs-link"
+						@click="assetsSearch(row.item.identifier)"
+					>
+						{{ row.item.assets }}
+					</a>
+				</template>
+
 				<!-- Asset group redirection -->
 				<template
 					v-if="canaccesspackagedetails"
@@ -807,6 +820,9 @@ export default {
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)
+		},
+		assetsSearch(identifier) {
+			this.$emit('assetsSearch', identifier)
 		},
 		updateColumnLabels() {
 			this.fields.forEach(field => {

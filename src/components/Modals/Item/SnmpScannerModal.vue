@@ -228,18 +228,19 @@ export default {
 			}, 500)
 		}
 	},
-	mounted() {
-		this.getCommunities()
+	async mounted() {
+		await this.getCommunities()
 	},
 	methods: {
-		loadData(id) {
+		async loadData(id) {
 			this.loading = true
 			this.snmpscannermodal = true
-			this.getSnmpScanner(id)
+			await this.getSnmpScanner(id)
 		},
 		async getSnmpScanner(id) {
 			this.row = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id+"?expand=configs",
+				{ headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")

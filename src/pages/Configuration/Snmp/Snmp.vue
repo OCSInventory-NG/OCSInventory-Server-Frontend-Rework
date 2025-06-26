@@ -175,6 +175,7 @@
 												title="snmp/scanner"
 												translationkey="network."
 												@reloadDatatable="reloadDatatable"
+												@assetsSearch="assetsSearch"
 											/>
 										</div>
 									</div>
@@ -234,7 +235,7 @@ export default {
 			activetab: 0,
 			allconfigview: false,
 			rowsnmpcommheader: [
-				"name", "version", "user", "level", "password", "auth_protocol",
+				"name", "version", "user", "auth_level", "password", "auth_protocol",
 				"priv_protocol", "priv_password", "retries", "timeout", "subnets"
 			],
 			rowsnmpcomm: [],
@@ -416,7 +417,8 @@ export default {
 		async getSnmpScanners() {
 			this.rowscannerdata = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner?expand=configs",
+				{ headers: this.header })
 				.then(response => {
 					this.rowscannerdata = response.data
 					for (const scan of this.rowscannerdata) {
@@ -431,6 +433,7 @@ export default {
 						}
 
 						scan.snmpcommunity = communities.join('\n')
+						scan.assets = scan.assets.length
 					}
 				})
 				.catch(e => {
@@ -459,6 +462,28 @@ export default {
 			this.getSnmpCommunities()
 			this.getSnmpTemplateHeader()
 			this.getSnmpScannerHeader()
+		},
+		assetsSearch(identifier) {
+			var search = [
+				[
+					{
+						object: "snmpscanner",
+						route: "snmp/scanner",
+						field: "identifier",
+						fieldtype: "string",
+						operator: "iexact",
+						value: identifier,
+						link: ""
+					}
+				]
+			]
+
+			localStorage.setItem('multisearch', JSON.stringify(search))
+			localStorage.setItem('useSavedSearch', true)
+
+			this.$router.push({
+				name: 'Multisearch',
+			});
 		}
 	}
 }
