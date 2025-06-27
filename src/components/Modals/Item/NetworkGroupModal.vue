@@ -173,6 +173,7 @@ export default {
 			netgroupmodal: false,
 			networks: [],
 			netid: [],
+			oldnetid: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -198,18 +199,20 @@ export default {
 		}
 	},
 	methods: {
-		loadData(id) {
+		async loadData(id) {
 			this.loading = true
 			this.netgroupmodal = true
-			this.getNetgroup(id)
+			await this.getNetgroup(id)
+			await this.getNetworks()
 		},
 		async getNetgroup(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
+					this.netid = this.row.networks
+					this.oldnetid = this.row.networks
 					this.errormsg = null
 					this.errored = false
-					this.getNetworks()
 				})
 				.catch(e => {
 					this.errormsg = e
@@ -220,12 +223,12 @@ export default {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
 				.then(response => {
 					this.networks = []
-					response.data.forEach(network => {
+					for (const network of response.data) {
 						this.networks.push({
 							value: network.id,
 							text: network.netid
 						})
-					});
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -235,22 +238,36 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		updateNetworks() {
-			this.netid.forEach(element => {
-				var json = {
-					group: this.row.id
+		async updateNetworks() {
+			// remove old group link
+			for (const network of this.oldnetid) {
+				if (!this.netid.includes(network)) {
+					var json = {
+						group: null
+					}
+					this.patchNetwork(network, json)
 				}
-
-				axios.patch(this.$config.BACKEND_API_ROUTE+"networks/"+element+"/", json, { headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
-			});
+			}
+			// add new group link
+			for (const network of this.netid) {
+				if (!this.oldnetid.includes(network)) {
+					var json = {
+						group: this.row.id
+					}
+					this.patchNetwork(network, json)
+				}
+			}
+		},
+		patchNetwork(network, json) {
+			axios.patch(this.$config.BACKEND_API_ROUTE+"networks/"+network+"/", json, { headers: this.header })
+				.then(() => {
+					this.errormsg = null
+					this.errored = false
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 		},
 		onSubmit(event) {
 			event.preventDefault()
@@ -270,9 +287,7 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				if(this.netid.length > 0) {
-					this.updateNetworks()
-				}
+				this.updateNetworks()
 
 				axios.patch(this.$config.BACKEND_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
