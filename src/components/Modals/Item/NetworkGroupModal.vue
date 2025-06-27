@@ -239,10 +239,11 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async updateNetworks() {
+			var json = {}
 			// remove old group link
 			for (const network of this.oldnetid) {
 				if (!this.netid.includes(network)) {
-					var json = {
+					json = {
 						group: null
 					}
 					this.patchNetwork(network, json)
@@ -251,7 +252,7 @@ export default {
 			// add new group link
 			for (const network of this.netid) {
 				if (!this.oldnetid.includes(network)) {
-					var json = {
+					json = {
 						group: this.row.id
 					}
 					this.patchNetwork(network, json)
