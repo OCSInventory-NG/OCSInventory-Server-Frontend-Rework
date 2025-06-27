@@ -10,7 +10,7 @@
 						:title="$t('template.addsection')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="sectionmodal = !sectionmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -87,6 +87,33 @@
 								v-model="row.name"
 								required
 							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('template.category')" 
+							label-for="category"
+						>
+							<v-select
+								id="category"
+								v-model="selectedcategory" 
+								:options="categories" 
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										:required="!row.retrieval_output"
+										v-bind="attributes"
+										v-on="events"
+									>
+								</template>
+							</v-select>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -306,6 +333,8 @@ export default {
 				{ value: 'SNMP_GET', text: this.$t('template.SNMP_GET') },
 				{ value: 'SNMP_WALK', text: this.$t('template.SNMP_WALK') }
 			],
+			categories: [],
+			selectedcategory: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -327,6 +356,7 @@ export default {
 					template: null,
 					options: {}
 				}
+				this.selectedcategory = null
 				if (!this.update) {
 					this.$emit("reloadTemplate")
 				} else {
@@ -362,10 +392,32 @@ export default {
 		}
 	},
 	methods: {
-		loadData() {
+		async loadData() {
 			this.loading = true
 			this.sectionmodal = true
-			this.loading = false
+			this.selectedcategory = null
+			await this.getCategories()
+		},
+		async getCategories() {
+			this.categories = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
+				.then(response => {
+					for (const category of response.data) {
+						this.categories.push({
+							value: category.id,
+							text: category.name
+						})
+						if (category.inventory_sections.includes(this.row.id)) {
+							this.selectedcategory = category.id
+						}
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(this.loading = false)
+
 		},
 		onSubmit(event) {
 			event.preventDefault()
