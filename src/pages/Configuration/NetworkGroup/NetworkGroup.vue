@@ -86,6 +86,7 @@ export default {
 				this.candelete = true
 			}
 			await this.getHeader()
+			await this.getNetgroup()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -98,9 +99,9 @@ export default {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
 					})
+					this.rowheader.push("networks")
 					this.errormsg = null
 					this.errored = false
-					this.getNetgroup()
 				})
 				.catch(e => {
 					this.errormsg = e.message
@@ -108,9 +109,16 @@ export default {
 				})
 		},
 		async getNetgroup() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
+			this.rowdata = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/?expand=networks", { headers: this.header })
 				.then(response => {
-					this.rowdata = response.data
+					const transformedData = response.data.map(netgroup => {
+						return {
+							...netgroup,
+							networks: netgroup.networks.map(n => n.netid).join(', ')
+						}
+					})
+					this.rowdata = transformedData
 					this.errormsg = null
 					this.errored = false
 				})
