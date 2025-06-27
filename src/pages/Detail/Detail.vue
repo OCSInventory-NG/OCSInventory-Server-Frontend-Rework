@@ -12,8 +12,8 @@
 
 			<!-- Page header for netdevice -->
 			<PageHeader 
-				v-if="device.netname"
-				:page-title="device.netname"
+				v-if="device.netname || device.ip"
+				:page-title="(device.netname) ? device.netname : device.ip"
 			/>
 
 			<!-- Display details -->
