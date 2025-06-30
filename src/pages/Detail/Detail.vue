@@ -42,6 +42,7 @@
 									>
 										<b-button-group class="mr-1">
 											<PackageResultModal
+												v-if="device.osname != 'SNMP'"
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>&nbsp;
@@ -50,6 +51,7 @@
 												@reloadInventory="reloadInventory"
 											/>&nbsp;&nbsp;
 											<router-link 
+												v-if="device.osname != 'SNMP'"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
 												:title="$t('inventory.see_logs')"
 												class="btn datatable-btn mr-1"
@@ -86,7 +88,7 @@
 														{{ $t(translationkey+key) }}
 													</div>
 													<div class="datagrid-content">
-														{{ value }}
+														{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
 													</div>
 												</div>
 											</div><br><br>
@@ -102,7 +104,7 @@
 												/>
 											</fieldset><br>
 										</div>
-										<div v-if="category.id == 2">
+										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">
 												<h2>{{ $t("title.deployment") }}</h2>
 											</div>
@@ -113,18 +115,23 @@
 											/>
 										</div>
 										<div
-											v-for="section in category.inventory_sections"
-											:key="section.id"
+											v-if="category.inventory_sections
+												&& category.inventory_sections.some(
+													section => section.template == device.template
+												)"
 										>
-											<Inventory 
-												v-if="section.template == device.template"
-												:section="section"
-												:inventory="sections[section.id]"
-											/>
+											<div
+												v-for="section in category.inventory_sections"
+												:key="section.id"
+											>
+												<Inventory
+													v-if="section.template == device.template"
+													:section="section"
+													:inventory="sections[section.id]"
+												/>
+											</div>
 										</div>
-										<div 
-											v-if="device.template == null && ![1, 2].includes(category.id)"
-										>
+										<div v-else>
 											<Alert 
 												:message="$t('message.no_inventory')" 
 												variant="info"
@@ -132,6 +139,43 @@
 										</div>
 									</b-tab>
 								</b-tabs>
+							</div>
+							<div v-else>
+								<div class="hr-text">
+									{{ $t("generic.information") }}
+								</div>
+								<b-row>
+									<b-col cols="1" />
+									<b-col>
+										<div class="datagrid">
+											<div 
+												v-for="(value,key) in device"
+												:key="key"
+												class="datagrid-item"
+											>
+												<div class="datagrid-title">
+													{{ $t(translationkey+key) }}
+												</div>
+												<div class="datagrid-content">
+													{{ value }}
+												</div>
+											</div>
+										</div>
+									</b-col>
+									<b-col cols="1" />
+								</b-row>
+								<br><br>
+								<div align="center">
+									<h2>{{ $t("title.accountinfo") }}</h2>
+								</div>
+								<fieldset class="form-fieldset">
+									<Accountinfo
+										:id="device.id"
+										:type="type"
+										:canedit="canedit"
+										:slug="slug"
+									/>
+								</fieldset><br>
 							</div>
 						</div>
 					</div>
@@ -177,28 +221,27 @@ export default {
 			await this.getCategories()
 			await this.getInventoryCollection()
 		}
-		/*if(this.$route.params.type == 'netdevice') {
-			extendedRoute = "netdevices/"+this.$route.params.id
+		if(this.$route.params.type == 'netdevice') {
 			this.type = "IPDISCOVER"
 			this.slug = "netdevice.netdevice"
 			this.translationkey = "network."
-		}*/
-
-		/*await axios.get(this.$config.BACKEND_API_ROUTE+extendedRoute, { headers: this.header })
-			.then(response => {
-				delete response.data.inventory_sections
-				this.rowdata = response.data
-				this.deployment.push(response.data)
-				this.errormsg = null
-				this.errored = false
-				this.loading = false
-			})
-			.catch(e => {
-				this.errormsg = e.message
-				this.errored = true
-			})*/
+			await this.getNetdevice()
+		}
 	},
 	methods: {
+		async getNetdevice() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"?expand=network",
+				{ headers: this.header })
+				.then(response => {
+					this.device = response.data
+					this.device.network = this.device.network.name
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {this.loading = false})
+		},
 		async getInventoryBase() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id, { headers: this.header })
 				.then(response => {

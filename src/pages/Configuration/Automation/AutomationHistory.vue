@@ -1,41 +1,40 @@
 <template>
 	<div 
-		id="netdevice" 
+		id="automation-history"
 		class="container-xl"
 	>
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="netdevice"
+				page-title="history"
 			/>
-			<!-- Display Collapse -->
+			<!-- Display Datatable -->
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
 						<!-- Error box message -->
-						<section v-if="errored">
+						<div v-if="errored">
 							<Alert 
 								:message="errormsg" 
 								variant="danger"
 							/>
-						</section>
+						</div>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<Datatable
-								id="netdevice-datatable"
+								id="scheduler-history-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
-								:canedit="canedit"
-								:candelete="candelete"
-								:canaccessdetails="true"
-								editcomponent="NetdeviceModal"
-								title="netdevice"
-								translationkey="network."
+								:usecheckbox="false"
+								title="automation/history"
+								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -50,16 +49,19 @@
 import axios from 'axios'
 
 export default {
-	name: "Netdevice",
+	name: "AutomationHistory",
 	data() {
 		return {
-			errormsg: null,
-			rowdata: [],
-			rowheader: [],
-			loading: true,
 			errored: false,
-			canedit: false,
-			candelete: false,
+			errormsg: null,
+			loading: true,
+			rowheader: [],
+			rowdata: [],
+			status: {
+				0: this.$t("scheduler.in_progress"),
+				1: this.$t("scheduler.success"),
+				2: this.$t("scheduler.in_error")
+			},
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -67,23 +69,12 @@ export default {
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
-			if(localStorage.getItem('permissions').split(",").includes("netdevice_change_netdevice")) {
-				this.canedit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("netdevice_delete_netdevice")) {
-				this.candelete = true
-			}
-			await this.getHeader()
-			await this.getNetdevice()
-		} else {
-			this.errormsg = this.$t("message.dont_have_right_to_see")
-			this.errored = true
-		}
+		await this.getHeader()
+		await this.getAutomationHistory()
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"netdevices", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"automation/history/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -96,20 +87,18 @@ export default {
 					this.errored = true
 				})
 		},
-		// Retrieve netdevice
-		async getNetdevice() {
+		async getAutomationHistory() {
 			this.rowdata = []
-
-			var extendedRoute = "/?expand=network"
-			if(this.$route.params.id) extendedRoute = "?expand=network&network="+this.$route.params.id
-
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
+			var id = ""
+			if(this.$route.params.id) id = this.$route.params.id
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/history?scheduler="+id+"&expand=scheduler",
+				{ headers: this.header })
 				.then(response => {
-					for (const netdevice of response.data) {
-						netdevice.network = netdevice.network.name
-						this.rowdata.push(netdevice)
+					this.rowdata = response.data
+					for (const history of response.data) {
+						history.scheduler = history.scheduler.name
+						history.status = this.status[history.status]
 					}
-
 					this.errormsg = null
 					this.errored = false
 				})
@@ -121,8 +110,8 @@ export default {
 		},
 		async reloadDatatable() {
 			this.loading = true
-			await this.getNetdevice()
-		}
+			await this.getAutomationHistory()
+		},
 	}
 }
 </script>

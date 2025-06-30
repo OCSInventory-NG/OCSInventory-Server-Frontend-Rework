@@ -53,11 +53,11 @@
 						>
 							<button 
 								id="export-row"
-								:title="$t('generic.download')"
+								:title="$t('generic.exportdata')"
 								class="form-control btn datatable-btn"
 							>
 								<font-awesome-icon 
-									:icon="['fas', 'download']"
+									:icon="['fas', 'upload']"
 								/>
 							</button>
 						</download-excel>
@@ -74,6 +74,26 @@
 					/>
 				</div>
 
+				<!-- Export template -->
+				<div
+					v-if="exporttemplate"
+					class="col-1 ocs-col-datatable"
+				>
+					<ExportTemplateModal
+						:ids="selectedids"
+					/>
+				</div>
+
+				<!-- Duplicate template -->
+				<div
+					v-if="duplicatetemplate"
+					class="col-1 ocs-col-datatable"
+				>
+					<DuplicateTemplateModal
+						@reloadDatatable="reloadDatatable"
+					/>
+				</div>
+
 				<!-- Attribute package -->
 				<div
 					v-if="candeploy"
@@ -84,6 +104,22 @@
 							:items="(multisearch && selected.length == 0) ? rowdata : selected"
 						/>
 					</b-button-group>
+				</div>
+
+				<!-- Scheduler history -->
+				<div
+					v-if="viewautomationhistory"
+					class="col-1 ocs-col-datatable"
+				>
+					<router-link 
+						:to="'/configurations/automations/history'"
+						:title="$t('scheduler.see_history')"
+						class="btn datatable-btn mr-1"
+					>
+						<font-awesome-icon 
+							:icon="['far', 'file-lines']"
+						/>
+					</router-link>
 				</div>
 
 				<div
@@ -256,13 +292,13 @@
 				<!-- Netdevices redirection -->
 				<template 
 					v-if="canaccessdetails"
-					#cell(netname)="row"
+					#cell(ip)="row"
 				>
 					<router-link  
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
-						{{ row.item.netname }}
+						{{ row.item.ip }}
 					</router-link>
 				</template>
 
@@ -276,6 +312,19 @@
 						@click="useSaveSearch(row.item.id)"
 					>
 						{{ row.item.searchname }}
+					</a>
+				</template>
+
+				<!-- Scanner assets redirection -->
+				<template
+					v-if="title == 'snmp/scanner'"
+					#cell(assets)="row"
+				>
+					<a
+						class="ocs-link"
+						@click="assetsSearch(row.item.identifier)"
+					>
+						{{ row.item.assets }}
 					</a>
 				</template>
 
@@ -405,6 +454,16 @@
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
+							<router-link
+								v-if="viewautomationhistory"
+								:to="'/configurations/automations/history/'+row.item.id"
+								:title="$t('scheduler.see_history')"
+								class="btn btn-ghost-dark"
+							>
+								<font-awesome-icon 
+									:icon="['far', 'file-lines']"
+								/>
+							</router-link>
 							<!-- Delete button -->
 							<DeleteItemModal
 								v-if="candelete && !row.item.is_protected"
@@ -472,6 +531,8 @@ export default {
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
 		importtemplate: { type: Boolean, default: false },
+		exporttemplate: { type: Boolean, default: false },
+		duplicatetemplate: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },
@@ -497,7 +558,8 @@ export default {
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
-		assets: { type: Array, default: () => [] }
+		assets: { type: Array, default: () => [] },
+		viewautomationhistory: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -607,6 +669,54 @@ export default {
 					index === -1 ? this.fields.push(arrayVisible) : null
 				}
 			})
+
+			// Remove old fields
+			this.fields = this.fields.filter(field =>
+				field.key === 'selected' ||
+				field.key === 'actions' ||
+				this.rowheader.includes(field.key)
+			)
+
+			// Add new fields
+			this.rowheader.forEach(data => {
+				if (!this.fields.some(field => field.key === data)) {
+					var visible = true
+					if (this.hiddenfields && this.hiddenfields.includes(data)) {
+						visible = false
+					}
+					var array = {
+						key: data,
+						label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+						sortable: true,
+						visible: visible,
+						disabled: false
+					}
+					this.json_fields[data] = data
+					this.fields.push(array)
+				}
+			})
+
+			// Order fields
+			const orderedFields = []
+			const orderedJsonFields = {}
+
+			const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
+			orderedFields.push(...specialFields)
+
+			this.rowheader.forEach(key => {
+				const field = this.fields.find(f => f.key === key)
+				if (field) {
+					orderedFields.push(field)
+					orderedJsonFields[key] = this.json_fields[key]
+				}
+			})
+
+			this.fields = orderedFields
+			this.json_fields = orderedJsonFields
+
+			// Update local storage key
+			localStorage.removeItem(key)
+			localStorage.setItem(key, JSON.stringify(this.fields))
 		} else {
 			Object.values(this.rowheader).forEach( data => {
 				var visible = true
@@ -710,6 +820,9 @@ export default {
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)
+		},
+		assetsSearch(identifier) {
+			this.$emit('assetsSearch', identifier)
 		},
 		updateColumnLabels() {
 			this.fields.forEach(field => {

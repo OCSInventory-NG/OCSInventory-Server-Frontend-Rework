@@ -110,9 +110,6 @@
 															v-model="subparameter.value" 
 															class="form-select mb-3"
 														>
-															<b-form-select-option value="">
-																{{ $t("configuration.none") }}
-															</b-form-select-option>
 															<b-form-select-option 
 																v-for="option in subparameter.options"
 																:key="option"
@@ -179,9 +176,6 @@
 													v-model="parameter.value" 
 													class="form-select mb-3"
 												>
-													<b-form-select-option value="">
-														{{ $t("configuration.none") }}
-													</b-form-select-option>
 													<b-form-select-option 
 														v-for="option in parameter.options"
 														:key="option"
