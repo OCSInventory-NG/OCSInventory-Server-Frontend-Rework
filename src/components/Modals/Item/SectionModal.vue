@@ -335,6 +335,8 @@ export default {
 			],
 			categories: [],
 			selectedcategory: null,
+			oldcategory: null,
+			allcategories: [],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -357,6 +359,7 @@ export default {
 					options: {}
 				}
 				this.selectedcategory = null
+				this.oldcategory = null
 				if (!this.update) {
 					this.$emit("reloadTemplate")
 				} else {
@@ -396,10 +399,12 @@ export default {
 			this.loading = true
 			this.sectionmodal = true
 			this.selectedcategory = null
+			this.oldcategory = null
 			await this.getCategories()
 		},
 		async getCategories() {
 			this.categories = []
+			this.allcategories = []
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
 				.then(response => {
 					for (const category of response.data) {
@@ -409,17 +414,49 @@ export default {
 						})
 						if (category.inventory_sections.includes(this.row.id)) {
 							this.selectedcategory = category.id
+							this.oldcategory = category.id
 						}
 					}
+					this.allcategories = response.data
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-				.finally(this.loading = false)
+				.finally(() => this.loading = false)
 
 		},
-		onSubmit(event) {
+		async updateCategories(category, remove = false) {
+			if (remove) {
+				category.inventory_sections = category.inventory_sections.filter(
+					sectionId => sectionId !== this.row.id
+				)
+			} else {
+				category.inventory_sections.push(this.row.id)
+			}
+
+			var json = {
+				inventory_sections: category.inventory_sections
+			}
+
+			await axios.patch(this.$config.BACKEND_API_ROUTE+"categories/"+category.id+"/", json,
+				{ headers: this.header })
+				.then(() => {
+					this.createerrormsg = null
+					this.createerror = false
+					if (!remove) {
+						this.createwithsuccess = true
+						this.loadingcreate = false
+					}
+				})
+				.catch(e => {
+					this.createerrormsg = e.message
+					this.createerror = true
+					this.createwithsuccess = false
+					this.loadingcreate = false
+				})
+		},
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
@@ -432,34 +469,52 @@ export default {
 			}
 			
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
+				await axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
+					.then((response) => {
+						this.row.id = response.data.data.id
+						if (this.selectedcategory) {
+							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
+							this.updateCategories(selectedCat)
+						} else {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+							this.loadingcreate = false
+						}
 					})
 					.catch(e => {
 						this.createerrormsg = e.message
 						this.createerror = true
 						this.createwithsuccess = false
+						this.loadingcreate = false
 					})
-					.finally(() => this.loadingcreate = false)
 			} else {
 				delete this.row.fields
 
 				axios.patch(this.$config.BACKEND_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
 					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
+						if (this.oldcategory && this.oldcategory != this.selectedcategory) {
+							var oldSelectedCat = this.allcategories.find(cat => cat.id === this.oldcategory)
+							this.updateCategories(oldSelectedCat, true)
+						}
+
+						if (this.selectedcategory && this.oldcategory != this.selectedcategory) {
+							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
+							this.updateCategories(selectedCat)
+						} else {
+							this.createwithsuccess = true
+							this.createerrormsg = null
+							this.createerror = false
+							this.loadingcreate = false
+						}
 					})
 					.catch(e => {
 						this.createerrormsg = e.message
 						this.createerror = true
 						this.createwithsuccess = false
+						this.loadingcreate = false
 					})
-					.finally(() => this.loadingcreate = false)
-			}			
+			}
 		}
 	}
 }
