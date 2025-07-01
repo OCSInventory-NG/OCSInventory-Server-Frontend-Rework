@@ -108,7 +108,6 @@
 								<template #search="{attributes, events}">
 									<input
 										class="vs__search"
-										:required="!row.retrieval_output"
 										v-bind="attributes"
 										v-on="events"
 									>
