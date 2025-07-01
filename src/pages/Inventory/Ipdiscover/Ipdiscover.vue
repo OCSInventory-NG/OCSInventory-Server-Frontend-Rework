@@ -46,6 +46,7 @@
 										:candelete="candelete"
 										:canedit="canedit"
 										:canaccesschild="true"
+										:hiddenfields="hiddenfields"
 										editcomponent="NetworkModal"
 										translationkey="network."
 										@reloadDatatable="reloadDatatable"
@@ -76,6 +77,7 @@ export default {
 			canedit: false,
 			candelete: false,
 			canviewnetdevice: false,
+			hiddenfields: ["id"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
