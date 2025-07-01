@@ -12,6 +12,7 @@
 					<thead>
 						<tr>
 							<th>{{ $t('user.name') }}</th>
+							<th>{{ $t('template.category') }}</th>
 							<th>{{ $t('template.retrieval_method') }}</th>
 							<th v-if="routetype != 'snmp'">
 								{{ $t('template.retrieval_output') }}
@@ -30,6 +31,7 @@
 					<tbody>
 						<tr>
 							<td>{{ rowsection.name }}</td>
+							<td>{{ selectedcategory }}</td>
 							<td>{{ $t("template."+rowsection.retrieval_method) }}</td>
 							<td v-if="routetype != 'snmp'">
 								{{ $t("template."+rowsection.retrieval_output) }}
@@ -135,7 +137,8 @@ export default {
 			errormsg: null,
 			rowheader: [],
 			rowdata: [],
-			rowsection: [], 
+			rowsection: [],
+			selectedcategory: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -146,6 +149,7 @@ export default {
 		this.rowsection = this.section
 		await this.getHeader()
 		await this.getFields()
+		await this.getCategories()
 		this.loadingsection = false
 	},
 	methods: {
@@ -179,7 +183,25 @@ export default {
 				field.options = options.trim()
 			}
 			this.rowdata = this.rowsection.fields
-			this.loading = false
+		},
+		async getCategories() {
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
+				.then(response => {
+					for (const category of response.data) {
+						if (category.inventory_sections.includes(this.rowsection.id)) {
+							this.selectedcategory = category.name
+						}
+					}
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
+				.finally(() => {
+					this.loading = false
+					this.loadingsection = false
+				})
+
 		},
 		// If new section
 		async reloadTemplate() {
@@ -194,12 +216,12 @@ export default {
 					this.rowsection = response.data
 					this.errormsg = null
 					this.errored = false
+					this.getCategories()
 				})
 				.catch(e => {
 					this.errormsg = e.message
 					this.errored = true
 				})
-				.finally(() => { this.loadingsection = false })
 		},
 		async reloadDatatable() {
 			this.loading = true
