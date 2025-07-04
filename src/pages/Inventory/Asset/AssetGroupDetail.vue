@@ -140,6 +140,7 @@
 											:removefromgroup="true"
 											:assetgroupid="id"
 											:assets="rowdata"
+											:hiddenfields="hiddenfields"
 											title="asset"
 											translationkey="inventory."
 											@reloadDatatable="reloadDatatable()"
@@ -194,6 +195,7 @@ export default {
 			candelete: true,
 			reload: false,
 			id: null,
+			hiddenfields: ["id", "uuid", "template", "agent", "is_template_forced"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
