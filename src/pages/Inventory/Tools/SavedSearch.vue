@@ -32,6 +32,7 @@
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								:hiddenfields="hiddenfields"
 								title="search/save"
 								translationkey="search."
 								editcomponent="SaveSearchModal"
@@ -73,6 +74,7 @@ export default {
 			errormsg: null,
 			user: null,
 			groups: [],
+			hiddenfields: ["allow_group_modification"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')

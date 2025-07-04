@@ -100,6 +100,7 @@
 												:rowheader="rowsnmpcommheader"
 												:canedit="can.community.edit"
 												:candelete="can.community.delete"
+												:hiddenfields="hiddenfields"
 												editcomponent="SnmpModal"
 												title="snmp/config"
 												translationkey="network."
@@ -171,6 +172,7 @@
 												:rowheader="rowscannerheader"
 												:canedit="can.scanner.edit"
 												:candelete="can.scanner.delete"
+												:hiddenfields="hiddenscannerfields"
 												editcomponent="SnmpScannerModal"
 												title="snmp/scanner"
 												translationkey="network."
@@ -243,6 +245,11 @@ export default {
 			rowtemplatedata: [],
 			rowscannerheader: [],
 			rowscannerdata: [],
+			hiddenfields: [
+				"auth_level", "password", "auth_protocol",
+				"priv_protocol", "priv_password"
+			],
+			hiddenscannerfields: ["last_updated"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
