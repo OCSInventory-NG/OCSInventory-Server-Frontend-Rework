@@ -295,7 +295,7 @@ export default {
 			this.getScheduler(id)
 		},
 		async getScheduler(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

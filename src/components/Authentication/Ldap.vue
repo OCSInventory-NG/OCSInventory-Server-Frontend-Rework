@@ -145,7 +145,7 @@ export default {
 	},
 	methods: {
 		async getLdapConfiguration() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method?name=LDAP", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/?name=LDAP", { headers: this.header })
 				.then(response => {
 					this.ldapdata = response.data
 					this.errormsg = null
@@ -192,7 +192,7 @@ export default {
 			await this.getLdapConfig()
 		},
 		async getLdapConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_config?auth_method="+this.authid, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_config/?auth_method="+this.authid, { headers: this.header })
 				.then(response => {
 					var tmpLdap = response.data
 

@@ -263,7 +263,7 @@ export default {
 	methods: {
 		// Get all config
 		async getConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"config", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"config/", { headers: this.header })
 				.then(response => {
 					for(const config of response.data) {
 						if(config.name != "snmp") {

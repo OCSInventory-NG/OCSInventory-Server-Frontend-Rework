@@ -436,7 +436,7 @@ export default {
 		async getGroups() {
 			this.groups = []
 			for (const group of this.groupids) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -508,7 +508,7 @@ export default {
 				}
 
 				for (const chart of charts.layout) {
-					await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name, { headers: this.header })
+					await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name+"/", { headers: this.header })
 						.then(response => {
 							this.loading = true
 							this.chartData[index].push({
@@ -609,7 +609,7 @@ export default {
 			var chartInfo = this.addchartid.split(";")
 			var index = this.layouts[this.activeLayout].layout.length
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chartInfo[0], { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chartInfo[0]+"/", { headers: this.header })
 				.then(response => {
 					this.chartData[this.activeLayout].push({
 						name: chartInfo[0],

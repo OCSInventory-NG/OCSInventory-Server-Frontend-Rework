@@ -223,7 +223,7 @@ export default {
 				})
 		},
 		async getAssetGroup(reload = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id+"?expand=assets,user,groups",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id+"/?expand=assets,user,groups",
 				{ headers: this.header })
 				.then(response => {
 					this.rowdata = []

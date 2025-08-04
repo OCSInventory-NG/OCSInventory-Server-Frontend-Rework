@@ -213,7 +213,7 @@ export default {
 			this.getPackages(id)
 		},
 		async getPackages(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

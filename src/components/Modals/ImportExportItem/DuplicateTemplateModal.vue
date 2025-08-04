@@ -182,7 +182,7 @@ export default {
 
 			var template = {}
 			
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.selected+"?expand=*",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.selected+"/?expand=*",
 				{ headers: this.header })
 				.then(response => {
 					template = response.data

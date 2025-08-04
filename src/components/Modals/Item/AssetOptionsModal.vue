@@ -200,7 +200,7 @@ export default {
 	methods: {
 		async getTemplate() {
 			this.rowtmp = this.item
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates?os!=SNMP", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?os!=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowdatatmp = []
 					response.data.forEach(template => {

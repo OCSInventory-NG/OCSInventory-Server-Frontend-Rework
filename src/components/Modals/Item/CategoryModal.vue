@@ -220,7 +220,7 @@ export default {
 			this.getCategory(id)
 		},
 		async getCategory(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.errormsg = null

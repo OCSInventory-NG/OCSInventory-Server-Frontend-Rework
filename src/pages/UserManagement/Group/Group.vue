@@ -114,7 +114,7 @@ export default {
 				})
 		},
 		async getPermissions() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions/", { headers: this.header })
 				.then(response => {
 					var array = ["add_", "change_", "delete_", "view_"]
 					var labeltmp = new Set()
