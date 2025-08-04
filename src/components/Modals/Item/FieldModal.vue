@@ -373,7 +373,7 @@ export default {
 			this.getField(id)
 		},
 		async getField(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.options = this.row.options

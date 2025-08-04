@@ -116,7 +116,7 @@ export default {
 		},
 		async getCategories() {
 			this.rowdata = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories?expand=inventory_sections", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections", { headers: this.header })
 				.then(response => {
 					for (const category of response.data) {
 						category.sections = ""
@@ -135,7 +135,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async getTemplates() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
 				.then(response => {
 					for (const template of response.data) {
 						this.templates[template.id] = template.name

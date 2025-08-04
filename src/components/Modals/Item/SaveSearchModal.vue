@@ -357,7 +357,7 @@ export default {
 			this.getSavedSearch(id)
 		},
 		async getSavedSearch(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.savesearch = response.data
 					this.errormsg = null
@@ -440,7 +440,7 @@ export default {
 		async getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,

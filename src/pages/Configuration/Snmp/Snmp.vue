@@ -387,7 +387,7 @@ export default {
 		async getSnmpTemplates() {
 			this.rowtemplatedata = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates?os=SNMP", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?os=SNMP", { headers: this.header })
 				.then(response => {
 					this.rowtemplatedata = response.data
 					this.errormsg = null

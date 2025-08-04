@@ -359,7 +359,7 @@ export default {
 			this.getSnmpConfig(id)
 		},
 		async getSnmpConfig(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/"+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/"+id+"/", { headers: this.header })
 				.then(response => {
 					this.row = response.data
 					this.row.subnets = this.row.subnets.join(",")

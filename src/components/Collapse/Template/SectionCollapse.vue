@@ -210,7 +210,7 @@ export default {
 		// If update section
 		async reloadSection() {
 			this.loadingsection = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+this.rowsection.id+"?expand=fields",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+this.rowsection.id+"/?expand=fields",
 				{ headers: this.header })
 				.then(response => {
 					this.rowsection = response.data

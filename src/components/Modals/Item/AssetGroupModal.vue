@@ -330,7 +330,7 @@ export default {
 			this.loading = true
 			this.assetgroupmodal = true
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id+"/", { headers: this.header })
 				.then(response => {
 					delete response.data.search
 					delete response.data.assets
@@ -347,7 +347,7 @@ export default {
 				})
 		},
 		async getUserName() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user+"/", { headers: this.header })
 				.then(response => {
 					this.user = response.data
 					if(response.data.first_name != "") {
@@ -384,7 +384,7 @@ export default {
 		async getGroups(groups) {
 			this.groups = []
 			for (const group of groups) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
 					.then(response => {
 						this.groups.push({
 							value: response.data.id,
@@ -421,7 +421,7 @@ export default {
 			this.optgroup = []
 			this.updategroupid = null
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter+"/", { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({

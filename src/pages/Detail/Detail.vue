@@ -239,7 +239,7 @@ export default {
 	},
 	methods: {
 		async getNetdevice() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"?expand=network",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
 				{ headers: this.header })
 				.then(response => {
 					this.device = response.data
@@ -252,7 +252,7 @@ export default {
 				.finally(() => {this.loading = false})
 		},
 		async getInventoryBase() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/", { headers: this.header })
 				.then(response => {
 					this.device = response.data
 					this.deployment.push(response.data)
@@ -263,7 +263,7 @@ export default {
 				})
 		},
 		async getCategories() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories?expand=inventory_sections", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections", { headers: this.header })
 				.then(response => {
 					response.data.sort((a, b) => a.id - b.id);
 					this.categories = []
