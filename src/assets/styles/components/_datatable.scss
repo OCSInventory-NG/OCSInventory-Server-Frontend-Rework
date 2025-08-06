@@ -2,7 +2,12 @@
 //  DATATABLE COMPONENT
 // ===========================================
 
-tbody, td, tfoot, th, thead, tr {
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
   border-color: #f2f3f4;
 }
 
@@ -19,7 +24,8 @@ tbody, td, tfoot, th, thead, tr {
   font-weight: 500;
 }
 
-.active>.page-link, .page-link.active {
+.active>.page-link,
+.page-link.active {
   background-color: $ocs-purple;
   border-color: $ocs-purple;
 }
@@ -43,11 +49,13 @@ tbody, td, tfoot, th, thead, tr {
   max-width: 100px;
 }
 
-.btn-group, .btn-group-vertical {
+.btn-group,
+.btn-group-vertical {
   box-shadow: none;
 }
 
-.markdown>table thead th, .table thead th {
+.markdown>table thead th,
+.table thead th {
   background: #f0f0f0;
 }
 
@@ -59,16 +67,19 @@ tbody, td, tfoot, th, thead, tr {
   .responsive {
     display: block;
 
-    > .col {
+    >.col {
       display: grid;
     }
 
-    > .col-1, > .col-2, .mr-1 {
+    >.col-1,
+    >.col-2,
+    .mr-1 {
       width: 100%;
     }
   }
 
-  .datatable-btn-maxsize, .mr-1 > div {
+  .datatable-btn-maxsize,
+  .mr-1>div {
     max-width: 100%;
     width: 100%;
   }
@@ -78,8 +89,23 @@ tbody, td, tfoot, th, thead, tr {
   }
 }
 
-.visible-select > .dropdown-item.active, .visible-select > .dropdown-item:active {
+.visible-select>.dropdown-item.active,
+.visible-select>.dropdown-item:active {
   background-color: rgba(253, 126, 20, .2);
   color: #fd7e14;
   font-weight: bold;
+}
+
+.loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

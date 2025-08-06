@@ -34,6 +34,7 @@
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'arrows-rotate']"
+								:class="{ 'loading': isReloading }"
 							/>
 						</button>
 					</b-button-group>
@@ -601,7 +602,9 @@ export default {
 			datatypes: [
 				'SELECT',
 				'CHECKBOX'
-			]
+			],
+			// Reload parameter
+			isReloading: false
 		};
 	},
 	computed: {
@@ -790,9 +793,14 @@ export default {
 			this.attributePackage()
 		},
 		reloadDatatable() {
+			this.isReloading = true;
 			this.selectedids = []
 			this.selected = []
 			this.$emit('reloadDatatable')
+
+			setTimeout(() => {
+				this.isReloading = false;
+			}, 3000);
 		},
 		attributePackage() {
 			this.$emit('attributePackage', this.selected)
