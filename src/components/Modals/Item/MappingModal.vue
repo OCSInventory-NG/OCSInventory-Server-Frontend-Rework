@@ -152,7 +152,7 @@ export default {
 			this.getMappingConfig(id)
 		},
 		async getMappingConfig(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping?auth_config="+id, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping/?auth_config="+id, { headers: this.header })
 				.then(response => {
 					this.mapping = response.data
 

@@ -239,7 +239,7 @@ export default {
 		},
 		async getSnmpScanner(id) {
 			this.row = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id+"?expand=configs",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id+"/?expand=configs",
 				{ headers: this.header })
 				.then(response => {
 					this.row = response.data

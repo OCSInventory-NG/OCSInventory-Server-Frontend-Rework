@@ -510,7 +510,7 @@ export default {
 						this.errored = true
 					})
 			} else if (section) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"fields?section="+route, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+route, { headers: this.header })
 					.then(response => {
 						this.loading = true
 
@@ -582,7 +582,7 @@ export default {
 			
 		},
 		async getSections(templateId, masterindex, index, loadingdata = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections?template="+templateId, { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+templateId, { headers: this.header })
 				.then(response => {
 					this.loadingsection = true
 					if(!Array.isArray(this.sectionopt[masterindex])) {

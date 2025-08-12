@@ -101,7 +101,7 @@ export default {
 			this.rowdata = []
 
 			var extendedRoute = "/?expand=network"
-			if(this.$route.params.id) extendedRoute = "?expand=network&network="+this.$route.params.id
+			if(this.$route.params.id) extendedRoute = "/?expand=network&network="+this.$route.params.id
 
 			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
 				.then(response => {

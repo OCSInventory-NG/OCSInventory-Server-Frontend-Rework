@@ -140,7 +140,7 @@ export default {
 				})
 		},
 		async getRuleInfo() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id+"?expand=actions",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id+"/?expand=actions",
 				{ headers: this.header })
 				.then(response => {
 					this.rule = response.data

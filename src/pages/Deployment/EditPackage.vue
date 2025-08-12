@@ -122,7 +122,7 @@ export default {
 				})
 		},
 		async getPackage(reload = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id+"?expand=actions_list",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id+"/?expand=actions_list",
 				{ headers: this.header })
 				.then(response => {
 					if(!reload) {

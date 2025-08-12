@@ -17,7 +17,7 @@ export default {
 		var sso = window.location.search
 
 		if(sso) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"callback/"+sso, { headers: header })
+			axios.get(this.$config.BACKEND_API_ROUTE+"callback"+sso, { headers: header })
 				.then(response => {
 					if(response.data.token_authentication) {
 						localStorage.setItem('token_authentication', response.data.token_authentication)
