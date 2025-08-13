@@ -41,6 +41,15 @@
 										align="right"
 									>
 										<b-button-group class="mr-1">
+											<button 
+												:title="$t('generic.reload')"
+												class="form-control btn datatable-btn"
+												@click="reloadInventory"
+											>
+												<font-awesome-icon 
+													:icon="['fas', 'arrows-rotate']"
+												/>
+											</button>&nbsp;&nbsp;
 											<PackageResultModal
 												v-if="device.osname != 'SNMP'"
 												:items="deployment"

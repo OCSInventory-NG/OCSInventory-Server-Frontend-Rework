@@ -24,6 +24,7 @@
 
 				<!-- Reload datatable -->
 				<div
+					v-if="canrefresh"
 					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
@@ -525,6 +526,7 @@ export default {
 		rowheader: { type: Array, default: null },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
+		canrefresh: { type: Boolean, default: true },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		usecheckbox: { type: Boolean, default: true },
