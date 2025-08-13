@@ -94,20 +94,28 @@ tbody, td, tfoot, th, thead, tr {
 }
 
 .datatable-custom th.sticky-col {
-  position: sticky;
   background-color: #f0f0f0;
+  position: sticky;
   z-index: 4;
 }
+
 .datatable-custom td.sticky-col {
+  background-color: #fff;
   position: sticky;
-  background-color: #ffffff;
   z-index: 5;
 }
 
-.datatable-custom .sticky-col.left  { left: 0; }
-.datatable-custom .sticky-col.right { right: 0; }
+.datatable-custom .sticky-col.left  {
+  left: 0;
+}
 
-.datatable-custom thead th.sticky-col { z-index: 6; }
+.datatable-custom .sticky-col.right {
+  right: 0;
+}
+
+.datatable-custom thead th.sticky-col {
+  z-index: 6;
+}
 
 .datatable-custom .actions-col {
   white-space: nowrap;
