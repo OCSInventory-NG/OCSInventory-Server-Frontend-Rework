@@ -747,7 +747,9 @@ export default {
 			label: this.$t('generic.actions'), 
 			sortable: false ,
 			visible: true,
-			disabled: true
+			disabled: true,
+			thClass: 'sticky-col right actions-col',
+			tdClass: 'sticky-col right actions-col'
 		}
 
 		if(this.canedit == true || this.candelete == true || this.canviewhistory) {

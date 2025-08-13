@@ -83,3 +83,36 @@ tbody, td, tfoot, th, thead, tr {
   color: #fd7e14;
   font-weight: bold;
 }
+
+.datatable-custom .overflow-auto {
+  overflow-x: auto;
+}
+
+.datatable-custom table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.datatable-custom th.sticky-col {
+  position: sticky;
+  background-color: #f0f0f0;
+  z-index: 4;
+}
+.datatable-custom td.sticky-col {
+  position: sticky;
+  background-color: #ffffff;
+  z-index: 5;
+}
+
+.datatable-custom .sticky-col.left  { left: 0; }
+.datatable-custom .sticky-col.right { right: 0; }
+
+.datatable-custom thead th.sticky-col { z-index: 6; }
+
+.datatable-custom .actions-col {
+  white-space: nowrap;
+}
+
+.datatable-custom .selected-col {
+  text-align: center;
+}
