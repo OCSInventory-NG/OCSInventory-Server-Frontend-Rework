@@ -27,6 +27,7 @@
 					:rowheader="rowheader"
 					:title="section.name"
 					:templateid="section.template"
+					:canrefresh="false"
 				/>
 			</div>
 		</section>

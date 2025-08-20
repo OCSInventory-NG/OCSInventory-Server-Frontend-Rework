@@ -24,6 +24,7 @@
 
 				<!-- Reload datatable -->
 				<div
+					v-if="canrefresh"
 					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
@@ -34,6 +35,7 @@
 						>
 							<font-awesome-icon 
 								:icon="['fas', 'arrows-rotate']"
+								:class="{ 'loading': isReloading }"
 							/>
 						</button>
 					</b-button-group>
@@ -524,6 +526,7 @@ export default {
 		rowheader: { type: Array, default: null },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
+		canrefresh: { type: Boolean, default: true },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		usecheckbox: { type: Boolean, default: true },
@@ -601,7 +604,9 @@ export default {
 			datatypes: [
 				'SELECT',
 				'CHECKBOX'
-			]
+			],
+			// Reload parameter
+			isReloading: false
 		};
 	},
 	computed: {
@@ -790,9 +795,14 @@ export default {
 			this.attributePackage()
 		},
 		reloadDatatable() {
+			this.isReloading = true;
 			this.selectedids = []
 			this.selected = []
 			this.$emit('reloadDatatable')
+
+			setTimeout(() => {
+				this.isReloading = false;
+			}, 3000);
 		},
 		attributePackage() {
 			this.$emit('attributePackage', this.selected)
