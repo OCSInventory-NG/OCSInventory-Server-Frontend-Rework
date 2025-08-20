@@ -281,9 +281,14 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.row.subnets != null && this.row.subnets.trim() != "") {
-				this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
-			} else {
+			try {
+				if(this.row.subnets != null && this.row.subnets.trim() != "") {
+					this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
+				} else {
+					this.row.subnets = []
+				}
+			}
+			catch (e) {
 				this.row.subnets = []
 			}
 
