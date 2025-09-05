@@ -32,7 +32,6 @@
 			</button>
 		</div>
 		<b-modal 
-			id="snmpscannermodal" 
 			v-model="snmpscannermodal"
 			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
@@ -279,17 +278,19 @@ export default {
 		},
 		onSubmit(event) {
 			event.preventDefault()
+			this.createerror = false
+			this.createerrormsg = null
 			this.loadingcreate = true
 
-			try {
-				if(this.row.subnets != null && this.row.subnets.trim() != "") {
+			if(!Array.isArray(this.row.subnets)) {
+				if(
+					this.row.subnets != null
+					&& this.row.subnets.trim() != ""
+				) {
 					this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
 				} else {
 					this.row.subnets = []
 				}
-			}
-			catch (e) {
-				this.row.subnets = []
 			}
 
 			if(!this.update) {
