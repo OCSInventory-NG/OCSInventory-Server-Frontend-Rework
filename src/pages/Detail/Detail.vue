@@ -83,6 +83,7 @@
 										v-for="category in categories"
 										:key="category.id"
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
+										title-item-class="ocs-menu-tab"
 										lazy
 										@click="scrollToTop()"
 									>

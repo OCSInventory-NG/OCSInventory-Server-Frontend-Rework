@@ -75,6 +75,7 @@
 										v-for="section in sections"
 										:key="section.id"
 										:title="section.name"
+										title-item-class="ocs-menu-tab"
 										lazy
 									>
 										<SectionCollapse
