@@ -36,6 +36,7 @@
 									v-for="netgroup in netgroups"
 									:key="netgroup.id"
 									:title="netgroup.name"
+									title-item-class="ocs-menu-tab"
 									lazy
 								>
 									<Datatable
