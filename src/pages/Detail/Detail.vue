@@ -255,7 +255,11 @@ export default {
 		async getInventoryBase() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/", { headers: this.header })
 				.then(response =>  {
-					return axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+response.data.template+"/", { headers: this.header })
+					return axios.get(
+						this.$config.BACKEND_API_ROUTE + "templates/" +
+						response.data.template + "/",
+						{ headers: this.header }
+					)
 						.then(templateResponse => {
 							response.data.template = templateResponse.data.name
 							return response
