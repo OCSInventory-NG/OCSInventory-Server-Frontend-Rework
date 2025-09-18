@@ -242,7 +242,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
+							{{ (!update) ? $t('generic.add') : $t('generic.save')}}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
@@ -470,7 +470,7 @@ export default {
 			if(!this.update) {
 				await axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
 					.then((response) => {
-						this.row.id = response.data.data.id
+						this.row.id = response.data.id
 						if (this.selectedcategory) {
 							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
 							this.updateCategories(selectedCat)
