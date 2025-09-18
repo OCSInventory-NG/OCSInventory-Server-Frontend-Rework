@@ -242,7 +242,7 @@
 							type="submit"
 							variant="success"
 						>
-							{{ (!update) ? $t('generic.add') : $t('generic.save')}}
+							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
 					</b-col>
 					<b-col align-self="end" />
