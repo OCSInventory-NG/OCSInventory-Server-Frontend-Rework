@@ -470,7 +470,7 @@ export default {
 			if(!this.update) {
 				await axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
 					.then((response) => {
-						this.row.id = response.data.id
+						this.row.id = response.data.data.id
 						if (this.selectedcategory) {
 							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
 							this.updateCategories(selectedCat)
