@@ -171,18 +171,27 @@ export default {
 				})
 		},
 		async getFields() {
-			for (const field of this.rowsection.fields) {
-				var options = ""
-				if (field.options && typeof field.options === 'object') {
-					for (const [key, value] of Object.entries(field.options)) {
-						options += key + " : " + value + "\n"
+			this.rowdata = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+this.rowsection.id,
+				{ headers: this.header })
+				.then(response => {
+					for (const field of response.data) {
+						var options = ""
+						if (field.options && typeof field.options === 'object') {
+							for (const [key, value] of Object.entries(field.options)) {
+								options += key + " : " + value + "\n"
+							}
+						} else if (field.options != null) {
+							options = field.options
+						}
+						field.options = options.trim()
+						this.rowdata.push(field)
 					}
-				} else if (field.options != null) {
-					options = field.options
-				}
-				field.options = options.trim()
-			}
-			this.rowdata = this.rowsection.fields
+				})
+				.catch(e => {
+					this.errormsg = e.message
+					this.errored = true
+				})
 		},
 		async getCategories() {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
@@ -201,7 +210,6 @@ export default {
 					this.loading = false
 					this.loadingsection = false
 				})
-
 		},
 		// If new section
 		async reloadTemplate() {

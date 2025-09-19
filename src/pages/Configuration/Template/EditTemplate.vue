@@ -151,7 +151,7 @@ export default {
 				})
 		},
 		async getSections() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+this.id+"&expand=fields",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+this.id,
 				{ headers: this.header })
 				.then(response => {
 					this.sections = response.data
