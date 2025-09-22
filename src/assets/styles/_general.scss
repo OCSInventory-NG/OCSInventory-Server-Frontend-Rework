@@ -47,3 +47,12 @@ h4 {
     max-width: 1550px;
   }
 }
+
+.table-vcenter th{
+  min-width: 150px;
+}
+
+.table-vcenter td{
+  width: 150px;
+  overflow-wrap: anywhere;
+}
