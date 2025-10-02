@@ -379,18 +379,6 @@ export default {
 			}
 			this.row.template = this.template
 			this.loading = false
-		} else {
-			this.row = this.rowsectiondata
-			this.options = this.row.options
-			this.row.id = this.id
-			this.row.template = this.template
-
-			if(this.options == null && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
-				this.options = {}
-				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
-					this.options[element.id] = element.default
-				})
-			}
 		}
 	},
 	methods: {
@@ -399,6 +387,12 @@ export default {
 			this.sectionmodal = true
 			this.selectedcategory = null
 			this.oldcategory = null
+
+			if (this.update && this.rowsectiondata) {
+				this.row = JSON.parse(JSON.stringify(this.rowsectiondata))
+				this.options = JSON.parse(JSON.stringify(this.row.options))
+			}
+
 			await this.getCategories()
 		},
 		async getCategories() {
