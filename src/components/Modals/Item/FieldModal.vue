@@ -390,6 +390,13 @@ export default {
 			event.preventDefault()
 			this.loadingcreate = true
 
+			if (!this.row.override_target || this.row.override_target === "false") {
+				this.row.retrieval_method = null
+				this.row.new_target = null
+				this.row.retrieval_output = null
+				this.row.options = {}
+			}
+
 			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
 				this.row.options = {}
 				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {

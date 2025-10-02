@@ -379,18 +379,6 @@ export default {
 			}
 			this.row.template = this.template
 			this.loading = false
-		} else {
-			this.row = this.rowsectiondata
-			this.options = this.row.options
-			this.row.id = this.id
-			this.row.template = this.template
-
-			if(this.options == null && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
-				this.options = {}
-				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
-					this.options[element.id] = element.default
-				})
-			}
 		}
 	},
 	methods: {
@@ -399,6 +387,12 @@ export default {
 			this.sectionmodal = true
 			this.selectedcategory = null
 			this.oldcategory = null
+
+			if (this.update && this.rowsectiondata) {
+				this.row = JSON.parse(JSON.stringify(this.rowsectiondata))
+				this.options = JSON.parse(JSON.stringify(this.row.options))
+			}
+
 			await this.getCategories()
 		},
 		async getCategories() {
@@ -470,7 +464,7 @@ export default {
 			if(!this.update) {
 				await axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
 					.then((response) => {
-						this.row.id = response.data.data.id
+						this.row.id = response.data.id
 						if (this.selectedcategory) {
 							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
 							this.updateCategories(selectedCat)

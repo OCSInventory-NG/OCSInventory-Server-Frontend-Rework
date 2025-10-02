@@ -590,7 +590,7 @@
     "submap": "Submap",
     "TBLE": "Table format",
     "target": "Target",
-    "use_index": "Use index",
+    "use_index": "Use first row as header",
     "WIN": "Windows"
   },
   "title": {

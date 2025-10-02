@@ -1,7 +1,7 @@
 <template>
 	<div 
 		id="draggable-component"
-		class="table-responsive"
+		class="table-responsive datatable-custom"
 	>
 		<table class="table table-vcenter table-striped table-hover border">
 			<thead>
@@ -13,7 +13,10 @@
 					>
 						{{ ($te(translationkey+theader)) ? $t(translationkey+theader) : theader }}
 					</th>
-					<th v-if="canedit || candelete">
+					<th
+						v-if="canedit || candelete"
+						class="sticky-col right actions-col"
+					>
 						{{ $t('generic.actions') }}
 					</th>
 				</tr>
@@ -43,7 +46,7 @@
 						</td>
 						<td 
 							v-if="candelete || canedit"
-							class="section-table-btn"
+							class="section-table-btn sticky-col right actions-col"
 						>
 							<b-button-toolbar>
 								<b-button-group class="mr-1">
