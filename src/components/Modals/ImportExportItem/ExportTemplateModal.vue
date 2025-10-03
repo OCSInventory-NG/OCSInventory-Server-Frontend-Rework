@@ -125,7 +125,7 @@ export default {
 			for (const id of this.templatetoexport) {
 				try {
 					const response = await axios.get(
-						this.$config.BACKEND_API_ROUTE + 'templates/' + id + '?expand=*',
+						this.$config.BACKEND_API_ROUTE + 'templates/' + id + '/export/',
 						{ headers: this.header }
 					)
 
