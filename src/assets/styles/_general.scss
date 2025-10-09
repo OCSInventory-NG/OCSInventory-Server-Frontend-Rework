@@ -50,5 +50,6 @@ h4 {
 }
 
 .table-vcenter td {
-  overflow-wrap: anywhere;
+  max-width: 260px;
+  overflow-wrap: break-word;
 }
