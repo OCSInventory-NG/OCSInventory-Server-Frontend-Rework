@@ -162,9 +162,10 @@ export default {
 			createwithsuccess: false,
 			templatemodal: false,
 			options: [
-				{ value: 'WIN', text: 'Windows' },
-				{ value: 'LIN', text: 'Linux' },
-				{ value: 'MAC', text: 'MacOS' }
+				{ value: 'WIN', text: this.$t('template.WIN') },
+				{ value: 'DEB', text: this.$t('template.LIN')+' ('+this.$t('template.DEB')+')' },
+				{ value: 'RHEL', text: this.$t('template.LIN')+' ('+this.$t('template.RHEL')+')' },
+				{ value: 'MAC', text: this.$t('template.MAC') }
 			],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
