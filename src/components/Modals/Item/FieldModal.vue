@@ -310,21 +310,12 @@ export default {
 			outputoptions: [
 				{ value: 'PTXT', text: this.$t('template.PTXT') },
 				{ value: 'JSON', text: this.$t('template.JSON') },
-				{ value: 'TBLE', text: this.$t('template.TBLE') },
 				{ value: 'REGX', text: this.$t('template.REGX') },
 				{ value: 'GREP', text: this.$t('template.GREP') }
 			],
 			outputoptionoptions: {
-				"TBLE": [
-					{ id: "use_index", type: "checkbox", default: false },
-					{ id: "remove_line", type: "text", default: null }
-				],
 				"JSON": [
 					{ id: "submap", type: "text", default: null }
-				],
-				"REGX": [
-					{ id: "multiple", type: "checkbox", default: false },
-					{ id: "separator", type: "text", default: null },
 				]
 			},
 			header: {
