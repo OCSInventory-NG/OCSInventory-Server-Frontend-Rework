@@ -40,6 +40,7 @@
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								:duplicateitem="duplicateitem"
 								editcomponent="GroupModal"
 								title="groups"
 								translationkey="group."
@@ -64,6 +65,7 @@ export default {
 			canedit: false,
 			candelete: false,
 			canview: false,
+			duplicateitem: false,
 			rowdata: [],
 			rowheader: [],
 			permissions: [],
@@ -82,6 +84,7 @@ export default {
 			this.canview = true
 			if(localStorage.getItem('permissions').split(",").includes("auth_add_group")) {
 				this.canadd = true
+				this.duplicateitem = true
 			}
 			if(localStorage.getItem('permissions').split(",").includes("auth_change_group")) {
 				this.canedit = true

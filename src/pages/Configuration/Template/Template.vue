@@ -41,7 +41,7 @@
 								:canexport="false"
 								:importtemplate="importtemplate"
 								:exporttemplate="exporttemplate"
-								:duplicatetemplate="duplicatetemplate"
+								:duplicateitem="duplicateitem"
 								title="templates"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
@@ -70,7 +70,7 @@ export default {
 			canview: false,
 			exporttemplate: false,
 			importtemplate: false,
-			duplicatetemplate: false,
+			duplicateitem: false,
 			rowdata: [],
 			rowheader: [],
 			header: {
@@ -86,7 +86,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true
-				this.duplicatetemplate = true
+				this.duplicateitem = true
 			}
 			if(localStorage.getItem('permissions').split(",").includes("template_change_template")) {
 				this.canedit = true

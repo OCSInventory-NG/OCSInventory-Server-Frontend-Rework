@@ -4,7 +4,7 @@ import AutomationModal from '@/components/Modals/Item/AutomationModal.vue'
 import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
-import DuplicateTemplateModal from '@/components/Modals/ImportExportItem/DuplicateTemplateModal.vue'
+import DuplicateModal from '@/components/Modals/ImportExportItem/DuplicateModal.vue'
 import ExportTemplateModal from '@/components/Modals/ImportExportItem/ExportTemplateModal.vue'
 import FieldModal from '@/components/Modals/Item/FieldModal.vue'
 import GroupModal from '@/components/Modals/Item/GroupModal.vue'
@@ -29,7 +29,7 @@ const GlobalComponents = {
 		Vue.component('CategoryModal', CategoryModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
-		Vue.component('DuplicateTemplateModal', DuplicateTemplateModal)
+		Vue.component('DuplicateModal', DuplicateModal)
 		Vue.component('ExportTemplateModal', ExportTemplateModal)
 		Vue.component('FieldModal', FieldModal)
 		Vue.component('GroupModal', GroupModal)
