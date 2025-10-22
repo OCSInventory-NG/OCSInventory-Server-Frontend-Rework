@@ -102,27 +102,41 @@ export default {
 				})
 		},
 		async getAssets() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true", { headers: this.header })
-				.then(response => {
-					response.data.forEach(data => {
-						if(data.accountinfo) {
-							Object.keys(data.accountinfo).forEach(accountinfo => {
-								if(!this.rowheader.includes("Account info : " + accountinfo)) {
-									this.rowheader.push("Account info : " + accountinfo)
-								}
-								data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
-							})
-						}
-					})
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
+			try {
+				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true", { headers: this.header });
+				const templateResponse = await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header });
+
+				const templates = {};
+				templateResponse.data.forEach(template => {
+					templates[template.id] = template.name;
+				});
+
+				response.data.forEach(asset => {
+					if (asset.template && templates[asset.template]) {
+						asset.template = templates[asset.template];
+					}
+				});
+
+				response.data.forEach(data => {
+					if(data.accountinfo) {
+						Object.keys(data.accountinfo).forEach(accountinfo => {
+							if(!this.rowheader.includes("Account info : " + accountinfo)) {
+								this.rowheader.push("Account info : " + accountinfo)
+							}
+							data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
+						})
+					}
 				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+
+				this.rowdata = response.data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
 		async reloadDatatable() {
 			this.loading = true
