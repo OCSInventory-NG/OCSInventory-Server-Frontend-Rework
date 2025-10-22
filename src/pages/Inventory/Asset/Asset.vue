@@ -103,19 +103,25 @@ export default {
 		},
 		async getAssets() {
 			try {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true", { headers: this.header });
-				const templateResponse = await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header });
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true",
+					{ headers: this.header }
+				)
+				const templateResponse = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"templates/",
+					{ headers: this.header }
+				)
 
-				const templates = {};
+				const templates = {}
 				templateResponse.data.forEach(template => {
-					templates[template.id] = template.name;
-				});
+					templates[template.id] = template.name
+				})
 
 				response.data.forEach(asset => {
 					if (asset.template && templates[asset.template]) {
-						asset.template = templates[asset.template];
+						asset.template = templates[asset.template]
 					}
-				});
+				})
 
 				response.data.forEach(data => {
 					if(data.accountinfo) {

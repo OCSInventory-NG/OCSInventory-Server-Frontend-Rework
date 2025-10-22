@@ -243,8 +243,10 @@ export default {
 	methods: {
 		async getNetdevice() {
 			try {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
-					{ headers: this.header });
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
+					{ headers: this.header }
+				)
 				this.device = response.data
 				this.device.network = this.device.network.name
 			} catch (e) {
@@ -256,7 +258,10 @@ export default {
 		},
 		async getInventoryBase() {
 			try {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/", { headers: this.header })
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/",
+					{ headers: this.header }
+				)
 				const templateResponse = await axios.get(
 					this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
 					{ headers: this.header }
@@ -272,7 +277,10 @@ export default {
 		},
 		async getCategories() {
 			try {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections", { headers: this.header })
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections",
+					{ headers: this.header }
+				)
 				response.data.sort((a, b) => a.id - b.id);
 				this.categories = []
 				for (const category of response.data) {
@@ -298,8 +306,10 @@ export default {
 		},
 		async getInventoryCollection() {
 			try {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
-					{ headers: this.header })
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
+					{ headers: this.header }
+				)
 				this.sections = []
 				for (const inventory of response.data) {
 					if (!this.sections[inventory.template_section]) {
