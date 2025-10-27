@@ -43,6 +43,7 @@
 								:exporttemplate="exporttemplate"
 								:duplicateitem="duplicateitem"
 								title="templates"
+								titlevalue="template"
 								translationkey="template."
 								@reloadDatatable="reloadDatatable"
 							/>
