@@ -74,6 +74,7 @@
 									<div class="col-1" />
 								</b-row>
 								<b-tabs
+									v-model="activetab"
 									content-class="col-10 sticky-tabs"
 									pills
 									card
@@ -215,6 +216,7 @@ export default {
 			device: {},
 			categories: [],
 			sections: [],
+			activetab: 0,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -314,10 +316,14 @@ export default {
 			this.reload = true
 		},
 		async reloadInventory() {
+			const currentTab = this.activetab
 			this.loading = true
 			await this.getInventoryBase()
 			await this.getCategories()
 			await this.getInventoryCollection()
+			this.$nextTick(() => {
+				this.activeTab = currentTab
+			})
 		},
 		endReloadDeployment() {
 			this.reload = false
