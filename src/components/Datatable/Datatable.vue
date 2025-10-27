@@ -93,6 +93,7 @@
 				>
 					<DuplicateModal
 						:route="title"
+						:title="titlevalue"
 						@reloadDatatable="reloadDatatable"
 					/>
 				</div>

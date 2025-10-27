@@ -60,7 +60,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.template')" 
+							:label="$t('title.'+title)" 
 							label-for="template"
 						>
 							<v-select
@@ -121,7 +121,8 @@ import axios from 'axios'
 export default {
 	name: 'DuplicateModal',
 	props: {
-		route: { type: String, default: 'templates' }
+		route: { type: String, default: 'templates' },
+		title: { type: String, default: 'template' }
 	},
 	data() {
 		return {

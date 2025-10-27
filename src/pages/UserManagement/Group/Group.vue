@@ -43,6 +43,7 @@
 								:duplicateitem="duplicateitem"
 								editcomponent="GroupModal"
 								title="groups"
+								titlevalue="group"
 								translationkey="group."
 								@reloadDatatable="reloadDatatable"
 							/>
