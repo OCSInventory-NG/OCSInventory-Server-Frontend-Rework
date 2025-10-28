@@ -86,12 +86,14 @@
 					/>
 				</div>
 
-				<!-- Duplicate template -->
+				<!-- Duplicate item -->
 				<div
-					v-if="duplicatetemplate"
+					v-if="duplicateitem"
 					class="col-1 ocs-col-datatable"
 				>
-					<DuplicateTemplateModal
+					<DuplicateModal
+						:route="title"
+						:title="titlevalue"
 						@reloadDatatable="reloadDatatable"
 					/>
 				</div>
@@ -535,7 +537,7 @@ export default {
 		caneditsnmptemplate: { type: Boolean, default: false },
 		importtemplate: { type: Boolean, default: false },
 		exporttemplate: { type: Boolean, default: false },
-		duplicatetemplate: { type: Boolean, default: false },
+		duplicateitem: { type: Boolean, default: false },
 		caneditpackage: { type: Boolean, default: false },
 		canaddvalue: { type: Boolean, default: false },
 		canviewaction: { type: Boolean, default: false },

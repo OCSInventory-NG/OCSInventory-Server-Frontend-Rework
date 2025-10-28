@@ -1,7 +1,7 @@
 <template>
-	<div id="duplicate-template-modal">
+	<div id="duplicate-modal">
 		<b-button 
-			:title="$t('template.duplicate_template')"
+			:title="$t('generic.duplicate')"
 			variant="bg-light"
 			class="form-control btn datatable-btn datatable-btn-maxsize"
 			@click="refresh()"
@@ -13,15 +13,15 @@
 
 		<b-modal 
 			id="export-template" 
-			v-model="duplicatetemplate"
-			:title="$t('template.duplicate_template')"
+			v-model="duplicateitem"
+			:title="$t('generic.duplicate')"
 			hide-footer
 			size="md"
 			modal-class="custom-modal modal-blur"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('template.duplicate_template') }}
+					{{ $t('generic.duplicate') }}
 					<b-spinner 
 						v-if="loadingduplicate"
 						variant="success"
@@ -60,13 +60,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('title.template')" 
+							:label="$t('title.'+title)" 
 							label-for="template"
 						>
 							<v-select
 								id="template"
 								v-model="selected" 
-								:options="templateopt" 
+								:options="itemopt" 
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
@@ -119,17 +119,21 @@
 import axios from 'axios'
 
 export default {
-	name: 'DuplicateTemplateModal',
+	name: 'DuplicateModal',
+	props: {
+		route: { type: String, default: 'templates' },
+		title: { type: String, default: 'template' }
+	},
 	data() {
 		return {
 			errormsg: null,
 			errored: false,
 			loading: true,
-			duplicatetemplate: false,
+			duplicateitem: false,
 			loadingduplicate: false,
 			duplicatewithsuccess: false,
 			duplicatename: null,
-			templateopt: [],
+			itemopt: [],
 			selected: null,
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
@@ -141,7 +145,7 @@ export default {
 		duplicatewithsuccess: function() {
 			setTimeout(() => {
 				this.duplicatewithsuccess = false
-				this.duplicatetemplate = false
+				this.duplicateitem = false
 				this.duplicatename = null
 				this.$emit('reloadDatatable')
 			}, 500)
@@ -150,20 +154,20 @@ export default {
 	methods: {
 		async refresh() {
 			this.loading = true
-			this.duplicatetemplate = true
+			this.duplicateitem = true
 			this.selected = null
 			this.duplicatename = null
-			await this.getTemplate()
+			await this.getItem()
 		},
-		async getTemplate() {
-			this.templateopt = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
+		async getItem() {
+			this.itemopt = []
+			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/", { headers: this.header })
 				.then(response => {
-					for (const temp of response.data) {
-						if(temp.os != "SNMP") {
-							this.templateopt.push({
-								value: temp.id,
-								text: temp.name
+					for (const item of response.data) {
+						if(!item.os || (item.os && item.os != "SNMP")) {
+							this.itemopt.push({
+								value: item.id,
+								text: item.name
 							})
 						}
 					}
@@ -180,14 +184,16 @@ export default {
 			event.preventDefault()
 			this.loadingduplicate = true
 
-			var template = {}
+			var item = {}
 			
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.selected+"/?expand=*",
+			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/"+this.selected+"/?expand=*",
 				{ headers: this.header })
 				.then(response => {
-					template = response.data
-					template.name = this.duplicatename
-					template.is_protected = false
+					item = response.data
+					item.name = this.duplicatename
+					if (item.is_protected) {
+						item.is_protected = false
+					}
 					this.errored = false
 					this.errormsg = null
 				})
@@ -196,8 +202,8 @@ export default {
 					this.errored = true
 				})
 
-			if(template) {
-				await axios.post(this.$config.BACKEND_API_ROUTE+"templates/", template, { headers: this.header })
+			if(item) {
+				await axios.post(this.$config.BACKEND_API_ROUTE+this.route+"/", item, { headers: this.header })
 					.then(() => {
 						this.errored = false
 						this.errormsg = null
