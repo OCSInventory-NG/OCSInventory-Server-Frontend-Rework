@@ -94,11 +94,13 @@
 													:key="key"
 													class="datagrid-item"
 												>
-													<div class="datagrid-title">
-														{{ $t(translationkey+key) }}
-													</div>
-													<div class="datagrid-content">
-														{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
+													<div v-if="key != 'templateid'">
+														<div class="datagrid-title">
+															{{ $t(translationkey+key) }}
+														</div>
+														<div class="datagrid-content">
+															{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
+														</div>
 													</div>
 												</div>
 											</div><br><br>
@@ -127,7 +129,7 @@
 										<div
 											v-if="category.inventory_sections
 												&& category.inventory_sections.some(
-													section => section.template == device.template
+													section => section.template == device.templateid
 												)"
 										>
 											<div
@@ -135,7 +137,7 @@
 												:key="section.id"
 											>
 												<Inventory
-													v-if="section.template == device.template"
+													v-if="section.template == device.templateid"
 													:section="section"
 													:inventory="sections[section.id]"
 												/>
@@ -240,75 +242,88 @@ export default {
 	},
 	methods: {
 		async getNetdevice() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
-				{ headers: this.header })
-				.then(response => {
-					this.device = response.data
-					this.device.network = this.device.network.name
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-				.finally(() => {this.loading = false})
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
+					{ headers: this.header }
+				)
+				this.device = response.data
+				this.device.network = this.device.network.name
+			} catch (e) {
+				this.errormsg = e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
 		async getInventoryBase() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/", { headers: this.header })
-				.then(response => {
-					this.device = response.data
-					this.deployment.push(response.data)
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/",
+					{ headers: this.header }
+				)
+				const templateResponse = await axios.get(
+					this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
+					{ headers: this.header }
+				)
+				response.data.templateid = response.data.template
+				response.data.template = templateResponse.data.name
+				this.device = response.data
+				this.deployment.push(response.data)
+			} catch (e) {
+				this.errormsg = e.message
+				this.errored = true
+			}
 		},
 		async getCategories() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections", { headers: this.header })
-				.then(response => {
-					response.data.sort((a, b) => a.id - b.id);
-					this.categories = []
-					for (const category of response.data) {
-						var allReadyPush = false
-						if (category.is_protected) {
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections",
+					{ headers: this.header }
+				)
+				response.data.sort((a, b) => a.id - b.id);
+				this.categories = []
+				for (const category of response.data) {
+					var allReadyPush = false
+					if (category.is_protected) {
+						this.categories.push(category)
+						allReadyPush = true
+					}
+
+					Object.keys(category.inventory_sections).forEach(item => {
+						var section = category.inventory_sections[item]
+
+						if (!allReadyPush && section.template == this.device.templateid) {
 							this.categories.push(category)
 							allReadyPush = true
 						}
-
-						Object.keys(category.inventory_sections).forEach(item => {
-							this.loading = true
-							var section = category.inventory_sections[item]
-
-							if (!allReadyPush && section.template == this.device.template) {
-								this.categories.push(category)
-								allReadyPush = true
-							}
-						})
-					}
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
+					})
+				}
+			} catch (e) {
+				this.errormsg = e.message
+				this.errored = true
+			}
 		},
 		async getInventoryCollection() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
-				{ headers: this.header })
-				.then(response => {
-					this.sections = []
-					for (const inventory of response.data) {
-						if (!this.sections[inventory.template_section]) {
-							this.sections[inventory.template_section] = []
-						}
-
-						this.sections[inventory.template_section].push(inventory.fields)
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
+					{ headers: this.header }
+				)
+				this.sections = []
+				for (const inventory of response.data) {
+					if (!this.sections[inventory.template_section]) {
+						this.sections[inventory.template_section] = []
 					}
-				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-				.finally(() => {this.loading = false})
+
+					this.sections[inventory.template_section].push(inventory.fields)
+				}
+			} catch (e) {
+				this.errormsg = e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
 		reloadDeployment() {
 			this.reload = true
