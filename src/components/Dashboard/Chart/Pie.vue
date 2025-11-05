@@ -67,6 +67,9 @@ export default {
 	},
 	async mounted() {
 		this.chartOptions.labels = this.options["labels"]
+		if(this.options["colors"]) {
+			this.chartOptions.colors = this.options["colors"]
+		}
 	},
 	methods: {
 		removeItem() {
