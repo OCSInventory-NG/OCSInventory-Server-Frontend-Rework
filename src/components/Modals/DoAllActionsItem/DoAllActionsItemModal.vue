@@ -85,9 +85,9 @@
 								</b-button>
 							</b-form-group>
 						</b-col>
-					<b-col
-						cols="2"
-					>
+						<b-col
+							cols="2"
+						>
 							<b-form-group>
 								<b-button
 									:title="$t(translationkey+titlevalue)"
@@ -165,15 +165,6 @@ export default {
 			}
 		}
 	},
-		created() {
-			this.datavalues = this.datavalues.map(v => ({
-				...v,
-				_localId: v._localId || (
-					Date.now().toString(36)+
-					Math.random().toString(36).slice(2)
-				)
-			}))
-	},
 	computed: {
 		currentError() {
 			return this.submitErrorMsg || this.loadErrorMsg || this.updateErrorMsg || this.deleteErrorMsg
@@ -187,6 +178,15 @@ export default {
 				this.$emit('reloadDatatable')
 			}, 500)
 		}
+	},
+	created() {
+		this.datavalues = this.datavalues.map(v => ({
+			...v,
+			_localId: v._localId || (
+				Date.now().toString(36)+
+					Math.random().toString(36).slice(2)
+			)
+		}))
 	},
 	methods: {
 		// Submit dynamic datas
