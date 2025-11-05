@@ -85,7 +85,7 @@
 								</b-button>
 							</b-form-group>
 						</b-col>
-					<b-col 
+					<b-col
 						cols="2"
 					>
 							<b-form-group>
