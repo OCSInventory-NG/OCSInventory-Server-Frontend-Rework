@@ -421,7 +421,7 @@ export default {
 			this.optgroup = []
 			this.updategroupid = null
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter+"/", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter, { headers: this.header })
 				.then(response => {
 					for (const assetgroup of response.data) {
 						this.optgroup.push({
