@@ -88,12 +88,12 @@
 									<div v-if="authmenu.value == 'LDAP'">
 										<Ldap />
 									</div>
-									<!-- CAS -->
-									<div v-if="authmenu.value == 'CAS'">
-										<Cas />
-									</div>
 									<!-- OIDC -->
 									<div v-if="authmenu.value == 'OIDC'">
+										<Cas />
+									</div>
+									<!-- CAS -->
+									<div v-if="authmenu.value == 'CAS'">
 										<Oidc />
 									</div>
 								</b-tab>
@@ -129,8 +129,8 @@ export default {
 			authmenus: [
 				{ value: "global", text: this.$t("authentication.global"), enabled: true },
 				{ value: "LDAP", text: this.$t("authentication.LDAP"), enabled: false },
-				{ value: "CAS", text: this.$t("authentication.CAS"), enabled: false },
 				{ value: "OIDC", text: this.$t("authentication.OIDC"), enabled: false },
+				{ value: "CAS", text: this.$t("authentication.CAS"), enabled: false },
 			]
 		}
 	},
