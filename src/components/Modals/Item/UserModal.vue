@@ -178,10 +178,12 @@
 				</b-row>
 				<b-row>
 					<b-col>
-						<b-form-group 
-							:label="$t('message.superuser_disclaimer')" 
-							label-for="is_superuser"
-						>
+						<Alert 
+							:message="$t('message.superuser_disclaimer')" 
+							variant="warning"
+							:cols="false"
+						/>
+						<b-form-group>
 							<b-form-checkbox
 								id="is_superuser"
 								v-model="row.is_superuser"
