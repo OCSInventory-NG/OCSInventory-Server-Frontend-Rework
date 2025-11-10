@@ -161,7 +161,8 @@ export default {
 			loading: true,
 			resultcount: {
 				options: {
-					labels: []
+					labels: [],
+					colors: []
 				},
 				series: []
 			},
@@ -278,6 +279,11 @@ export default {
 					this.resultcount.options.labels.push(this.$t("deployment.notified"))
 					this.resultcount.options.labels.push(this.$t("deployment.success"))
 					this.resultcount.options.labels.push(this.$t("deployment.error"))
+
+					this.resultcount.options.colors.push("#3B82F6")
+					this.resultcount.options.colors.push("#F97316")
+					this.resultcount.options.colors.push("#22C55E")
+					this.resultcount.options.colors.push("#EF4444")
 
 					this.resultcount.series.push(this.count.waiting)
 					this.resultcount.series.push(this.count.notified)
