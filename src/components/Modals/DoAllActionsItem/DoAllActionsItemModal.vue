@@ -31,7 +31,7 @@
 						color="green"
 					/>
 					<font-awesome-icon 
-						v-if="errored"
+						v-if="currentError"
 						:icon="['fas', 'xmark']"
 						color="red"
 					/>
@@ -52,13 +52,13 @@
 				@submit="onSubmit"
 			>
 				<Alert 
-					v-if="errored"
-					:message="errormsg" 
+					v-if="currentError"
+					:message="currentError" 
 					variant="danger"
 				/>
 				<div
 					v-for="(input, index) in datavalues"
-					:key="`valueInput-${index}`"
+					:key="input.id || input._localId || 'tmp-'+index"
 					class="modal-allactions"
 				>
 					<b-row>
@@ -67,15 +67,13 @@
 								<b-form-input
 									:id="'value'+index"
 									v-model="input.value"
-									required
 									@change="onUpdate(input)"
 								/>
 							</b-form-group>
 						</b-col>
 						<b-col cols="2">
 							<b-form-group>
-								<b-button 
-									v-b-modal="idModal"
+								<b-button
 									:title="$t(translationkey+titlevalue)"
 									variant="primary"
 									class="d-none d-sm-inline-block form-control"
@@ -87,13 +85,11 @@
 								</b-button>
 							</b-form-group>
 						</b-col>
-						<b-col 
-							v-show="datavalues.length > 1"
+						<b-col
 							cols="2"
 						>
 							<b-form-group>
-								<b-button 
-									v-b-modal="idModal"
+								<b-button
 									:title="$t(translationkey+titlevalue)"
 									variant="danger"
 									class="d-none d-sm-inline-block form-control"
@@ -116,6 +112,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
+							:disabled="loadingcreate"
 						>
 							{{ $t('generic.save') }}
 						</b-button>
@@ -150,8 +147,10 @@ export default {
 			row: {
 				id: this.id
 			},
-			errormsg: null,
-			errored: false,
+			submitErrorMsg: null,
+			loadErrorMsg: null,
+			updateErrorMsg: null,
+			deleteErrorMsg: null,
 			idModal: 'manage-item'+this.id,
 			loading: true,
 			loadingcreate: false,
@@ -166,6 +165,11 @@ export default {
 			}
 		}
 	},
+	computed: {
+		currentError() {
+			return this.submitErrorMsg || this.loadErrorMsg || this.updateErrorMsg || this.deleteErrorMsg
+		}
+	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
@@ -175,92 +179,152 @@ export default {
 			}, 500)
 		}
 	},
+	created() {
+		this.datavalues = this.datavalues.map(v => ({
+			...v,
+			_localId: v._localId || (
+				Date.now().toString(36)+
+					Math.random().toString(36).slice(2)
+			)
+		}))
+	},
 	methods: {
 		// Submit dynamic datas
-		onSubmit(event) {
+		async onSubmit(event) {
 			event.preventDefault()
+			this.submitErrorMsg = null
 			this.loadingcreate = true
 
-			var jsonAdd = []
-
+			const jsonAdd = []
 			this.datavalues.forEach(data => {
-				if(!data.id) {
+				const valueStr = (data && data.value !== undefined && data.value !== null) ? String(data.value).trim() : ''
+				if(!data.id && valueStr !== '') {
 					jsonAdd.push({
 						[this.reconciliationname]: this.id,
-						value: data.value
+						value: valueStr
 					})
 				}
 			})
 
-			if(jsonAdd.length > 0) {
-				axios.post(this.$config.BACKEND_API_ROUTE+this.route+"/", jsonAdd, { headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-					.finally(() => this.loadingcreate = false)
-			}
+			const updates = this.datavalues
+				.filter(data => {
+					const valueStr = (data && data.value !== undefined && data.value !== null) ? String(data.value).trim() : ''
+					return data.id && data._dirty && valueStr !== ''
+				})
+				.map(data => ({ id: data.id, payload: { value: String(data.value).trim() } }))
 
-			if(!this.errored) {
-				this.loadingcreate = false
+			try {
+				const requests = []
+				if(jsonAdd.length > 0) {
+					requests.push(
+						axios.post(
+							this.$config.BACKEND_API_ROUTE+this.route+"/",
+							jsonAdd,
+							{ headers: this.header }
+						)
+					)
+				}
+				if(updates.length > 0) {
+					updates.forEach(u => {
+						requests.push(
+							axios.patch(
+								this.$config.BACKEND_API_ROUTE+this.route+"/"+u.id+"/",
+								u.payload,
+								{ headers: this.header }
+							)
+						)
+					})
+				}
+				if(requests.length > 0) {
+					await Promise.all(requests)
+				}
 				this.createwithsuccess = true
+				this.datavalues = this.datavalues.map(v => ({
+					...v,
+					_dirty: false
+				}))
+			} catch (e) {
+				this.submitErrorMsg = e && e.message ? e.message : String(e)
+			} finally {
+				this.loadingcreate = false
 			}
 		},
 		onUpdate(input) {
-			if(input.id) {
-				axios.patch(this.$config.BACKEND_API_ROUTE+this.route+"/"+input.id+"/", input, 
-					{ headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
+			this.updateErrorMsg = null
+			if (input) {
+				input._dirty = true
 			}
 		},
 		async getData() {
 			this.loading = true
 			this.doallaction = true
-			
-			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get, { headers: this.header })
-				.then(response => {
-					if(response.data.length > 0) {
-						this.datavalues = []
-					}
-					response.data.forEach(details => {
-						this.datavalues.push(details)
-					})
-					this.errormsg = null
-					this.errored = false
+			this.loadErrorMsg = null
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get,
+					{ headers: this.header }
+				)
+				if(response.data.length > 0) {
+					this.datavalues = []
+				}
+				response.data.forEach(details => {
+					this.datavalues.push(details)
 				})
-				.catch(e => {
-					this.errormsg = e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+				this.datavalues = this.datavalues.map(v => ({
+					...v,
+					_localId: v._localId || (
+						Date.now().toString(36)+
+						Math.random().toString(36).slice(2)
+					)
+				}))
+			} catch (e) {
+				this.loadErrorMsg = e && e.message ? e.message : String(e)
+			} finally {
+				this.loading = false
+			}
 		},
 		addField(value, fieldType) {
-			fieldType.push({ value: "" })
+			fieldType.push({
+				value: "",
+				_localId: (
+					Date.now().toString(36)+
+					Math.random().toString(36).slice(2)
+				)
+			})
 		},
-		removeField(index, fieldType) {
+		async removeField(index, fieldType) {
+			this.deleteErrorMsg = null
 			if(typeof fieldType[index].id !== 'undefined') {
-				axios.delete(this.$config.BACKEND_API_ROUTE+this.route+"/"+fieldType[index].id, { headers: this.header })
-					.then(() => {
-						this.errormsg = null
-						this.errored = false
+				try {
+					await axios.delete(
+						this.$config.BACKEND_API_ROUTE+this.route+"/"+fieldType[index].id+"/",
+						{ headers: this.header }
+					)
+					fieldType.splice(index, 1)
+					if (fieldType.length === 0) {
+						fieldType.push({
+							value: "",
+							_localId: (
+								Date.now().toString(36)+
+								Math.random().toString(36).slice(2)
+							)
+						})
+					}
+				} catch (e) {
+					this.deleteErrorMsg = e && e.message ? e.message : String(e)
+				}
+			} else {
+				fieldType.splice(index, 1)
+				if (fieldType.length === 0) {
+					fieldType.push({
+						value: "",
+						_localId: (
+							Date.now().toString(36)+
+							Math.random().toString(36).slice(2)
+						)
 					})
-					.catch(e => {
-						this.errormsg = e.message
-						this.errored = true
-					})
+				}
 			}
-			fieldType.splice(index, 1)
 		},
 	}
 }

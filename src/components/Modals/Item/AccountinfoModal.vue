@@ -116,6 +116,7 @@
 								:options="datatypeoptions" 
 								:reduce="text => text.value"
 								:clearable="false"
+								:disabled="(update) ? true : false"
 								label="text"
 								class="mb-3"
 							/>
@@ -134,6 +135,7 @@
 								:options="datatargetoptions" 
 								:reduce="text => text.value"
 								:clearable="false"
+								:disabled="(update) ? true : false"
 								label="text"
 								class="mb-3"
 							/>
