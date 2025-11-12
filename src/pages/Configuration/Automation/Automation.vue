@@ -88,8 +88,14 @@ export default {
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("scheduler_view_scheduler")) {
 			this.canview = true
+			if(localStorage.getItem('permissions').split(",").includes("scheduler_add_scheduler")) {
+				this.canadd = true
+			}
 			if(localStorage.getItem('permissions').split(",").includes("scheduler_change_scheduler")) {
 				this.canedit = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("scheduler_delete_scheduler")) {
+				this.candelete = true
 			}
 			await this.getHeader()
 		} else {
