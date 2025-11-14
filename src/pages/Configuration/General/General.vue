@@ -15,7 +15,8 @@
 						<!-- Display success box message -->
 						<section v-if="successed">
 							<Alert 
-								:message="$t('message.success_saved')" 
+								:message="$t('message.success_saved')"
+								:cols="true"
 								variant="success"
 							/>
 						</section>
@@ -23,7 +24,8 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</section>

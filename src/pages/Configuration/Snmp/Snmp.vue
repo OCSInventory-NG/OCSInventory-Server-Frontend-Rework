@@ -21,7 +21,8 @@
 						</section>
 						<section v-if="successed">
 							<Alert 
-								:message="successmsg" 
+								:message="successmsg"
+								:cols="true"
 								variant="success"
 							/>
 						</section>

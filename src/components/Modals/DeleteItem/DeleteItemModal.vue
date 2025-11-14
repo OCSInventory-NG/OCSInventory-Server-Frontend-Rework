@@ -55,7 +55,7 @@
 			>
 				<Alert 
 					v-if="deleteerror"
-					:message="deleteerrormsg" 
+					:message="deleteerrormsg"
 					variant="danger"
 				/>
 

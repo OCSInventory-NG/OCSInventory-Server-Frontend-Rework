@@ -70,7 +70,6 @@
 			<Alert 
 				v-if="createerror || errored"
 				:message="(createerror) ? createerrormsg : errormsg"
-				:cols="false"
 				variant="danger"
 			/>
 			<b-form
@@ -182,7 +181,6 @@
 						<Alert 
 							:message="$t('message.superuser_disclaimer')" 
 							variant="warning"
-							:cols="false"
 						/>
 						<b-form-group>
 							<b-form-checkbox

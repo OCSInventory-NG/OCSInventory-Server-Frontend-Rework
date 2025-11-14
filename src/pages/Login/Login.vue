@@ -18,7 +18,6 @@
 				<section v-if="errored">
 					<Alert 
 						:message="errormsg"
-						:cols="false"
 						variant="danger"
 					/>
 				</section>

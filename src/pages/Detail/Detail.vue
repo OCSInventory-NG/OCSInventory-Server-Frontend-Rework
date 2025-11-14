@@ -23,7 +23,8 @@
 						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</section>
@@ -146,7 +147,8 @@
 										</div>
 										<div v-else>
 											<Alert 
-												:message="$t('message.no_inventory')" 
+												:message="$t('message.no_inventory')"
+												:cols="true"
 												variant="info"
 											/>
 										</div>

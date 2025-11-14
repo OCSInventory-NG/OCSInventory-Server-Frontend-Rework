@@ -10,7 +10,8 @@
 					<!-- Error box message -->
 					<section v-if="errored">
 						<Alert 
-							:message="errormsg" 
+							:message="errormsg"
+							:cols="true" 
 							variant="danger"
 						/>
 					</section>
@@ -117,7 +118,8 @@
 							<b-col cols="6">
 								<Alert 
 									v-if="!layouts[activeLayout].id && !edit"
-									:message="$t('dashboard.nodashboard')" 
+									:message="$t('dashboard.nodashboard')"
+									:cols="true" 
 									variant="info"
 								/>
 							</b-col>

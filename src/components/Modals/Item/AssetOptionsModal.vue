@@ -88,7 +88,6 @@
 						<Alert
 							:message="$t('inventory.force_template')"
 							variant="warning"
-							:cols="false"
 						/>
 					</b-col>
 				</b-row>
