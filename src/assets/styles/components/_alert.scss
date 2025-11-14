@@ -10,38 +10,38 @@
 }
 
 .alert-danger {
-  color: #721c24;
   background-color: #f8d7da;
-  border: none;
+  border: 0;
+  color: #721c24;
 
   .alert-icon {
     color: #721c24;
   }
 
   .alert-description {
-    color: #A82936;
+    color: #a82936;
     margin-bottom: .25rem;
   }
 }
 
 .alert-warning {
-  color: #856404;
   background-color: #fff3cd;
-  border: none;
+  border: 0;
+  color: #856404;
 
   .alert-icon {
     color: #856404;
   }
 
   .alert-description {
-    color: #9E7805;
+    color: #9e7805;
   }
 }
 
 .alert-success {
-  color: #155724;
   background-color: #d4edda;
-  border: none;
+  border: 0;
+  color: #155724;
 
   .alert-icon {
     color: #155724;
@@ -53,16 +53,16 @@
 }
 
 .alert-info {
-  color: #0c5460;
   background-color: #d1ecf1;
-  border: none;
+  border: 0;
+  color: #0c5460;
 
   .alert-icon {
     color: #0c5460;
   }
 
   .alert-description {
-    color: #127E91;
+    color: #127e91;
   }
 }
 
@@ -72,5 +72,5 @@
 }
 
 .danger-btn {
-  border: none;
+  border: 0;
 }
