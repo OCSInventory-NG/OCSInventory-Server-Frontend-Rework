@@ -17,7 +17,8 @@
 			<div class="col-4 form-login">
 				<section v-if="errored">
 					<Alert 
-						:message="errormsg" 
+						:message="errormsg"
+						:cols="false"
 						variant="danger"
 					/>
 				</section>
@@ -104,7 +105,7 @@ export default {
 			})
 			.catch(e => {
 				this.errored = true
-				this.errormsg = e.message
+				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 			})
 	},
 	methods: {
@@ -136,7 +137,7 @@ export default {
 					if(e.response.data.non_field_errors) {
 						this.errormsg = e.response.data.non_field_errors[0]
 					} else {
-						this.errormsg = e.message
+						this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 					}
 				})
 		},
@@ -161,7 +162,7 @@ export default {
 				})
 				.catch(e => {
 					this.errored = true
-					this.errormsg = e.message
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 				})
 		}
 	}

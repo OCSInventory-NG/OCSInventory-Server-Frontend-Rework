@@ -210,7 +210,7 @@ export default {
 				this.row = response.data
 			} catch (e) {
 				this.errored = true
-				this.errormsg = e.message
+				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 			} finally {
 				this.loading = false
 			}
@@ -227,7 +227,7 @@ export default {
 						this.createerror = false
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
+						this.createerrormsg = (e.response.data.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 					})
@@ -245,7 +245,7 @@ export default {
 					})
 					.catch(e => {
 						this.createerror = true
-						this.createerrormsg = e.message
+						this.createerrormsg = (e.response.data.error) ? e.response.data.error : e.message
 						this.createwithsuccess = false
 					})
 					.finally(() => {

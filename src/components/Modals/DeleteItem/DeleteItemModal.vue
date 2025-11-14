@@ -174,7 +174,7 @@ export default {
 						this.deletewithsuccess = true
 					})
 					.catch(e => {
-						this.deleteerrormsg = e.message
+						this.deleteerrormsg = (e.response.data.error) ? e.response.data.error : e.message
 						this.deleteerror = true
 						this.deletewithsuccess = false
 					})
@@ -188,7 +188,7 @@ export default {
 						this.deletewithsuccess = true
 					})
 					.catch(e => {
-						this.deleteerrormsg = e.message
+						this.deleteerrormsg = (e.response.data.error) ? e.response.data.error : e.message
 						this.deleteerror = true
 						this.deletewithsuccess = false
 					})
@@ -216,7 +216,7 @@ export default {
 					this.deletewithsuccess = true
 				})
 				.catch(e => {
-					this.deleteerrormsg = e.message
+					this.deleteerrormsg = (e.response.data.error) ? e.response.data.error : e.message
 					this.deleteerror = true
 					this.deletewithsuccess = false
 				})

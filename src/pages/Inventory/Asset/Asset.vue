@@ -97,7 +97,7 @@ export default {
 					this.getAssets()
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -138,7 +138,7 @@ export default {
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = e.message
+				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 				this.errored = true
 			} finally {
 				this.loading = false

@@ -152,7 +152,7 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},

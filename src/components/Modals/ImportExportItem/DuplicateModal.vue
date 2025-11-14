@@ -175,7 +175,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -198,7 +198,7 @@ export default {
 					this.errormsg = null
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 
@@ -211,7 +211,7 @@ export default {
 						this.duplicatewithsuccess = true
 					})
 					.catch(e => {
-						this.errormsg = e.message
+						this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 						this.errored = true
 						this.duplicatewithsuccess = false
 					})
