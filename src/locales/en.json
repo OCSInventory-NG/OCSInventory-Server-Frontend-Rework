@@ -339,18 +339,25 @@
     "uuid": "UUID"
   },
   "message": {
+    "danger": "Danger",
     "delete_msg": "Do you really want to delete",
     "deletevalid": "Are you sure?",
     "dont_have_right_to_see": "You do not have permission to view this page",
     "error_no_permissions": "You do not have the required permissions, please contact your administrator",
     "no_field": "No fields available. Click \"Add new field\" to create one.",
+    "hide_details": "Hide detail",
+    "info": "Information",
     "no_inventory": "No inventory data available",
     "no_section": "No sections available. Click \"Add new section\" to create one.",
     "no_selection": "No machine has been selected",
     "no_template_selection": "No template has been selected",
     "select_multi": "Hold CTRL to select/deselect entry",
+    "show_details": "Show detail",
+    "something_went_wrong": "Oops, something went wrong with server side",
+    "success": "Success",
     "success_saved": "Configuration successfully saved!",
-    "superuser_disclaimer": "Warning: Grants unrestricted access."
+    "superuser_disclaimer": "Warning: Grants unrestricted access.",
+    "warning": "Warning"
   },
   "network": {
     "addnetgroup": "Add a network group",
