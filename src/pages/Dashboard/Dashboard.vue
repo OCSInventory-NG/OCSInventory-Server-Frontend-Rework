@@ -10,7 +10,8 @@
 					<!-- Error box message -->
 					<section v-if="errored">
 						<Alert 
-							:message="errormsg" 
+							:message="errormsg"
+							:cols="true" 
 							variant="danger"
 						/>
 					</section>
@@ -117,7 +118,8 @@
 							<b-col cols="6">
 								<Alert 
 									v-if="!layouts[activeLayout].id && !edit"
-									:message="$t('dashboard.nodashboard')" 
+									:message="$t('dashboard.nodashboard')"
+									:cols="true" 
 									variant="info"
 								/>
 							</b-col>
@@ -415,7 +417,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -429,7 +431,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -444,7 +446,7 @@ export default {
 						})
 					})
 					.catch(e => {
-						this.errormsg = e.message
+						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.errored = true
 					})
 			}
@@ -454,7 +456,7 @@ export default {
 			this.layouts = []
 			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/layout/", { headers: this.header })
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 
@@ -519,7 +521,7 @@ export default {
 							this.errored = false
 						})
 						.catch(e => {
-							this.errormsg = e.message
+							this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 							this.errored = true
 						})
 				}
@@ -546,7 +548,7 @@ export default {
 				.catch(e => {
 					this.savewithsuccess = false
 					this.saveerror = true
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loadingsave = false)
@@ -568,7 +570,7 @@ export default {
 				.catch(e => {
 					this.savewithsuccess = false
 					this.saveerror = true
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => {
@@ -619,7 +621,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 

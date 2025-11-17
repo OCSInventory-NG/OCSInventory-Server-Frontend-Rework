@@ -15,7 +15,8 @@
 						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</div>
@@ -115,7 +116,7 @@ export default {
 					this.getTemplates()
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -132,7 +133,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

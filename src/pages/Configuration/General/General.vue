@@ -15,7 +15,8 @@
 						<!-- Display success box message -->
 						<section v-if="successed">
 							<Alert 
-								:message="$t('message.success_saved')" 
+								:message="$t('message.success_saved')"
+								:cols="true"
 								variant="success"
 							/>
 						</section>
@@ -23,7 +24,8 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</section>
@@ -273,7 +275,7 @@ export default {
 					this.loading = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 					this.loading = false
 				})
@@ -298,7 +300,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 					this.successmsg = null
 					this.successed = false

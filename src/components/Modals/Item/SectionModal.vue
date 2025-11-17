@@ -413,7 +413,7 @@ export default {
 					this.allcategories = response.data
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -443,7 +443,7 @@ export default {
 					}
 				})
 				.catch(e => {
-					this.createerrormsg = e.message
+					this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.createerror = true
 					this.createwithsuccess = false
 					this.loadingcreate = false
@@ -476,7 +476,7 @@ export default {
 						}
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 						this.loadingcreate = false
@@ -502,7 +502,7 @@ export default {
 						}
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 						this.loadingcreate = false

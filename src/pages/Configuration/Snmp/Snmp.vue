@@ -21,7 +21,8 @@
 						</section>
 						<section v-if="successed">
 							<Alert 
-								:message="successmsg" 
+								:message="successmsg"
+								:cols="true"
 								variant="success"
 							/>
 						</section>
@@ -342,7 +343,7 @@ export default {
 					this.configs = response.data
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loadingconfig = false)
@@ -359,7 +360,7 @@ export default {
 					}
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loadingcommunity = false)
@@ -380,7 +381,7 @@ export default {
 					this.getSnmpTemplates()
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -394,7 +395,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loadingtemplate = false)
@@ -417,7 +418,7 @@ export default {
 					this.getSnmpScanners()
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -444,7 +445,7 @@ export default {
 					}
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loadingscanner = false)
@@ -459,7 +460,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 					this.successmsg = null
 					this.successed = false

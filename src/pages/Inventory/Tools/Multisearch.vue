@@ -15,7 +15,8 @@
 						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</div>
@@ -38,7 +39,8 @@
 						<div v-else>
 							<Alert 
 								v-if="noresult != null"
-								:message="noresult" 
+								:message="noresult"
+								:cols="true"
 								variant="info"
 							/>
 
@@ -119,7 +121,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

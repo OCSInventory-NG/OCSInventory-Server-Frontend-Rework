@@ -69,7 +69,7 @@
 			</template>
 			<Alert 
 				v-if="createerror || errored"
-				:message="(createerror) ? createerrormsg : errormsg" 
+				:message="(createerror) ? createerrormsg : errormsg"
 				variant="danger"
 			/>
 			<b-form
@@ -181,7 +181,6 @@
 						<Alert 
 							:message="$t('message.superuser_disclaimer')" 
 							variant="warning"
-							:cols="false"
 						/>
 						<b-form-group>
 							<b-form-checkbox
@@ -330,7 +329,8 @@ export default {
 						this.createerror = false
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
+						console.log(e)
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 					})
@@ -347,7 +347,7 @@ export default {
 						this.createerror = false
 					})
 					.catch(e => {
-						this.createerrormsg = e.message
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 					})

@@ -15,7 +15,8 @@
 						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
-								:message="errormsg" 
+								:message="errormsg"
+								:cols="true"
 								variant="danger"
 							/>
 						</section>
@@ -147,7 +148,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -161,7 +162,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => {this.loading = false})

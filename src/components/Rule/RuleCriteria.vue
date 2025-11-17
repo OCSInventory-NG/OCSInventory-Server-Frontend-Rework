@@ -542,7 +542,7 @@ export default {
 					this.$emit('reloadRule')
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 					this.successmsg = null
 					this.successed = false

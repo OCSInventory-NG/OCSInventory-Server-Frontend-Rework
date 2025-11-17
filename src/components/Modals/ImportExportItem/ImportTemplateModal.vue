@@ -137,7 +137,7 @@ export default {
 					this.importwithsuccess = true
 				})
 				.catch(e => {
-					this.errormsg = e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 					this.importwithsuccess = false
 				})

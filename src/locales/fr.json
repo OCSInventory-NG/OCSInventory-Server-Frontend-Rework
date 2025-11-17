@@ -339,18 +339,25 @@
     "uuid": "UUID"
   },
   "message": {
+    "danger": "Danger",
     "delete_msg": "Souhaitez-vous vraiment supprimer",
     "deletevalid": "Êtes-vous sûr(e) ?",
     "dont_have_right_to_see": "Vous n'avez pas l'autorisation de voir cette page",
     "error_no_permissions": "Vous ne disposez pas des permissions requises, veuillez contacter votre administrateur",
+    "hide_details": "Masquer le détail",
+    "info": "Information",
     "no_field": "Aucun champ disponible. Cliquez sur \"Ajouter un nouveau champ\" pour en créer un.",
     "no_inventory": "Aucune donnée d'inventaire disponible",
     "no_section": "Aucune section disponible. Cliquez sur \"Ajouter une nouvelle section\" pour en créer une.",
     "no_selection": "Aucune machine sélectionnée",
     "no_template_selection": "Aucun modèle sélectionné",
     "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
+    "show_details": "Afficher le détail",
+    "something_went_wrong": "Oups, un problème est survenu",
+    "success": "Succès",
     "success_saved": "Configuration sauvegardée avec succès !",
-    "superuser_disclaimer": "Attention : Donne un accès sans restrictions."
+    "superuser_disclaimer": "Donne un accès sans restrictions.",
+    "warning": "Attention"
   },
   "network": {
     "addnetgroup": "Ajouter un groupe réseau",
