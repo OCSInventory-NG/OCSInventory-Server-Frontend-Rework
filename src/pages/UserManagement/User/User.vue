@@ -109,7 +109,7 @@ export default {
 					this.getGroups()
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -128,7 +128,7 @@ export default {
 					this.getUsers()
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -141,7 +141,7 @@ export default {
 					this.permissionsGroupsTreatment()
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
