@@ -118,7 +118,7 @@
     "Frequency of inventory in hours": "Frequency of inventory in hours",
     "hours": "hours",
     "Interval in days for purging agent logs": "Agent logs retention in days",
-    "Interval in months for purging deployment packages": "Interval in months between each deployment package purge",
+    "Max age of deployment packages to purge": "Maximum age of deployment packages to purge",
     "Inventory collection log level": "Inventory collection log level",
     "inventory_checksum": "Inventory checksum",
     "inventory_loglevel": "Inventory log level",
