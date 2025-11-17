@@ -353,7 +353,7 @@
     "no_template_selection": "No template has been selected",
     "select_multi": "Hold CTRL to select/deselect entry",
     "show_details": "Show detail",
-    "something_went_wrong": "Oops, something went wrong with server side",
+    "something_went_wrong": "Oops, something went wrong",
     "success": "Success",
     "success_saved": "Configuration successfully saved!",
     "superuser_disclaimer": "Warning: Grants unrestricted access.",
