@@ -100,7 +100,7 @@
 									class="mb-2 danger-btn"
 									@click="toggleDetails"
 								>
-									{{ showDetails ? $t('message.hide_details') : $t('message.show_details')  }}
+									{{ showDetails ? $t('message.hide_details') : $t('message.show_details') }}
 								</b-button>
 								<b-collapse
 									v-if="message"
@@ -140,9 +140,6 @@ export default {
 			return this.variant === 'danger'
 		}
 	},
-	created() {
-		this.updateHeader()
-	},
 	watch: {
 		message() {
 			this.showDetails = false
@@ -151,6 +148,9 @@ export default {
 			this.showDetails = false
 			this.updateHeader()
 		}
+	},
+	created() {
+		this.updateHeader()
 	},
 	methods: {
 		updateHeader() {
