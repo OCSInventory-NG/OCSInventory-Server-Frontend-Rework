@@ -39,7 +39,6 @@
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
-										@option:selected="refreshActiveLayout()"
 									/>
 								</b-col>
 								<b-col cols="1">
@@ -88,7 +87,7 @@
 											&& (
 												layouts[activeLayout].user == userid
 												|| (
-													layouts[activeLayout].groups.includes(groupids)
+													hasGroupAccess(layouts[activeLayout].groups)
 													&& layouts[activeLayout].allow_group_modification == true
 												)
 											)
@@ -210,7 +209,7 @@
 													&& (
 														layouts[activeLayout].user == userid
 														|| (
-															layouts[activeLayout].groups.includes(groupids)
+															hasGroupAccess(layouts[activeLayout].groups)
 															&& layouts[activeLayout].allow_group_modification == true
 														)
 													)
@@ -243,6 +242,7 @@
 
 						<GridLayout 
 							v-else
+							:key="activeLayout"
 							v-model:layout="layouts[activeLayout].layout"
 							:row-height="30"
 							:static="true"
@@ -376,19 +376,25 @@ export default {
 				this.edit = false
 				this.savewithsuccess = false
 			}, 500)
+		},
+		activeLayout() {
+			this.onActiveLayoutChanged()
 		}
 	},
 	async beforeMount() {
-		if (localStorage.getItem('active_layout')) {
-			this.activeLayout = parseInt(localStorage.getItem('active_layout'))
+		const storedActiveLayout = localStorage.getItem('active_layout')
+		if (storedActiveLayout) {
+			this.activeLayout = parseInt(storedActiveLayout)
 		}
-		if(localStorage.getItem('permissions').split(",").includes("layout_add_dashboardlayout")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		if(permissions.includes("layout_add_dashboardlayout")) {
 			this.canadd = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("layout_change_dashboardlayout")) {
+		if(permissions.includes("layout_change_dashboardlayout")) {
 			this.canedit = true
 		}
-		if(localStorage.getItem('permissions').split(",").includes("layout_delete_dashboardlayout")) {
+		if(permissions.includes("layout_delete_dashboardlayout")) {
 			this.candelete = true
 		}
 
@@ -437,19 +443,30 @@ export default {
 		},
 		async getGroups() {
 			this.groups = []
-			for (const group of this.groupids) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
-					.then(response => {
-						this.groups.push({
-							value: response.data.id,
-							text: response.data.name
-						})
-					})
-					.catch(e => {
-						this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
-						this.errored = true
-					})
+			if (!Array.isArray(this.groupids) || !this.groupids.length) {
+				return
 			}
+			const requests = this.groupids.map(group =>
+				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
+			)
+			const results = await Promise.allSettled(requests)
+
+			results.forEach(result => {
+				if (result.status === "fulfilled") {
+					const response = result.value
+					this.groups.push({
+						value: response.data.id,
+						text: response.data.name
+					})
+					this.errormsg = null
+					this.errored = false
+				} else {
+					const e = result.reason
+					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errored = true
+				}
+			})
+
 			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 		},
 		async getLayouts() {
@@ -471,7 +488,7 @@ export default {
 							|| layouts.user == this.userid
 							|| (
 								layouts.visibility == "private_group"
-								&& layouts.groups.includes(this.groupids)
+								&& this.hasGroupAccess(layouts.groups)
 							)
 						) {
 							this.layouts.push(layouts)
@@ -495,40 +512,49 @@ export default {
 		},
 		async getChartData() {
 			this.loadingchart = true
-			var index = 0
 			this.optlayouts = []
 			this.chartData = []
 
-			for (const charts of this.layouts) {
+			const layoutPromises = this.layouts.map((charts, index) => {
 				this.optlayouts.push({
 					value: index,
-					text: charts.name
+					text: charts.name || this.$t("dashboard.noname")
 				})
 
-				if (!this.chartData[index]) {
-					this.chartData[index] = []
+				this.chartData[index] = []
+
+				if (!charts.layout || !charts.layout.length) {
+					return Promise.resolve()
 				}
 
-				for (const chart of charts.layout) {
-					await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name+"/", { headers: this.header })
-						.then(response => {
-							this.loading = true
-							this.chartData[index].push({
+				const chartRequests = charts.layout.map(chart =>
+					axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name+"/", { headers: this.header })
+						.then(response => ({
+							chart,
+							data: response.data
+						}))
+				)
+
+				return Promise.allSettled(chartRequests).then(results => {
+					results.forEach(result => {
+						if (result.status === "fulfilled") {
+							const { chart, data } = result.value
+							this.chartData[index][chart.i] = {
 								name: chart.name,
-								data: response.data
-							})
+								data
+							}
 							this.errormsg = null
 							this.errored = false
-						})
-						.catch(e => {
+						} else {
+							const e = result.reason
 							this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
 							this.errored = true
-						})
-				}
+						}
+					})
+				})
+			})
 
-				index = index + 1
-			}
-
+			await Promise.all(layoutPromises)
 			this.loadingchart = false
 		},
 		saveDashboard() {
@@ -578,7 +604,7 @@ export default {
 					this.reloadDashboard()
 				})
 		},
-		refreshActiveLayout() {
+		onActiveLayoutChanged() {
 			this.loadingchart = true
 			localStorage.setItem('active_layout', this.activeLayout)
 			this.emptylayout = this.layouts[this.activeLayout]
@@ -598,7 +624,9 @@ export default {
 
 			if (index > -1) {
 				this.layouts[this.activeLayout].layout.splice(index, 1)
-				this.chartData[this.activeLayout].splice(index, 1)
+				if (this.chartData[this.activeLayout]) {
+					this.chartData[this.activeLayout].splice(index, 1)
+				}
 				for (const layout of this.layouts[this.activeLayout].layout) {
 					if (layout.i > index) {
 						layout.i = index
@@ -608,15 +636,22 @@ export default {
 			}
 		},
 		async addItem() {
+			if (!this.addchartid) {
+				return
+			}
 			var chartInfo = this.addchartid.split(";")
 			var index = this.layouts[this.activeLayout].layout.length
 
+			if (!this.chartData[this.activeLayout]) {
+				this.chartData[this.activeLayout] = []
+			}
+
 			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chartInfo[0]+"/", { headers: this.header })
 				.then(response => {
-					this.chartData[this.activeLayout].push({
+					this.chartData[this.activeLayout][index] = {
 						name: chartInfo[0],
 						data: response.data
-					})
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -652,6 +687,14 @@ export default {
 					resizable: false
 				})
 			}
+
+			this.addchartid = null
+		},
+		hasGroupAccess(groups = []) {
+			if (!Array.isArray(groups) || !Array.isArray(this.groupids)) {
+				return false
+			}
+			return groups.some(group => this.groupids.includes(group))
 		}
 	}
 }
