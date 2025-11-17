@@ -100,7 +100,6 @@
 							<b-form-input
 								id="retrieval_value"
 								v-model="row.retrieval_value"
-								required
 							/>
 						</b-form-group>
 					</b-col>
