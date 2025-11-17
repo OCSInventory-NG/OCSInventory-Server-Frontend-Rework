@@ -254,7 +254,7 @@ export default {
 				this.device = response.data
 				this.device.network = this.device.network.name
 			} catch (e) {
-				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			} finally {
 				this.loading = false
@@ -275,7 +275,7 @@ export default {
 				this.device = response.data
 				this.deployment.push(response.data)
 			} catch (e) {
-				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			}
 		},
@@ -304,7 +304,7 @@ export default {
 					})
 				}
 			} catch (e) {
-				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			}
 		},
@@ -323,7 +323,7 @@ export default {
 					this.sections[inventory.template_section].push(inventory.fields)
 				}
 			} catch (e) {
-				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			} finally {
 				this.loading = false

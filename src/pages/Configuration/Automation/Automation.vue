@@ -110,7 +110,7 @@ export default {
 					this.getSchedulers()
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
@@ -128,7 +128,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)

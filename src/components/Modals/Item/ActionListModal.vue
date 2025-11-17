@@ -241,7 +241,7 @@ export default {
 					this.errored = false
 				})
 				.catch(e => {
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 				.finally(() => this.loading = false)
@@ -281,7 +281,7 @@ export default {
 						this.createerror = false
 					})
 					.catch(e => {
-						this.createerrormsg = (e.response.data.error) ? e.response.data.error : e.message
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 					})
@@ -295,7 +295,7 @@ export default {
 						this.createerror = false
 					})
 					.catch(e => {
-						this.createerrormsg = (e.response.data.error) ? e.response.data.error : e.message
+						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.createerror = true
 						this.createwithsuccess = false
 					})

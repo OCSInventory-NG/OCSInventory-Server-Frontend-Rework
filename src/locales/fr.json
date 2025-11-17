@@ -353,7 +353,7 @@
     "no_template_selection": "Aucun modèle sélectionné",
     "select_multi": "Maintenir CTRL pour sélectionner / déselectionner une entrée",
     "show_details": "Afficher le détail",
-    "something_went_wrong": "Oups, un problème est survenu côté serveur",
+    "something_went_wrong": "Oups, un problème est survenu",
     "success": "Succès",
     "success_saved": "Configuration sauvegardée avec succès !",
     "superuser_disclaimer": "Donne un accès sans restrictions.",

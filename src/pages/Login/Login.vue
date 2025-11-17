@@ -104,7 +104,7 @@ export default {
 			})
 			.catch(e => {
 				this.errored = true
-				this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 			})
 	},
 	methods: {
@@ -136,7 +136,7 @@ export default {
 					if(e.response.data.non_field_errors) {
 						this.errormsg = e.response.data.non_field_errors[0]
 					} else {
-						this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					}
 				})
 		},
@@ -161,7 +161,7 @@ export default {
 				})
 				.catch(e => {
 					this.errored = true
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				})
 		}
 	}
