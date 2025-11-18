@@ -16,7 +16,7 @@
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
-                                :cols="true"
+								:cols="true"
 								variant="danger"
 							/>
 						</section>
@@ -33,151 +33,151 @@
 						>
 							<Loader />
 						</div>
-                        <b-form
+						<b-form
 							v-else
 							@submit="onSubmit"
 						>
-                            <b-list-group 
-                                v-for="parameter in configs.value"
-                                :key="parameter.name"
-                                flush
-                            >
-                                <div v-if="parameter.length">
-                                    <div
-                                        v-for="subparameter in parameter"
-                                        :key="subparameter.name"
-                                    >
-                                        <b-list-group-item 
-                                            class="d-flex justify-content-between align-items-center"
-                                        >
-                                            <div>
-                                                <h4 class="mb-1">
-                                                    {{ $t("configuration."+subparameter.name) }}
-                                                </h4>
-                                                <p class="mb-1">
-                                                    {{ $t("configuration."+subparameter.description) }}
-                                                </p>
-                                            </div>
-                                            <div 
-                                                v-if="subparameter.type == 'switch'"
-                                            >
-                                                <label class="form-check form-switch">
-                                                    <input 
-                                                        :id="subparameter.name"
-                                                        v-model="subparameter.value"
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        :disabled="!canedit"
-                                                    >
-                                                </label>
-                                            </div>
-                                            <div 
-                                                v-if="subparameter.type in inputtype"
-                                                class="ocs-config-form"
-                                            >
-                                                <b-input-group>
-                                                    <template 
-                                                        v-if="subparameter.unit != ''"
-                                                        #append
-                                                    >
-                                                        <b-input-group-text class="form-control">
-                                                            {{ $t("configuration."+subparameter.unit) }}
-                                                        </b-input-group-text>
-                                                    </template>
-                                                    <b-form-input
-                                                        :id="subparameter.name"
-                                                        v-model="subparameter.value"
-                                                        :type="inputtype[subparameter.type]"
-                                                        :disabled="!canedit"
-                                                    />
-                                                </b-input-group>
-                                            </div>
-                                            <div 
-                                                v-if="subparameter.type == 'select'"
-                                                class="ocs-config-form"
-                                            >
-                                                <b-form-select 
-                                                    v-model="subparameter.value" 
-                                                    class="form-select mb-3"
-                                                >
-                                                    <b-form-select-option 
-                                                        v-for="option in subparameter.options"
-                                                        :key="option"
-                                                        :value="option"
-                                                    >
-                                                        {{ $t("configuration."+option) }}
-                                                    </b-form-select-option>
-                                                </b-form-select>
-                                            </div>
-                                        </b-list-group-item>
-                                    </div>
-                                </div>
-                                <b-list-group-item 
-                                    v-else
-                                    class="d-flex justify-content-between align-items-center"
-                                >
-                                    <div>
-                                        <h4 class="mb-1">
-                                            {{ $t("configuration."+parameter.name) }}
-                                        </h4>
-                                        <p class="mb-1">
-                                            {{ $t("configuration."+parameter.description) }}
-                                        </p>
-                                    </div>
-                                    <div 
-                                        v-if="parameter.type == 'switch'"
-                                    >
-                                        <label class="form-check form-switch">
-                                            <input 
-                                                :id="parameter.name"
-                                                v-model="parameter.value"
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                :disabled="!canedit"
-                                            >
-                                        </label>
-                                    </div>
-                                    <div 
-                                        v-if="parameter.type in inputtype"
-                                        class="ocs-config-form"
-                                    >
-                                        <b-input-group>
-                                            <template 
-                                                v-if="parameter.unit != ''"
-                                                #append
-                                            >
-                                                <b-input-group-text class="form-control">
-                                                    {{ $t("configuration."+parameter.unit) }}
-                                                </b-input-group-text>
-                                            </template>
-                                            <b-form-input
-                                                :id="parameter.name"
-                                                v-model="parameter.value"
-                                                :type="inputtype[parameter.type]"
-                                                :disabled="!canedit"
-                                            />
-                                        </b-input-group>
-                                    </div>
-                                    <div 
-                                        v-if="parameter.type == 'select'"
-                                        class="ocs-config-form"
-                                    >
-                                        <b-form-select 
-                                            v-model="parameter.value" 
-                                            class="form-select mb-3"
-                                        >
-                                            <b-form-select-option 
-                                                v-for="option in parameter.options"
-                                                :key="option"
-                                                :value="option"
-                                            >
-                                                {{ $te("configuration."+option) ?
-                                                    $t("configuration."+option) : option }}
-                                            </b-form-select-option>
-                                        </b-form-select>
-                                    </div>
-                                </b-list-group-item>
-                            </b-list-group>
+							<b-list-group 
+								v-for="parameter in configs.value"
+								:key="parameter.name"
+								flush
+							>
+								<div v-if="parameter.length">
+									<div
+										v-for="subparameter in parameter"
+										:key="subparameter.name"
+									>
+										<b-list-group-item 
+											class="d-flex justify-content-between align-items-center"
+										>
+											<div>
+												<h4 class="mb-1">
+													{{ $t("configuration."+subparameter.name) }}
+												</h4>
+												<p class="mb-1">
+													{{ $t("configuration."+subparameter.description) }}
+												</p>
+											</div>
+											<div 
+												v-if="subparameter.type == 'switch'"
+											>
+												<label class="form-check form-switch">
+													<input 
+														:id="subparameter.name"
+														v-model="subparameter.value"
+														class="form-check-input"
+														type="checkbox"
+														:disabled="!canedit"
+													>
+												</label>
+											</div>
+											<div 
+												v-if="subparameter.type in inputtype"
+												class="ocs-config-form"
+											>
+												<b-input-group>
+													<template 
+														v-if="subparameter.unit != ''"
+														#append
+													>
+														<b-input-group-text class="form-control">
+															{{ $t("configuration."+subparameter.unit) }}
+														</b-input-group-text>
+													</template>
+													<b-form-input
+														:id="subparameter.name"
+														v-model="subparameter.value"
+														:type="inputtype[subparameter.type]"
+														:disabled="!canedit"
+													/>
+												</b-input-group>
+											</div>
+											<div 
+												v-if="subparameter.type == 'select'"
+												class="ocs-config-form"
+											>
+												<b-form-select 
+												v-model="subparameter.value" 
+												class="form-select mb-3"
+												>
+													<b-form-select-option 
+														v-for="option in subparameter.options"
+														:key="option"
+														:value="option"
+													>
+														{{ $t("configuration."+option) }}
+													</b-form-select-option>
+												</b-form-select>
+											</div>
+										</b-list-group-item>
+									</div>
+								</div>
+								<b-list-group-item 
+									v-else
+									class="d-flex justify-content-between align-items-center"
+								>
+									<div>
+										<h4 class="mb-1">
+											{{ $t("configuration."+parameter.name) }}
+										</h4>
+										<p class="mb-1">
+											{{ $t("configuration."+parameter.description) }}
+										</p>
+									</div>
+									<div 
+										v-if="parameter.type == 'switch'"
+									>
+										<label class="form-check form-switch">
+											<input 
+												:id="parameter.name"
+												v-model="parameter.value"
+												class="form-check-input"
+												type="checkbox"
+												:disabled="!canedit"
+											>
+										</label>
+									</div>
+									<div 
+										v-if="parameter.type in inputtype"
+										class="ocs-config-form"
+									>
+										<b-input-group>
+											<template 
+												v-if="parameter.unit != ''"
+												#append
+											>
+												<b-input-group-text class="form-control">
+													{{ $t("configuration."+parameter.unit) }}
+												</b-input-group-text>
+											</template>
+											<b-form-input
+												:id="parameter.name"
+												v-model="parameter.value"
+												:type="inputtype[parameter.type]"
+												:disabled="!canedit"
+											/>
+										</b-input-group>
+									</div>
+									<div 
+										v-if="parameter.type == 'select'"
+										class="ocs-config-form"
+									>
+										<b-form-select 
+											v-model="parameter.value" 
+											class="form-select mb-3"
+										>
+											<b-form-select-option 
+												v-for="option in parameter.options"
+												:key="option"
+												:value="option"
+											>
+												{{ $te("configuration."+option) ?
+												$t("configuration."+option) : option }}
+											</b-form-select-option>
+										</b-form-select>
+									</div>
+								</b-list-group-item>
+							</b-list-group>
 							<b-row>
 								<b-col align-self="start" />
 								<b-col 
@@ -209,10 +209,10 @@ export default {
 	name: "IpdiscoverConfig",
 	data() {
 		return {
-            canadd: false,
-            canview: false,
-            canedit: false,
-            candelete: false,
+			canadd: false,
+			canview: false,
+			canedit: false,
+			candelete: false,
 			configs: [],
 			errormsg: null,
 			errored: false,
@@ -260,7 +260,7 @@ export default {
 		async getIpdConfig() {
 			this.loading = true
 			this.configs = []
-			
+
 			await axios.get(this.$config.BACKEND_API_ROUTE+"config/ipdiscover/", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
