@@ -140,6 +140,10 @@
 						{ 
 							header: $t('title.snmp'), link: '/configurations/snmp', 
 							route:'Snmp', column: 'network' 
+						},
+						{ 
+							header: $t('title.ipdiscover'), link: '/configurations/ipdiscover', 
+							route:'IpdiscoverConfig', column: 'network' 
 						}
 					]"
 					link="/configurations"
