@@ -97,8 +97,8 @@
 												class="ocs-config-form"
 											>
 												<b-form-select 
-												v-model="subparameter.value" 
-												class="form-select mb-3"
+													v-model="subparameter.value" 
+													class="form-select mb-3"
 												>
 													<b-form-select-option 
 														v-for="option in subparameter.options"
