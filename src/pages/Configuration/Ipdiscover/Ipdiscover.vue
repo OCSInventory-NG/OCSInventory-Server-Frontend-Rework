@@ -172,7 +172,7 @@
 												:value="option"
 											>
 												{{ $te("configuration."+option) ?
-												$t("configuration."+option) : option }}
+													$t("configuration."+option) : option }}
 											</b-form-select-option>
 										</b-form-select>
 									</div>
