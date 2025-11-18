@@ -16,12 +16,13 @@
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg" 
+								:cols="true"
 								variant="danger"
 							/>
 						</section>
 						<section v-if="successed">
 							<Alert 
-								:message="successmsg"
+								:message="$t('message.success_saved')"
 								:cols="true"
 								variant="success"
 							/>
@@ -338,7 +339,7 @@ export default {
 			this.loadingconfig = true
 			this.configs = []
 			
-			await axios.get(this.$config.BACKEND_API_ROUTE+"config/snmp", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"config/snmp/", { headers: this.header })
 				.then(response => {
 					this.configs = response.data
 				})
@@ -352,7 +353,7 @@ export default {
 			this.loadingcommunity = true
 			this.rowsnmpcomm = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/", { headers: this.header })
 				.then(response => {
 					this.rowsnmpcomm = response.data
 					for (const community of this.rowsnmpcomm) {
@@ -404,7 +405,7 @@ export default {
 			this.loadingscanner = true
 			this.rowscannerheader = []
 
-			await axios.options(this.$config.BACKEND_API_ROUTE+"snmp/scanner", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"snmp/scanner/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field == "configs") {
@@ -425,7 +426,7 @@ export default {
 		async getSnmpScanners() {
 			this.rowscannerdata = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner?expand=configs",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/?expand=configs",
 				{ headers: this.header })
 				.then(response => {
 					this.rowscannerdata = response.data
