@@ -315,6 +315,15 @@ import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import PieChart from '@/components/Dashboard/Chart/Pie.vue'
 import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
+const createEmptyLayout = () => ({
+	visibility: "public",
+	user: null,
+	groups: [],
+	allow_group_modification: false,
+	name: null,
+	layout: []
+})
+
 export default {
 	name: "Dashboard",
 	components: { 
@@ -334,14 +343,7 @@ export default {
 			errormsg: null,
 			loading: true,
 			errored: false,
-			emptylayout: {
-				visibility: "public",
-				user: null,
-				groups: [],
-				allow_group_modification: false,
-				name: null,
-				layout: []
-			},
+			emptylayout: createEmptyLayout(),
 			layouts: [
 				{
 					layout: []
@@ -432,7 +434,10 @@ export default {
 				.then(response => {
 					this.userid = response.data.id
 					this.groupids = response.data.groups
-					this.emptylayout.user = this.userid
+					this.ensureEmptyLayoutInitialized()
+					if (this.emptylayout.user === null || this.emptylayout.user === undefined) {
+						this.emptylayout.user = this.userid
+					}
 					this.errormsg = null
 					this.errored = false
 				})
@@ -462,7 +467,7 @@ export default {
 					this.errored = false
 				} else {
 					const e = result.reason
-					this.errormsg = (e.response.data.error) ? e.response.data.error : e.message
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				}
 			})
@@ -506,7 +511,7 @@ export default {
 					if (!this.layouts[this.activeLayout]) {
 						this.activeLayout = 0
 					}
-					this.emptylayout = this.layouts[this.activeLayout]
+					this.syncEmptyLayoutFromActive()
 				}
 			}
 		},
@@ -607,7 +612,7 @@ export default {
 		onActiveLayoutChanged() {
 			this.loadingchart = true
 			localStorage.setItem('active_layout', this.activeLayout)
-			this.emptylayout = this.layouts[this.activeLayout]
+			this.syncEmptyLayoutFromActive()
 			this.loadingchart = false
 		},
 		async reloadDashboard() {
@@ -695,6 +700,23 @@ export default {
 				return false
 			}
 			return groups.some(group => this.groupids.includes(group))
+		},
+		ensureEmptyLayoutInitialized() {
+			if (!this.emptylayout) {
+				this.emptylayout = createEmptyLayout()
+			}
+		},
+		syncEmptyLayoutFromActive() {
+			const activeLayout = this.layouts[this.activeLayout]
+			if (activeLayout) {
+				this.emptylayout = activeLayout
+			} else {
+				this.ensureEmptyLayoutInitialized()
+				this.emptylayout.layout = []
+			}
+			if (this.userid && (this.emptylayout.user === null || this.emptylayout.user === undefined)) {
+				this.emptylayout.user = this.userid
+			}
 		}
 	}
 }
