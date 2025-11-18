@@ -448,6 +448,7 @@ export default {
 		async onSubmit(event) {
 			event.preventDefault();
 
+			this.actionupdate = []
 			var actionremove = []
 			var actionupdateids = []
 			
@@ -529,8 +530,6 @@ export default {
 						})
 				} else {
 					delete action.id
-					delete action.object_id
-					delete action.object_slug
 
 					await axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
