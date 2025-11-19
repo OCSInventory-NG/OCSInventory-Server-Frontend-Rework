@@ -1,9 +1,9 @@
 <template>
 	<div id="Accountinfo">		
 		<!-- Error box message -->
-		<section v-if="errored">
+		<section v-if="errored || massprocerrored">
 			<Alert 
-				:message="errormsg" 
+				:message="(errored) ? errormsg : massprocerrormsg" 
 				variant="danger"
 			/>
 		</section>
@@ -74,6 +74,18 @@
 								:options="value.values"
 							/>
 						</b-col>
+						<b-col
+							v-if="massprocessing"
+							class="col-1"
+						>
+							<label class="form-check form-switch">
+								<input 
+									v-model="value.update"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</label>
+						</b-col>
 						<b-col class="col-2" />
 					</b-row>
 					<b-row>
@@ -100,7 +112,7 @@
 								variant="success"
 							/>
 							<font-awesome-icon 
-								v-if="successed"
+								v-if="successed || massprocsuccessed"
 								:icon="['fas', 'check']"
 								color="green"
 							/>
@@ -130,7 +142,9 @@ export default {
 		type: { type: String, default: '' },
 		id: { type: Number, default: null },
 		canedit: { type: Boolean, default: false },
-		slug: { type: String, default: 'inventory_base.inventorybase' }
+		slug: { type: String, default: 'inventory_base.inventorybase' },
+		massprocessing: { type: Boolean, default: false },
+		items: { type: Array, default: () => [] }
 	},
 	data() {
 		return {
@@ -138,6 +152,9 @@ export default {
 			loading: true,
 			errormsg: null,
 			errored: false,
+			massprocerrored: false,
+			massprocerrormsg: [],
+			massprocsuccessed: false,
 			successed: false,
 			loadingcreate: false,
 			create: true,
@@ -153,6 +170,12 @@ export default {
 			setTimeout(() => {
 				this.successed = false
 			}, 500)
+		},
+		massprocsuccessed: function() {
+			setTimeout(() => {
+				this.massprocsuccessed = false
+				this.$emit('reloadDatatable')
+			}, 500)
 		}
 	},
 	async mounted() {
@@ -160,10 +183,10 @@ export default {
 	},
 	methods: {
 		async getAccountinfoConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config?expand=accountinfo_values&datatarget="+this.type,
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values&datatarget="+this.type,
 				{ headers: this.header })
 				.then(response => {
-					response.data.forEach(rowDetails => {
+					for (const rowDetails of response.data) {
 						this.rowdata.push({
 							id: rowDetails.id,
 							name: rowDetails.name,
@@ -171,10 +194,14 @@ export default {
 							value: (rowDetails.datatype == "CHECKBOX") ? [] : null,
 							values: this.getAccountinfoValue(rowDetails.accountinfo_values)
 						})
-					})
+					}
 					this.errormsg = null
 					this.errored = false
-					this.getAccountinfoData()
+					if (!this.massprocessing) {
+						this.getAccountinfoData()
+					} else {
+						this.loading = false
+					}
 				})
 				.catch(e => {
 					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
@@ -193,7 +220,7 @@ export default {
 			return array
 		},
 		async getAccountinfoData() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data?object_slug="
+			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data/?object_slug="
 			+this.slug+"&object_id="+this.id, { headers: this.header })
 				.then(response => {
 					response.data.forEach(rowDetails => {
@@ -215,50 +242,134 @@ export default {
 				})
 				.finally(() => this.loading = false)
 		},
-		onSubmit(event) {
+		async onPatch(id, json) {
+			await axios.patch(
+				this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+id+"/",
+				json, 
+				{ headers: this.header }
+			)
+		},
+		async onPost(json) {
+			await axios.post(
+				this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json,
+				{ headers: this.header }
+			)
+		},
+		async get(itemid) {
+			try {
+				const parameter = "object_id="+itemid+"&object_sulg="+this.slug
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"accountinfo/data/?"+parameter,
+					{ headers: this.header }
+				)
+
+				for (const accountdata of response.data) {
+					return accountdata
+				}
+			} catch (e) {
+				this.massprocerrormsg.push({
+					itemid: itemid,
+					message: (e.response?.data?.error) ? e.response.data.error : e.message
+				})
+			}
+		},
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			var json = {
-				object_id: this.id,
+			const json = {
+				object_id: null,
 				object_slug: this.slug,
 				accountdata: {}
 			}
 
-			this.rowdata.forEach(rowDetails => {
-				json.accountdata[rowDetails.id] = rowDetails.value
-			})
+			if (this.massprocessing) {
+				this.massprocerrored = false
+				this.massprocerrormsg = []
+				this.massprocsuccessed = false
 
-			if(this.create) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json, { headers: this.header })
-					.then(() => {
+				var patch = false
+				for (const item of this.items) {
+					if (item.accountinfo) {
+						patch = true
+					}
+
+					json.object_id = item.id
+					json.accountdata = this.rowdata.reduce((acc, row) => {
+						if (row.update) acc[row.id] = row.value
+						return acc
+					}, {})
+
+					if (patch) {
+						var accountdata_item = await this.get(item.id)
+						Object.keys(json.accountdata).forEach(key => {
+							if (accountdata_item.accountdata[key] !== json.accountdata[key]) {
+								accountdata_item.accountdata[key] = json.accountdata[key]
+							}
+						})
+						json.accountdata = accountdata_item.accountdata
+						try {
+							await this.onPatch(accountdata_item.id, json)
+						} catch(e) {
+							this.massprocerrormsg.push({
+								itemid: item.id,
+								message: (e.response?.data?.error) ? e.response.data.error : e.message
+							})
+						}
+					} else {
+						try {
+							await this.onPost(json)
+						} catch(e) {
+							this.massprocerrormsg.push({
+								itemid: item.id,
+								message: (e.response?.data?.error) ? e.response.data.error : e.message
+							})
+						}
+					}
+				}
+
+				if (this.massprocerrormsg.length > 0) {
+					this.massprocerrormsg = this.massprocerrormsg
+						.map(e => `Item ${e.itemid} : ${e.message}`)
+						.join('\n')
+					this.massprocerrored = true
+				}
+
+				if (!this.massprocerrored) {
+					this.massprocsuccessed = true
+				}
+
+				this.loadingcreate = false
+			} else {
+				json.object_id = this.id
+				json.accountdata = this.rowdata.reduce((acc, row) => {
+					acc[row.id] = row.value
+					return acc
+				}, {})
+
+				if (this.create) {
+					try {
+						await this.onPost(json)
 						this.successed = true
-						this.errormsg = null
-						this.errored = false
-						this.loading = true
 						this.rowdata = []
 						this.getAccountinfoConfig()
-					})
-					.catch(e => {
+					} catch(e) {
 						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.errored = true
-						this.successed = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+this.accountid+"/", json, 
-					{ headers: this.header })
-					.then(() => {
+					} finally {
+						this.loadingcreate = false
+					}
+				} else {
+					try {
+						await this.onPatch(this.accountid, json)
 						this.successed = true
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
+					} catch(e) {
 						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 						this.errored = true
-						this.successed = false
-					})
-					.finally(() => this.loadingcreate = false)
+					} finally {
+						this.loadingcreate = false
+					}
+				}
 			}
 		}
 	}
