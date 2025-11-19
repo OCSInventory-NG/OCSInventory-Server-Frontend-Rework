@@ -258,7 +258,7 @@ export default {
 				.finally(() => this.loading = false)
 		},
 		async getCommunities() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/", { headers: this.header })
 				.then(response => {
 					this.configs = []
 					for (const config of response.data) {

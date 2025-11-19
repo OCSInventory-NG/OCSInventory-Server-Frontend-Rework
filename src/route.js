@@ -97,6 +97,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/configurations/ipdiscover',
+		name: 'IpdiscoverConfig',
+		component: () => import('@/pages/Configuration/Ipdiscover/Ipdiscover.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/configurations/snmp/:id',
 		name: 'EditSnmpTemplate',
 		component: () => import('@/pages/Configuration/Template/EditTemplate.vue'),		

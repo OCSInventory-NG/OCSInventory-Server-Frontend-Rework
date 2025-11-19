@@ -268,7 +268,7 @@ export default {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"config/", { headers: this.header })
 				.then(response => {
 					for(const config of response.data) {
-						if(config.name != "snmp") {
+						if(!["snmp", "ipdiscover"].includes(config.name)) {
 							this.configs.push(config)
 						}
 					}
