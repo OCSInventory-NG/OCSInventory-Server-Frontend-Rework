@@ -24,6 +24,16 @@
 				<h5 class="modal-title">
 					{{ $t('accountinfo.massprocessing') }}
 				</h5>
+				<b-button
+					size="sm"
+					variant="outline-danger"
+					@click="close()"
+				>
+					<font-awesome-icon
+						:icon="['fas', 'xmark']"
+						size="1x"
+					/>
+				</b-button>
 			</template>
 			<Accountinfo
 				:canedit="true"

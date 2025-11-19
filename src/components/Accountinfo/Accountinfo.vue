@@ -183,8 +183,10 @@ export default {
 	},
 	methods: {
 		async getAccountinfoConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values&datatarget="+this.type,
-				{ headers: this.header })
+			await axios.get(
+				this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values&datatarget="+this.type,
+				{ headers: this.header }
+			)
 				.then(response => {
 					for (const rowDetails of response.data) {
 						this.rowdata.push({

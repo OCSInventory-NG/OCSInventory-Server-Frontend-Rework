@@ -570,8 +570,8 @@ export default {
 		deleteids: { type: Array, default: null },
 		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
-		sortby: { type: String, Default: null },
-		sortdesc: { type: String, Default: null },
+		sortby: { type: String, Default: 'id' },
+		sortdesc: { type: String, Default: 'asc' },
 		templateid: { type: Number, default: 0 },
 		hiddenfields: { type: Array, default: null },
 		// Remove assets from group
