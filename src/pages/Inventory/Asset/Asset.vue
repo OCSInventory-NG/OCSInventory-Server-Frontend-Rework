@@ -36,6 +36,7 @@
 								:candelete="candelete"
 								:rowheader="rowheader"
 								:candeploy="true"
+								:canmassprocessing="true"
 								:usecheckbox="true"
 								:hiddenfields="hiddenfields"
 								title="asset/bases"
@@ -73,11 +74,15 @@ export default {
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
-			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		if(permissions.includes("inventory_base_view_inventorybase")) {
+			if(permissions.includes("inventory_base_delete_inventorybase")) {
 				this.candelete = true
 			}
+			await this.getAccountinfoCfg()
 			await this.getHeader()
+			await this.getAssets()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -95,12 +100,28 @@ export default {
 					})
 					this.errormsg = null
 					this.errored = false
-					this.getAssets()
 				})
 				.catch(e => {
 					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
+		},
+		async getAccountinfoCfg() {
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget=ASSET",
+					{ headers: this.header }
+				)
+
+				for (const accountinfo of response.data) {
+					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
+						this.rowheader.push("Account info : " + accountinfo.name)
+					}
+				}
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
 		async getAssets() {
 			try {
