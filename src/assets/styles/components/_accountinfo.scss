@@ -15,6 +15,7 @@
 }
 
 .admin-row {
+  align-items: center !important;
   margin-bottom: 10px;
 }
 
@@ -24,4 +25,8 @@
 
 .admin-btn {
   flex-basis: content;
+}
+
+.form-check {
+  margin-bottom: 0;
 }
