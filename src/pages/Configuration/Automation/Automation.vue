@@ -89,8 +89,14 @@ export default {
 	async mounted() {
 		if(localStorage.getItem('permissions').split(",").includes("scheduler_view_scheduler")) {
 			this.canview = true
+			if(localStorage.getItem('permissions').split(",").includes("scheduler_add_scheduler")) {
+				this.canadd = true
+			}
 			if(localStorage.getItem('permissions').split(",").includes("scheduler_change_scheduler")) {
 				this.canedit = true
+			}
+			if(localStorage.getItem('permissions').split(",").includes("scheduler_delete_scheduler")) {
+				this.candelete = true
 			}
 			await this.getHeader()
 		} else {
@@ -103,7 +109,9 @@ export default {
 			await axios.options(this.$config.BACKEND_API_ROUTE+"automation/scheduler/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
+						if (!["is_protected"].includes(field) ) {
+							this.rowheader.push(field)
+						}
 					})
 					this.errormsg = null
 					this.errored = false

@@ -110,15 +110,13 @@
 							:label="$t('scheduler.active')" 
 							label-for="active"
 						>
-							<v-select
-								id="active"
-								v-model="row.active" 
-								:options="active" 
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-							/>
+							<label class="form-check form-switch">
+								<input 
+									v-model="row.active"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</label>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -244,10 +242,6 @@ export default {
 			createerrormsg: null,
 			createwithsuccess: false,
 			automationmodal: false,
-			active: [
-				{ value: true, text: this.$t('generic.yes') },
-				{ value: false, text: this.$t('generic.no') }
-			],
 			recurrences: [
 				{ value: 'hourly', text: this.$t('scheduler.hourly') },
 				{ value: 'daily', text: this.$t('scheduler.daily') },
