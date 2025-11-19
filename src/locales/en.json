@@ -8,6 +8,7 @@
     "description": "Description",
     "editaccountinfo": "Edit administrative data",
     "id": "ID",
+    "massprocessing": "Mass processing",
     "name": "Name"
   },
   "assetgroup": {
