@@ -34,6 +34,8 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:usecheckbox="false"
+								sortby="date"
+								sortdesc="desc"
 								title="automation/history"
 								translationkey="scheduler."
 								@reloadDatatable="reloadDatatable"
