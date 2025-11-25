@@ -266,12 +266,18 @@ export default {
 					this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/",
 					{ headers: this.header }
 				)
-				const templateResponse = await axios.get(
-					this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
-					{ headers: this.header }
-				)
+
+				let templateResponse = null
+
+				if (response.data.template) {
+					templateResponse = await axios.get(
+						this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
+						{ headers: this.header }
+					)
+				}
+				
 				response.data.templateid = response.data.template
-				response.data.template = templateResponse.data.name
+				response.data.template = (templateResponse) ? templateResponse.data.name : this.$t('generic.none')
 				this.device = response.data
 				this.deployment.push(response.data)
 			} catch (e) {
@@ -311,7 +317,7 @@ export default {
 		async getInventoryCollection() {
 			try {
 				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
+					this.$config.BACKEND_API_ROUTE+"asset/sections/?base="+this.$route.params.id+"&expand=fields",
 					{ headers: this.header }
 				)
 				this.sections = []
