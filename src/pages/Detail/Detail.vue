@@ -101,7 +101,7 @@
 															{{ $t(translationkey+key) }}
 														</div>
 														<div class="datagrid-content">
-															{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
+															{{ formatDate(value, key) }}
 														</div>
 													</div>
 												</div>
@@ -203,11 +203,6 @@
 <script>
 import axios from 'axios'
 
-const timezoneByLang = {
-    fr: 'Europe/Paris',
-    en: 'UTC',
-}
-
 export default {
 	name: 'Detail',
 	data() {
@@ -279,13 +274,6 @@ export default {
 				response.data.template = templateResponse.data.name
 				this.device = response.data
 				this.deployment.push(response.data)
-				const tz = timezoneByLang[this.$i18n.locale] || 'UTC'
-				if (response.data.last_update) {
-					response.data.last_update = new Date(response.data.last_update).toLocaleString(
-						this.$i18n.locale, 
-						{ timeZone: tz }
-					)
-				}
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
@@ -364,6 +352,14 @@ export default {
 					scrollContainer.scrollTop = 0;
 				}
 			});
+		},
+		formatDate(value, key) {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
 		}
 	}
 }

@@ -55,11 +55,6 @@
 <script>
 import axios from 'axios'
 
-const timezoneByLang = {
-    fr: 'Europe/Paris',
-    en: 'UTC',
-}
-
 export default {
 	name: 'Assets',
 	data() {
@@ -126,16 +121,6 @@ export default {
 				response.data.forEach(asset => {
 					if (asset.template && templates[asset.template]) {
 						asset.template = templates[asset.template]
-					}
-				})
-
-				const tz = timezoneByLang[this.$i18n.locale] || 'UTC'
-				response.data.forEach(asset => {
-					if (asset.last_update) {
-						asset.last_update = new Date(asset.last_update).toLocaleString(
-							this.$i18n.locale, 
-							{ timeZone: tz }
-						)
 					}
 				})
 

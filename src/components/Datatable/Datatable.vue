@@ -381,6 +381,22 @@
 						/>
 					</div>
 				</template>
+				<!-- Last update -->
+				<template #cell(last_update)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(last_updated)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(timestamp)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(date_created)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(date)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
 
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
@@ -634,7 +650,8 @@ export default {
 			this.attributePackage()
 		},
 		'$root.$i18n.locale': function() {
-			this.updateColumnLabels()
+			this.updateColumnLabels(),
+			this.updateDateFormat()
 		}
 	},
 	created() {
@@ -772,6 +789,14 @@ export default {
 		this.totalRows = this.rowdata.length
 		// Initialize data to export
 		this.json_data = this.rowdata
+
+		this.rowdata.forEach(row => {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date'];
+			const dateValue = dateFields.find(field => row[field]);
+			if (dateValue) {
+				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
+			}
+		});
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
@@ -848,7 +873,16 @@ export default {
 		updateRowPage() {
 			localStorage.removeItem("perPage")
 			localStorage.setItem("perPage", this.perPage)
-		}
+		},
+		updateDateFormat() {
+			this.rowdata.forEach(row => {
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date'];
+				const dateValue = dateFields.find(field => row[field]);
+				if (dateValue) {
+					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
+				}
+			});
+		},
 	}
 }
 </script>
