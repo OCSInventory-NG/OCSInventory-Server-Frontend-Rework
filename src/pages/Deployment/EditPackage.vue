@@ -34,7 +34,10 @@
 								<b-col>
 									<p>{{ $t('deployment.description') }} : {{ rowpackagedata.description }}</p>
 									<p>{{ $t('deployment.target_os') }} : {{ $t('template.'+rowpackagedata.target_os) }}</p>
-									<p>{{ $t('deployment.date_created') }} : {{ formatDate(rowpackagedata.date_created, 'date_created') }}</p>
+									<p>
+										{{ $t('deployment.date_created') }} : 
+										{{ formatDate(rowpackagedata.date_created, 'date_created') }}
+									</p>
 								</b-col>
 							</b-row><br>
 							<ActionListModal

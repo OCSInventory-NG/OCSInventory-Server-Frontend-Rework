@@ -165,13 +165,13 @@ export default {
 			this.$emit('reloadDatatable')
 		},
 		updateDateFormat(){
-			 this.rowdatas.forEach(row => {
+			this.rowdatas.forEach(row => {
 				for (const dateValue of this.dateFields) {
 					if (row[dateValue]) {
 						row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale)
 					}
 				}
-			 });
+			});
 		}
 	}
 }

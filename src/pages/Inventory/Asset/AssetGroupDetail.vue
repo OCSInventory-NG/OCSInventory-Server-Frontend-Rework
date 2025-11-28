@@ -274,7 +274,7 @@ export default {
 				return new Date(value).toLocaleString(this.$i18n.locale)
 			}
 			return value
-    	},
+		},
 	}
 }
 </script>
