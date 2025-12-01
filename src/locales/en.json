@@ -480,7 +480,7 @@
     "active": "Active",
     "addscheduler": "Add an automated action",
     "comment": "Comment",
-    "creation_warning":"This will create a scheduler entry referencing a custom automated action. Refer to the documentation for full instructions on creating automated actions.",
+    "creation_warning": "This will create a scheduler entry referencing a custom automated action. Refer to the documentation for full instructions on creating automated actions.",
     "daily": "Daily",
     "date": "Date",
     "day_of_month": "Day of month",
