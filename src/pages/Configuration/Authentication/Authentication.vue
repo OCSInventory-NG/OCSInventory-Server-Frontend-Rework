@@ -92,11 +92,11 @@
 										<Ldap />
 									</div>
 									<!-- OIDC -->
-									<div v-if="authmenu.value == 'OIDC'">
+									<div v-if="authmenu.value == 'CAS'">
 										<Cas />
 									</div>
 									<!-- CAS -->
-									<div v-if="authmenu.value == 'CAS'">
+									<div v-if="authmenu.value == 'OIDC'">
 										<Oidc />
 									</div>
 								</b-tab>
