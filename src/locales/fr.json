@@ -309,7 +309,7 @@
     "domain": "Domaine",
     "expandall": "Dérouler l'inventaire",
     "false": "Automatique",
-    "force_template": "Attention, l'assignation manuelle d'un modèle désactive l'attribution automatique par le biais du moteur de règles. Pour réactiver l'attribution automatique, veuillez sélectionner l'action \"Réinitialiser le modèle d'inventaire\".",
+    "force_template": "L'assignation manuelle d'un modèle désactive l'attribution automatique par le biais du moteur de règles. Pour réactiver l'attribution automatique, veuillez sélectionner l'action \"Réinitialiser le modèle d'inventaire\".",
     "id": "ID",
     "INVENTORY_BASE_ERR": "Erreur lors de la gestion de l'inventaire de base",
     "INVENTORY_BASE_INSERT": "Insertion dans l'inventaire de base",
