@@ -42,7 +42,7 @@
 							v-for="theader in rowheader" 
 							:key="theader"
 						>
-							    {{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
+							{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
 						</td>
 						<td 
 							v-if="candelete || canedit"
