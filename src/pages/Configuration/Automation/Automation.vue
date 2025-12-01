@@ -39,7 +39,7 @@
 								:rowheader="rowheader"
 								:candelete="candelete"
 								:canedit="canedit"
-								:usecheckbox="false"
+								:usecheckbox="true"
 								:viewautomationhistory="true"
 								editcomponent="AutomationModal"
 								title="automation/scheduler"
