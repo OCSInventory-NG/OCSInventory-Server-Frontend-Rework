@@ -313,7 +313,7 @@
     "domain": "Domain",
     "expandall": "Expand inventory",
     "false": "Automatic",
-    "force_template": "Warning, manually assigning a template disables automatic assignment through the rules engine. To reactivate automatic assignment, please select the \"Reset inventory template\" action.",
+    "force_template": "Manually assigning a template disables automatic assignment through the rules engine. To reactivate automatic assignment, please select the \"Reset inventory template\" action.",
     "id": "ID",
     "INVENTORY_BASE_ERR": "Error managing base inventory",
     "INVENTORY_BASE_INSERT": "Inserting into base inventory",
