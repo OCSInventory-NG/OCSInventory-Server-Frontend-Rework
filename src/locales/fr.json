@@ -178,6 +178,7 @@
     "deletedashboardlayout": "Supprimer le tableau de bord",
     "Devices per last contacted date (7 days)": "Ligne - Actifs par date de dernier contact (7 jours)",
     "editdashboardlayout": "Ajouter/Éditer un tableau de bord",
+    "error_loading_chart": "Erreur lors du chargement du graphique",
     "lastcontacted": "Actifs contactés pour la dernière fois au cours des 7 derniers jours",
     "nbassets": "Nombre d'actifs",
     "nb_netdevices": "Nombre d'équipements",
