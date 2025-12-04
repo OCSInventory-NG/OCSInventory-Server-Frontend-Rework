@@ -18,15 +18,26 @@
 						{{ $t(computedFirstTitle) }}
 					</div>
 				</div>
-				<div v-if="!loaded && !errored" class="text-center py-4">
+				<div
+					v-if="!loaded && !errored"
+					class="text-center py-4"
+				>
 					<b-spinner />
 				</div>
-				<div v-else-if="errored" class="text-center py-4 text-danger">
+				<div
+					v-else-if="errored"
+					class="text-center py-4 text-danger"
+				>
 					{{ $t("dashboard.error_loading_chart") }}
 				</div>
 				<div v-else>
-					<div class="h1 mb-3">{{ firstcount }}</div>
-					<div v-if="secondcount != null" class="d-flex mb-2">
+					<div class="h1 mb-3">
+						{{ firstcount }}
+					</div>
+					<div
+						v-if="secondcount != null"
+						class="d-flex mb-2"
+					>
 						<div>{{ $t(secondtitle) }}</div>
 						<div class="ms-auto">
 							<span class="badge bg-purple">
@@ -55,11 +66,11 @@ export default {
 	},
 	data() {
 		return {
-		firstcount: null,
-		secondcount: null,
-		loaded: false,
-		errored: false,
-		errormsg: null
+			firstcount: null,
+			secondcount: null,
+			loaded: false,
+			errored: false,
+			errormsg: null
 		}
 	},
 	computed: {

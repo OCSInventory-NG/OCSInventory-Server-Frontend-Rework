@@ -266,7 +266,7 @@
 									v-if="chartsVisible && item.type == 'Counter'"
 									:firsttitle="'dashboard.'+item.name"
 									secondtitle="dashboard.contacted"
-									:chartName="item.name"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -274,7 +274,7 @@
 								<PieChart
 									v-if="chartsVisible && item.type == 'DonutChart'"
 									:title="'dashboard.'+item.name"
-									:chartName="item.name"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -282,7 +282,7 @@
 								<LineChart
 									v-if="chartsVisible && item.type == 'LineChart'"
 									:title="'dashboard.'+item.name"
-									:chartName="item.name"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -290,7 +290,7 @@
 								<BarChart
 									v-if="chartsVisible && item.type == 'BarChart'"
 									:title="'dashboard.'+item.name"
-									:chartName="item.name"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"

@@ -19,10 +19,16 @@
 				<h3 class="card-title">
 					{{ $t(computedTitle) }}
 				</h3>
-				<div v-if="!loaded && !errored" class="text-center py-4">
+				<div
+					v-if="!loaded && !errored"
+					class="text-center py-4"
+				>
 					<b-spinner />
 				</div>
-				<div v-else-if="errored" class="text-center py-4 text-danger">
+				<div
+					v-else-if="errored"
+					class="text-center py-4 text-danger"
+				>
 					{{ $t("dashboard.error_loading_chart") }}
 				</div>
 				<apexchart 
