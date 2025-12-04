@@ -67,6 +67,11 @@
 					/>
 				</b-button>
 			</template>
+			<Alert
+				v-if="!update"
+				:message="$t('scheduler.creation_warning')"
+				variant="warning"
+			/>
 			<Alert 
 				v-if="createerror || errored"
 				:message="(createerror) ? createerrormsg : errormsg" 

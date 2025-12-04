@@ -484,6 +484,7 @@
     "active": "Activé",
     "addscheduler": "Ajouter une action automatisée",
     "comment": "Commentaire",
+    "creation_warning": "Cela va créer une entrée de planification faisant référence à une action automatisée personnalisée. Consultez la documentation pour obtenir des instructions complètes sur la création d’actions automatisées.",
     "daily": "Tous les jours",
     "date": "Date",
     "day_of_month": "Jour du mois",
