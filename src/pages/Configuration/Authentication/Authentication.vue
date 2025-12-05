@@ -93,11 +93,11 @@
 									</div>
 									<!-- OIDC -->
 									<div v-if="authmenu.value == 'OIDC'">
-										<Cas />
+										<Oidc />
 									</div>
 									<!-- CAS -->
 									<div v-if="authmenu.value == 'CAS'">
-										<Oidc />
+										<Cas />
 									</div>
 								</b-tab>
 							</b-tabs>
