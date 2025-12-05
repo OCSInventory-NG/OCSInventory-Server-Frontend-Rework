@@ -37,6 +37,10 @@
 								editcomponent="NetdeviceModal"
 								title="netdevice"
 								translationkey="network."
+								:server-side="true"
+								:server-total-rows="total"
+								:isbusy="isbusy"
+								@change-query="handleQueryChange"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -64,7 +68,15 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			total: 0,
+			query: {
+				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				offset: 0,
+				ordering: '-last_seen',
+				search: null,
+			},
+			isbusy: true,
 		}
 	},
 	async mounted() {
@@ -76,7 +88,8 @@ export default {
 				this.candelete = true
 			}
 			await this.getHeader()
-			await this.getNetdevice()
+			this.loading = false
+			await this.getNetdevice(this.query)
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -84,7 +97,7 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"netdevices", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"netdevices/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -98,15 +111,35 @@ export default {
 				})
 		},
 		// Retrieve netdevice
-		async getNetdevice() {
+		async getNetdevice(query = null) {
 			this.rowdata = []
 
-			var extendedRoute = "/?expand=network"
-			if(this.$route.params.id) extendedRoute = "/?expand=network&network="+this.$route.params.id
+			const q = query || this.query
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices"+extendedRoute, { headers: this.header })
+			const params = {
+				expand: 'network',
+			}
+
+			if (q.limit != null) params.limit = q.limit
+			if (q.offset != null) params.offset = q.offset
+			if (q.ordering) params.ordering = q.ordering
+			if (q.search) params.search = q.search
+
+			if(this.$route.params.id) params.network = this.$route.params.id
+
+			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/",
+				{ headers: this.header, params })
 				.then(response => {
-					for (const netdevice of response.data) {
+					const data = response.data
+					const results = data.results || data
+
+					if (typeof data.count === 'number') {
+						this.total = data.count
+					} else {
+						this.total = results.length
+					}
+
+					for (const netdevice of results) {
 						netdevice.network = netdevice.network.name
 						this.rowdata.push(netdevice)
 					}
@@ -118,11 +151,23 @@ export default {
 					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
-				.finally(() => this.loading = false)
+				.finally(() => {
+					this.isbusy = false
+				})
 		},
 		async reloadDatatable() {
-			this.loading = true
-			await this.getNetdevice()
+			this.isbusy = true
+			await this.getNetdevice(this.query)
+		},
+		async handleQueryChange(newQuery) {
+			if (!this.isbusy) {
+				this.isbusy = true
+				this.query = {
+					...this.query,
+					...newQuery,
+				}
+				await this.getNetdevice(this.query)
+			}
 		}
 	}
 }
