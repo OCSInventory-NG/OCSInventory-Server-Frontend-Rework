@@ -20,6 +20,7 @@ import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
+import Draggable from '@/components/Draggable/Draggable.vue'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -29,6 +30,7 @@ const GlobalComponents = {
 		Vue.component('CategoryModal', CategoryModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
+		Vue.component('Draggable', Draggable)
 		Vue.component('DuplicateModal', DuplicateModal)
 		Vue.component('ExportTemplateModal', ExportTemplateModal)
 		Vue.component('FieldModal', FieldModal)

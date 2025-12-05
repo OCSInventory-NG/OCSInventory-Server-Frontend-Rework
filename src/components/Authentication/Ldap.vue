@@ -85,11 +85,9 @@
 
 <script>
 import axios from 'axios'
-import Draggable from '../Draggable/Draggable.vue'
 
 export default {
 	name: "Ldap",
-	components: { Draggable },
 	data() {
 		return {
 			errormsg: null,
