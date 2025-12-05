@@ -267,6 +267,7 @@
     "false": "Non",
     "id": "ID",
     "information": "Informations",
+    "loading_data": "Chargement des données...",
     "login": "Connexion",
     "logout": "Déconnexion",
     "no": "Non",

@@ -267,6 +267,7 @@
     "false": "No",
     "id": "ID",
     "information": "Information",
+    "loading_data": "Loading data...",
     "login": "Login",
     "logout": "Logout",
     "no": "No",
