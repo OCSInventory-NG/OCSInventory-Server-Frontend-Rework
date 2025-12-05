@@ -42,6 +42,10 @@
 								translationkey="inventory."
 								sortby="last_update"
 								sortdesc="desc"
+								:server-side="true"
+								:server-total-rows="total"
+								:isbusy="isbusy"
+								@change-query="handleQueryChange"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -69,7 +73,15 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			total: 0,
+			query: {
+				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				offset: 0,
+				ordering: '-last_update',
+				search: null,
+			},
+			isbusy: true,
 		}
 	},
 	async mounted() {
@@ -95,19 +107,40 @@ export default {
 					})
 					this.errormsg = null
 					this.errored = false
-					this.getAssets()
+					this.getAssets(this.query)
 				})
 				.catch(e => {
 					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
 		},
-		async getAssets() {
+		async getAssets(query = null) {
 			try {
+				const q = query || this.query
+
+				const params = {
+					accountinfo: true,
+				}
+
+				if (q.limit != null) params.limit = q.limit
+				if (q.offset != null) params.offset = q.offset
+				if (q.ordering) params.ordering = q.ordering
+				if (q.search) params.search = q.search
+
 				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true",
-					{ headers: this.header }
+					this.$config.BACKEND_API_ROUTE+"asset/bases/",
+					{ headers: this.header, params }
 				)
+
+				const data = response.data
+				const results = data.results || data
+
+				if (typeof data.count === 'number') {
+					this.total = data.count
+				} else {
+					this.total = results.length
+				}
+
 				const templateResponse = await axios.get(
 					this.$config.BACKEND_API_ROUTE+"templates/",
 					{ headers: this.header }
@@ -118,13 +151,13 @@ export default {
 					templates[template.id] = template.name
 				})
 
-				response.data.forEach(asset => {
+				results.forEach(asset => {
 					if (asset.template && templates[asset.template]) {
 						asset.template = templates[asset.template]
 					}
 				})
 
-				response.data.forEach(data => {
+				results.forEach(data => {
 					if(data.accountinfo) {
 						Object.keys(data.accountinfo).forEach(accountinfo => {
 							if(!this.rowheader.includes("Account info : " + accountinfo)) {
@@ -135,7 +168,8 @@ export default {
 					}
 				})
 
-				this.rowdata = response.data
+				this.rowdata = results
+
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
@@ -143,12 +177,24 @@ export default {
 				this.errored = true
 			} finally {
 				this.loading = false
+				this.isbusy = false
 			}
 		},
 		async reloadDatatable() {
-			this.loading = true
-			await this.getAssets()
+			this.isbusy = true
+			await this.getAssets(this.query)
 		},
+		async handleQueryChange(newQuery) {
+			if (!this.isbusy) {
+				this.isbusy = true
+				this.query = {
+					...this.query,
+					...newQuery,
+				}
+
+				await this.getAssets(this.query)
+			}
+		}
 	}
 }
 </script>
