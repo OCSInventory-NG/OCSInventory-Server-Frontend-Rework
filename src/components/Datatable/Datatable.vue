@@ -211,11 +211,14 @@
 				:select-mode="selectMode"
 				:items="rowdata" 
 				:fields="visibleFields"
-				:sort-by="sortby"
-				:sort-desc="sortdesc"
-				:per-page="perPage"
-				:current-page="currentPage"
-				:filter="filter"
+				v-model:sort-by="sortByLocal"
+				v-model:sort-desc="sortDescLocal"
+				:per-page="serverSide ? 0 : perPage"
+				:current-page="serverSide ? 1 : currentPage"
+				:filter="serverSide ? '' : filter"
+				:no-local-sorting="serverSide"
+				:no-local-filtering="serverSide"
+				:busy="isbusy"
 				primary-key="id"
 				style="white-space: pre-line;"
 				class="table-vcenter"
@@ -227,6 +230,13 @@
 				<!-- No data available -->
 				<template #empty="">
 					{{ $t('generic.no_data') }}
+				</template>
+
+				<template #table-busy>
+					<div class="text-center my-3">
+						<b-spinner small class="me-2" />
+						<span>{{ $t('generic.loading_data') }}</span>
+					</div>
 				</template>
 
 				<!-- Selected row -->
@@ -556,8 +566,8 @@ export default {
 		deletemultiple: { type: Boolean, default: false },
 		deleteids: { type: Array, default: null },
 		// Sort datatable parameters
-		sortby: { type: String, Default: null },
-		sortdesc: { type: String, Default: null },
+		sortby: { type: String, default: null },
+		sortdesc: { type: String, default: null },
 		templateid: { type: Number, default: 0 },
 		hiddenfields: { type: Array, default: null },
 		// Remove assets from group
@@ -565,6 +575,10 @@ export default {
 		assetgroupid: { type: [String, Number], default: null },
 		assets: { type: Array, default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
+		// Server side pagination
+		serverSide: { type: Boolean, default: false },
+		serverTotalRows: { type: Number, default: 0 },
+		isbusy: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -581,6 +595,8 @@ export default {
 				{ value: 1000, text: "1000" },
 			],
 			totalRows: 1,
+			sortByLocal: this.sortby,
+			sortDescLocal: this.sortdesc,
 			// Datatable datas
 			fields: [],
 			// Search parameter
@@ -622,7 +638,9 @@ export default {
 	},
 	watch: {
 		rowdata: function () {
-			this.totalRows = this.rowdata.length
+			if (!this.serverSide && Array.isArray(this.rowdata)) {
+				this.totalRows = this.rowdata.length
+			}
 		},
 		isChecked: function () {
 			if(this.isChecked) {
@@ -635,7 +653,42 @@ export default {
 		},
 		'$root.$i18n.locale': function() {
 			this.updateColumnLabels()
-		}
+		},
+		serverTotalRows(val) {
+			if (this.serverSide) {
+				this.totalRows = val
+			}
+		},
+		  currentPage() {
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
+		},
+		perPage() {
+			this.updateRowPage()
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
+		},
+		filter() {
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChangeDebounced()
+			}
+		},
+		sortByLocal() {
+			if (this.serverSide) {
+				this.currentPage = 1
+				this.emitQueryChange()
+			}
+		},
+		sortDescLocal() {
+			if (this.serverSide) {
+				this.currentPage = 1
+				this.emitQueryChange()
+			}
+		},
 	},
 	created() {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
@@ -769,13 +822,20 @@ export default {
 	},
 	mounted() {
 		// Set the initial number of items
-		this.totalRows = this.rowdata.length
+		if (this.serverSide) {
+			this.totalRows = this.serverTotalRows
+		} else {
+			this.totalRows = Array.isArray(this.rowdata) ? this.rowdata.length : 0
+		}
 		// Initialize data to export
 		this.json_data = this.rowdata
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
+			if (this.serverSide) {
+				return
+			}
 			this.totalRows = filteredItems.length
 			this.json_data = filteredItems
 			this.currentPage = 1
@@ -807,6 +867,46 @@ export default {
 			setTimeout(() => {
 				this.isReloading = false;
 			}, 3000);
+		},
+		getOrdering() {
+			if (!this.sortByLocal) return null
+			return this.sortDescLocal ? `-${this.sortByLocal}` : this.sortByLocal
+		},
+		emitQueryChange() {
+			if (!this.serverSide) return
+
+			const limit = Number(this.perPage) || 10
+			const offset = (Number(this.currentPage) - 1) * limit
+
+			const query = {
+				limit,
+				offset,
+			}
+
+			const ordering = this.getOrdering()
+			if (ordering) query.ordering = ordering
+			if (this.filter) query.search = this.filter
+
+			this.$emit('change-query', query)
+		},
+		emitQueryChangeDebounced: (function () {
+			let timeout = null
+			return function () {
+				if (!this.serverSide) return
+				clearTimeout(timeout)
+				timeout = setTimeout(() => {
+					this.emitQueryChange()
+				}, 400)
+			}
+		})(),
+		onSortChanged(ctx) {
+			// ctx = { sortBy, sortDesc, ... }
+			this.sortByLocal = ctx.sortBy
+			this.sortDescLocal = ctx.sortDesc
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
 		},
 		attributePackage() {
 			this.$emit('attributePackage', this.selected)
