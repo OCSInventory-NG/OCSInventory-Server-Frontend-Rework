@@ -67,7 +67,6 @@
 							<b-form-input
 								:id="index"
 								v-model="rows[index]"
-								:value="index"
 							/>
 						</b-form-group>
 					</b-col>
