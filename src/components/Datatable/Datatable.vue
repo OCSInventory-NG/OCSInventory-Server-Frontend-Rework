@@ -110,6 +110,19 @@
 					</b-button-group>
 				</div>
 
+				<!-- Mass processing -->
+				<div
+					v-if="canmassprocessing"
+					class="col-1 ocs-col-datatable"
+				>
+					<b-button-group class="mr-1">
+						<MassProcessingModal
+							:items="(multisearch && selected.length == 0) ? rowdata : selected"
+							@reloadDatatable="reloadDatatable"
+						/>
+					</b-button-group>
+				</div>
+
 				<!-- Scheduler history -->
 				<div
 					v-if="viewautomationhistory"
@@ -555,9 +568,10 @@ export default {
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
 		deleteids: { type: Array, default: null },
+		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
-		sortby: { type: String, Default: null },
-		sortdesc: { type: String, Default: null },
+		sortby: { type: String, Default: 'id' },
+		sortdesc: { type: String, Default: 'asc' },
 		templateid: { type: Number, default: 0 },
 		hiddenfields: { type: Array, default: null },
 		// Remove assets from group
@@ -626,7 +640,18 @@ export default {
 		},
 		isChecked: function () {
 			if(this.isChecked) {
-				this.$refs.selectableTable.selectAllRows()
+				const perPage = this.perPage
+				const currentPage = this.currentPage
+
+				const start = (currentPage - 1) * perPage
+				const end   = Math.min(start + perPage, this.rowdata.length)
+
+				this.$refs.selectableTable.clearSelected()
+				this.selected = []
+
+				for (let index = start; index < end; index++) {
+					this.$refs.selectableTable.selectRow(index)
+				}
 			} else {
 				this.$refs.selectableTable.clearSelected()
 				this.selected = []

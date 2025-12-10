@@ -10,6 +10,7 @@ import FieldModal from '@/components/Modals/Item/FieldModal.vue'
 import GroupModal from '@/components/Modals/Item/GroupModal.vue'
 import ImportTemplateModal from '@/components/Modals/ImportExportItem/ImportTemplateModal.vue'
 import Localeswitcher from '@/components/LocaleSwitcher/LocaleSwitcher.vue'
+import MassProcessingModal from '@/components/Modals/Item/MassProcessingModal.vue'
 import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
 import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
@@ -35,6 +36,7 @@ const GlobalComponents = {
 		Vue.component('GroupModal', GroupModal)
 		Vue.component('ImportTemplateModal', ImportTemplateModal)
 		Vue.component('Localeswitcher', Localeswitcher)
+		Vue.component('MassProcessingModal', MassProcessingModal)
 		Vue.component('NetdeviceModal', NetdeviceModal)
 		Vue.component('NetworkGroupModal', NetworkGroupModal)
 		Vue.component('NetworkModal', NetworkModal)

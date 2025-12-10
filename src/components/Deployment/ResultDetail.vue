@@ -75,7 +75,7 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "package") {
@@ -114,7 +114,7 @@ export default {
 
 			await axios.get(
 				this.$config.BACKEND_API_ROUTE+
-					"deployment/results?"+
+					"deployment/results/?"+
 					this.parameter+
 					"&expand=group",
 				{ headers: this.header }

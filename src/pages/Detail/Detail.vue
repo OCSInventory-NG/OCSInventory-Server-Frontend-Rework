@@ -86,7 +86,6 @@
 										:key="category.id"
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										title-item-class="ocs-menu-tab"
-										lazy
 										@click="scrollToTop()"
 									>
 										<div v-if="category.id == 1">
@@ -141,7 +140,7 @@
 												<Inventory
 													v-if="section.template == device.templateid"
 													:section="section"
-													:inventory="sections[section.id]"
+													:base="device.id"
 												/>
 											</div>
 										</div>
@@ -235,7 +234,6 @@ export default {
 			if(this.$route.params.id) this.id = this.$route.params.id
 			await this.getInventoryBase()
 			await this.getCategories()
-			await this.getInventoryCollection()
 		}
 		if(this.$route.params.type == 'netdevice') {
 			this.type = "IPDISCOVER"
@@ -312,25 +310,6 @@ export default {
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
-			}
-		},
-		async getInventoryCollection() {
-			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/sections/?base="+this.$route.params.id+"&expand=fields",
-					{ headers: this.header }
-				)
-				this.sections = []
-				for (const inventory of response.data) {
-					if (!this.sections[inventory.template_section]) {
-						this.sections[inventory.template_section] = []
-					}
-
-					this.sections[inventory.template_section].push(inventory.fields)
-				}
-			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
 			} finally {
 				this.loading = false
 			}
@@ -343,7 +322,6 @@ export default {
 			this.loading = true
 			await this.getInventoryBase()
 			await this.getCategories()
-			await this.getInventoryCollection()
 			this.$nextTick(() => {
 				this.activeTab = currentTab
 			})
