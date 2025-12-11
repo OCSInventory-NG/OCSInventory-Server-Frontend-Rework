@@ -881,11 +881,11 @@ export default {
 			const query = {
 				limit,
 				offset,
+				search: this.filter && this.filter.length ? this.filter : null,
 			}
 
 			const ordering = this.getOrdering()
 			if (ordering) query.ordering = ordering
-			if (this.filter) query.search = this.filter
 
 			this.$emit('change-query', query)
 		},
