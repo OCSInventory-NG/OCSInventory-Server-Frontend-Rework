@@ -8,8 +8,6 @@ import router from '@/route'
 import i18n from '@/i18n'
 /***** Apex Charts *****/
 import VueApexCharts from 'vue3-apexcharts'
-/***** Vue Json Excel 3 *****/
-import JsonExcel from 'vue-json-excel3'
 /***** Vue select *****/
 import vSelect from "vue-select"
 import "vue-select/dist/vue-select.css"
@@ -52,7 +50,6 @@ loadConfig().then((config) => {
 	app.use(router)
 	app.use(i18n)
 	app.use(VueApexCharts)
-	app.component("DownloadExcel", JsonExcel)
 	app.component("VSelect", vSelect)
 	app.component("Multiselect", VueMultiselect)
 	app.component('FontAwesomeIcon', FontAwesomeIcon)
