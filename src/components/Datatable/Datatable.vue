@@ -213,7 +213,7 @@
 				bordered
 				:selectable="usecheckbox"
 				:select-mode="selectMode"
-				:items="rowdata" 
+				:items="rowdata"
 				:fields="visibleFields"
 				v-model:sort-by="sortByLocal"
 				v-model:sort-desc="sortDescLocal"
