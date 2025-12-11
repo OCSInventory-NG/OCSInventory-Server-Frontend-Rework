@@ -100,7 +100,7 @@
 															{{ $t(translationkey+key) }}
 														</div>
 														<div class="datagrid-content">
-															{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
+															{{ formatDate(value, key) }}
 														</div>
 													</div>
 												</div>
@@ -336,6 +336,14 @@ export default {
 					scrollContainer.scrollTop = 0;
 				}
 			});
+		},
+		formatDate(value, key) {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
 		}
 	}
 }

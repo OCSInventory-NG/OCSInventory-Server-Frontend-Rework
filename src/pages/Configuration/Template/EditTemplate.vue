@@ -61,7 +61,7 @@
 										<span class="datagrid-title">
 											{{ $t('inventory.last_update') }} :
 										</span>
-										{{ template.last_update }}
+										{{ formatDate(template.last_update, 'last_update') }}
 									</p>
 								</b-col>
 							</b-row>
@@ -172,6 +172,14 @@ export default {
 			await this.getTemplate()
 			await this.getSections()
 		},
+		formatDate(value, key) {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
+		}
 	}
 }
 </script>

@@ -78,7 +78,7 @@
 										{{ $t("assetgroup.last_updated") }}
 									</div>
 									<div class="datagrid-content">
-										{{ groupinfo.last_updated }}
+										{{ formatDate(groupinfo.last_updated, 'last_updated') }}
 									</div>
 								</div>
 								<div class="datagrid-item">
@@ -266,7 +266,15 @@ export default {
 		async reloadDatatable() {
 			this.loadingasset = true
 			await this.getAssetGroup(true)
-		}
+		},
+		formatDate(value, key) {
+			const dateFields = ['last_updated', 'created_at', 'updated_at']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
+		},
 	}
 }
 </script>
