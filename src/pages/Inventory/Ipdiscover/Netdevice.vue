@@ -41,6 +41,8 @@
 								:server-total-rows="total"
 								:isbusy="isbusy"
 								@change-query="handleQueryChange"
+								@export="handleExport"
+								@export-all="exportAllNetdevices"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -168,6 +170,52 @@ export default {
 				}
 				await this.getNetdevice(this.query)
 			}
+		},
+		handleExport({ scope, rows }) {
+			const csv = this.buildCsvFromRows(rows)
+			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			link.setAttribute('download', `netdevices_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
+		},
+		buildCsvFromRows(rows) {
+			if (!rows || !rows.length) return ''
+			const headers = Object.keys(rows[0])
+			const csvRows = []
+			csvRows.push(headers.join(';'))
+
+			rows.forEach(row => {
+				const values = headers.map(h => {
+					const v = row[h] != null ? String(row[h]) : ''
+					return `"${v.replace(/"/g, '""')}"`
+				})
+				csvRows.push(values.join(';'))
+			})
+
+			return csvRows.join('\n')
+		},
+		async exportAllNetdevices({ filter, ordering }) {
+			const allRows = []
+
+			if (filter) params.search = filter
+			if (ordering) params.ordering = ordering
+
+			if(this.$route.params.id) params.network = this.$route.params.id
+
+			const { data } = await axios.get(
+				this.$config.BACKEND_API_ROUTE + "netdevices/",
+				{ headers: this.header, params }
+			)
+
+			const results = data.results || data
+			allRows.push(...results)
+
+			this.handleExport({ scope: 'all', rows: allRows })
 		}
 	}
 }

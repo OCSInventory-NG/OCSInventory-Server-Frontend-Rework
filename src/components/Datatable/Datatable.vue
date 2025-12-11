@@ -47,22 +47,13 @@
 					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
-						<download-excel
-							:data="json_data"
-							:fields="json_fields"
-							type="xlsx"
-							:name="title+'_export.xlsx'"
-						>
-							<button 
-								id="export-row"
-								:title="$t('generic.exportdata')"
-								class="form-control btn datatable-btn"
-							>
-								<font-awesome-icon 
-									:icon="['fas', 'upload']"
-								/>
-							</button>
-						</download-excel>
+						<ExportModal
+							:server-side="serverSide"
+							:total-rows="totalRows"
+							:page-length="pageRows.length"
+							:selection-length="selectionLength"
+							@confirm="onExportConfirm"
+						/>
 					</b-button-group>
 				</div>
 
@@ -634,7 +625,22 @@ export default {
 			localStorage.removeItem(key)
 			localStorage.setItem(key, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
-		}
+		},
+		pageRows() {
+			if (this.serverSide) {
+				return Array.isArray(this.rowdata) ? this.rowdata : []
+			}
+			const source = (this.json_data && this.json_data.length)
+				? this.json_data
+				: (this.rowdata || [])
+			const start = (this.currentPage - 1) * this.perPage
+			const end = start + this.perPage
+			return source.slice(start, end)
+		},
+
+		selectionLength() {
+			return Array.isArray(this.selected) ? this.selected.length : 0
+		},
 	},
 	watch: {
 		rowdata: function () {
@@ -900,13 +906,83 @@ export default {
 			}
 		})(),
 		onSortChanged(ctx) {
-			// ctx = { sortBy, sortDesc, ... }
 			this.sortByLocal = ctx.sortBy
 			this.sortDescLocal = ctx.sortDesc
 			this.currentPage = 1
 			if (this.serverSide) {
 				this.emitQueryChange()
 			}
+		},
+		onExportConfirm(mode) {
+			if (!this.serverSide) {
+				let rows = []
+
+				if (mode === 'selection') {
+					rows = this.selected || []
+					this.exportRowsLocal(rows, 'selection')
+					return
+				}
+
+				if (mode === 'current') {
+					rows = this.pageRows
+					this.exportRowsLocal(rows, 'page')
+					return
+				}
+
+				rows = (this.json_data && this.json_data.length)
+					? this.json_data
+					: (this.rowdata || [])
+				this.exportRowsLocal(rows, 'all')
+				return
+			}
+
+			if (mode === 'selection') {
+				const rows = this.selected || []
+				this.$emit('export', { scope: 'selection', rows })
+				return
+			}
+
+			if (mode === 'current') {
+				const rows = this.pageRows
+				this.$emit('export', { scope: 'page', rows })
+				return
+			}
+
+			this.$emit('export-all', {
+				scope: 'all',
+				total: this.totalRows,
+				filter: this.filter || null,
+				ordering: this.getOrdering(),
+			})
+		},
+		exportRowsLocal(rows, scope) {
+			if (!rows || !rows.length) {
+				return
+			}
+
+			const headers = Object.keys(rows[0])
+			const csvRows = []
+
+			csvRows.push(headers.join(';'))
+
+			rows.forEach(row => {
+				const values = headers.map(h => {
+					const v = row[h] != null ? String(row[h]) : ''
+					return `"${v.replace(/"/g, '""')}"`
+				})
+				csvRows.push(values.join(';'))
+			})
+
+			const csv = csvRows.join('\n')
+			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			link.setAttribute('download', `${this.title}_export_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
 		},
 		attributePackage() {
 			this.$emit('attributePackage', this.selected)
