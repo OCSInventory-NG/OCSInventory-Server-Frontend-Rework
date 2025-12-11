@@ -17,9 +17,22 @@
 			</b-button>
 			<div class="card-body line-card">
 				<h3 class="card-title">
-					{{ $t(title) }}
+					{{ $t(computedTitle) }}
 				</h3>
+				<div
+					v-if="!loaded && !errored"
+					class="text-center py-4"
+				>
+					<b-spinner />
+				</div>
+				<div
+					v-else-if="errored"
+					class="text-center py-4 text-danger"
+				>
+					{{ $t("dashboard.error_loading_chart") }}
+				</div>
 				<apexchart 
+					v-else
 					type="line" 
 					:options="chartOptions" 
 					:series="series"
@@ -32,11 +45,12 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
 	name: "LineChart",
 	props: {
-		options: { type: Object, default: null },
-		series: { type: Array, default: null },
+		chartName: { type: String, default: null },
 		title: { type: String, default: null },
 		edit: { type: Boolean, default: false },
 		i: { type: Number, default: 0 }
@@ -62,11 +76,35 @@ export default {
 						}
 					}
 				]
-			}
+			},
+			series: [],
+			loaded: false,
+			errored: false,
+			errormsg: null
+		}
+	},
+	computed: {
+		computedTitle() {
+			return `dashboard.${this.chartName}`
 		}
 	},
 	async mounted() {
-		this.chartOptions.xaxis = this.options["xaxis"]
+		try {
+			const header = {
+				"Content-Type": "application/json;charset=utf-8",
+				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+			}
+			const response = await axios.get(
+				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
+				{ headers: header }
+			)
+			this.series = response.data.series;
+			this.chartOptions.xaxis = response.data.options.xaxis;
+			this.loaded = true;
+		} catch(e) {
+			this.errored = true
+			this.errormsg = e.response?.data?.error || e.message
+		}
 	},
 	methods: {
 		removeItem() {

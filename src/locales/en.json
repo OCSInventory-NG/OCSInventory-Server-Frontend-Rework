@@ -183,6 +183,7 @@
     "deletedashboardlayout": "Remove dashboard",
     "Devices per last contacted date (7 days)": "Line - Devices per last contacted date (7 days)",
     "editdashboardlayout": "Add/Edit dashboard",
+    "error_loading_chart": "Error while loading chart",
     "lastcontacted": "Assets last contacted in the last 7 days",
     "nbassets": "Assets number",
     "nb_netdevices": "Devices number",

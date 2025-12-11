@@ -263,38 +263,34 @@
 								:is-resizable="item.resizable"
 							>
 								<Counter 
-									v-if="item.type == 'Counter'"
+									v-if="chartsVisible && item.type == 'Counter'"
 									:firsttitle="'dashboard.'+item.name"
-									:firstcount="chartData[activeLayout][item.i].data.total"
 									secondtitle="dashboard.contacted"
-									:secondcount="chartData[activeLayout][item.i].data.contacted"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
 								/>
 								<PieChart
-									v-if="item.type == 'DonutChart'"
+									v-if="chartsVisible && item.type == 'DonutChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[activeLayout][item.i].data.options"
-									:series="chartData[activeLayout][item.i].data.series"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
 								/>
 								<LineChart
-									v-if="item.type == 'LineChart'"
+									v-if="chartsVisible && item.type == 'LineChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[activeLayout][item.i].data.options"
-									:series="chartData[activeLayout][item.i].data.series"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
 								/>
 								<BarChart
-									v-if="item.type == 'BarChart'"
+									v-if="chartsVisible && item.type == 'BarChart'"
 									:title="'dashboard.'+item.name"
-									:options="chartData[activeLayout][item.i].data.options"
-									:series="chartData[activeLayout][item.i].data.series"
+									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
 									@removeItem="removeItem"
@@ -337,7 +333,7 @@ export default {
 			canedit: false,
 			canadd: false,
 			candelete: false,
-			chartData: [],
+			chartsVisible: false,
 			draggable: true,
 			resizable: true,
 			errormsg: null,
@@ -405,9 +401,11 @@ export default {
 		await this.getChartsList()
 		await this.getLayouts()
 		if (!this.errored) {
-			await this.getChartData()
 			this.loading = false
 		}
+		setTimeout(() => {
+			this.chartsVisible = true
+		}, 10)
 	},
 	methods: {
 		async getChartsList() {
@@ -498,6 +496,10 @@ export default {
 						) {
 							this.layouts.push(layouts)
 						}
+						this.optlayouts = this.layouts.map((layout, index) => ({
+							value: index,
+							text: layout.name
+						}));
 					}
 				}
 
@@ -514,53 +516,6 @@ export default {
 					this.syncEmptyLayoutFromActive()
 				}
 			}
-		},
-		async getChartData() {
-			this.loadingchart = true
-			this.optlayouts = []
-			this.chartData = []
-
-			const layoutPromises = this.layouts.map((charts, index) => {
-				this.optlayouts.push({
-					value: index,
-					text: charts.name || this.$t("dashboard.noname")
-				})
-
-				this.chartData[index] = []
-
-				if (!charts.layout || !charts.layout.length) {
-					return Promise.resolve()
-				}
-
-				const chartRequests = charts.layout.map(chart =>
-					axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chart.name+"/", { headers: this.header })
-						.then(response => ({
-							chart,
-							data: response.data
-						}))
-				)
-
-				return Promise.allSettled(chartRequests).then(results => {
-					results.forEach(result => {
-						if (result.status === "fulfilled") {
-							const { chart, data } = result.value
-							this.chartData[index][chart.i] = {
-								name: chart.name,
-								data
-							}
-							this.errormsg = null
-							this.errored = false
-						} else {
-							const e = result.reason
-							this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.errored = true
-						}
-					})
-				})
-			})
-
-			await Promise.all(layoutPromises)
-			this.loadingchart = false
 		},
 		saveDashboard() {
 			this.loadingsave = true
@@ -620,7 +575,6 @@ export default {
 			this.edit = false
 			await this.getLayouts()
 			if (!this.errored) {
-				await this.getChartData()
 				this.loading = false
 			}
 		},
@@ -629,9 +583,6 @@ export default {
 
 			if (index > -1) {
 				this.layouts[this.activeLayout].layout.splice(index, 1)
-				if (this.chartData[this.activeLayout]) {
-					this.chartData[this.activeLayout].splice(index, 1)
-				}
 				for (const layout of this.layouts[this.activeLayout].layout) {
 					if (layout.i > index) {
 						layout.i = index
@@ -646,24 +597,6 @@ export default {
 			}
 			var chartInfo = this.addchartid.split(";")
 			var index = this.layouts[this.activeLayout].layout.length
-
-			if (!this.chartData[this.activeLayout]) {
-				this.chartData[this.activeLayout] = []
-			}
-
-			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/"+chartInfo[0]+"/", { headers: this.header })
-				.then(response => {
-					this.chartData[this.activeLayout][index] = {
-						name: chartInfo[0],
-						data: response.data
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
 
 			if (chartInfo[1] == "Counter") {
 				this.layouts[this.activeLayout].layout.push({
