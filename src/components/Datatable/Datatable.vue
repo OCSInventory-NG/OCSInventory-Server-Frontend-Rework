@@ -702,6 +702,9 @@ export default {
 			this.updateColumnLabels(),
 			this.updateDateFormat()
 		},
+		isbusy: function() {
+			this.updateDateFormat()
+		},
 		serverTotalRows(val) {
 			if (this.serverSide) {
 				this.totalRows = val
