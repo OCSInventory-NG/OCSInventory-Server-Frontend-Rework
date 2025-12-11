@@ -201,6 +201,7 @@ export default {
 		},
 		async exportAllNetdevices({ filter, ordering }) {
 			const allRows = []
+			const params = {}
 
 			if (filter) params.search = filter
 			if (ordering) params.ordering = ordering

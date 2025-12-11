@@ -710,7 +710,7 @@ export default {
 				this.totalRows = val
 			}
 		},
-		  currentPage() {
+		currentPage() {
 			if (this.serverSide) {
 				this.emitQueryChange()
 			}
