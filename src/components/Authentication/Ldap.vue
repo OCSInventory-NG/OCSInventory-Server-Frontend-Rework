@@ -3,7 +3,8 @@
 		<!-- Display success box message -->
 		<div v-if="successed">
 			<Alert 
-				:message="$t('message.success_saved')" 
+				:message="$t('message.success_saved')"
+				:cols="true"
 				variant="success"
 			/>
 		</div>
@@ -11,7 +12,8 @@
 		<!-- Display error box message -->
 		<div v-if="errored">
 			<Alert 
-				:message="errormsg.message" 
+				:message="errormsg.message"
+				:cols="true"
 				variant="danger"
 			/>
 		</div>
@@ -120,6 +122,11 @@ export default {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
+		}
+	},
+	watch: {
+		successed: function() {
+			setTimeout(() => this.successed = false, 5000)
 		}
 	},
 	async mounted() {
