@@ -34,7 +34,10 @@
 								<b-col>
 									<p>{{ $t('deployment.description') }} : {{ rowpackagedata.description }}</p>
 									<p>{{ $t('deployment.target_os') }} : {{ $t('template.'+rowpackagedata.target_os) }}</p>
-									<p>{{ $t('deployment.date_created') }} : {{ rowpackagedata.date_created }}</p>
+									<p>
+										{{ $t('deployment.date_created') }} : 
+										{{ formatDate(rowpackagedata.date_created, 'date_created') }}
+									</p>
 								</b-col>
 							</b-row><br>
 							<ActionListModal
@@ -153,7 +156,15 @@ export default {
 		async reloadPackage() {
 			this.loading = true
 			await this.getPackage()
-		}
+		},
+		formatDate(value, key) {
+			const dateFields = ['last_updated', 'created_at', 'updated_at','date_created']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
+		},
 	}
 }
 </script>

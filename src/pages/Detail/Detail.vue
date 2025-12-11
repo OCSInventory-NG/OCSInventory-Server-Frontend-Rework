@@ -86,7 +86,6 @@
 										:key="category.id"
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										title-item-class="ocs-menu-tab"
-										lazy
 										@click="scrollToTop()"
 									>
 										<div v-if="category.id == 1">
@@ -101,7 +100,7 @@
 															{{ $t(translationkey+key) }}
 														</div>
 														<div class="datagrid-content">
-															{{ ($te('inventory.'+value)) ? $t('inventory.'+value) : value }}
+															{{ formatDate(value, key) }}
 														</div>
 													</div>
 												</div>
@@ -141,7 +140,7 @@
 												<Inventory
 													v-if="section.template == device.templateid"
 													:section="section"
-													:inventory="sections[section.id]"
+													:base="device.id"
 												/>
 											</div>
 										</div>
@@ -235,7 +234,6 @@ export default {
 			if(this.$route.params.id) this.id = this.$route.params.id
 			await this.getInventoryBase()
 			await this.getCategories()
-			await this.getInventoryCollection()
 		}
 		if(this.$route.params.type == 'netdevice') {
 			this.type = "IPDISCOVER"
@@ -266,12 +264,18 @@ export default {
 					this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/",
 					{ headers: this.header }
 				)
-				const templateResponse = await axios.get(
-					this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
-					{ headers: this.header }
-				)
+
+				let templateResponse = null
+
+				if (response.data.template) {
+					templateResponse = await axios.get(
+						this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
+						{ headers: this.header }
+					)
+				}
+				
 				response.data.templateid = response.data.template
-				response.data.template = templateResponse.data.name
+				response.data.template = (templateResponse) ? templateResponse.data.name : this.$t('generic.none')
 				this.device = response.data
 				this.deployment.push(response.data)
 			} catch (e) {
@@ -306,25 +310,6 @@ export default {
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
-			}
-		},
-		async getInventoryCollection() {
-			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/sections?base="+this.$route.params.id+"&expand=fields",
-					{ headers: this.header }
-				)
-				this.sections = []
-				for (const inventory of response.data) {
-					if (!this.sections[inventory.template_section]) {
-						this.sections[inventory.template_section] = []
-					}
-
-					this.sections[inventory.template_section].push(inventory.fields)
-				}
-			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
 			} finally {
 				this.loading = false
 			}
@@ -337,7 +322,6 @@ export default {
 			this.loading = true
 			await this.getInventoryBase()
 			await this.getCategories()
-			await this.getInventoryCollection()
 			this.$nextTick(() => {
 				this.activeTab = currentTab
 			})
@@ -352,6 +336,14 @@ export default {
 					scrollContainer.scrollTop = 0;
 				}
 			});
+		},
+		formatDate(value, key) {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created']
+			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
+			if (dateFields.includes(key)) {
+				return new Date(value).toLocaleString(this.$i18n.locale)
+			}
+			return value
 		}
 	}
 }

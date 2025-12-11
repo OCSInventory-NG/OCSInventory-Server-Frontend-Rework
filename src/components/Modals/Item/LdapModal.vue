@@ -215,6 +215,7 @@ export default {
 				auth_method: this.authid,
 				enabled: true,
 				priority: 1,
+				mappings: [],
 				config: {
 					SERVER_URI: null,
 					BIND_DN: null,
@@ -252,6 +253,7 @@ export default {
 					auth_method: this.authid,
 					enabled: true,
 					priority: 1,
+					mappings: [],
 					config: {
 						SERVER_URI: null,
 						BIND_DN: null,

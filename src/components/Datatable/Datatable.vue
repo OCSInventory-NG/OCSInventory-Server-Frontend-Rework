@@ -101,6 +101,19 @@
 					</b-button-group>
 				</div>
 
+				<!-- Mass processing -->
+				<div
+					v-if="canmassprocessing"
+					class="col-1 ocs-col-datatable"
+				>
+					<b-button-group class="mr-1">
+						<MassProcessingModal
+							:items="(multisearch && selected.length == 0) ? rowdata : selected"
+							@reloadDatatable="reloadDatatable"
+						/>
+					</b-button-group>
+				</div>
+
 				<!-- Scheduler history -->
 				<div
 					v-if="viewautomationhistory"
@@ -382,6 +395,22 @@
 						/>
 					</div>
 				</template>
+				<!-- Last update -->
+				<template #cell(last_update)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(last_updated)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(timestamp)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(date_created)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(date)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
 
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
@@ -556,6 +585,7 @@ export default {
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
 		deleteids: { type: Array, default: null },
+		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
 		sortby: { type: String, default: null },
 		sortdesc: { type: String, default: null },
@@ -650,7 +680,18 @@ export default {
 		},
 		isChecked: function () {
 			if(this.isChecked) {
-				this.$refs.selectableTable.selectAllRows()
+				const perPage = this.perPage
+				const currentPage = this.currentPage
+
+				const start = (currentPage - 1) * perPage
+				const end   = Math.min(start + perPage, this.rowdata.length)
+
+				this.$refs.selectableTable.clearSelected()
+				this.selected = []
+
+				for (let index = start; index < end; index++) {
+					this.$refs.selectableTable.selectRow(index)
+				}
 			} else {
 				this.$refs.selectableTable.clearSelected()
 				this.selected = []
@@ -658,7 +699,8 @@ export default {
 			this.attributePackage()
 		},
 		'$root.$i18n.locale': function() {
-			this.updateColumnLabels()
+			this.updateColumnLabels(),
+			this.updateDateFormat()
 		},
 		serverTotalRows(val) {
 			if (this.serverSide) {
@@ -835,6 +877,14 @@ export default {
 		}
 		// Initialize data to export
 		this.json_data = this.rowdata
+
+		this.rowdata.forEach(row => {
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date'];
+			const dateValue = dateFields.find(field => row[field]);
+			if (dateValue) {
+				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
+			}
+		});
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
@@ -1024,7 +1074,16 @@ export default {
 		updateRowPage() {
 			localStorage.removeItem("perPage")
 			localStorage.setItem("perPage", this.perPage)
-		}
+		},
+		updateDateFormat() {
+			this.rowdata.forEach(row => {
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date'];
+				const dateValue = dateFields.find(field => row[field]);
+				if (dateValue) {
+					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
+				}
+			});
+		},
 	}
 }
 </script>

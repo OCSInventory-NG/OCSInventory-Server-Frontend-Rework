@@ -42,7 +42,7 @@
 							v-for="theader in rowheader" 
 							:key="theader"
 						>
-							{{ element[theader] }}
+							{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
 						</td>
 						<td 
 							v-if="candelete || canedit"
@@ -115,14 +115,27 @@ export default {
 	data() {
 		return {
 			rowdatas: [],
+			dateFields: ['last_update', 'last_updated', 'timestamp', 'date_created'],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}		
 		}
 	},
+	watch: {
+		'$i18n.locale': function() {
+			this.updateDateFormat()
+		}
+	},
 	mounted() {
 		this.rowdatas = this.rowdata
+		this.rowdatas.forEach(row => {
+			for (const dateValue of this.dateFields) {
+				if (row[dateValue]) {
+					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale)
+				}
+			}
+		});
 		this.rowdatas.sort((a,b) => a[this.field] - b[this.field])
 	},
 	methods: {
@@ -150,6 +163,15 @@ export default {
 		},
 		reloadDatatable() {
 			this.$emit('reloadDatatable')
+		},
+		updateDateFormat(){
+			this.rowdatas.forEach(row => {
+				for (const dateValue of this.dateFields) {
+					if (row[dateValue]) {
+						row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale)
+					}
+				}
+			});
 		}
 	}
 }
