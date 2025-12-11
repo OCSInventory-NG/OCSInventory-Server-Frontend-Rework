@@ -207,6 +207,8 @@
 			<b-table
 				id="data-list"  
 				ref="selectableTable"
+				v-model:sort-by="sortByLocal"
+				v-model:sort-desc="sortDescLocal"
 				responsive
 				striped
 				hover
@@ -215,8 +217,6 @@
 				:select-mode="selectMode"
 				:items="rowdata"
 				:fields="visibleFields"
-				v-model:sort-by="sortByLocal"
-				v-model:sort-desc="sortDescLocal"
 				:per-page="serverSide ? 0 : perPage"
 				:current-page="serverSide ? 1 : currentPage"
 				:filter="serverSide ? '' : filter"
@@ -238,7 +238,10 @@
 
 				<template #table-busy>
 					<div class="text-center my-3">
-						<b-spinner small class="me-2" />
+						<b-spinner
+							small
+							class="me-2"
+						/>
 						<span>{{ $t('generic.loading_data') }}</span>
 					</div>
 				</template>
