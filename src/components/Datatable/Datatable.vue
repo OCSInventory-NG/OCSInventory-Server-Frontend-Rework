@@ -47,22 +47,13 @@
 					class="col-1 ocs-col-datatable" 
 				>
 					<b-button-group class="mr-1">
-						<download-excel
-							:data="json_data"
-							:fields="json_fields"
-							type="xlsx"
-							:name="title+'_export.xlsx'"
-						>
-							<button 
-								id="export-row"
-								:title="$t('generic.exportdata')"
-								class="form-control btn datatable-btn"
-							>
-								<font-awesome-icon 
-									:icon="['fas', 'upload']"
-								/>
-							</button>
-						</download-excel>
+						<ExportModal
+							:server-side="serverSide"
+							:total-rows="totalRows"
+							:page-length="pageRows.length"
+							:selection-length="selectionLength"
+							@confirm="onExportConfirm"
+						/>
 					</b-button-group>
 				</div>
 
@@ -216,19 +207,22 @@
 			<b-table
 				id="data-list"  
 				ref="selectableTable"
+				v-model:sort-by="sortByLocal"
+				v-model:sort-desc="sortDescLocal"
 				responsive
 				striped
 				hover
 				bordered
 				:selectable="usecheckbox"
 				:select-mode="selectMode"
-				:items="rowdata" 
+				:items="rowdata"
 				:fields="visibleFields"
-				:sort-by="sortby"
-				:sort-desc="sortdesc"
-				:per-page="perPage"
-				:current-page="currentPage"
-				:filter="filter"
+				:per-page="serverSide ? 0 : perPage"
+				:current-page="serverSide ? 1 : currentPage"
+				:filter="serverSide ? '' : filter"
+				:no-local-sorting="serverSide"
+				:no-local-filtering="serverSide"
+				:busy="isbusy"
 				primary-key="id"
 				style="white-space: pre-line;"
 				class="table-vcenter"
@@ -240,6 +234,16 @@
 				<!-- No data available -->
 				<template #empty="">
 					{{ $t('generic.no_data') }}
+				</template>
+
+				<template #table-busy>
+					<div class="text-center my-3">
+						<b-spinner
+							small
+							class="me-2"
+						/>
+						<span>{{ $t('generic.loading_data') }}</span>
+					</div>
 				</template>
 
 				<!-- Selected row -->
@@ -586,8 +590,8 @@ export default {
 		deleteids: { type: Array, default: null },
 		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
-		sortby: { type: String, Default: 'id' },
-		sortdesc: { type: String, Default: 'asc' },
+		sortby: { type: String, default: null },
+		sortdesc: { type: String, default: null },
 		templateid: { type: Number, default: 0 },
 		hiddenfields: { type: Array, default: null },
 		// Remove assets from group
@@ -595,6 +599,10 @@ export default {
 		assetgroupid: { type: [String, Number], default: null },
 		assets: { type: Array, default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
+		// Server side pagination
+		serverSide: { type: Boolean, default: false },
+		serverTotalRows: { type: Number, default: 0 },
+		isbusy: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -611,6 +619,8 @@ export default {
 				{ value: 1000, text: "1000" },
 			],
 			totalRows: 1,
+			sortByLocal: this.sortby,
+			sortDescLocal: this.sortdesc,
 			// Datatable datas
 			fields: [],
 			// Search parameter
@@ -648,11 +658,28 @@ export default {
 			localStorage.removeItem(key)
 			localStorage.setItem(key, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
-		}
+		},
+		pageRows() {
+			if (this.serverSide) {
+				return Array.isArray(this.rowdata) ? this.rowdata : []
+			}
+			const source = (this.json_data && this.json_data.length)
+				? this.json_data
+				: (this.rowdata || [])
+			const start = (this.currentPage - 1) * this.perPage
+			const end = start + this.perPage
+			return source.slice(start, end)
+		},
+
+		selectionLength() {
+			return Array.isArray(this.selected) ? this.selected.length : 0
+		},
 	},
 	watch: {
 		rowdata: function () {
-			this.totalRows = this.rowdata.length
+			if (!this.serverSide && Array.isArray(this.rowdata)) {
+				this.totalRows = this.rowdata.length
+			}
 		},
 		isChecked: function () {
 			if(this.isChecked) {
@@ -677,7 +704,45 @@ export default {
 		'$root.$i18n.locale': function() {
 			this.updateColumnLabels(),
 			this.updateDateFormat()
-		}
+		},
+		isbusy: function() {
+			this.updateDateFormat()
+		},
+		serverTotalRows(val) {
+			if (this.serverSide) {
+				this.totalRows = val
+			}
+		},
+		currentPage() {
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
+		},
+		perPage() {
+			this.updateRowPage()
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
+		},
+		filter() {
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChangeDebounced()
+			}
+		},
+		sortByLocal() {
+			if (this.serverSide) {
+				this.currentPage = 1
+				this.emitQueryChange()
+			}
+		},
+		sortDescLocal() {
+			if (this.serverSide) {
+				this.currentPage = 1
+				this.emitQueryChange()
+			}
+		},
 	},
 	created() {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
@@ -811,7 +876,11 @@ export default {
 	},
 	mounted() {
 		// Set the initial number of items
-		this.totalRows = this.rowdata.length
+		if (this.serverSide) {
+			this.totalRows = this.serverTotalRows
+		} else {
+			this.totalRows = Array.isArray(this.rowdata) ? this.rowdata.length : 0
+		}
 		// Initialize data to export
 		this.json_data = this.rowdata
 
@@ -826,6 +895,9 @@ export default {
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
+			if (this.serverSide) {
+				return
+			}
 			this.totalRows = filteredItems.length
 			this.json_data = filteredItems
 			this.currentPage = 1
@@ -857,6 +929,116 @@ export default {
 			setTimeout(() => {
 				this.isReloading = false;
 			}, 3000);
+		},
+		getOrdering() {
+			if (!this.sortByLocal) return null
+			return this.sortDescLocal ? `-${this.sortByLocal}` : this.sortByLocal
+		},
+		emitQueryChange() {
+			if (!this.serverSide) return
+
+			const limit = Number(this.perPage) || 10
+			const offset = (Number(this.currentPage) - 1) * limit
+
+			const query = {
+				limit,
+				offset,
+				search: this.filter && this.filter.length ? this.filter : null,
+			}
+
+			const ordering = this.getOrdering()
+			if (ordering) query.ordering = ordering
+
+			this.$emit('change-query', query)
+		},
+		emitQueryChangeDebounced: (function () {
+			let timeout = null
+			return function () {
+				if (!this.serverSide) return
+				clearTimeout(timeout)
+				timeout = setTimeout(() => {
+					this.emitQueryChange()
+				}, 400)
+			}
+		})(),
+		onSortChanged(ctx) {
+			this.sortByLocal = ctx.sortBy
+			this.sortDescLocal = ctx.sortDesc
+			this.currentPage = 1
+			if (this.serverSide) {
+				this.emitQueryChange()
+			}
+		},
+		onExportConfirm(mode) {
+			if (!this.serverSide) {
+				let rows = []
+
+				if (mode === 'selection') {
+					rows = this.selected || []
+					this.exportRowsLocal(rows, 'selection')
+					return
+				}
+
+				if (mode === 'current') {
+					rows = this.pageRows
+					this.exportRowsLocal(rows, 'page')
+					return
+				}
+
+				rows = (this.json_data && this.json_data.length)
+					? this.json_data
+					: (this.rowdata || [])
+				this.exportRowsLocal(rows, 'all')
+				return
+			}
+
+			if (mode === 'selection') {
+				const rows = this.selected || []
+				this.$emit('export', { scope: 'selection', rows })
+				return
+			}
+
+			if (mode === 'current') {
+				const rows = this.pageRows
+				this.$emit('export', { scope: 'page', rows })
+				return
+			}
+
+			this.$emit('export-all', {
+				scope: 'all',
+				total: this.totalRows,
+				filter: this.filter || null,
+				ordering: this.getOrdering(),
+			})
+		},
+		exportRowsLocal(rows, scope) {
+			if (!rows || !rows.length) {
+				return
+			}
+
+			const headers = Object.keys(rows[0])
+			const csvRows = []
+
+			csvRows.push(headers.join(';'))
+
+			rows.forEach(row => {
+				const values = headers.map(h => {
+					const v = row[h] != null ? String(row[h]) : ''
+					return `"${v.replace(/"/g, '""')}"`
+				})
+				csvRows.push(values.join(';'))
+			})
+
+			const csv = csvRows.join('\n')
+			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			link.setAttribute('download', `${this.title}_export_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
 		},
 		attributePackage() {
 			this.$emit('attributePackage', this.selected)

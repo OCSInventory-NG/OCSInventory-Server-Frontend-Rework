@@ -43,6 +43,12 @@
 								translationkey="inventory."
 								sortby="last_update"
 								sortdesc="desc"
+								:server-side="true"
+								:server-total-rows="total"
+								:isbusy="isbusy"
+								@change-query="handleQueryChange"
+								@export="handleExport"
+								@export-all="exportAllAssets"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -70,7 +76,15 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			total: 0,
+			query: {
+				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				offset: 0,
+				ordering: '-last_update',
+				search: null,
+			},
+			isbusy: true,
 		}
 	},
 	async mounted() {
@@ -82,7 +96,7 @@ export default {
 			}
 			await this.getAccountinfoCfg()
 			await this.getHeader()
-			await this.getAssets()
+			await this.getAssets(this.query)
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -109,7 +123,7 @@ export default {
 		async getAccountinfoCfg() {
 			try {
 				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"accountinfo/config?datatarget=ASSET",
+					this.$config.BACKEND_API_ROUTE+"accountinfo/config/?datatarget=ASSET",
 					{ headers: this.header }
 				)
 
@@ -123,12 +137,33 @@ export default {
 				this.errored = true
 			}
 		},
-		async getAssets() {
+		async getAssets(query = null) {
 			try {
+				const q = query || this.query
+
+				const params = {
+					accountinfo: true,
+				}
+
+				if (q.limit != null) params.limit = q.limit
+				if (q.offset != null) params.offset = q.offset
+				if (q.ordering) params.ordering = q.ordering
+				if (q.search) params.search = q.search
+
 				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/bases/?accountinfo=true",
-					{ headers: this.header }
+					this.$config.BACKEND_API_ROUTE+"asset/bases/",
+					{ headers: this.header, params }
 				)
+
+				const data = response.data
+				const results = data.results || data
+
+				if (typeof data.count === 'number') {
+					this.total = data.count
+				} else {
+					this.total = results.length
+				}
+
 				const templateResponse = await axios.get(
 					this.$config.BACKEND_API_ROUTE+"templates/",
 					{ headers: this.header }
@@ -139,13 +174,13 @@ export default {
 					templates[template.id] = template.name
 				})
 
-				response.data.forEach(asset => {
+				results.forEach(asset => {
 					if (asset.template && templates[asset.template]) {
 						asset.template = templates[asset.template]
 					}
 				})
 
-				response.data.forEach(data => {
+				results.forEach(data => {
 					if(data.accountinfo) {
 						Object.keys(data.accountinfo).forEach(accountinfo => {
 							if(!this.rowheader.includes("Account info : " + accountinfo)) {
@@ -156,7 +191,8 @@ export default {
 					}
 				})
 
-				this.rowdata = response.data
+				this.rowdata = results
+
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
@@ -164,12 +200,71 @@ export default {
 				this.errored = true
 			} finally {
 				this.loading = false
+				this.isbusy = false
 			}
 		},
 		async reloadDatatable() {
-			this.loading = true
-			await this.getAssets()
+			this.isbusy = true
+			await this.getAssets(this.query)
 		},
+		async handleQueryChange(newQuery) {
+			if (!this.isbusy) {
+				this.isbusy = true
+				this.query = {
+					...this.query,
+					...newQuery,
+				}
+
+				await this.getAssets(this.query)
+			}
+		},
+		handleExport({ scope, rows }) {
+			const csv = this.buildCsvFromRows(rows)
+			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+			link.setAttribute('download', `assets_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
+		},
+		buildCsvFromRows(rows) {
+			if (!rows || !rows.length) return ''
+			const headers = Object.keys(rows[0])
+			const csvRows = []
+			csvRows.push(headers.join(';'))
+
+			rows.forEach(row => {
+				const values = headers.map(h => {
+					const v = row[h] != null ? String(row[h]) : ''
+					return `"${v.replace(/"/g, '""')}"`
+				})
+				csvRows.push(values.join(';'))
+			})
+
+			return csvRows.join('\n')
+		},
+		async exportAllAssets({ filter, ordering }) {
+			const allRows = []
+
+			const params = {
+				accountinfo: true
+			}
+			if (filter) params.search = filter
+			if (ordering) params.ordering = ordering
+
+			const { data } = await axios.get(
+				this.$config.BACKEND_API_ROUTE + "asset/bases/",
+				{ headers: this.header, params }
+			)
+
+			const results = data.results || data
+			allRows.push(...results)
+
+			this.handleExport({ scope: 'all', rows: allRows })
+		}
 	}
 }
 </script>
