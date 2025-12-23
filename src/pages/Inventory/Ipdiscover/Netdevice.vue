@@ -67,6 +67,7 @@ export default {
 			errored: false,
 			canedit: false,
 			candelete: false,
+			accountinfoName: "",
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -89,6 +90,7 @@ export default {
 			if(localStorage.getItem('permissions').split(",").includes("netdevice_delete_netdevice")) {
 				this.candelete = true
 			}
+			await this.getAccountinfoCfg()
 			await this.getHeader()
 			this.loading = false
 			await this.getNetdevice(this.query)
@@ -112,6 +114,23 @@ export default {
 					this.errored = true
 				})
 		},
+		async getAccountinfoCfg() {
+			try {
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"accountinfo/config/?datatarget=IPDISCOVER",
+					{ headers: this.header }
+				)
+				for (const accountinfo of response.data) {
+					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
+						this.rowheader.push("Account info : " + accountinfo.name)
+						this.accountinfoName = accountinfo.name
+					}
+				}
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
 		// Retrieve netdevice
 		async getNetdevice(query = null) {
 			this.rowdata = []
@@ -120,6 +139,7 @@ export default {
 
 			const params = {
 				expand: 'network',
+				accountinfo: true,
 			}
 
 			if (q.limit != null) params.limit = q.limit
@@ -140,11 +160,24 @@ export default {
 					} else {
 						this.total = results.length
 					}
+					results.forEach(data => {
+						if(data.accountinfo) {
+							Object.keys(data.accountinfo).forEach(accountinfo => {
+								if(accountinfo === this.accountinfoName) {
+									if(!this.rowheader.includes("Account info : " + accountinfo)) {
+										this.rowheader.push("Account info : " + accountinfo)
+									}
+									data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
+								}
+							})
+						}
+					})
 
 					for (const netdevice of results) {
 						netdevice.network = netdevice.network.name
-						this.rowdata.push(netdevice)
 					}
+
+					this.rowdata = results
 
 					this.errormsg = null
 					this.errored = false
