@@ -303,6 +303,10 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "0": "Success",
+    "1": "Pending",
+    "2": "Notified",
+    "3": "Error",
     "agent": "Agent",
     "asset": "Asset",
     "assign": "Assign a static group",
@@ -646,6 +650,7 @@
     "rules": "Rules",
     "savedsearch": "Saved searches",
     "snmp": "SNMP",
+    "snmpscanner": "Scanners",
     "system": "System",
     "template": "Template",
     "templates": "Templates",
