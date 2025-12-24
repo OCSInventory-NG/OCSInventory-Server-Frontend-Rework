@@ -232,7 +232,10 @@ export default {
 					for (const [key, value] of Object.entries(match || {})) {
 						var col = null
 						if (this.$te(this.translation_col_keys[type]+"."+key)) {
-							col = `${this.$t("title."+this.translation_title_keys[type])}: ${this.$t(this.translation_col_keys[type]+"."+key)}`
+							col = `
+								${this.$t("title."+this.translation_title_keys[type])}: 
+								${this.$t(this.translation_col_keys[type]+"."+key)}
+							`
 						} else if(type == "inventory_sections") {
 							col = `${this.$t("title."+this.translation_title_keys[type])}: ${key}`
 						}
