@@ -132,7 +132,10 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row v-for="field in fieldsToForeach" :key="field">
+				<b-row
+					v-for="field in fieldsToForeach"
+					:key="field"
+				>
 					<b-col>
 						<b-form-group
 							:label="$t('software.'+field)"
