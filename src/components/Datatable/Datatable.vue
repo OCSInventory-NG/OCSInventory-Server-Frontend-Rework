@@ -414,6 +414,9 @@
 				<template #cell(date)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
+				<template #cell(updated_at)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
 
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
@@ -1083,7 +1086,7 @@ export default {
 		},
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
-				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date'];
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date', 'updated_at'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
