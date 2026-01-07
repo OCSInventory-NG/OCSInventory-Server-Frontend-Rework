@@ -325,7 +325,8 @@ export default {
 					})
 					.finally(() => this.loadingcreate = false)
 			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"software_mapping/"+this.row.id+"/", this.row, { headers: this.header })
+				axios.patch(this.$config.BACKEND_API_ROUTE+"software_mapping/"+this.row.id+"/", this.row,
+					{ headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null

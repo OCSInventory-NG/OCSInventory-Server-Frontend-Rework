@@ -142,16 +142,19 @@ export default {
 			this.loading = false
 		},
 		async getTemplate(templateId) {
-			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+templateId+"/", { headers: this.header })
+			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+templateId+"/",
+				{ headers: this.header })
 			return response.data.name
 		},
 		async getSection(sectionId) {
-			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+sectionId+"/", { headers: this.header })
+			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+sectionId+"/",
+				{ headers: this.header })
 			return response.data.name
 		},
 		async getFields(fieldsId) {
 			if (fieldsId) {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+fieldsId+"/", { headers: this.header })
+				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+fieldsId+"/",
+					{ headers: this.header })
 				return response.data.name
 			}
 			return null
