@@ -308,6 +308,10 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "0": "Succès",
+    "1": "En attente",
+    "2": "Notifié",
+    "3": "En erreur",
     "agent": "Agent",
     "asset": "Actif",
     "assign": "Assigner un groupe statique",
@@ -651,6 +655,7 @@
     "rules": "Règles",
     "savedsearch": "Recherches sauvegardées",
     "snmp": "SNMP",
+    "snmpscanner": "Scanners",
     "system": "Système",
     "template": "Modèle",
     "templates": "Modèles",
