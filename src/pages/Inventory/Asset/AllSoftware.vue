@@ -42,7 +42,7 @@
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
-								:redirectToSearch="true"
+								:redirect-to-search="true"
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllSoftwares"
