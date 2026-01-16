@@ -189,6 +189,7 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.networkmodal = true
+			this.netgroup = []
 			this.getNetworks(id)
 		},
 		async getNetworks(id) {
