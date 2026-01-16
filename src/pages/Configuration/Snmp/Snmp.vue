@@ -472,7 +472,7 @@ export default {
 			this.getSnmpTemplateHeader()
 			this.getSnmpScannerHeader()
 		},
-		assetsSearch(identifier) {
+		assetsSearch(params) {
 			var search = [
 				[
 					{
@@ -481,7 +481,7 @@ export default {
 						field: "identifier",
 						fieldtype: "string",
 						operator: "iexact",
-						value: identifier,
+						value: params[0],
 						link: ""
 					}
 				]

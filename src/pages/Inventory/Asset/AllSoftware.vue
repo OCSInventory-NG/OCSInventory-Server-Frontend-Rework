@@ -42,10 +42,12 @@
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
+								:redirectToSearch="true"
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllSoftwares"
 								@reloadDatatable="reloadDatatable"
+								@assetsSearch="assetsSearch"
 							/>
 						</div>
 					</div>
@@ -212,6 +214,46 @@ export default {
 			allRows.push(...results)
 
 			this.handleExport({ scope: 'all', rows: allRows })
+		},
+		assetsSearch(params) {
+			var search = [
+				[
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "name",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[0],
+						link: "AND"
+					},
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "publisher",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[1],
+						link: "AND"
+					},
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "version",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[2],
+						link: "AND"
+					},
+				]
+			]
+
+			localStorage.setItem('multisearch', JSON.stringify(search))
+			localStorage.setItem('useSavedSearch', true)
+
+			this.$router.push({
+				name: 'Multisearch',
+			});
 		}
 	}
 }

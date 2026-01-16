@@ -311,6 +311,7 @@ export default {
 				{ value: "asset/logs", text: this.$t("title.inventory_logs") },
 				{ value: "templates", text: this.$t("title.inventory") },
 				{ value: "snmp/scanner", text: this.$t("network.snmpscanner") },
+				{ value: "software_dictionary", text: this.$t("title.software_dictionary") },
 			],
 			obj: {
 				"asset/bases": "InventoryBase",
@@ -318,7 +319,8 @@ export default {
 				"deployment/results": "results",
 				"asset/logs": "logs",
 				"templates": "inventory_sections",
-				"snmp/scanner": "snmpscanner"
+				"snmp/scanner": "snmpscanner",
+				"software_dictionary": "software_dictionary_entries",
 			},
 			fieldopt: [],
 			operatoropt: {
@@ -447,6 +449,10 @@ export default {
 
 				if(component == "snmp") {
 					component = "network"
+				}
+
+				if(component == "software_dictionary") {
+					component = "software"
 				}
 
 				this.datavalues[masterindex][index].object = this.obj[route]
