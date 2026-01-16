@@ -311,6 +311,10 @@
     "permissions": "Permissions"
   },
   "inventory": {
+    "0": "Success",
+    "1": "Pending",
+    "2": "Notified",
+    "3": "Error",
     "agent": "Agent",
     "asset": "Asset",
     "assign": "Assign a static group",
@@ -673,6 +677,7 @@
     "software_dictionary": "Softwares",
     "software_mapping": "Software mapping",
     "snmp": "SNMP",
+    "snmpscanner": "Scanners",
     "system": "System",
     "template": "Template",
     "templates": "Templates",
