@@ -267,6 +267,22 @@ const routes = [
 		meta: {
 			layout: AppLayout
 		}
+	},
+	{
+		path: '/configurations/software_mapping',
+		name: 'SoftwareMapping',
+		component: () => import('@/pages/Configuration/SoftwareMapping/SoftwareMapping.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/inventory/software_dictionary',
+		name: 'AllSoftware',
+		component: () => import('@/pages/Inventory/Asset/AllSoftware.vue'),
+		meta: {
+			layout: AppLayout
+		}
 	}
 ]
 

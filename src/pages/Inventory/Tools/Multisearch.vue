@@ -89,13 +89,15 @@ export default {
 				"results": "deployment",
 				"logs": "inventory",
 				"snmpscanner": "snmp",
-				"inventory_sections": "inventory"
+				"inventory_sections": "inventory",
+				"software_dictionary_entries": "software"
 			},
 			translation_title_keys: {
 				"results": "deployment",
 				"logs": "inventory_logs",
 				"snmpscanner": "snmpscanner",
-				"inventory_sections": "inventory"
+				"inventory_sections": "inventory",
+				"software_dictionary_entries": "software_dictionary"
 			},
 			header: {
 				"Content-Type": "application/json;charset=utf-8",

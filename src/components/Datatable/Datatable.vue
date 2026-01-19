@@ -349,6 +349,23 @@
 					</a>
 				</template>
 
+				<!-- Software search redirection -->
+				<template
+					v-if="redirectToSearch"
+					#cell(installation_number)="row"
+				>
+					<a
+						class="ocs-link"
+						@click="assetsSearch(
+							row.item.name,
+							row.item.publisher,
+							row.item.version
+						)"
+					>
+						{{ row.item.installation_number }}
+					</a>
+				</template>
+
 				<!-- Asset group redirection -->
 				<template
 					v-if="canaccesspackagedetails"
@@ -412,6 +429,9 @@
 					{{ row.item.last_update_formatted }}
 				</template>
 				<template #cell(date)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(updated_at)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
 
@@ -603,6 +623,8 @@ export default {
 		serverSide: { type: Boolean, default: false },
 		serverTotalRows: { type: Number, default: 0 },
 		isbusy: { type: Boolean, default: false },
+		// Multisearch
+		redirectToSearch: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -1067,8 +1089,8 @@ export default {
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)
 		},
-		assetsSearch(identifier) {
-			this.$emit('assetsSearch', identifier)
+		assetsSearch(value1, value2 = null, value3 = null) {
+			this.$emit('assetsSearch', [value1, value2, value3])
 		},
 		updateColumnLabels() {
 			this.fields.forEach(field => {
@@ -1083,7 +1105,7 @@ export default {
 		},
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
-				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date'];
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date', 'updated_at'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);

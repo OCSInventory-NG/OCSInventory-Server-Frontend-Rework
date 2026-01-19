@@ -51,6 +51,10 @@
 							header: $t('title.inventory_logs'), link: '/inventory/inventory_logs', 
 							route:'InventoryLog', column: 'tools' 
 						},
+						{ 
+							header: $t('title.software_dictionary'), link: '/inventory/software_dictionary', 
+							route:'AllSoftware', column: 'general' 
+						}
 					]"
 					link="/inventory"
 					icon-name="desktop"
@@ -144,6 +148,10 @@
 						{ 
 							header: $t('title.ipdiscover'), link: '/configurations/ipdiscover', 
 							route:'IpdiscoverConfig', column: 'network' 
+						},
+						{ 
+							header: $t('title.software_mapping'), link: '/configurations/software_mapping', 
+							route:'SoftwareMapping', column: 'inventory' 
 						}
 					]"
 					link="/configurations"
