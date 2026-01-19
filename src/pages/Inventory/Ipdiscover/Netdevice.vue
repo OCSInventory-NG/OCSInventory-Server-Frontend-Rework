@@ -34,6 +34,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:canaccessdetails="true"
+								:canmassprocessing="true"
 								editcomponent="NetdeviceModal"
 								title="netdevice"
 								translationkey="network."
@@ -92,8 +93,8 @@ export default {
 			}
 			await this.getAccountinfoCfg()
 			await this.getHeader()
-			this.loading = false
 			await this.getNetdevice(this.query)
+			this.loading = false
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -123,7 +124,6 @@ export default {
 				for (const accountinfo of response.data) {
 					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
 						this.rowheader.push("Account info : " + accountinfo.name)
-						this.accountinfoName = accountinfo.name
 					}
 				}
 			} catch (e) {
@@ -163,12 +163,10 @@ export default {
 					results.forEach(data => {
 						if(data.accountinfo) {
 							Object.keys(data.accountinfo).forEach(accountinfo => {
-								if(accountinfo === this.accountinfoName) {
-									if(!this.rowheader.includes("Account info : " + accountinfo)) {
-										this.rowheader.push("Account info : " + accountinfo)
-									}
-									data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
+								if(!this.rowheader.includes("Account info : " + accountinfo)) {
+									this.rowheader.push("Account info : " + accountinfo)
 								}
+								data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
 							})
 						}
 					})
