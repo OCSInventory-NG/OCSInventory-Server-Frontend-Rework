@@ -100,6 +100,7 @@ export default {
 			await this.getHeader()
 			await this.getNetgroups()
 			await this.getNetworks()
+			this.loading = false
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -171,12 +172,12 @@ export default {
 					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					this.errored = true
 				})
-				.finally(this.loading = false)
 		},
 		async reloadDatatable() {
 			this.loading = true
 			await this.getNetgroups()
 			await this.getNetworks()
+			this.loading = false
 		}
 	}
 }
