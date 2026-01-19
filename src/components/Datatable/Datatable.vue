@@ -109,6 +109,7 @@
 					<b-button-group class="mr-1">
 						<MassProcessingModal
 							:items="(multisearch && selected.length == 0) ? rowdata : selected"
+							:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
 							@reloadDatatable="reloadDatatable"
 						/>
 					</b-button-group>
