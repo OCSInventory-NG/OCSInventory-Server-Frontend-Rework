@@ -19,6 +19,7 @@ import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
 import SaveSearchModal from '@/components/Modals/Item/SaveSearchModal.vue'
+import SoftwareMappingModal from '@/components/Modals/Item/SoftwareMappingModal.vue'
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
@@ -48,6 +49,7 @@ const GlobalComponents = {
 		Vue.component('PackageResultModal', PackageResultModal)
 		Vue.component('RuleModal', RuleModal)
 		Vue.component('SaveSearchModal', SaveSearchModal)
+		Vue.component('SoftwareMappingModal', SoftwareMappingModal)
 		Vue.component('SnmpModal', SnmpModal)
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)

@@ -1,12 +1,12 @@
 <template>
 	<div 
-		id="assets" 
+		id="all-software" 
 		class="container-xl"
 	>
 		<div>
 			<!-- Page header -->
 			<PageHeader 
-				page-title="assets"
+				page-title="software_dictionary"
 			/>
 			<!-- Display Datatable -->
 			<div class="page-body">
@@ -30,26 +30,24 @@
 
 						<div v-else>
 							<Datatable
-								id="assets-datatable"
+								id="all-software-datatable"
 								:rowdata="rowdata"
-								:canaccessdetails="true"
 								:candelete="candelete"
 								:rowheader="rowheader"
-								:candeploy="true"
-								:canmassprocessing="true"
-								:usecheckbox="true"
 								:hiddenfields="hiddenfields"
-								title="asset/bases"
-								translationkey="inventory."
-								sortby="last_update"
-								sortdesc="desc"
+								:usecheckbox="false"
+								title="software_dictionary"
+								translationkey="software."
+								sortby="name"
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
+								:redirect-to-search="true"
 								@change-query="handleQueryChange"
 								@export="handleExport"
-								@export-all="exportAllAssets"
+								@export-all="exportAllSoftwares"
 								@reloadDatatable="reloadDatatable"
+								@assetsSearch="assetsSearch"
 							/>
 						</div>
 					</div>
@@ -63,7 +61,7 @@
 import axios from 'axios'
 
 export default {
-	name: 'Assets',
+	name: 'AllSoftware',
 	data() {
 		return {
 			errormsg: null,
@@ -72,7 +70,7 @@ export default {
 			loading: true,
 			errored: false,
 			candelete: false,
-			hiddenfields: ["id", "uuid", "template", "agent", "is_template_forced"],
+			hiddenfields: ["id", "updated_at"],
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
@@ -81,7 +79,7 @@ export default {
 			query: {
 				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
 				offset: 0,
-				ordering: '-last_update',
+				ordering: 'name',
 				search: null,
 			},
 			isbusy: true,
@@ -90,28 +88,24 @@ export default {
 	async mounted() {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		if(permissions.includes("inventory_base_view_inventorybase")) {
-			if(permissions.includes("inventory_base_delete_inventorybase")) {
-				this.candelete = true
-			}
-			await this.getAccountinfoCfg()
+		if(permissions.includes("software_view_softwaredictionary")) {
 			await this.getHeader()
-			await this.getAssets(this.query)
+			await this.getSoftwares(this.query)
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
-			this.loading = false
 		}
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"software_dictionary/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "matched") {
+						if (!["assets"].includes(field)) {
 							this.rowheader.push(field)
 						}
 					})
+					this.rowheader.push("installation_number")
 					this.errormsg = null
 					this.errored = false
 				})
@@ -120,30 +114,11 @@ export default {
 					this.errored = true
 				})
 		},
-		async getAccountinfoCfg() {
-			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"accountinfo/config/?datatarget=ASSET",
-					{ headers: this.header }
-				)
-
-				for (const accountinfo of response.data) {
-					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
-						this.rowheader.push("Account info : " + accountinfo.name)
-					}
-				}
-			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
-			}
-		},
-		async getAssets(query = null) {
+		async getSoftwares(query = null) {
 			try {
 				const q = query || this.query
 
-				const params = {
-					accountinfo: true,
-				}
+				const params = {}
 
 				if (q.limit != null) params.limit = q.limit
 				if (q.offset != null) params.offset = q.offset
@@ -151,7 +126,7 @@ export default {
 				if (q.search) params.search = q.search
 
 				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/bases/",
+					this.$config.BACKEND_API_ROUTE+"software_dictionary/",
 					{ headers: this.header, params }
 				)
 
@@ -164,31 +139,8 @@ export default {
 					this.total = results.length
 				}
 
-				const templateResponse = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"templates/",
-					{ headers: this.header }
-				)
-
-				const templates = {}
-				templateResponse.data.forEach(template => {
-					templates[template.id] = template.name
-				})
-
-				results.forEach(asset => {
-					if (asset.template && templates[asset.template]) {
-						asset.template = templates[asset.template]
-					}
-				})
-
 				results.forEach(data => {
-					if(data.accountinfo) {
-						Object.keys(data.accountinfo).forEach(accountinfo => {
-							if(!this.rowheader.includes("Account info : " + accountinfo)) {
-								this.rowheader.push("Account info : " + accountinfo)
-							}
-							data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
-						})
-					}
+					data.installation_number = data.assets.length 
 				})
 
 				this.rowdata = results
@@ -205,7 +157,7 @@ export default {
 		},
 		async reloadDatatable() {
 			this.isbusy = true
-			await this.getAssets(this.query)
+			await this.getSoftwares(this.query)
 		},
 		async handleQueryChange(newQuery) {
 			if (!this.isbusy) {
@@ -215,7 +167,7 @@ export default {
 					...newQuery,
 				}
 
-				await this.getAssets(this.query)
+				await this.getSoftwares(this.query)
 			}
 		},
 		handleExport({ scope, rows }) {
@@ -224,7 +176,7 @@ export default {
 			const url = URL.createObjectURL(blob)
 			const link = document.createElement('a')
 			link.href = url
-			link.setAttribute('download', `assets_${scope}.csv`)
+			link.setAttribute('download', `softwares_${scope}.csv`)
 			document.body.appendChild(link)
 			link.click()
 			link.remove()
@@ -246,17 +198,15 @@ export default {
 
 			return csvRows.join('\n')
 		},
-		async exportAllAssets({ filter, ordering }) {
+		async exportAllSoftwares({ filter, ordering }) {
 			const allRows = []
+			const params = {}
 
-			const params = {
-				accountinfo: true
-			}
 			if (filter) params.search = filter
 			if (ordering) params.ordering = ordering
 
 			const { data } = await axios.get(
-				this.$config.BACKEND_API_ROUTE + "asset/bases/",
+				this.$config.BACKEND_API_ROUTE + "software_dictionary/",
 				{ headers: this.header, params }
 			)
 
@@ -264,6 +214,46 @@ export default {
 			allRows.push(...results)
 
 			this.handleExport({ scope: 'all', rows: allRows })
+		},
+		assetsSearch(params) {
+			var search = [
+				[
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "name",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[0],
+						link: "AND"
+					},
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "publisher",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[1],
+						link: "AND"
+					},
+					{
+						object: "software_dictionary_entries",
+						route: "software_dictionary",
+						field: "version",
+						fieldtype: "string",
+						operator: "iexact",
+						value: params[2],
+						link: "AND"
+					},
+				]
+			]
+
+			localStorage.setItem('multisearch', JSON.stringify(search))
+			localStorage.setItem('useSavedSearch', true)
+
+			this.$router.push({
+				name: 'Multisearch',
+			});
 		}
 	}
 }

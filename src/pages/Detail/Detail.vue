@@ -95,7 +95,7 @@
 													:key="key"
 													class="datagrid-item"
 												>
-													<div v-if="key != 'templateid'">
+													<div v-if="!['templateid', 'matched'].includes(key)">
 														<div class="datagrid-title">
 															{{ $t(translationkey+key) }}
 														</div>
