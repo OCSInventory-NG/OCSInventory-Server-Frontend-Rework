@@ -153,6 +153,11 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.netdevicemodal = true
+			this.row = {
+				netname: null,
+				ip: null,
+				mac: null
+			}
 			this.getNetdevice(id)
 		},
 		// Retrieve networks info by id

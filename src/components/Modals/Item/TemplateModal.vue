@@ -10,7 +10,7 @@
 						:title="$t('template.addtemplate')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="templatemodal = !templatemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -197,9 +197,20 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.templatemodal = true
-			this.getTemplateName(id);
+			this.row = {
+				name: null,
+				sections: [],
+				id: null,
+				os: null,
+				is_protected: false,
+				last_update: null,
+			}
+
+			if (id) {
+				this.loading = true
+				this.getTemplateName(id);
+			}
 		},
 		async getTemplateName(id){
 			try {
