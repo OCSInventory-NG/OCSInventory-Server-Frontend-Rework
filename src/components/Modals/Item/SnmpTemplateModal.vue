@@ -10,7 +10,7 @@
 						:title="$t('network.addsnmptemplate')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="snmptemplatemodal = !snmptemplatemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -169,6 +169,11 @@ export default {
 		loadData() {
 			this.loading = true
 			this.snmptemplatemodal = true
+			this.row = {
+				name: null,
+				os: 'SNMP',
+				sections: []
+			}
 		},
 		onSubmit(event) {
 			event.preventDefault()

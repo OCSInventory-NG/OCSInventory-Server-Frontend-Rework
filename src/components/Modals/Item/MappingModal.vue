@@ -148,6 +148,12 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.mappingmodal = true
+			this.rows = {
+				username: null,
+				last_name: null,
+				first_name: null,
+				email: null
+			}
 			this.getMappingConfig(id)
 		},
 		async getMappingConfig(id) {

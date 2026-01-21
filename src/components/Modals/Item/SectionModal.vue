@@ -385,6 +385,16 @@ export default {
 		async loadData() {
 			this.loading = true
 			this.sectionmodal = true
+			this.row = {
+				id: null,
+				name: null,
+				retrieval_method: 'FILE',
+				retrieval_output: null,
+				target: null,
+				fields: [],
+				template: null,
+				options: {}
+			}
 			this.selectedcategory = null
 			this.oldcategory = null
 

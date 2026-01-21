@@ -10,7 +10,7 @@
 						:title="$t('group.addgroup')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="groupmodal = !groupmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -193,9 +193,16 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.groupmodal = true
-			this.getPermissions(id)
+			this.row = {
+				name: null,
+				permissions: []
+			}
+
+			if (id) {
+				this.loading = true
+				this.getPermissions(id)
+			}
 		},
 		async getPermissions(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions/", { headers: this.header })

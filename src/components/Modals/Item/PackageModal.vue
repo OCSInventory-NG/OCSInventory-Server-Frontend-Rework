@@ -10,7 +10,7 @@
 						:title="$t('deployment.addpackage')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="packagemodal = !packagemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -208,9 +208,19 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.packagemodal = true
-			this.getPackages(id)
+			this.row = {
+				name: null,
+				description: null,
+				target_os: 'WIN',
+				actions_list: [],
+				result: []
+			}
+
+			if (id) {
+				this.loading = true
+				this.getPackages(id)
+			}
 		},
 		async getPackages(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+id+"/", { headers: this.header })

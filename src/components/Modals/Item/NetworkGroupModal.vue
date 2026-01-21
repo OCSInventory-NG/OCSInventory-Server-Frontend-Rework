@@ -10,7 +10,7 @@
 						:title="$t('network.addnetgroup')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="netgroupmodal = !netgroupmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -200,10 +200,18 @@ export default {
 	},
 	methods: {
 		async loadData(id) {
-			this.loading = true
 			this.netgroupmodal = true
-			await this.getNetgroup(id)
-			await this.getNetworks()
+			this.row = {
+				name: null,
+				description: null
+			}
+
+			if (id) {
+				this.loading = true
+
+				await this.getNetgroup(id)
+				await this.getNetworks()
+			}
 		},
 		async getNetgroup(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
