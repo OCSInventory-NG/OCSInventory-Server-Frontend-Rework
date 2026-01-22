@@ -159,6 +159,7 @@
 						v-for="group in groups"
 						:key="group.id"
 						cols="4"
+						class="mb-2"
 					>
 						<b-form-checkbox
 							:id="group.code"
