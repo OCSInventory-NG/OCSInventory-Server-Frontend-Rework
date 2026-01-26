@@ -230,6 +230,8 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			// Remove netdevices from network before PATCH
+			delete this.row.netdevices
 			
 			axios.patch(this.$config.BACKEND_API_ROUTE+"networks/"+this.row.id+"/", this.row, { headers: this.header })
 				.then(() => {
