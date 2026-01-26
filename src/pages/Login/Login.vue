@@ -61,11 +61,11 @@
 								variant="inverse"
 								:disabled="loadingLogin"
 							>
-							<b-spinner
-    							v-if="loadingLogin"
-    								small
-    								class="me-2"
-  							/>
+								<b-spinner
+									v-if="loadingLogin"
+									small
+									class="me-2"
+								/>
 								{{ $t('generic.login') }}
 							</BButton>
 						</BCol>
