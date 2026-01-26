@@ -57,14 +57,14 @@
 						<BCol>
 							<BButton
 								type="submit"
-								class="auth-btn mb-3" 
+								class="auth-btn mb-3"
 								variant="inverse"
-								 :disabled="loadingLogin"
+								:disabled="loadingLogin"
 							>
-							<b-spinner 
-    							v-if="loadingLogin" 
-    								small 
-    								class="me-2" 
+							<b-spinner
+    							v-if="loadingLogin"
+    								small
+    								class="me-2"
   							/>
 								{{ $t('generic.login') }}
 							</BButton>
