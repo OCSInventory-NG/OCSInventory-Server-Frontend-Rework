@@ -38,8 +38,9 @@
 			<Accountinfo
 				:canedit="true"
 				:massprocessing="true"
+				:slug="(type == 'ASSET') ? 'inventory_base.inventorybase' : 'netdevice.netdevice'"
 				:items="items"
-				type="ASSET"
+				:type="type"
 				@reloadDatatable="reloadDatatable"
 			/>
 		</b-modal>
@@ -79,7 +80,8 @@
 export default {
 	name: "MassProcessingModal",
 	props: {
-		items: { type: Array, default: () => [] }
+		items: { type: Array, default: () => [] },
+		type: {type: String, default: "ASSET"}
 	},
 	data() {
 		return {
