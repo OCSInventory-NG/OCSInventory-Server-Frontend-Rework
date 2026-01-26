@@ -59,7 +59,13 @@
 								type="submit"
 								class="auth-btn mb-3" 
 								variant="inverse"
+								 :disabled="loadingLogin"
 							>
+							<b-spinner 
+    							v-if="loadingLogin" 
+    								small 
+    								class="me-2" 
+  							/>
 								{{ $t('generic.login') }}
 							</BButton>
 						</BCol>
@@ -83,6 +89,7 @@ export default {
 			redirect_url: null,
 			username: null,
 			password: null,
+			loadingLogin: false,
 			langs: [
 				{value: 'fr', text: 'Français'},
 				{value: 'en', text: 'English'},
@@ -110,7 +117,7 @@ export default {
 	methods: {
 		onSubmit(event) {
 			event.preventDefault()
-
+			this.loadingLogin = true
 			const loginOptions = { 
 				"username": this.username,
 				"password": this.password
@@ -138,6 +145,9 @@ export default {
 					} else {
 						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 					}
+				})
+				.finally(() => {
+					this.loadingLogin = false
 				})
 		},
 		getPermissions() {
