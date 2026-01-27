@@ -32,7 +32,7 @@
 					v-else
 					type="bar" 
 					:options="chartOptions" 
-					:series="series"
+					:series="chartSeries"
 					height="274.69"
 					width="568"
 				/>
@@ -50,7 +50,9 @@ export default {
 		chartName: { type: String, default: null },
 		title: { type: String, default: null },
 		edit: { type: Boolean, default: false },
-		i: { type: Number, default: 0 }
+		i: { type: Number, default: 0 },
+		options: { type: Object, default: null },
+		series: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -82,7 +84,7 @@ export default {
 					}
 				]
 			},
-			series: [],
+			chartSeries: [],
 			loaded: false,
 			errored: false,
 			errormsg: null
@@ -90,10 +92,27 @@ export default {
 	},
 	computed: {
 		computedTitle() {
-			return `dashboard.${this.chartName}`;
+			if (this.chartName) {
+				return `dashboard.${this.chartName}`;
+			}
+			return this.title || 'dashboard.chart';
 		}
 	},
 	async mounted() {
+		if (this.options && this.series) {
+			if (this.options.xaxis) {
+				this.chartOptions.xaxis = this.options.xaxis;
+			}
+			this.chartSeries = this.series;
+			this.loaded = true;
+			return
+		}
+
+		if (!this.chartName) {
+			this.loaded = true
+			return
+		}
+
 		try {
 			const header = {
 				"Content-Type": "application/json;charset=utf-8",
@@ -103,7 +122,7 @@ export default {
 				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
 				{ headers: header }
 			)
-			this.series = response.data.series
+			this.chartSeries = response.data.series
 			this.chartOptions.xaxis = response.data.options.xaxis
 			this.loaded = true
 		} catch(e) {
