@@ -147,8 +147,8 @@
 										variant="primary"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.addandcondition')"
-										@click="addAndCondition(masterindex, index, datavalues)"
 										:disabled="viewOnly"
+										@click="addAndCondition(masterindex, index, datavalues)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'plus']"
@@ -167,8 +167,8 @@
 										variant="danger"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
-										@click="removeAndCondition(masterindex, index, datavalues)"
 										:disabled="viewOnly"
+										@click="removeAndCondition(masterindex, index, datavalues)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
@@ -191,8 +191,8 @@
 						type="button"
 						variant="info"
 						class="multisearch-btn"
-						@click="addOrCondition(datavalues)"
 						:disabled="viewOnly"
+						@click="addOrCondition(datavalues)"
 					>
 						{{ $t('rule.addorcondition') }}
 					</b-button>

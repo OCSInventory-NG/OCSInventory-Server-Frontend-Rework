@@ -71,8 +71,8 @@
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
-										@reloadRule="reloadRule"
 										:view-only="viewOnly"
+										@reloadRule="reloadRule"
 									/>
 									<RuleAction
 										v-if="rulemenu.value == 'actions'"
@@ -80,8 +80,8 @@
 										:trigger="trigger"
 										:actions="actions"
 										:triggers="triggers"
-										@reloadRule="reloadRule"
 										:view-only="viewOnly"
+										@reloadRule="reloadRule"
 									/>
 								</b-tab>
 							</b-tabs>

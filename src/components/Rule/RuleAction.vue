@@ -44,8 +44,8 @@
 									:clearable="false"
 									label="text"
 									class="mb-3 ocs-select"
-									@option:selected="getFields(index, input.model, true)"
 									:disabled="viewOnly"
+									@option:selected="getFields(index, input.model, true)"
 								/>
 							</b-form-group>
 						</b-col>
@@ -60,8 +60,8 @@
 									label="text"
 									class="mb-3 ocs-select"
 									:loading="(loadingfield) ? true : false"
-									@option:selected="setFieldType(input, index)"
 									:disabled="viewOnly"
+									@option:selected="setFieldType(input, index)"
 								>
 									<template #search="{attributes, events}">
 										<input
@@ -124,8 +124,8 @@
 									variant="primary"
 									class="d-none d-sm-inline-block form-control"
 									:title="$t('rule.addaction')"
-									@click="addAction(index, datavalues)"
 									:disabled="viewOnly"
+									@click="addAction(index, datavalues)"
 								>
 									<font-awesome-icon 
 										:icon="['fas', 'plus']"
