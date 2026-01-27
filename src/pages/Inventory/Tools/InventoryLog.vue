@@ -37,6 +37,10 @@
 								sortdesc="desc"
 								title="inventory_logs"
 								translationkey="inventory."
+								:server-side="true"
+								:server-total-rows="total"
+								:isbusy="isbusy"
+								@change-query="handleQueryChange"
 							/>
 						</div>
 					</div>
@@ -61,7 +65,15 @@ export default {
 			header: {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			},
+			total: 0,
+			query: {
+				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				offset: 0,
+				ordering: '-timestamp',
+				search: null,
+			},
+			isbusy: true,
 		}
 	},
 	async mounted() {
@@ -69,7 +81,7 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/logs", { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/logs/", { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						this.rowheader.push(field)
@@ -84,26 +96,55 @@ export default {
 				})
 		},
 		// Retrieve logs
-		async getLogs() {
-			var extendedRoute = "?expand=asset"
-			if(this.$route.params.id) extendedRoute += "&asset="+this.$route.params.id
+		async getLogs(query = null) {
+			try {
+				const q = query || this.query;
 
-			await axios.get(
-				this.$config.BACKEND_API_ROUTE+
-					"asset/logs"+
-					extendedRoute,
-				{ headers: this.header }
-			)
-				.then(response => {
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+				const params = {
+					expand: 'asset',
+				}
+
+				if (q.limit != null) params.limit = q.limit
+				if (q.offset != null) params.offset = q.offset
+				if (q.ordering) params.ordering = q.ordering
+				if (q.search) params.search = q.search
+
+				if(this.$route.params.id) params.asset = this.$route.params.id
+
+				const response = await axios.get(
+					this.$config.BACKEND_API_ROUTE+"asset/logs/",
+					{ headers: this.header, params }
+				)
+
+				const data = response.data
+				const results = data.results || data
+
+				if (typeof data.count === 'number') {
+					this.total = data.count
+				} else {
+					this.total = results.length
+				}
+
+				this.rowdata = results
+				this.errormsg = null
+				this.errored = false
+			} catch(e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+		async handleQueryChange(newQuery) {
+			if (!this.isbusy) {
+				this.isbusy = true
+				this.query = {
+					...this.query,
+					...newQuery,
+				}
+				await this.getLogs(this.query)
+			}
 		}
 	}
 }
