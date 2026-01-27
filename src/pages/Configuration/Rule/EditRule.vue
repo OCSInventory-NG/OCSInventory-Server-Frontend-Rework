@@ -125,9 +125,9 @@ export default {
 		}
 	},
 	computed: {
-  		viewOnly() {
-    		return !localStorage.getItem('permissions') ?.split(',').includes('rule_change_rule')
-  		}
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('rule_change_rule')
+		}
 	},
 	watch: {
 		successed: function() {
