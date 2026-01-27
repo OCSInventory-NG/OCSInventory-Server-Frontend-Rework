@@ -98,6 +98,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
+										:disabled="viewOnly"
 									/>
 								</b-form-group>
 							</b-col>
@@ -112,6 +113,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										required
+										:disabled="viewOnly"
 									/>
 								</b-form-group>
 								<b-form-checkbox
@@ -122,6 +124,7 @@
 									v-model="input.case_sensitive"
 									name="enabled"
 									:value="true"
+									:disabled="viewOnly"
 								>
 									{{ $t("rule.case_sensitive") }}
 								</b-form-checkbox>
@@ -132,7 +135,7 @@
 										id="value"
 										v-model="input.value"
 										class="mb-3"
-										:disabled="(disabledvalue.includes(input.operator)) ? true : false"
+										:disabled="viewOnly || (disabledvalue.includes(input.operator)) ? true : false"
 									/>
 								</b-form-group>
 							</b-col>
@@ -145,6 +148,7 @@
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.addandcondition')"
 										@click="addAndCondition(masterindex, index, datavalues)"
+										:disabled="viewOnly"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'plus']"
@@ -164,6 +168,7 @@
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
 										@click="removeAndCondition(masterindex, index, datavalues)"
+										:disabled="viewOnly"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
@@ -187,12 +192,14 @@
 						variant="info"
 						class="multisearch-btn"
 						@click="addOrCondition(datavalues)"
+						:disabled="viewOnly"
 					>
 						{{ $t('rule.addorcondition') }}
 					</b-button>
 					<b-button 
 						type="submit"
 						variant="success"
+						:disabled="viewOnly"
 					>
 						{{ $t('generic.save') }}
 					</b-button>
@@ -211,7 +218,8 @@ export default {
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
-		logic: { type: Object, default: null }
+		logic: { type: Object, default: null },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

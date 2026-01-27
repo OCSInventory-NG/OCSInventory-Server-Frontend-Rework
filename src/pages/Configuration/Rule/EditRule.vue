@@ -72,6 +72,7 @@
 										:trigger="trigger"
 										:logic="logic"
 										@reloadRule="reloadRule"
+										:view-only="viewOnly"
 									/>
 									<RuleAction
 										v-if="rulemenu.value == 'actions'"
@@ -80,6 +81,7 @@
 										:actions="actions"
 										:triggers="triggers"
 										@reloadRule="reloadRule"
+										:view-only="viewOnly"
 									/>
 								</b-tab>
 							</b-tabs>
@@ -121,6 +123,11 @@ export default {
 				{ value: "actions", text: this.$t("rule.actions"), enabled: true },
 			]
 		}
+	},
+	computed: {
+  		viewOnly() {
+    		return !localStorage.getItem('permissions') ?.split(',').includes('rule_change_rule')
+  		}
 	},
 	watch: {
 		successed: function() {
