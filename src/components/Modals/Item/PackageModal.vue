@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('deployment.addpackage') : $t('deployment.editpackage')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

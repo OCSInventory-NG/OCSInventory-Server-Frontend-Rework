@@ -19,6 +19,7 @@
 			hide-footer
 			modal-class="modal modal-blur"
 			size="sm"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

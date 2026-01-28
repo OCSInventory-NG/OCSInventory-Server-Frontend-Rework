@@ -16,6 +16,7 @@
 			:title="$t('network.editnetwork')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

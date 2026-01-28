@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

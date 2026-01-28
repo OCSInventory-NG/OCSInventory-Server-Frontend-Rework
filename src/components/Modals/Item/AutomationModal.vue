@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('scheduler.addscheduler') : $t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
