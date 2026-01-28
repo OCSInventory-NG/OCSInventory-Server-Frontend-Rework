@@ -103,15 +103,15 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					<Matrix 
-						:id="id"
-						v-model="row.permissions"
-						:rowtab="permissions"
-						:rowlabel="permissionslabel"
-						:rowpermissions="row.permissions"
-						@permissions="row.permissions = $event"
-					/>
-				</b-row>
+					                    <Matrix 
+											:id="id"
+											v-model="row.permissions"
+											:rowtab="permissions"
+											:rowlabel="permissionslabel"
+											:rowpermissions="row.permissions"
+											@permissions="row.permissions = $event"
+										/>
+									</b-row>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
@@ -194,10 +194,8 @@ export default {
 	methods: {
 		loadData(id) {
 			this.groupmodal = true
-			this.row = {
-				name: null,
-				permissions: []
-			}
+			this.row.name = null
+			this.row.permissions.splice(0, this.row.permissions.length)
 
 			if (id) {
 				this.loading = true
