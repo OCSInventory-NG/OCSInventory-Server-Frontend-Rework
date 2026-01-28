@@ -805,7 +805,9 @@ export default {
 					var index = this.fields.findIndex(x => x.key==visible);
 					if (index === -1) {
 						// Translate label
-						visible.label = (this.$te(this.translationkey+visible.key)) ? this.$t(this.translationkey+visible.key) : visible.key;
+						visible.label = (this.$te(this.translationkey+visible.key))
+							? this.$t(this.translationkey+visible.key)
+							: visible.key;
 						this.fields.push(arrayVisible);
 					}
 				}
