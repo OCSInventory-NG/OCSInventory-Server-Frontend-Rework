@@ -803,7 +803,11 @@ export default {
 					this.json_fields[visible.key] = visible.key
 					// Initialize datatable header
 					var index = this.fields.findIndex(x => x.key==visible);
-					index === -1 ? this.fields.push(arrayVisible) : null
+					if (index === -1) {
+						// Translate label
+						visible.label = (this.$te(this.translationkey+visible.key)) ? this.$t(this.translationkey+visible.key) : visible.key;
+						this.fields.push(arrayVisible);
+					}
 				}
 			})
 
