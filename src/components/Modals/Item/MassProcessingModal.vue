@@ -19,6 +19,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -50,6 +51,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="lg"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
