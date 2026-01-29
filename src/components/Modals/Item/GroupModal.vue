@@ -103,15 +103,15 @@
 					</b-col>
 				</b-row>
 				<b-row>
-					                    <Matrix 
-											:id="id"
-											v-model="row.permissions"
-											:rowtab="permissions"
-											:rowlabel="permissionslabel"
-											:rowpermissions="row.permissions"
-											@permissions="row.permissions = $event"
-										/>
-									</b-row>
+					<Matrix
+						:id="id"
+						v-model="row.permissions"
+						:rowtab="permissions"
+						:rowlabel="permissionslabel"
+						:rowpermissions="row.permissions"
+						@permissions="row.permissions = $event"
+					/>
+				</b-row>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
