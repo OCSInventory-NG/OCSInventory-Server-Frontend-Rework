@@ -158,6 +158,10 @@ export default {
 				ip: null,
 				mac: null
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 			this.getNetdevice(id)
 		},
 		// Retrieve networks info by id

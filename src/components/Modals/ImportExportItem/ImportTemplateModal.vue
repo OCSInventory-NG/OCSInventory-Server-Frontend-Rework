@@ -4,7 +4,7 @@
 			:title="$t('template.import_template')"
 			variant="bg-light"
 			class="form-control btn datatable-btn datatable-btn-maxsize"
-			@click="importtemplate = !importtemplate"
+			@click="loadData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'download']"
@@ -59,6 +59,7 @@
 				<b-row>
 					<b-col>
 						<b-form-file
+							ref="fileInput"
 							:placeholder="$t('template.select_template_file')"
 							accept=".json"
 							@change="processFile($event)"
@@ -115,6 +116,14 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.importtemplate = true
+			this.file = null
+			this.jsonToSend = null
+			this.$refs.fileInput.reset()
+			this.errormsg = null
+			this.errored = false
+		},
 		processFile(event) {
 			this.file = event.target.files[0]
 			const reader = new FileReader();

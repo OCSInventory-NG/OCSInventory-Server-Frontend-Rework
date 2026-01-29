@@ -159,6 +159,8 @@ export default {
 			this.rows.ids = this.ids
 			this.row.id = this.id
 			this.deleteact = true
+			this.deleteerror = false
+			this.deleteerrormsg = null
 		},
 		onSubmit(event) {
 			event.preventDefault()

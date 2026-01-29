@@ -197,6 +197,10 @@ export default {
 				group: null
 			}
 			this.netgroup = []
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 			this.getNetworks(id)
 		},
 		async getNetworks(id) {

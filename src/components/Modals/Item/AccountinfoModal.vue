@@ -239,6 +239,14 @@ export default {
 				datatype: 'TEXT',
 				datatarget: 'ASSET'
 			}
+			this.errormsg = null
+			this.errored = false
+			this.loading = true
+			this.loadingcreate = false
+			this.createerror = false
+			this.createerrormsg = null
+			this.createwithsuccess = false
+			this.accountinfomodal = false
 
 			if (id) {
 				this.loading = true

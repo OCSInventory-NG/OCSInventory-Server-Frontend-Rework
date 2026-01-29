@@ -303,6 +303,10 @@ export default {
 				day_of_week: null,
 				day_of_month: null
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true

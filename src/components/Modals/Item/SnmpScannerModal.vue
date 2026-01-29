@@ -132,7 +132,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="snmpscannermodal">
 					<b-col>
 						<b-form-group
 							:label="$t('network.snmpcommunity')" 
@@ -240,6 +240,10 @@ export default {
 				notes: null,
 				configs: []
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true

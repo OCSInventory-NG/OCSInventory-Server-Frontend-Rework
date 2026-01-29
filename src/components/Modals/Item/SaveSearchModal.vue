@@ -25,10 +25,7 @@
 				<b-button
 					:title="$t('search.usesavedsearch')"
 					class="btn btn-yellow"
-					@click="
-						loadData(),
-						getMySearches()
-					"
+					@click="getMySearches()"
 				>
 					<font-awesome-icon 
 						:icon="['far', 'star']"
@@ -341,7 +338,7 @@ export default {
 			setTimeout(() => {
 				this.savesearchmodal = false
 				this.createwithsuccess = false
-				this.savedsearch = {
+				this.savesearch = {
 					search: {},
 					visibility: "private_personal",
 					name: null,
@@ -359,7 +356,7 @@ export default {
 	methods: {
 		loadData(id) {
 			this.savesearchmodal = true
-			this.savedsearch = {
+			this.savesearch = {
 				search: {},
 				visibility: "private_personal",
 				name: null,
@@ -368,6 +365,10 @@ export default {
 				user: null,
 				groups: []
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true

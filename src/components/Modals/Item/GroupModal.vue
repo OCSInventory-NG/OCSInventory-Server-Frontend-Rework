@@ -196,6 +196,10 @@ export default {
 			this.groupmodal = true
 			this.row.name = null
 			this.row.permissions.splice(0, this.row.permissions.length)
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true

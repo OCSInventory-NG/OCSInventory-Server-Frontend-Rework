@@ -9,7 +9,9 @@
 				class="form-control btn datatable-btn"
 				@click="
 					assetoptmodal = true,
-					selectedopt = null
+					selectedopt = null,
+					errored = false,
+					errormsg = null
 				"
 			>
 				<font-awesome-icon 

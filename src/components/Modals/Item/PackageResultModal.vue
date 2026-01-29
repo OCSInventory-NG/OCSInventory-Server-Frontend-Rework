@@ -7,7 +7,10 @@
 				id="attr-pkg"
 				:title="$t('deployment.attrpkg')"
 				class="form-control btn datatable-btn"
-				@click="(items.length > 0) ? getHeader() : emptyselection = !emptyselection"
+				@click="
+					(items.length > 0) ? getHeader() : emptyselection = !emptyselection,
+					loadData()
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'boxes-packing']"
@@ -166,6 +169,10 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.errormsg = null
+			this.errored = false
+		},
 		getHeader() {
 			this.loading = true
 			this.packageresultmodal = true

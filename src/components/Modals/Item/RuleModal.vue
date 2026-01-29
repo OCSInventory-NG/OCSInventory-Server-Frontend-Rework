@@ -218,6 +218,10 @@ export default {
 				logic: {},
 				actions: []
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true

@@ -258,7 +258,10 @@ export default {
 		async getData() {
 			this.loading = true
 			this.doallaction = true
+			this.submitErrorMsg = null
 			this.loadErrorMsg = null
+			this.updateErrorMsg = null
+			this.deleteErrorMsg = null
 			try {
 				const response = await axios.get(
 					this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get,

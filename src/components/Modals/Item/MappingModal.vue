@@ -154,6 +154,10 @@ export default {
 				first_name: null,
 				email: null
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 			this.getMappingConfig(id)
 		},
 		async getMappingConfig(id) {

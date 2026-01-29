@@ -167,12 +167,19 @@ export default {
 	},
 	methods: {
 		loadData() {
-			this.loading = true
 			this.snmptemplatemodal = true
 			this.row = {
 				name: null,
 				os: 'SNMP',
 				sections: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (this.update) {
+				this.loading = true
 			}
 		},
 		onSubmit(event) {

@@ -397,6 +397,10 @@ export default {
 			}
 			this.selectedcategory = null
 			this.oldcategory = null
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (this.update && this.rowsectiondata) {
 				this.row = JSON.parse(JSON.stringify(this.rowsectiondata))

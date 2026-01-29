@@ -238,6 +238,10 @@ export default {
 				command: null,
 				original_file_name: null
 			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (id) {
 				this.loading = true
