@@ -466,21 +466,23 @@
 							<button 
 								v-if="canviewaction"
 								:title="$t('deployment.manageaction')"
-								class="btn btn-ghost-dark"
+								class="btn btn-ghost-orange ocs-auto"
 								@click="goToEditPackage(row.item.id)"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'gear']"
+									size="1x"
 								/>
 							</button>
 							<button 
 								v-if="canviewruleaction"
 								:title="$t('rule.managerule')"
-								class="btn btn-ghost-dark"
+								class="btn btn-ghost-orange ocs-auto"
 								@click="goToEditRule(row.item.id)"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'gear']"
+									size="1x"
 								/>
 							</button>
 							<button 

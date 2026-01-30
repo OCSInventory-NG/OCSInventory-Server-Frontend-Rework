@@ -2,11 +2,12 @@
 	<div id="do-all-actions-item-modal">
 		<button 
 			:title="$t(translationkey+titlevalue)"
-			class="btn btn-ghost-warning"
+			class="btn btn-ghost-orange ocs-auto"
 			@click="getData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
+				size="1x"
 			/>
 		</button>
 
