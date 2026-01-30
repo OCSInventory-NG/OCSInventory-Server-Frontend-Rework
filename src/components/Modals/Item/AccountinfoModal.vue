@@ -10,7 +10,7 @@
 						:title="$t('accountinfo.addaccountinfo')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="accountinfomodal = !accountinfomodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -233,9 +233,26 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.accountinfomodal = true
-			this.getAccountinfo(id)
+			this.row = {
+				name: null,
+				description: null,
+				datatype: 'TEXT',
+				datatarget: 'ASSET'
+			}
+			this.errormsg = null
+			this.errored = false
+			this.loading = true
+			this.loadingcreate = false
+			this.createerror = false
+			this.createerrormsg = null
+			this.createwithsuccess = false
+			this.accountinfomodal = false
+
+			if (id) {
+				this.loading = true
+				this.getAccountinfo(id)
+			}
 		},
 		async getAccountinfo(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })

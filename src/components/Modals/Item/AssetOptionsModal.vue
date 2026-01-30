@@ -7,7 +7,12 @@
 				id="asset-options"
 				:title="$t('inventory.options')"
 				class="form-control btn datatable-btn"
-				@click="assetoptmodal = true"
+				@click="
+					assetoptmodal = true,
+					selectedopt = null,
+					errored = false,
+					errormsg = null
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'sliders']"

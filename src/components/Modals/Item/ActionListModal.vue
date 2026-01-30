@@ -10,7 +10,7 @@
 						:title="$t('deployment.addaction')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="actionlistmodal = !actionlistmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -230,9 +230,24 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.actionlistmodal = true
-			this.getAction(id)
+			this.row = {
+				id: null,
+				name: null,
+				priority: 1,
+				action_type: "EXEC",
+				command: null,
+				original_file_name: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getAction(id)
+			}
 		},
 		async getAction(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/actions/"+id+"/", { headers: this.header })

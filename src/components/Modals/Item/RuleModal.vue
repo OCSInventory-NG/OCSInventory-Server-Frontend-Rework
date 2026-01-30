@@ -10,7 +10,7 @@
 						:title="$t('rule.addrule')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="rulemodal = !rulemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -211,9 +211,23 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.rulemodal = true
-			this.getRules(id)
+			this.row = {
+				description: null,
+				trigger: 'inventory_received',
+				enabled: false,
+				logic: {},
+				actions: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getRules(id)
+			}
 		},
 		async getRules(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+id+"/", { headers: this.header })

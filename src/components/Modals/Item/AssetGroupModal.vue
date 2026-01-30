@@ -8,7 +8,10 @@
 			<b-button
 				:title="$t('assetgroup.saveasgroup')"
 				:class="cssclass + ' d-none d-sm-inline-block btn-teal'"
-				@click="getUserInfo()"
+				@click="
+					loadData(),
+					getUserInfo()
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'plus']"
@@ -323,9 +326,27 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.assetgroupmodal = true
-			this.getAssetGroupInfo(id)
+			this.rowgroup = {
+				name: null,
+				description: null,
+				search: [],
+				is_dynamic: (this.datatable) ? false : true,
+				assets: [],
+				visibility: "public",
+				allow_group_modification: false,
+				user: null,
+				groups: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getAssetGroupInfo(id)
+			}
 		},
 		async getAssetGroupInfo() {
 			this.loading = true

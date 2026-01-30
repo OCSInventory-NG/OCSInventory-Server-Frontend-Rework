@@ -10,7 +10,7 @@
 						:title="$t('authentication.addldap')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="ldapmodal = !ldapmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -275,9 +275,31 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.ldapmodal = true
-			this.getLdapConfig(id)
+			this.row = {
+				auth_method: this.authid,
+				enabled: true,
+				priority: 1,
+				mappings: [],
+				config: {
+					SERVER_URI: null,
+					BIND_DN: null,
+					BIND_PASSWORD: null,
+					BASE_DN: null,
+					USER_LOGIN_FIELD: null,
+					MIRROR_GROUPS: false,
+					PROTOCOL_VERSION: 3
+				}
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getLdapConfig(id)
+			}
 		},
 		async getLdapConfig(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_config/"+id+"/", { headers: this.header })

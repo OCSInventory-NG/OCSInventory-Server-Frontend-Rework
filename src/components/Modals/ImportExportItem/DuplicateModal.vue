@@ -158,6 +158,8 @@ export default {
 			this.duplicateitem = true
 			this.selected = null
 			this.duplicatename = null
+			this.errormsg = null
+			this.errored = false,
 			await this.getItem()
 		},
 		async getItem() {

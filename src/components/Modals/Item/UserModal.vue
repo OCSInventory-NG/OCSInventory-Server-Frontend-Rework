@@ -10,7 +10,7 @@
 						:title="$t('user.adduser')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="usermodal = !usermodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -287,9 +287,26 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.usermodal = true
-			this.getUser(id)
+			this.row = {
+				username: null,
+				password: null,
+				email: null,
+				first_name: null,
+				last_name: null,
+				is_superuser: false,
+				groups: [],
+				user_permissions: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getUser(id)
+			}
 		},
 		async getUser(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })

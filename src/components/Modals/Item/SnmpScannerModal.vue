@@ -10,7 +10,7 @@
 						:title="$t('network.addsnmpscanner')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="snmpscannermodal = !snmpscannermodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -132,7 +132,7 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="snmpscannermodal">
 					<b-col>
 						<b-form-group
 							:label="$t('network.snmpcommunity')" 
@@ -232,9 +232,24 @@ export default {
 	},
 	methods: {
 		async loadData(id) {
-			this.loading = true
 			this.snmpscannermodal = true
-			await this.getSnmpScanner(id)
+			this.row = {
+				identifier: null,
+				ip: null,
+				subnets: null,
+				notes: null,
+				configs: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				
+				await this.getSnmpScanner(id)
+			}
 		},
 		async getSnmpScanner(id) {
 			this.row = []

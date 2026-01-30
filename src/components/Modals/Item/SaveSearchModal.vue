@@ -12,7 +12,10 @@
 					v-if="!navbar"
 					:title="$t('search.savemysearch')"
 					class="btn btn-teal btn-save-search"
-					@click="getMyInfo()"
+					@click="
+						loadData(),
+						getMyInfo()
+					"
 				>
 					<font-awesome-icon 
 						:icon="['far', 'floppy-disk']"
@@ -116,9 +119,9 @@
 						color="red"
 					/>
 				</h5>
-				<b-button 
-					size="sm" 
-					variant="outline-danger" 
+				<b-button
+					size="sm"
+					variant="outline-danger"
 					@click="close()"
 				>
 					<font-awesome-icon 
@@ -337,7 +340,7 @@ export default {
 			setTimeout(() => {
 				this.savesearchmodal = false
 				this.createwithsuccess = false
-				this.savedsearch = {
+				this.savesearch = {
 					search: {},
 					visibility: "private_personal",
 					name: null,
@@ -354,9 +357,25 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.savesearchmodal = true
-			this.getSavedSearch(id)
+			this.savesearch = {
+				search: {},
+				visibility: "private_personal",
+				name: null,
+				description: null,
+				allow_group_modification: false,
+				user: null,
+				groups: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getSavedSearch(id)
+			}
 		},
 		async getSavedSearch(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id+"/", { headers: this.header })

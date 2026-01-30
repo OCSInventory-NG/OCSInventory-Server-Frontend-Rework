@@ -10,7 +10,7 @@
 						:title="$t('template.addcategory')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="categorymodal = !categorymodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -216,9 +216,21 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.categorymodal = true
-			this.getCategory(id)
+			this.row = {
+				name: null,
+				description: null,
+				inventory_sections: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getCategory(id)
+			}
 		},
 		async getCategory(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id+"/", { headers: this.header })

@@ -4,7 +4,10 @@
 			:title="$t('generic.exportdata')"
 			variant="bg-light"
 			class="form-control btn datatable-btn datatable-btn-maxsize"
-			@click="(!exportmodal) ? exportmodal = true : exportmodal = false"
+			@click="
+				(!exportmodal) ? exportmodal = true : exportmodal = false,
+				loadData()
+			"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'upload']"
@@ -145,6 +148,11 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.exportmodal = true
+			this.errormsg = null
+			this.errored = false
+		},
 		onSubmit(e) {
 			e.preventDefault()
 			this.$emit('confirm', this.exportmethod)
