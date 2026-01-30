@@ -16,35 +16,35 @@ export default {
 
 		const token = this.getTokenFromUrl()
 		if(token) {
-				localStorage.setItem('token_authentication', token)
-				localStorage.setItem('authenticated', true)
-				this.clearAuthParams()
-				this.getPermissions()
-				return
-			}
+			localStorage.setItem('token_authentication', token)
+			localStorage.setItem('authenticated', true)
+			this.clearAuthParams()
+			this.getPermissions()
+			return
+		}
 
-			if (localStorage.getItem("authenticated") === null
+		if (localStorage.getItem("authenticated") === null
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
 			|| localStorage.getItem('permissions') === null) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
-					.then(response => {
-						if(response.data) {
-							if(response.data.auto_redirect) {
-								window.location.href = response.data.redirect_url
-							} else {
-								if (localStorage.getItem("authenticated") === null
+			axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
+				.then(response => {
+					if(response.data) {
+						if(response.data.auto_redirect) {
+							window.location.href = response.data.redirect_url
+						} else {
+							if (localStorage.getItem("authenticated") === null
 								|| localStorage.getItem("authenticated") === "false"
 								|| localStorage.getItem('token_authentication') === null 
 								|| localStorage.getItem('permissions') === null) {
-									this.$router.push({path:'/login'}).catch(() => {})
-								}
+								this.$router.push({path:'/login'}).catch(() => {})
 							}
 						}
-					})
-					.catch(e => {
-						console.log(e.message)
-					})
+					}
+				})
+				.catch(e => {
+					console.log(e.message)
+				})
 		}
 	},
 	methods: {
