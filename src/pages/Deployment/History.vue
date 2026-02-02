@@ -97,7 +97,11 @@ export default {
 				})
 		},
 		async getPackages() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
+			var params = {
+				expand: "result"
+			}
+
+			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header, params })
 				.then(response => {
 					response.data.forEach(packages => {
 						packages.actions_list = packages.actions_list.length
