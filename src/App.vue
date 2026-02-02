@@ -27,10 +27,11 @@ export default {
 			|| localStorage.getItem("authenticated") === "false"
 			|| localStorage.getItem('token_authentication') === null 
 			|| localStorage.getItem('permissions') === null) {
+			const noAuto = [...new URLSearchParams(window.location.search).keys()].some(k => k.toLowerCase() === 'noauto')
 			axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
 				.then(response => {
 					if(response.data) {
-						if(response.data.auto_redirect) {
+						if(response.data.auto_redirect && !noAuto) {
 							window.location.href = response.data.redirect_url
 						} else {
 							if (localStorage.getItem("authenticated") === null
