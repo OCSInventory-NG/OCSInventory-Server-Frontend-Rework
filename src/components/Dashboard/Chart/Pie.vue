@@ -34,7 +34,7 @@
 				<apexchart 
 					v-else
 					:options="chartOptions" 
-					:series="series"
+					:series="chartSeries"
 					type="pie"
 					height="300"
 					width="568"
@@ -53,7 +53,9 @@ export default {
 		chartName: { type: String, default: null },
 		title: { type: String, default: null },
 		edit: { type: Boolean, default: false },
-		i: { type: Number, default: 0 }
+		i: { type: Number, default: 0 },
+		options: { type: Object, default: null },
+		series: { type: Array, default: null }
 	},
 	data() {
 		return {
@@ -78,7 +80,7 @@ export default {
 					}
 				]
 			},
-			series: [],
+			chartSeries: [],
 			loaded: false,
 			errored: false,
 			errormsg: null
@@ -86,10 +88,30 @@ export default {
 	},
 	computed: {
 		computedTitle() {
-			return `dashboard.${this.chartName}`;
+			if (this.chartName) {
+				return `dashboard.${this.chartName}`;
+			}
+			return this.title || 'dashboard.chart';
 		}
 	},
 	async mounted() {
+		if (this.options && this.series) {
+			if (this.options.labels && Array.isArray(this.series)) {
+				this.chartOptions.labels = this.options.labels;
+				if (this.options.colors) {
+					this.chartOptions.colors = this.options.colors;
+				}
+				this.chartSeries = this.series;
+			}
+			this.loaded = true;
+			return
+		}
+
+		if (!this.chartName) {
+			this.loaded = true
+			return
+		}
+
 		try {
 			const header = {
 				"Content-Type": "application/json;charset=utf-8",
@@ -101,7 +123,7 @@ export default {
 			)
 			if (response.data.options?.labels && Array.isArray(response.data.series)) {
 				this.chartOptions.labels = response.data.options.labels;
-				this.series = response.data.series;
+				this.chartSeries = response.data.series;
 			} else {
 				throw new Error("Format de données inattendu");
 			}

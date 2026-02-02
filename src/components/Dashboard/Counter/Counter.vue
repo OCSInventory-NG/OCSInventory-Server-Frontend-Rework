@@ -32,16 +32,16 @@
 				</div>
 				<div v-else>
 					<div class="h1 mb-3">
-						{{ firstcount }}
+						{{ displayFirstCount }}
 					</div>
 					<div
-						v-if="secondcount != null"
+						v-if="displaySecondCount != null"
 						class="d-flex mb-2"
 					>
 						<div>{{ $t(secondtitle) }}</div>
 						<div class="ms-auto">
 							<span class="badge bg-purple">
-								{{ secondcount }}
+								{{ displaySecondCount }}
 							</span>
 						</div>
 					</div>
@@ -62,23 +62,47 @@ export default {
 		secondtitle: { type: String, default: null },
 		classstyle: { type: String, default: "" },
 		edit: { type: Boolean, default: false },
-		i: { type: Number, default: 0 }
+		i: { type: Number, default: 0 },
+		firstcount: { type: [Number, String], default: null },
+		secondcount: { type: [Number, String], default: null }
 	},
 	data() {
 		return {
-			firstcount: null,
-			secondcount: null,
+			loadedFirstCount: null,
+			loadedSecondCount: null,
 			loaded: false,
 			errored: false,
 			errormsg: null
 		}
 	},
 	computed: {
+		displayFirstCount() {
+			return this.firstcount !== null ? this.firstcount : this.loadedFirstCount
+		},
+		displaySecondCount() {
+			return this.secondcount !== null ? this.secondcount : this.loadedSecondCount
+		},
 		computedFirstTitle() {
-			return `dashboard.${this.chartName}`
+			if (this.chartName) {
+				return `dashboard.${this.chartName}`
+			}
+			if (this.firsttitle) {
+				return this.firsttitle
+			}
+			return 'dashboard.counter'
 		}
 	},
 	async mounted() {
+		if (this.firstcount !== null || this.secondcount !== null) {
+			this.loaded = true
+			return
+		}
+
+		if (!this.chartName) {
+			this.loaded = true
+			return
+		}
+
 		try {
 			const header = {
 				"Content-Type": "application/json;charset=utf-8",
@@ -88,8 +112,8 @@ export default {
 				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
 				{ headers: header }
 			)
-			this.firstcount = response.data.total
-			this.secondcount = response.data.contacted
+			this.loadedFirstCount = response.data.total
+			this.loadedSecondCount = response.data.contacted
 			this.loaded = true
 		} catch(e) {
 			this.errored = true
