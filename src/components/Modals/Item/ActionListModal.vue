@@ -237,7 +237,8 @@ export default {
 				priority: 1,
 				action_type: "EXEC",
 				command: null,
-				original_file_name: null
+				original_file_name: null,
+				package: this.package
 			}
 			this.errormsg = null
 			this.errored = false
