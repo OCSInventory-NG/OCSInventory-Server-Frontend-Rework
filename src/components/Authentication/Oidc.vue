@@ -129,10 +129,7 @@ export default {
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			},
 			booleans: [
-				"ALLOW_UNSECURED_JWT",
 				"AUTO_REDIRECT",
-				"ALLOW_UNSECURE_JWT",
-				"VERIFY_SSL",
 			],
 			options: [
 				{ value: "HS256", text: "HS256" },
