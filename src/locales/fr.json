@@ -39,6 +39,7 @@
     "addldap": "Ajouter un annuaire LDAP",
     "CAS": "CAS",
     "cas_config": "Configuration CAS",
+    "connect_with_sso": "Se connecter avec SSO",
     "des_AUTHORIZATION_ENDPOINT": "URL d'autorisation du fournisseur OpenID Connect",
     "des_AUTO_REDIRECT": "Activer la redirection automatique",
     "des_CLIENT_ID": "Identifiant client OpenID Connect",
