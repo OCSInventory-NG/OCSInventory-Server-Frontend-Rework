@@ -54,7 +54,7 @@
 					</div>
 					<!-- Submit button -->
 					<BRow>
-						<BCol>
+						<BCol cols="3">
 							<BButton
 								type="submit"
 								class="auth-btn mb-3"
@@ -67,6 +67,16 @@
 									class="me-2"
 								/>
 								{{ $t('generic.login') }}
+							</BButton>
+						</BCol>
+						<BCol align="right">
+							<BButton
+								v-if="sso"
+								:href="redirect_url"
+								class="auth-btn mb-3"
+								variant="inverse"
+							>
+								{{ $t('authentication.connect_with_sso') }}
 							</BButton>
 						</BCol>
 					</BRow>
