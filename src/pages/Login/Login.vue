@@ -116,7 +116,7 @@ export default {
 					this.errored = false
 					this.errormsg = null
 					this.sso = response.data.SSO
-					this.redirect_url = response.data.redirect_url+window.location.origin
+					this.redirect_url = response.data.redirect_url
 				}
 			})
 			.catch(e => {
