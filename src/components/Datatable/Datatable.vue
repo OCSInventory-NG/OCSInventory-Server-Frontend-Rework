@@ -1118,7 +1118,7 @@ export default {
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
 				const dateFields = ['last_update', 'last_updated', 'timestamp', 
-				'date_created', 'date', 'updated_at','last_seen'];
+					'date_created', 'date', 'updated_at','last_seen'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
