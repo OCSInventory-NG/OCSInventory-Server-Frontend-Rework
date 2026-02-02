@@ -2,11 +2,12 @@
 	<div id="mapping-modal">
 		<button 
 			:title="$t('authentication.editmapping')"
-			class="btn btn-ghost-warning"
+			class="btn btn-ghost-orange ocs-auto"
 			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
+				size="1x"
 			/>
 		</button>
 
