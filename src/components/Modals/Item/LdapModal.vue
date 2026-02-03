@@ -112,6 +112,7 @@
 							<b-form-input
 								id="BIND_PASSWORD"
 								v-model="row.config.BIND_PASSWORD"
+								type="password"
 							/>
 						</b-form-group>
 					</b-col>
