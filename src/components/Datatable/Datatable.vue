@@ -272,6 +272,19 @@
 					</template>
 				</template>
 
+				<!-- Network redirection -->
+				<template 
+					v-if="canaccesschild"
+					#cell(network)="row"
+				>
+					<router-link
+						:to="'/inventory/netdevices/'+row.item.network_id"
+						class="ocs-link"
+					>
+						{{ row.item.network }}
+					</router-link>
+				</template>
+
 				<!-- Netdevice redirection -->
 				<template 
 					v-if="canaccesschild"

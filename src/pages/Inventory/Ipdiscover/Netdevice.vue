@@ -35,6 +35,7 @@
 								:candelete="candelete"
 								:canaccessdetails="true"
 								:canmassprocessing="true"
+								:canaccesschild="true"
 								editcomponent="NetdeviceModal"
 								title="netdevice"
 								translationkey="network."
@@ -161,6 +162,10 @@ export default {
 						this.total = results.length
 					}
 					results.forEach(data => {
+						if(data.network) {
+							data.network_name = data.network.name
+							data.network_id = data.network.id
+						}
 						if(data.accountinfo) {
 							Object.keys(data.accountinfo).forEach(accountinfo => {
 								if(!this.rowheader.includes("Account info : " + accountinfo)) {
@@ -176,7 +181,7 @@ export default {
 					}
 
 					this.rowdata = results
-
+					console.log(this.rowdata)
 					this.errormsg = null
 					this.errored = false
 				})
