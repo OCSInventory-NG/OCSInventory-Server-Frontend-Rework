@@ -66,8 +66,9 @@
 						<b-form-group
 							:label="$t('extensions.enabled')" 
 							label-for="enabled"
+							label-cols="2"
 						>
-							<label class="form-check form-switch">
+							<label class="form-check form-switch col-form-label">
 								<input 
 									v-model="row.enabled"
 									class="form-check-input"
@@ -76,7 +77,7 @@
 							</label>
 						</b-form-group>
 					</b-col>
-				</b-row>
+				</b-row><br>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
