@@ -152,6 +152,10 @@
 						{ 
 							header: $t('title.software_mapping'), link: '/configurations/software_mapping', 
 							route:'SoftwareMapping', column: 'inventory' 
+						},
+						{ 
+							header: $t('title.extensions'), link: '/configurations/extensions', 
+							route:'Extension', column: 'general' 
 						}
 					]"
 					link="/configurations"
