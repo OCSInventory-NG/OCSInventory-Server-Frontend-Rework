@@ -277,7 +277,11 @@
 					v-if="canaccesschild"
 					#cell(network)="row"
 				>
-					<a href="#" class="ocs-link" @click.prevent="filterByNetwork(row.item.network_id)" >
+					<a
+						href="#"
+						class="ocs-link"
+						@click.prevent="filterByNetwork(row.item.network_id)"
+					>
 						{{ row.item.network }}
 					</a>
 				</template>
