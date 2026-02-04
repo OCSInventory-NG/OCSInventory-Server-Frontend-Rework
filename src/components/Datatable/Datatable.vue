@@ -1132,8 +1132,8 @@ export default {
 			});
 		},
 		filterByNetwork(networkId) {
-        	this.$emit('filter-by-network', networkId);
-    	},
+			this.$emit('filter-by-network', networkId);
+		},
 	}
 }
 </script>
