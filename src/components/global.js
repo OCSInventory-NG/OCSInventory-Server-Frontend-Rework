@@ -24,6 +24,7 @@ import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 import Draggable from '@/components/Draggable/Draggable.vue'
+import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -53,6 +54,7 @@ const GlobalComponents = {
 		Vue.component('SnmpModal', SnmpModal)
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)
+		Vue.component('ExtensionModal', ExtensionModal)
 	}
 }
 
