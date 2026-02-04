@@ -277,12 +277,9 @@
 					v-if="canaccesschild"
 					#cell(network)="row"
 				>
-					<router-link
-						:to="'/inventory/netdevices/'+row.item.network_id"
-						class="ocs-link"
-					>
+					<a href="#" class="ocs-link" @click.prevent="filterByNetwork(row.item.network_id)" >
 						{{ row.item.network }}
-					</router-link>
+					</a>
 				</template>
 
 				<!-- Netdevice redirection -->
@@ -1134,6 +1131,9 @@ export default {
 				}
 			});
 		},
+		filterByNetwork(networkId) {
+        	this.$emit('filter-by-network', networkId);
+    	},
 	}
 }
 </script>
