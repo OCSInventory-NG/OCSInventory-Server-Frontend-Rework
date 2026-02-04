@@ -35,15 +35,21 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import GlobalComponents from '@/components/global'
 
+/***** Extensions *****/
+import axios from "axios"
+import { createPluginApi } from "@/extensions/pluginApi"
+import { loadFrontendExtensions } from "@/extensions/loader"
+import { ensureExtensionsLoaded } from "@/extensions/runtime"
+
 async function loadConfig() {
-	const response = await fetch('/config/config.json');
+	const response = await fetch('/config/config.json')
 	if (!response.ok) {
-		throw new Error('Failed to load config');
+		throw new Error('Failed to load config')
 	}
-	return response.json();
+	return response.json()
 }
 
-loadConfig().then((config) => {
+loadConfig().then(async (config) => {
 	const app = createApp(App)
 
 	app.use(createBootstrap())
@@ -67,8 +73,30 @@ loadConfig().then((config) => {
 
 	router.isReady()
 
-	app.config.globalProperties.$config = config;
+	app.config.globalProperties.$config = config
+
+	const apiClient = axios.create()
+	apiClient.interceptors.request.use((req) => {
+		const token = localStorage.getItem("token_authentication")
+		if (token) req.headers.Authorization = "Token " + token
+		return req
+	})
+
+	const pluginApi = createPluginApi({ router, i18n, config })
+	router.beforeEach(async (to) => {
+		await ensureExtensionsLoaded(() =>
+			loadFrontendExtensions({ apiClient, pluginApi, config })
+		)
+
+		if (to.matched.length === 0) {
+			return to.fullPath
+		}
+
+		return true
+	})
+
+	await router.isReady()
 	app.mount('#app')
 }).catch((error) => {
-	console.error('Error loading config:', error);
+	console.error('Error loading config:', error)
 })
