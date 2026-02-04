@@ -1,8 +1,8 @@
 <template>
 	<component
+		:is="e.component"
 		v-for="(e, idx) in entries"
 		:key="idx"
-		:is="e.component"
 		v-bind="context"
 	/>
 </template>

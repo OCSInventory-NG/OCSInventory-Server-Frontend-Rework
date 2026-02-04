@@ -1,5 +1,9 @@
 <template>
-	<div id="navbarMenu" class="collapse navbar-collapse" :class="showmobilemenu ? 'show' : ''">
+	<div
+		id="navbarMenu"
+		class="collapse navbar-collapse"
+		:class="showmobilemenu ? 'show' : ''"
+	>
 		<div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
 			<BNav class="navbar-nav">
 				<NavLink
