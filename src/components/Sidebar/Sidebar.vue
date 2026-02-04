@@ -8,7 +8,9 @@
 					:is-active="activeItem"
 					:header="$t(item.headerKey)"
 					:column-dividers="item.columnDividers?.map(d => ({ header: $t(d.headerKey), identifier: d.identifier }))"
-					:children-links="item.children?.map(c => ({ header: $t(c.headerKey), link: c.link, route: c.route, column: c.column }))"
+					:children-links="item.children?.map(c => ({ 
+						header: $t(c.headerKey), link: c.link, route: c.route, column: c.column
+					}))"
 					:link="item.link"
 					:icon-name="item.icon"
 					:index="item.index"

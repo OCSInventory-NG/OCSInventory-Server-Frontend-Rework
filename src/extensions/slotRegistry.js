@@ -7,5 +7,5 @@ export function registerSlot(slotName, entry) {
 }
 
 export function getSlotEntries(slotName, ctx) {
-  	return (slots.get(slotName) || []).filter(e => (e.when ? e.when(ctx) : true))
+	return (slots.get(slotName) || []).filter(e => (e.when ? e.when(ctx) : true))
 }
