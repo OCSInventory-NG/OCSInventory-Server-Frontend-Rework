@@ -1,5 +1,8 @@
 <template>
-	<div id="assets" class="container-xl">
+	<div
+		id="assets"
+		class="container-xl"
+	>
 		<div>
 			<PageHeader page-title="assets" />
 
@@ -7,10 +10,17 @@
 				<div class="card">
 					<div class="card-body">
 						<div v-if="errored">
-							<Alert :message="errormsg" :cols="true" variant="danger" />
+							<Alert
+								:message="errormsg"
+								:cols="true"
+								variant="danger"
+							/>
 						</div>
 
-						<div v-if="loading" class="ocs-loader">
+						<div
+							v-if="loading"
+							class="ocs-loader"
+						>
 							<Loader />
 						</div>
 
@@ -155,7 +165,7 @@ export default {
 
 				// Flatten accountinfo
 				results.forEach((item) => {
-				if (!item.accountinfo) return
+					if (!item.accountinfo) return
 					Object.keys(item.accountinfo).forEach((k) => {
 						const label = "Account info : " + k
 						if (!this.rowheader.includes(label)) this.rowheader.push(label)
