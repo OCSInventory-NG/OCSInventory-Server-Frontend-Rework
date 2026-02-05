@@ -157,7 +157,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-    		return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
+			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
 		}
 	},
 	methods: {
