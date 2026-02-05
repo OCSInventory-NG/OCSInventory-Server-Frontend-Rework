@@ -39,6 +39,7 @@
 			:title="(!update) ? $t('template.addsection') : $t('template.editsection')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -388,8 +389,22 @@ export default {
 		async loadData() {
 			this.loading = true
 			this.sectionmodal = true
+			this.row = {
+				id: null,
+				name: null,
+				retrieval_method: 'FILE',
+				retrieval_output: null,
+				target: null,
+				fields: [],
+				template: null,
+				options: {}
+			}
 			this.selectedcategory = null
 			this.oldcategory = null
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 
 			if (this.update && this.rowsectiondata) {
 				this.row = JSON.parse(JSON.stringify(this.rowsectiondata))

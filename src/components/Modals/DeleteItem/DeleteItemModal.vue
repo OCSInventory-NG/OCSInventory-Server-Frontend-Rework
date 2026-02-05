@@ -19,6 +19,7 @@
 			hide-footer
 			modal-class="modal modal-blur"
 			size="sm"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -164,6 +165,8 @@ export default {
 			this.rows.ids = this.ids
 			this.row.id = this.id
 			this.deleteact = true
+			this.deleteerror = false
+			this.deleteerrormsg = null
 		},
 		onSubmit(event) {
 			event.preventDefault()

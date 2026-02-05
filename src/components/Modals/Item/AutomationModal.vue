@@ -10,7 +10,7 @@
 						:title="$t('scheduler.addscheduler')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="automationmodal = !automationmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('scheduler.addscheduler') : $t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -293,9 +294,25 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.automationmodal = true
-			this.getScheduler(id)
+			this.row = {
+				name: null,
+				description: null,
+				active: false,
+				recurrence: "daily",
+				hour: null,
+				day_of_week: null,
+				day_of_month: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getScheduler(id)
+			}
 		},
 		async getScheduler(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id+"/", { headers: this.header })

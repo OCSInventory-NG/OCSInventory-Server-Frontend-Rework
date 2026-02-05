@@ -18,6 +18,7 @@
 			hide-footer
 			size="md"
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -115,6 +116,8 @@ export default {
 		refreshIds() {
 			this.templatetoexport = this.ids
 			this.exporttemplate = true
+			this.errormsg = null
+			this.errored = false
 		},
 		async onSubmit(event) {
 			event.preventDefault()

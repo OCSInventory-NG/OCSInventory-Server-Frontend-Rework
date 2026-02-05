@@ -6,7 +6,10 @@
 			<button 
 				:title="$t('accountinfo.massprocessing')"
 				class="form-control btn datatable-btn"
-				@click="(items.length > 0) ? massprocessingmodal = true : emptyselection = !emptyselection"
+				@click="
+					(items.length > 0) ? massprocessingmodal = true : emptyselection = !emptyselection,
+					loadData()
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'tag']"
@@ -19,6 +22,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -50,6 +54,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="lg"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -107,6 +112,10 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.errormsg = null
+			this.errored = false
+		},
 		reloadDatatable() {
 			this.successed = true
 		} 

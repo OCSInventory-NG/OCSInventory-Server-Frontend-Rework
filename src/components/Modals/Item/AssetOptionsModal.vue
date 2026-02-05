@@ -7,7 +7,12 @@
 				id="asset-options"
 				:title="$t('inventory.options')"
 				class="form-control btn datatable-btn"
-				@click="assetoptmodal = true"
+				@click="
+					assetoptmodal = true,
+					selectedopt = null,
+					errored = false,
+					errormsg = null
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'sliders']"
@@ -20,6 +25,7 @@
 			:title="$t('inventory.options')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

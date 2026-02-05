@@ -2,11 +2,12 @@
 	<div id="do-all-actions-item-modal">
 		<button 
 			:title="$t(translationkey+titlevalue)"
-			class="btn btn-ghost-warning"
+			class="btn btn-ghost-orange ocs-auto"
 			@click="getData()"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
+				size="1x"
 			/>
 		</button>
 
@@ -258,7 +259,10 @@ export default {
 		async getData() {
 			this.loading = true
 			this.doallaction = true
+			this.submitErrorMsg = null
 			this.loadErrorMsg = null
+			this.updateErrorMsg = null
+			this.deleteErrorMsg = null
 			try {
 				const response = await axios.get(
 					this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get,

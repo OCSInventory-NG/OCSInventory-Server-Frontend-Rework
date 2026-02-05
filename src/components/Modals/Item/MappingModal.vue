@@ -2,11 +2,12 @@
 	<div id="mapping-modal">
 		<button 
 			:title="$t('authentication.editmapping')"
-			class="btn btn-ghost-warning"
+			class="btn btn-ghost-orange ocs-auto"
 			@click="loadData(id)"
 		>
 			<font-awesome-icon 
 				:icon="['fas', 'gear']"
+				size="1x"
 			/>
 		</button>
 
@@ -16,6 +17,7 @@
 			:title="$t('authentication.editmapping')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -148,6 +150,16 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.mappingmodal = true
+			this.rows = {
+				username: null,
+				last_name: null,
+				first_name: null,
+				email: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 			this.getMappingConfig(id)
 		},
 		async getMappingConfig(id) {
@@ -183,7 +195,7 @@ export default {
 			if(this.mapping.length) {
 				this.mapping.forEach(map => {
 					if(map.internal_field in this.rows) {
-						if(this.rows[map.internal_field] != "") {
+						if(this.rows[map.internal_field] != "" && this.rows[map.internal_field] != null) {
 							jsonToUpdate.push({
 								id: map.id,
 								auth_config: this.id,
@@ -195,26 +207,26 @@ export default {
 								id: map.id
 							})
 						}
-					} else {
-						if(this.rows[map.internal_field] != "") {
-							jsonToAdd.push({
-								auth_config: this.id,
-								internal_field: map.internal_field,
-								external_field: this.rows[map.internal_field]
-							})
-						}
 					}
 				})
-			} else {
-				Object.keys(this.rows).forEach(row => {
-					if(this.rows[row] != "") {
+			}
+
+			Object.keys(this.rows).forEach(row => {
+				if(this.rows[row] != "" && this.rows[row] != null) {
+					const exists = this.mapping.some(map => map.internal_field === row)
+					if(!exists) {
 						jsonToAdd.push({
 							auth_config: this.id,
 							internal_field: row,
 							external_field: this.rows[row]
 						})
 					}
-				})
+				}
+			})
+
+			if(!jsonToUpdate.length && !jsonToAdd.length && !jsonToDelete.length) {
+				this.loadingcreate = false
+				this.createwithsuccess = true
 			}
 
 			if(jsonToUpdate.length) {

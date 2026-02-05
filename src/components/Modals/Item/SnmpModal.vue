@@ -10,7 +10,7 @@
 						:title="$t('network.addsnmpcommunity')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="snmpmodal = !snmpmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -354,9 +354,28 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.snmpmodal = true
-			this.getSnmpConfig(id)
+			this.row = {
+				name: null,
+				version: "2c",
+				user: null,
+				level: null,
+				password: null,
+				auth_protocol: null,
+				priv_protocol: null,
+				retries: 1,
+				timeout: 30,
+				subnets: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getSnmpConfig(id)
+			}
 		},
 		async getSnmpConfig(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/"+id+"/", { headers: this.header })

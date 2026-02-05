@@ -11,7 +11,7 @@
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						:disabled="viewOnly"
-						@click="fieldmodal = !fieldmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -361,9 +361,27 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.fieldmodal = true
-			this.getField(id)
+			this.row = {
+				id: null,
+				name: null,
+				retrieval_value: null,
+				override_target: false,
+				new_target: null,
+				retrieval_method: null,
+				retrieval_output: null,
+				options: {},
+				section: this.section
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getField(id)
+			}
 		},
 		async getField(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id+"/", { headers: this.header })

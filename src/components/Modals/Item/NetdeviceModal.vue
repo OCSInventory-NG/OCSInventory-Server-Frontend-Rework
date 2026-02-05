@@ -16,6 +16,7 @@
 			:title="$t('network.editnetdevice')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -153,6 +154,15 @@ export default {
 		loadData(id) {
 			this.loading = true
 			this.netdevicemodal = true
+			this.row = {
+				netname: null,
+				ip: null,
+				mac: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
 			this.getNetdevice(id)
 		},
 		// Retrieve networks info by id

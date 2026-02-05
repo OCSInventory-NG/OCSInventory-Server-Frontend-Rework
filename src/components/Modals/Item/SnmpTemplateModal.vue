@@ -10,7 +10,7 @@
 						:title="$t('network.addsnmptemplate')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="snmptemplatemodal = !snmptemplatemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -167,8 +168,20 @@ export default {
 	},
 	methods: {
 		loadData() {
-			this.loading = true
 			this.snmptemplatemodal = true
+			this.row = {
+				name: null,
+				os: 'SNMP',
+				sections: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (this.update) {
+				this.loading = true
+			}
 		},
 		onSubmit(event) {
 			event.preventDefault()

@@ -9,52 +9,59 @@ import axios from 'axios'
 
 export default {
 	name: 'App',
-	beforeCreate() {
+	created() {
 		const header = {
 			"Content-Type": "application/json;charset=utf-8"
 		}
 
-		var sso = window.location.search
+		const token = this.getTokenFromUrl()
+		if(token) {
+			localStorage.setItem('token_authentication', token)
+			localStorage.setItem('authenticated', true)
+			this.clearAuthParams()
+			this.getPermissions()
+			return
+		}
 
-		if(sso) {
-			axios.get(this.$config.BACKEND_API_ROUTE+"callback"+sso, { headers: header })
+		if (localStorage.getItem("authenticated") === null
+			|| localStorage.getItem("authenticated") === "false"
+			|| localStorage.getItem('token_authentication') === null 
+			|| localStorage.getItem('permissions') === null) {
+			const noAuto = [...new URLSearchParams(window.location.search).keys()].some(k => k.toLowerCase() === 'noauto')
+			axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
 				.then(response => {
-					if(response.data.token_authentication) {
-						localStorage.setItem('token_authentication', response.data.token_authentication)
-						localStorage.setItem('authenticated', true)
-						this.getPermissions()
+					if(response.data) {
+						if(response.data.auto_redirect && !noAuto) {
+							window.location.href = response.data.redirect_url
+						} else {
+							if (localStorage.getItem("authenticated") === null
+								|| localStorage.getItem("authenticated") === "false"
+								|| localStorage.getItem('token_authentication') === null 
+								|| localStorage.getItem('permissions') === null) {
+								this.$router.push({path:'/login'}).catch(() => {})
+							}
+						}
 					}
 				})
 				.catch(e => {
 					console.log(e.message)
 				})
-		} else {
-			if (localStorage.getItem("authenticated") === null
-			|| localStorage.getItem("authenticated") === "false"
-			|| localStorage.getItem('token_authentication') === null 
-			|| localStorage.getItem('permissions') === null) {
-				axios.get(this.$config.BACKEND_API_ROUTE+"login/", { headers: header })
-					.then(response => {
-						if(response.data) {
-							if(response.data.auto_redirect) {
-								window.location.href = response.data.redirect_url+window.location.origin
-							} else {
-								if (localStorage.getItem("authenticated") === null
-								|| localStorage.getItem("authenticated") === "false"
-								|| localStorage.getItem('token_authentication') === null 
-								|| localStorage.getItem('permissions') === null) {
-									this.$router.push({path:'/login'}).catch(() => {})
-								}
-							}
-						}
-					})
-					.catch(e => {
-						console.log(e.message)
-					})
-			}
 		}
 	},
 	methods: {
+		getTokenFromUrl() {
+			const hash = window.location.hash ? window.location.hash.substring(1) : ""
+			const hashParams = new URLSearchParams(hash)
+			const searchParams = new URLSearchParams(window.location.search)
+			return hashParams.get("token_authentication") || searchParams.get("token_authentication")
+		},
+		clearAuthParams() {
+			const searchParams = new URLSearchParams(window.location.search)
+			searchParams.delete("token_authentication")
+			const search = searchParams.toString()
+			const cleanUrl = window.location.pathname + (search ? `?${search}` : "")
+			window.history.replaceState({}, document.title, cleanUrl)
+		},
 		getPermissions() {
 			const header = {
 				"Content-Type": "application/json;charset=utf-8",

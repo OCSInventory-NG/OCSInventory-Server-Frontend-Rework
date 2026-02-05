@@ -10,7 +10,7 @@
 						:title="$t('template.addcategory')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="categorymodal = !categorymodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('template.addcategory') : $t('template.editcategory')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -215,9 +216,21 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.categorymodal = true
-			this.getCategory(id)
+			this.row = {
+				name: null,
+				description: null,
+				inventory_sections: []
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getCategory(id)
+			}
 		},
 		async getCategory(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id+"/", { headers: this.header })

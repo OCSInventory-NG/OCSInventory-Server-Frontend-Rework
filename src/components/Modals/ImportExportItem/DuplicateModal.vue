@@ -18,6 +18,7 @@
 			hide-footer
 			size="md"
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -157,6 +158,8 @@ export default {
 			this.duplicateitem = true
 			this.selected = null
 			this.duplicatename = null
+			this.errormsg = null
+			this.errored = false,
 			await this.getItem()
 		},
 		async getItem() {

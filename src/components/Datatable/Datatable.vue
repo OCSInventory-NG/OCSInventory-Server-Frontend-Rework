@@ -467,21 +467,23 @@
 							<button 
 								v-if="canviewaction"
 								:title="$t('deployment.manageaction')"
-								class="btn btn-ghost-dark"
+								class="btn btn-ghost-orange ocs-auto"
 								@click="goToEditPackage(row.item.id)"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'gear']"
+									size="1x"
 								/>
 							</button>
 							<button 
 								v-if="canviewruleaction"
 								:title="$t('rule.managerule')"
-								class="btn btn-ghost-dark"
+								class="btn btn-ghost-orange ocs-auto"
 								@click="goToEditRule(row.item.id)"
 							>
 								<font-awesome-icon 
 									:icon="['fas', 'gear']"
+									size="1x"
 								/>
 							</button>
 							<button 
@@ -803,7 +805,13 @@ export default {
 					this.json_fields[visible.key] = visible.key
 					// Initialize datatable header
 					var index = this.fields.findIndex(x => x.key==visible);
-					index === -1 ? this.fields.push(arrayVisible) : null
+					if (index === -1) {
+						// Translate label
+						visible.label = (this.$te(this.translationkey+visible.key))
+							? this.$t(this.translationkey+visible.key)
+							: visible.key;
+						this.fields.push(arrayVisible);
+					}
 				}
 			})
 

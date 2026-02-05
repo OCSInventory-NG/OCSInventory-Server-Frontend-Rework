@@ -11,7 +11,7 @@
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						:disabled="viewOnly"
-						@click="templatemodal = !templatemodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -39,6 +39,7 @@
 			:title="(!update) ? $t('template.addtemplate') : $t('template.editname')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -200,9 +201,24 @@ export default {
 	},
 	methods: {
 		loadData(id) {
-			this.loading = true
 			this.templatemodal = true
-			this.getTemplateName(id);
+			this.row = {
+				name: null,
+				sections: [],
+				id: null,
+				os: null,
+				is_protected: false,
+				last_update: null,
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			if (id) {
+				this.loading = true
+				this.getTemplateName(id);
+			}
 		},
 		async getTemplateName(id){
 			try {

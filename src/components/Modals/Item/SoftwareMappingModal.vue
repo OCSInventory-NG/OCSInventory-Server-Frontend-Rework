@@ -10,7 +10,7 @@
 						:title="$t('software.addsoftwaremapping')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
-						@click="softwaremappingmodal = !softwaremappingmodal"
+						@click="loadData()"
 					>
 						<font-awesome-icon 
 							:icon="['fas', 'plus']"
@@ -37,6 +37,7 @@
 			:title="(!update) ? $t('software.addsoftwaremapping') : $t('software.editsoftwaremapping')"
 			hide-footer
 			modal-class="custom-modal modal-blur"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -260,9 +261,26 @@ export default {
 	},
 	methods: {
 		async loadData(id) {
-			this.loading = true
 			this.softwaremappingmodal = true
-			await this.getSoftwareMapping(id)
+			this.row = {
+				template: null,
+				section: null,
+				name: null,
+				publisher: null,
+				version: null,
+				major_version: null,
+				minor_version: null,
+				patch_version: null
+			}
+			this.errormsg = null
+			this.errored = false
+			this.createerror = false
+			this.createerrormsg = null
+			
+			if (id) {
+				this.loading = true
+				await this.getSoftwareMapping(id)
+			}
 		},
 		async getSoftwareMapping(id) {
 			await axios.get(this.$config.BACKEND_API_ROUTE+"software_mapping/"+id+"/", { headers: this.header })

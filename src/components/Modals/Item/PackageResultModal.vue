@@ -7,7 +7,10 @@
 				id="attr-pkg"
 				:title="$t('deployment.attrpkg')"
 				class="form-control btn datatable-btn"
-				@click="(items.length > 0) ? getHeader() : emptyselection = !emptyselection"
+				@click="
+					(items.length > 0) ? getHeader() : emptyselection = !emptyselection,
+					loadData()
+				"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'boxes-packing']"
@@ -21,6 +24,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="xl"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -104,6 +108,7 @@
 			hide-footer
 			modal-class="custom-modal modal-blur"
 			size="lg"
+			scrollable
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -166,6 +171,10 @@ export default {
 		}
 	},
 	methods: {
+		loadData() {
+			this.errormsg = null
+			this.errored = false
+		},
 		getHeader() {
 			this.loading = true
 			this.packageresultmodal = true
