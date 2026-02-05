@@ -37,6 +37,7 @@
 										<TemplateModal
 											:id="id"
 											:update="true"
+											:view-only="viewOnly"
 											@reloadDatatable="reloadTemplate"
 										/>
 									</div>
@@ -45,6 +46,7 @@
 									<SectionModal
 										:template="parseInt(id)"
 										:routetype="routetype"
+										:view-only="viewOnly"
 										@reloadTemplate="reloadTemplate"
 									/>
 								</b-col>
@@ -82,6 +84,7 @@
 										<SectionCollapse
 											:section="section"
 											:routetype="routetype"
+											:view-only="viewOnly"
 											@reloadTemplate="reloadTemplate"
 										/>
 									</b-tab>
@@ -123,6 +126,11 @@ export default {
 				"Content-Type": "application/json;charset=utf-8",
 				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
 			}
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
 		}
 	},
 	watch: {

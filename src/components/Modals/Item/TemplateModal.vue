@@ -10,6 +10,7 @@
 						:title="$t('template.addtemplate')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
+						:disabled="viewOnly"
 						@click="templatemodal = !templatemodal"
 					>
 						<font-awesome-icon 
@@ -24,6 +25,7 @@
 			<button 
 				:title="$t('template.editname')"
 				class="btn btn-ghost-dark"
+				:disabled="viewOnly"
 				@click="loadData(id)"
 			>
 				<font-awesome-icon 
@@ -141,7 +143,8 @@ export default {
 	name: "TemplateModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: [String, Number], default: null }
+		id: { type: [String, Number], default: null },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

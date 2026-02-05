@@ -889,7 +889,7 @@ export default {
 			tdClass: 'sticky-col right actions-col'
 		}
 
-		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction) {
+		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction || this.canviewaction || this.canedittemplate) {
 			this.fields.push(actions)
 		}
 

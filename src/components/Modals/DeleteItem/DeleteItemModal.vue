@@ -4,7 +4,7 @@
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			:class="'btn ' + customclass"
-			:disabled="disabled"
+			:disabled="disabled || viewOnly"
 			@click="refreshIds()"
 		>
 			<font-awesome-icon 
@@ -152,6 +152,11 @@ export default {
 				this.$emit('reloadTemplate')
 				this.$emit('reloadDashboard')
 			}, 500)
+		}
+	},
+	computed: {
+		viewOnly() {
+    		return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
 		}
 	},
 	methods: {

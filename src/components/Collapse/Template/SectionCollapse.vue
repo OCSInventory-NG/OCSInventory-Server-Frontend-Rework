@@ -56,6 +56,7 @@
 											:update="true"
 											:rowsectiondata="rowsection"
 											:template="rowsection.template"
+											:view-only="viewOnly"
 											@reloadTemplate="reloadTemplate"
 											@reloadSection="reloadSection"
 										/>
@@ -81,6 +82,7 @@
 					<FieldModal
 						:section="section.id"
 						:routetype="routetype"
+						:view-only="viewOnly"
 						@reloadDatatable="reloadDatatable"
 					/>
 				</b-col>
@@ -102,6 +104,7 @@
 						:candelete="true"
 						:rowdata="rowdata"
 						:rowheader="rowheader"
+						:view-only="viewOnly"
 						field="order"
 						apiroute="fields"
 						translationkey="template."
@@ -127,7 +130,8 @@ export default {
 	name: 'SectionCollapse',
 	props: {
 		section: { type: Object, default: () => {} },
-		routetype: { type: String, default: "assets" }
+		routetype: { type: String, default: "assets" },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

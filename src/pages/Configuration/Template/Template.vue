@@ -37,7 +37,7 @@
 								id="templates-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
-								:canedittemplate="canedit"
+								:canedittemplate="canopenedit"
 								:candelete="candelete"
 								:canexport="false"
 								:importtemplate="importtemplate"
@@ -68,6 +68,7 @@ export default {
 			errored: false,
 			canadd: false,
 			canedit: false,
+			canopenedit: false,
 			candelete: false,
 			canview: false,
 			exporttemplate: false,
@@ -85,6 +86,7 @@ export default {
 		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
 			this.canview = true
 			this.exporttemplate = true
+			this.canopenedit = true
 			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true
