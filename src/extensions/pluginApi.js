@@ -3,21 +3,10 @@ import AppLayout from "@/layouts/AppLayout.vue"
 import PageHeader from "@/components/Header/PageHeader.vue"
 import Alert from "@/components/Alert/Alert.vue"
 import Loader from "@/components/Loader/Loader.vue"
-import axios from "axios"
 import { addMenuItem } from "@/menu/menuStore"
 import { registerSlot } from "@/extensions/slotRegistry"
 
-export function createPluginApi({ router, i18n, config }) {
-	const token = localStorage.getItem("token_authentication") || null
-
-	const http = axios.create({
-		baseURL: config.BACKEND_API_ROUTE,
-	})
-	http.interceptors.request.use((req) => {
-		if (token) req.headers.Authorization = "Token " + token
-		return req
-	})
-
+export function createPluginApi({ router, i18n, config, apiClient }) {
 	const coreComponents = {
 		Datatable,
 		AppLayout,
@@ -39,7 +28,7 @@ export function createPluginApi({ router, i18n, config }) {
 		registerSlot,
 		mergeI18n: (locale, messages) => i18n.global.mergeLocaleMessage(locale, messages),
 		hasPermissions,
-		http,
+		http: apiClient,
 		getComponent: (name) => coreComponents[name],
 		importModule: async (url) => import(/* @vite-ignore */ new URL(url, window.location.href).href),
 	}
