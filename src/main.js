@@ -96,7 +96,6 @@ loadConfig().then(async (config) => {
 	const pluginApi = createPluginApi({
 		router,
 		i18n,
-		config,
 		apiClient: api.http,
 	})
 

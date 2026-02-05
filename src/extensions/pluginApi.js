@@ -6,7 +6,7 @@ import Loader from "@/components/Loader/Loader.vue"
 import { addMenuItem } from "@/menu/menuStore"
 import { registerSlot } from "@/extensions/slotRegistry"
 
-export function createPluginApi({ router, i18n, config, apiClient }) {
+export function createPluginApi({ router, i18n, apiClient }) {
 	const coreComponents = {
 		Datatable,
 		AppLayout,
