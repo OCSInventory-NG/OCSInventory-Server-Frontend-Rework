@@ -11,8 +11,8 @@ export function createGenericService(http) {
 		// Retrieve items
 		// Params :
 		// route : item API route
-		// Optionnal : query : { limit, offset, ordering, search }
-		// Optionnal : customParams : dynamic parameters (ex: { expand: network })
+		// Optional : query : { limit, offset, ordering, search }
+		// Optional : customParams : dynamic parameters (ex: { expand: network })
 		get(route, query = {}, customParams = {}) {
 			const params = {}
 			
