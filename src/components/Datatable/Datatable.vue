@@ -784,6 +784,9 @@ export default {
 		} else {
 			this.deleterte = this.title
 		}
+		if(this.title == "netdevice") {
+			this.deleterte = "netdevices"
+		}
 
 		if(this.usecheckbox == true) {
 			this.fields.push({
