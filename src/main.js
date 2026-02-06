@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 
 /***** Bootstrap *****/
-import { createBootstrap } from 'bootstrap-vue-next'
+import { installBootstrapUi } from "@/ui/bootstrap"
 
 /***** Vue Router *****/
 import router from '@/route'
@@ -61,7 +61,7 @@ loadConfig().then(async (config) => {
 	const app = createApp(App)
 
 	// Plugins
-	app.use(createBootstrap())
+	installBootstrapUi(app)
 	app.use(router)
 	app.use(i18n)
 	app.use(VueApexCharts)
