@@ -119,7 +119,6 @@
 							<b-form-input
 								id="email"
 								v-model="row.email"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -133,7 +132,6 @@
 							<b-form-input
 								id="first_name"
 								v-model="row.first_name"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -145,7 +143,6 @@
 							<b-form-input
 								id="last_name"
 								v-model="row.last_name"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -339,9 +336,13 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
+			const payload = {}
+			Object.keys(this.row).forEach(key => {
+				payload[key] = this.row[key] === null ? "" : this.row[key]
+			})
+
 			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"users/", this.row, { headers: this.header })
+				axios.post(this.$config.BACKEND_API_ROUTE+"users/", payload, { headers: this.header })
 					.then(() => {
 						this.createwithsuccess = true
 						this.createerrormsg = null
