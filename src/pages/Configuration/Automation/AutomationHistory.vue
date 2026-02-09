@@ -94,7 +94,7 @@ export default {
 			this.rowdata = []
 			var id = ""
 			if(this.$route.params.id) id = this.$route.params.id
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/history?scheduler="+id+"&expand=scheduler",
+			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/history/?scheduler="+id+"&expand=scheduler",
 				{ headers: this.header })
 				.then(response => {
 					this.rowdata = response.data

@@ -109,7 +109,7 @@ export default {
 	},
 	methods: {
 		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
+			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions/?package="+this.id, { headers: this.header })
 				.then(response => {
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if (!this.excludedFields.includes(field)) {

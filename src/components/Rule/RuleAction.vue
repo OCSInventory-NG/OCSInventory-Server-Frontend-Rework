@@ -386,7 +386,7 @@ export default {
 					route = "templates"
 				}
 
-				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
+				await axios.get(this.$config.BACKEND_API_ROUTE+route+"/", { headers: this.header })
 					.then(response => {
 						this.loadingselect = true
 						this.selectfieldopt[index] = []
