@@ -75,6 +75,7 @@
 								:href="redirect_url"
 								class="auth-btn mb-3"
 								variant="inverse"
+								@click="setSSOAuth"
 							>
 								{{ $t('authentication.connect_with_sso') }}
 							</BButton>
@@ -125,6 +126,9 @@ export default {
 			})
 	},
 	methods: {
+		setSSOAuth() {
+			localStorage.setItem('auth_method', 'sso');
+		},
 		onSubmit(event) {
 			event.preventDefault()
 			this.loadingLogin = true
@@ -146,6 +150,7 @@ export default {
 					localStorage.setItem('token_authentication', response.data.token)
 					localStorage.setItem('authenticated', true)
 					localStorage.setItem('locale', this.$root.$i18n.locale)
+					localStorage.setItem('auth_method', 'local')
 					this.getPermissions()
 				})
 				.catch(e => {

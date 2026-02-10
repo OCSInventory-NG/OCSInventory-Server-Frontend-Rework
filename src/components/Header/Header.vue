@@ -61,6 +61,18 @@
 						/>
 						<p>{{ $t('generic.logout') }}</p>
 					</b-dropdown-item-button>
+
+					<b-dropdown-item-button
+						v-if="isSSO"
+						class="d-flex align-items-center justify-content-between"
+					>
+						<span>SLO</span>
+						<b-form-checkbox
+						switch
+						v-model="sloEnabled"
+						@change.stop="onSLOChange"
+						/>
+					</b-dropdown-item-button>
 				</BNavItemDropdown>
 			</div>
 
@@ -72,18 +84,54 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
 	name: 'Header',
 	data() {
 		return {
 			showmobilemenu: false,
+			sloEnabled: localStorage.getItem('slo_enabled') === 'true',
+			endpoint_logout: null,
+			sso: false,
+		}
+	},
+	mounted() {
+		const header = {
+        "Content-Type": "application/json;charset=utf-8"
+		}
+		
+		axios.get(`${this.$config.BACKEND_API_ROUTE}login/`, { headers: header })
+		.then(response => {
+			if(response.data) {
+				this.endpoint_logout = response.data.endpoint_logout
+			}
+		})
+		.catch(e => {
+			console.error("Erreur récupération SSO URL:", e)
+		})
+	},
+	computed: {
+		isSSO() {
+			return localStorage.getItem('auth_method') === 'sso';
 		}
 	},
 	methods: {
+		onSLOChange() {
+			localStorage.setItem('slo_enabled', this.sloEnabled)
+		},
 		logout() {
+			const authMethod = localStorage.getItem('auth_method');
+			const sloEnabled = this.sloEnabled;
+
 			localStorage.setItem('authenticated', false);
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
+
+			if(authMethod === 'sso' && sloEnabled) {
+				window.location.href = this.endpoint_logout;
+				return;
+			}
 			this.$router.push('/login');
 		},
 		account() {
