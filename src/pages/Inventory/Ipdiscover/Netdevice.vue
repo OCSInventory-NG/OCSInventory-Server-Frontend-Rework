@@ -183,7 +183,6 @@ export default {
 					}
 
 					this.rowdata = results
-					console.log(this.rowdata)
 					this.errormsg = null
 					this.errored = false
 				})
