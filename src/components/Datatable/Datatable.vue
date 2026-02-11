@@ -272,6 +272,20 @@
 					</template>
 				</template>
 
+				<!-- Network redirection -->
+				<template 
+					v-if="canaccesschild"
+					#cell(network)="row"
+				>
+					<a
+						href="#"
+						class="ocs-link"
+						@click.prevent="filterByNetwork(row.item.network_id)"
+					>
+						{{ row.item.network }}
+					</a>
+				</template>
+
 				<!-- Netdevice redirection -->
 				<template 
 					v-if="canaccesschild"
@@ -433,6 +447,9 @@
 					{{ row.item.last_update_formatted }}
 				</template>
 				<template #cell(updated_at)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
+				<template #cell(last_seen)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
 
@@ -784,6 +801,9 @@ export default {
 		} else {
 			this.deleterte = this.title
 		}
+		if(this.title == "netdevice") {
+			this.deleterte = "netdevices"
+		}
 
 		if(this.usecheckbox == true) {
 			this.fields.push({
@@ -916,7 +936,7 @@ export default {
 		this.json_data = this.rowdata
 
 		this.rowdata.forEach(row => {
-			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date'];
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at'];
 			const dateValue = dateFields.find(field => row[field]);
 			if (dateValue) {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
@@ -1114,12 +1134,16 @@ export default {
 		},
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
-				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date', 'updated_at'];
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 
+					'date_created', 'date', 'updated_at','last_seen'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 				}
 			});
+		},
+		filterByNetwork(networkId) {
+			this.$emit('filter-by-network', networkId);
 		},
 	}
 }

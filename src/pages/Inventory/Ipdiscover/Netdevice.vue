@@ -35,6 +35,7 @@
 								:candelete="candelete"
 								:canaccessdetails="true"
 								:canmassprocessing="true"
+								:canaccesschild="true"
 								editcomponent="NetdeviceModal"
 								title="netdevice"
 								translationkey="network."
@@ -45,6 +46,7 @@
 								@export="handleExport"
 								@export-all="exportAllNetdevices"
 								@reloadDatatable="reloadDatatable"
+								@filter-by-network="onFilterByNetwork"
 							/>
 						</div>
 					</div>
@@ -146,6 +148,7 @@ export default {
 			if (q.offset != null) params.offset = q.offset
 			if (q.ordering) params.ordering = q.ordering
 			if (q.search) params.search = q.search
+			if (q.network) params.network = q.network
 
 			if(this.$route.params.id) params.network = this.$route.params.id
 
@@ -161,6 +164,10 @@ export default {
 						this.total = results.length
 					}
 					results.forEach(data => {
+						if(data.network) {
+							data.network_name = data.network.name
+							data.network_id = data.network.id
+						}
 						if(data.accountinfo) {
 							Object.keys(data.accountinfo).forEach(accountinfo => {
 								if(!this.rowheader.includes("Account info : " + accountinfo)) {
@@ -176,7 +183,6 @@ export default {
 					}
 
 					this.rowdata = results
-
 					this.errormsg = null
 					this.errored = false
 				})
@@ -248,6 +254,12 @@ export default {
 			allRows.push(...results)
 
 			this.handleExport({ scope: 'all', rows: allRows })
+		},
+		async onFilterByNetwork(networkId) {
+			this.isbusy = true;
+			this.query.network = networkId;
+			this.query.offset = 0;
+			await this.getNetdevice(this.query);
 		}
 	}
 }

@@ -113,7 +113,7 @@ export default {
 		async getSavedSearches() {
 			this.rowdata = []
 			this.loading = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save?expand=user,groups", { headers: this.header })
+			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/?expand=user,groups", { headers: this.header })
 				.then(response => {
 					for (const search of response.data) {
 						delete search.last_updated
