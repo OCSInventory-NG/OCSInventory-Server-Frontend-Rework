@@ -272,6 +272,20 @@
 					</template>
 				</template>
 
+				<!-- Network redirection -->
+				<template 
+					v-if="canaccesschild"
+					#cell(network)="row"
+				>
+					<a
+						href="#"
+						class="ocs-link"
+						@click.prevent="filterByNetwork(row.item.network_id)"
+					>
+						{{ row.item.network }}
+					</a>
+				</template>
+
 				<!-- Netdevice redirection -->
 				<template 
 					v-if="canaccesschild"
@@ -1127,6 +1141,9 @@ export default {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 				}
 			});
+		},
+		filterByNetwork(networkId) {
+			this.$emit('filter-by-network', networkId);
 		},
 	}
 }
