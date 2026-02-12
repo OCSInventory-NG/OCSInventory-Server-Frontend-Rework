@@ -4,15 +4,13 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
 			<PageHeader 
 				page-title="groups"
 			/>
-			<!-- Display Datatable -->
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -35,6 +33,7 @@
 								:permissionslabelprop="permissionslabel"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="groups-datatable"
 								:rowdata="rowdata"
@@ -42,6 +41,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:duplicateitem="duplicateitem"
+								:isbusy="isbusy"
 								editcomponent="GroupModal"
 								title="groups"
 								titlevalue="group"
@@ -57,163 +57,178 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Group",
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
-			canview: false,
+
 			duplicateitem: false,
 			rowdata: [],
 			rowheader: [],
 			permissions: [],
 			permissionslabel: [],
-			errored: false,
-			errormsg: null,
+
+			isbusy: true,
 			loading: true,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("auth_view_group")) {
-			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("auth_add_group")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("auth_view_group")) {
+			if (permissions.includes("auth_add_group")) {
 				this.canadd = true
-				this.duplicateitem = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("auth_change_group")) {
+			if (permissions.includes("auth_change_group")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("auth_delete_group")) {
+			if (permissions.includes("auth_delete_group")) {
 				this.candelete = true
 			}
-			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if (field != "is_protected") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getPermissions()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getPermissions() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions/", { headers: this.header })
-				.then(response => {
-					var array = ["add_", "change_", "delete_", "view_"]
-					var labeltmp = new Set()
-
-					response.data.forEach(permissionDetails => {
-						array.forEach(type => {
-							if(~permissionDetails.codename.indexOf(type)) {
-								var permissionKey = permissionDetails.codename.replace(type, "")
-
-								if(this.$te("permission." + permissionKey)) {
-									var key = permissionKey + "_" + permissionDetails.content_type
-									
-									if(typeof this.permissions[key] === 'undefined') {
-										this.permissions[key] = [{
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
-										}]
-									} else {
-										this.permissions[key].push({
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
-										})
-									}
-
-									labeltmp.add(key)
-								}
-							}
-						})
-					})
-					labeltmp.forEach(label => {
-						this.permissionslabel.push({
-							id: label,
-							trad: this.$t('permission.'+label.split("_")[0])
-						})
-					})
-
-					this.permissionslabel.sort((a,b) => (a.trad > b.trad) ? 1 : ((b.trad > a.trad) ? -1 : 0))
-
-					this.getGroups()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getGroups() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
-				.then(response => {
-					this.rowdata = response.data
-					this.permissionsTreatment()
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		permissionsTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpPermissions = []
-				rowDetails.permissions.forEach(permissionsDetails => {
-					this.permissionslabel.forEach(label => {
-						this.permissions[label.id].forEach(permissions => {
-							if(permissions.id == permissionsDetails) {
-								if(typeof tmpPermissions[label.trad] === 'undefined') {
-									tmpPermissions[label.trad] = [this.$t('generic.'+permissions.type)]
-								} else {
-									tmpPermissions[label.trad].push(this.$t('generic.'+permissions.type)) 
-								}
-							}
-						})					
-					})
-				})
-
-				var tmpTradPermission = []
-				Object.keys(tmpPermissions).forEach(key => {
-					tmpTradPermission.push(key+" : "+tmpPermissions[key].join(', '))
-				});
-
-				tmpTradPermission.sort()
-
-				rowDetails.permissions = tmpTradPermission.join('\n')
-			})
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("groups/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["is_protected"].includes(f)
+				)
+
+				// Get permissions
+				await this.getPermissions()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getPermissions() {
+			this.isbusy = true
+			try {
+				const data = await this.$api.generic.get("permissions/")
+				const perms = Array.isArray(data) ? data : (data?.results || [])
+
+				const prefixes = ["add_", "change_", "delete_", "view_"]
+				const labelSet = new Set()
+
+				this.permissions = {}
+				this.permissionslabel = []
+
+				for (const p of perms) {
+					for (const prefix of prefixes) {
+						if (!p?.codename?.includes(prefix)) continue
+
+						const permissionKey = p.codename.replace(prefix, "")
+						if (!this.$te("permission." + permissionKey)) continue
+
+						const key = `${permissionKey}_${p.content_type}`
+						const entry = {
+							id: p.id,
+							code: `permission_${p.id}`,
+							name: p.codename,
+							key: permissionKey,
+							type: prefix.replace("_", ""),
+						}
+
+						if (!this.permissions[key]) this.permissions[key] = []
+						this.permissions[key].push(entry)
+
+						labelSet.add(key)
+					}
+				}
+
+				this.permissionslabel = Array.from(labelSet).map((label) => ({
+					id: label,
+					trad: this.$t("permission." + label.split("_")[0]),
+				}))
+
+				this.permissionslabel.sort((a, b) => (a.trad || "").localeCompare(b.trad || ""))
+
+				await this.getGroups()
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
+
+		async getGroups() {
+			this.isbusy = true
+
+			try {
+				const data = await this.$api.generic.get("groups/")
+				this.rowdata = Array.isArray(data) ? data : (data?.results || [])
+
+				this.permissionsTreatment()
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		permissionsTreatment() {
+			const permById = new Map()
+
+			for (const label of this.permissionslabel) {
+				const list = this.permissions?.[label.id] || []
+				for (const p of list) {
+					permById.set(p.id, {
+						labelTrad: label.trad,
+						typeTrad: this.$t("generic." + p.type),
+					})
+				}
+			}
+
+			for (const row of this.rowdata || []) {
+				const grouped = new Map()
+
+				for (const permId of row.permissions || []) {
+					const info = permById.get(permId)
+					if (!info) continue
+
+					if (!grouped.has(info.labelTrad)) grouped.set(info.labelTrad, new Set())
+					grouped.get(info.labelTrad).add(info.typeTrad)
+				}
+
+				const lines = Array.from(grouped.entries())
+					.map(([labelTrad, setTypes]) => `${labelTrad} : ${Array.from(setTypes).join(", ")}`)
+					.sort((a, b) => a.localeCompare(b))
+
+				row.permissions = lines.join("\n")
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getGroups()
 		}
 	}
