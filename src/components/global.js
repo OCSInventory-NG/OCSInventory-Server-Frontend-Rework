@@ -26,6 +26,10 @@ import UserModal from '@/components/Modals/Item/UserModal.vue'
 import Draggable from '@/components/Draggable/Draggable.vue'
 import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
+import BarChart from '@/components/Dashboard/Chart/Bar.vue'
+import Counter from '@/components/Dashboard/Counter/Counter.vue'
+import PieChart from '@/components/Dashboard/Chart/Pie.vue'
+import LineChart from '@/components/Dashboard/Chart/Line.vue'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -57,6 +61,10 @@ const GlobalComponents = {
 		Vue.component('UserModal', UserModal)
 		Vue.component('ExtensionModal', ExtensionModal)
 		Vue.component('ExtensionSlot', ExtensionSlot)
+		Vue.component('BarChart', BarChart)
+		Vue.component('Counter', Counter)
+		Vue.component('PieChart', PieChart)
+		Vue.component('LineChart', LineChart)
 	}
 }
 
