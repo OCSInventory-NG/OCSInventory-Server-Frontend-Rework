@@ -533,7 +533,7 @@ export default {
 			try {
 				this.emptylayout.layout = this.layouts[this.activeLayout].layout
 
-				const { id, ...payload } = this.emptylayout
+				const { id: _, ...payload } = this.emptylayout
 
 				await this.$api.generic.post("dashboard/layout/", payload)
 
