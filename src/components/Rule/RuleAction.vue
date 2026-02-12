@@ -306,9 +306,8 @@ export default {
 	},
 	methods: {
 		async getFields(index, model, reload = false) {
-			var route = this.routetargets[this.trigger][model].route
-			var component = this.routetargets[this.trigger][model].key
-
+			const route = this.routetargets[this.trigger]?.[model]?.route
+			if (!route) return
 			if(!Array.isArray(this.fieldopt[index])) {
 				this.fieldopt[index] = []
 			}
@@ -373,7 +372,7 @@ export default {
 			this.loadingfield = false
 		},
 		async setFieldType(input, index) {
-			for (const element of this.fieldopt[index]) {
+			for (const element of this.fieldopt[index] || []) {
 				if(element.value == input.field) {
 					input.fieldtype = element.fieldtype
 				}
@@ -501,7 +500,7 @@ export default {
 						value: action.value,
 						rule: parseInt(this.id),
 						object_id: null,
-						object_slug: null
+						object_slug: action.model.toLowerCase()
 					})
 				}
 			}

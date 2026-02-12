@@ -99,6 +99,13 @@
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
 									/>
+									<b-form-input
+										v-if="input.field.includes('metadata')" 
+										v-model="input.metadata_field"
+										required
+										placeholder="Metadata field"
+										class="mb-3"
+									/>
 								</b-form-group>
 							</b-col>
 							<b-col cols="3">
@@ -274,7 +281,8 @@ export default {
 						field: "id",
 						operator: "==",
 						value: null,
-						case_sensitive: false
+						case_sensitive: false,
+						metadata_field: null
 					}
 				]
 			],
@@ -292,10 +300,32 @@ export default {
 	},
 	methods: {
 		async getModelField() {
+			this.loadingfield = true
+			this.fields = []
+			await axios.get(this.$config.BACKEND_API_ROUTE + "automation/triggers/", { headers: this.header })
+        	.then(triggerResponse => {
+				const trigger = triggerResponse.data.find(t => t.trigger === this.trigger)
+				if(trigger && trigger.context_fields) {
+					Object.keys(trigger.context_fields).forEach(parent => {
+						Object.keys(trigger.context_fields[parent]).forEach(child => {
+							const fullPath = parent + "." + child
+							if(!this.fields.find(f => f.value === fullPath)) {
+								this.fields.push({
+									value: fullPath,
+									text: fullPath
+								})
+							}
+						})
+					})
+				}
+			})
+			.catch(e => {
+				this.errormsg = e
+				this.errored = true
+			})
+
 			await axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
-					this.loadingfield = true
-
 					Object.keys(response.data.actions.POST).forEach(field => {
 						if(field != "inventory_sections") {
 							this.fields.push({
@@ -441,10 +471,14 @@ export default {
 			fieldType.splice(masterindex, 1)
 		},
 		pushInLogicComplexe(object, key, logics) {
+			let fieldVar = logics[key].field;
+			if (logics[key].metadata_field) {
+				fieldVar = logics[key].field + "." + logics[key].metadata_field;
+			}
 			if(this.disabledvalue.includes(logics[key].operator)) {
 				object.push({
 					[logics[key].operator]: [
-						{ var: logics[key].field }
+						{ var: fieldVar }
 					],
 					case_sensitive: logics[key].case_sensitive
 				})
@@ -452,14 +486,14 @@ export default {
 				object.push({
 					[logics[key].operator]: [
 						logics[key].value,
-						{ var: logics[key].field }
+						{ var: fieldVar }
 					],
 					case_sensitive: logics[key].case_sensitive
 				})
 			} else {
 				object.push({
 					[logics[key].operator]: [
-						{ var: logics[key].field },
+						{ var: fieldVar },
 						logics[key].value
 					],
 					case_sensitive: logics[key].case_sensitive
@@ -469,20 +503,24 @@ export default {
 			return object
 		},
 		pushInLogicSimple(object, key, logics) {
+			let fieldVar = logics[key].field;
+			if (logics[key].metadata_field) {
+				fieldVar = logics[key].field + "." + logics[key].metadata_field;
+			}
 			if(this.disabledvalue.includes(logics[key].operator)) {
 				object[logics[key].operator] = [
-					{ var: logics[key].field }
+					{ var: fieldVar }
 				]
 				object["case_sensitive"] = logics[key].case_sensitive
 			} else if(logics[key].operator == "in") {
 				object[logics[key].operator] = [
 					logics[key].value,
-					{ var: logics[key].field }
+					{ var: fieldVar }
 				]
 				object["case_sensitive"] = logics[key].case_sensitive
 			} else {
 				object[logics[key].operator] = [
-					{ var: logics[key].field },
+					{ var: fieldVar },
 					logics[key].value
 				]
 				object["case_sensitive"] = logics[key].case_sensitive
