@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="software_dictionary"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="software_dictionary" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -58,86 +54,77 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'AllSoftware',
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
+
 			rowdata: [],
 			rowheader: [],
-			loading: true,
-			errored: false,
+			total: 0,
+
 			candelete: false,
 			hiddenfields: ["id", "updated_at"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
-			total: 0,
+
 			query: {
-				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
 				ordering: 'name',
 				search: null,
 			},
+
 			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		if(permissions.includes("software_view_softwaredictionary")) {
-			await this.getHeader()
-			await this.getSoftwares(this.query)
-		} else {
+
+		if (!permissions.includes("software_view_softwaredictionary")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"software_dictionary/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if (!["assets"].includes(field)) {
-							this.rowheader.push(field)
-						}
-					})
-					this.rowheader.push("installation_number")
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getSoftwares(query = null) {
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
 			try {
-				const q = query || this.query
+				// Get header
+				const header = await this.$api.generic.options("software_dictionary/")
+				this.rowheader = Object.keys(header.actions.POST).filter((f) => f !== "assets")
+				this.rowheader.push("installation_number")
 
-				const params = {}
+				// Get softwares
+				await this.getSoftwares(this.query)
 
-				if (q.limit != null) params.limit = q.limit
-				if (q.offset != null) params.offset = q.offset
-				if (q.ordering) params.ordering = q.ordering
-				if (q.search) params.search = q.search
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
 
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"software_dictionary/",
-					{ headers: this.header, params }
-				)
+		async getSoftwares(query = null) {
+			this.isbusy = true
+			try {
+				const data = await this.$api.generic.get("software_dictionary/", query)
 
-				const data = response.data
 				const results = data.results || data
-
-				if (typeof data.count === 'number') {
-					this.total = data.count
-				} else {
-					this.total = results.length
-				}
+				this.total = typeof data.count === "number" ? data.count : results.length
 
 				results.forEach(data => {
 					data.installation_number = data.assets.length 
@@ -148,17 +135,17 @@ export default {
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
 				this.errored = true
 			} finally {
-				this.loading = false
 				this.isbusy = false
 			}
 		},
+
 		async reloadDatatable() {
-			this.isbusy = true
 			await this.getSoftwares(this.query)
 		},
+
 		async handleQueryChange(newQuery) {
 			if (!this.isbusy) {
 				this.isbusy = true
@@ -170,6 +157,8 @@ export default {
 				await this.getSoftwares(this.query)
 			}
 		},
+
+		// Export functions
 		handleExport({ scope, rows }) {
 			const csv = this.buildCsvFromRows(rows)
 			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -182,6 +171,7 @@ export default {
 			link.remove()
 			URL.revokeObjectURL(url)
 		},
+
 		buildCsvFromRows(rows) {
 			if (!rows || !rows.length) return ''
 			const headers = Object.keys(rows[0])
@@ -198,23 +188,23 @@ export default {
 
 			return csvRows.join('\n')
 		},
+
 		async exportAllSoftwares({ filter, ordering }) {
 			const allRows = []
-			const params = {}
+			const params = {
+				ordering: ordering,
+				search: filter,
+			}
 
-			if (filter) params.search = filter
-			if (ordering) params.ordering = ordering
-
-			const { data } = await axios.get(
-				this.$config.BACKEND_API_ROUTE + "software_dictionary/",
-				{ headers: this.header, params }
-			)
+			const data = await this.$api.generic.get("software_dictionary/", params)
 
 			const results = data.results || data
 			allRows.push(...results)
 
 			this.handleExport({ scope: 'all', rows: allRows })
 		},
+
+		// Software search
 		assetsSearch(params) {
 			var search = [
 				[
