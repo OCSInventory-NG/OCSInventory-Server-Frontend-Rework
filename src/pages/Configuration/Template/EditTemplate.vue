@@ -38,17 +38,14 @@
 											:update="true"
 											@reloadDatatable="reloadTemplate"
 										/>
-
 									</div>
 								</b-col>
 								<b-col cols="4">
-
 									<SectionModal
 										:template="parseInt(id)"
 										:routetype="routetype"
 										@reloadTemplate="reloadTemplate"
 									/>
-
 								</b-col>
 							</b-row>
 							<b-row class="text-center">
@@ -81,13 +78,11 @@
 										title-item-class="ocs-menu-tab"
 										lazy
 									>
-
 										<SectionCollapse
 											:section="section"
 											:routetype="routetype"
 											@reloadTemplate="reloadTemplate"
 										/>
-
 									</b-tab>
 								</b-tabs>
 							</div>

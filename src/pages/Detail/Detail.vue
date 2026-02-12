@@ -122,7 +122,6 @@
 												name="inventory.asset.detail.afterAccountInfo"
 												:context="{ assetId: device?.id }"
 											/><br>
-
 										</div>
 										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">
@@ -134,7 +133,6 @@
 												:reload="reload"
 												@endReloadDeployment="endReloadDeployment"
 											/>
-
 										</div>
 										<div
 											v-if="category.inventory_sections
@@ -146,13 +144,11 @@
 												v-for="section in category.inventory_sections"
 												:key="section.id"
 											>
-
 												<Inventory
 													v-if="section.template == device.templateid"
 													:section="section"
 													:base="device.id"
 												/>
-
 											</div>
 										</div>
 										<div v-else>
@@ -194,14 +190,12 @@
 									<h2>{{ $t("title.accountinfo") }}</h2>
 								</div>
 								<fieldset class="form-fieldset">
-
 									<Accountinfo
 										:id="device.id"
 										:type="type"
 										:canedit="canedit"
 										:slug="slug"
 									/>
-
 								</fieldset><br>
 							</div>
 						</div>

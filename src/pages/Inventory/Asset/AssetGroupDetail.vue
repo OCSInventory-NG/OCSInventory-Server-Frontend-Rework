@@ -32,13 +32,11 @@
 										align="right"
 									>
 										<b-button-group class="mr-1">
-
 											<PackageResultModal
 												:items="rowdata"
 												:group="$route.params.id"
 												@reloadDeployment="reloadDeployment"
 											/>
-
 										</b-button-group>
 									</div>
 								</b-row>
@@ -142,24 +140,20 @@
 									<b-tab
 										:title="$t('title.deployment')"
 									>
-
 										<ResultDetail
 											:group="$route.params.id"
 											:reload="reload"
 											@endReloadDeployment="endReloadDeployment"
 										/>
-
 									</b-tab>
 									<b-tab
 										v-if="groupinfo.is_dynamic == true"
 										:title="$t('assetgroup.associatedsearch')"
 									>
-
 										<Search 
 											:searchgroup="groupinfo.search"
 											:disableforgroup="true"
 										/>
-
 									</b-tab>
 								</b-tabs>
 							</div>

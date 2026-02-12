@@ -298,11 +298,11 @@ export default {
 					...activeConfig,
 					value: Array.isArray(activeConfig.value)
 						? activeConfig.value.map((item) => {
-								if (item?.type === "number input") {
-									const n = parseInt(item.value, 10)
-									return { ...item, value: Number.isNaN(n) ? item.value : n }
-								}
-								return item
+							if (item?.type === "number input") {
+								const n = parseInt(item.value, 10)
+								return { ...item, value: Number.isNaN(n) ? item.value : n }
+							}
+							return item
 						})
 						: activeConfig.value,
 				}

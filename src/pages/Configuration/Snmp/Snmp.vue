@@ -90,7 +90,6 @@
 													v-if="can.community.add"
 													@reloadDatatable="reloadDatatableComm"
 												/>
-
 											</div>
 										</div>
 
@@ -131,7 +130,6 @@
 													v-if="can.template.add"
 													@reloadDatatable="reloadDatatableTemp"
 												/>
-
 											</div>
 										</div>
 
@@ -150,7 +148,6 @@
 												@reloadDatatable="reloadDatatableTemp"
 											/>
 										</div>
-
 									</div>
 								</b-tab>
 
@@ -176,7 +173,6 @@
 													v-if="can.scanner.add"
 													@reloadDatatable="reloadDatatableScan"
 												/>
-
 											</div>
 										</div>
 
