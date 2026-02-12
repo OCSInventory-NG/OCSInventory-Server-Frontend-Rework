@@ -303,26 +303,26 @@ export default {
 			this.loadingfield = true
 			this.fields = []
 			await axios.get(this.$config.BACKEND_API_ROUTE + "automation/triggers/", { headers: this.header })
-			.then(triggerResponse => {
-				const trigger = triggerResponse.data.find(t => t.trigger === this.trigger)
-				if(trigger && trigger.context_fields) {
-					Object.keys(trigger.context_fields).forEach(parent => {
-						Object.keys(trigger.context_fields[parent]).forEach(child => {
-							const fullPath = parent + "." + child
-							if(!this.fields.find(f => f.value === fullPath)) {
-								this.fields.push({
-									value: fullPath,
-									text: fullPath
-								})
-							}
+				.then(triggerResponse => {
+					const trigger = triggerResponse.data.find(t => t.trigger === this.trigger)
+					if(trigger && trigger.context_fields) {
+						Object.keys(trigger.context_fields).forEach(parent => {
+							Object.keys(trigger.context_fields[parent]).forEach(child => {
+								const fullPath = parent + "." + child
+								if(!this.fields.find(f => f.value === fullPath)) {
+									this.fields.push({
+										value: fullPath,
+										text: fullPath
+									})
+								}
+							})
 						})
-					})
-				}
-			})
-			.catch(e => {
-				this.errormsg = e
-				this.errored = true
-			})
+					}
+				})
+				.catch(e => {
+					this.errormsg = e
+					this.errored = true
+				})
 
 			await axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
 				.then(response => {
