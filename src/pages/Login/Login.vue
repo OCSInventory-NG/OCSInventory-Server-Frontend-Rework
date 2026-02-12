@@ -102,7 +102,7 @@ export default {
 				{ value: 'fr', text: 'Français' },
 				{ value: 'en', text: 'English' },
 			],
-			
+
 			loading: false,
 		}
 	},
@@ -132,7 +132,6 @@ export default {
 					password: this.password,
 				}
 
-				// NOTE: pas de headers ici (gérés par ton instance axios)
 				const data = await this.$api.generic.post("api-auth/token", loginOptions)
 
 				this.errored = false
@@ -158,8 +157,6 @@ export default {
 
 		async getPermissions() {
 			try {
-				// Si ton $api ajoute automatiquement Authorization depuis localStorage,
-				// ça suffit. Sinon, il faudra le gérer via un interceptor.
 				const account = await this.$api.generic.get("myaccount/")
 
 				const perms = account?.full_permissions || []
