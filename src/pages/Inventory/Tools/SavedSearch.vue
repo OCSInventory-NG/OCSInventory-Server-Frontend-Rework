@@ -144,8 +144,7 @@ export default {
 						? s.groups.map((g) => g?.name).filter(Boolean).join("\n")
 						: ""
 
-					// retire last_updated sans muter s
-					const { last_updated, ...rest } = s
+					const { ...rest } = s
 
 					return {
 						...rest,

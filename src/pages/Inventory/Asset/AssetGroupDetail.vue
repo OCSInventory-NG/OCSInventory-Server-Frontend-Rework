@@ -248,7 +248,7 @@ export default {
 						? data.groups.map((g) => g?.name).filter(Boolean).join("\n")
 						: ""
 
-					const { assets: _, ...groupinfo } = data
+					const { ...groupinfo } = data
 
 					this.groupinfo = {
 						...groupinfo,
