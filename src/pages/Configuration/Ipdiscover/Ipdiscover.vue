@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="ipdiscover"
-			/>
-			<!-- Display datatable -->
+			<PageHeader page-title="ipdiscover" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,6 +16,7 @@
 								variant="danger"
 							/>
 						</section>
+
 						<section v-if="successed">
 							<Alert 
 								:message="$t('message.success_saved')"
@@ -27,12 +24,14 @@
 								variant="success"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<b-form
 							v-else
 							@submit="onSubmit"
@@ -203,31 +202,27 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "IpdiscoverConfig",
 	data() {
 		return {
-			canadd: false,
-			canview: false,
-			canedit: false,
-			candelete: false,
-			configs: [],
 			errormsg: null,
 			errored: false,
+
 			successmsg: null,
 			successed: false,
-			loading: true,
+
+			canedit: false,
+
+			configs: [],
+
 			allconfigview: false,
 			inputtype: {
 				"number input": "number",
 				"text input": "text"
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			loading: true,
 		}
 	},
 	watch: {
@@ -235,66 +230,82 @@ export default {
 			setTimeout(() => {
 				this.successed = false
 				this.successmsg = null
-			}, 4000)
+			}, 5000)
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
-			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("config_add_config")) {
-				this.canadd = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("config_view_config")) {
+			if (permissions.includes("config_change_config")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("config_delete_config")) {
-				this.candelete = true
-			}
-			await this.getIpdConfig()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			return
 		}
+
+		// Data init
+		await this.getIpdConfig()
 	},
 	methods: {
 		async getIpdConfig() {
 			this.loading = true
 			this.configs = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"config/ipdiscover/", { headers: this.header })
-				.then(response => {
-					this.configs = response.data
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get("config/ipdiscover/")
+				this.configs = data
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 
-			for (const config of this.configs.value) {
-				if (config.type == "number input") {
-					config.value = parseInt(config.value)
-				}
-			}
+			try {
+				this.loading = true
 
-			axios.patch(this.$config.BACKEND_API_ROUTE+"config/ipdiscover/", this.configs,
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-		}
+				const payload = {
+					...this.configs,
+					value: Array.isArray(this.configs?.value)
+						? this.configs.value.map((item) => {
+								if (item?.type === "number input") {
+									const n = parseInt(item.value, 10)
+									return { ...item, value: Number.isNaN(n) ? item.value : n }
+								}
+								return item
+						})
+						: this.configs?.value,
+				}
+
+				await this.$api.generic.patch("config/ipdiscover/", payload)
+
+				this.configs = payload
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
+			} finally {
+				this.loading = false
+			}
+		},
 	}
 }
 </script>

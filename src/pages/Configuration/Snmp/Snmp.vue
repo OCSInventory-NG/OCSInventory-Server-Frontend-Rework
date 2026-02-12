@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="snmp"
-			/>
-			<!-- Display datatable -->
+			<PageHeader page-title="snmp" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg" 
@@ -20,6 +16,7 @@
 								variant="danger"
 							/>
 						</section>
+
 						<section v-if="successed">
 							<Alert 
 								:message="$t('message.success_saved')"
@@ -27,12 +24,14 @@
 								variant="success"
 							/>
 						</section>
+
 						<div 
-							v-if="loading"
+							v-if="loading.global"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<b-tabs 
 								v-if="allconfigview"
@@ -43,13 +42,7 @@
 								<b-tab 
 									:title="$t('network.snmpconfiggeneral')"
 								>
-									<div 
-										v-if="loadingconfig"
-										class="ocs-loader"
-									>
-										<Loader />
-									</div>
-									<div v-else>
+									<div>
 										<b-list-group flush>
 											<b-list-group-item 
 												class="d-flex justify-content-between align-items-center"
@@ -76,25 +69,31 @@
 											</b-list-group-item>
 										</b-list-group>
 									</div>
+
 									<hr v-if="can.community.view">
+
 									<div 
-										v-if="loadingcommunity"
+										v-if="loading.community"
 										class="ocs-loader"
 									>
 										<Loader />
 									</div>
+
 									<div v-else>
 										<div class="page-header d-print-none">
 											<div class="row">
 												<div class="col-auto">
 													<h2>{{ $t("network.snmpcommunity") }}</h2>
 												</div>
+
 												<SnmpModal
 													v-if="can.community.add"
-													@reloadDatatable="reloadDatatable"
+													@reloadDatatable="reloadDatatableComm"
 												/>
+
 											</div>
 										</div>
+
 										<div>
 											<Datatable
 												id="snmpconfig-datatable"
@@ -103,32 +102,39 @@
 												:canedit="can.community.edit"
 												:candelete="can.community.delete"
 												:hiddenfields="hiddenfields"
+												:isbusy="isbusy.community"
 												editcomponent="SnmpModal"
 												title="snmp/config"
 												translationkey="network."
-												@reloadDatatable="reloadDatatable"
+												@reloadDatatable="reloadDatatableComm"
 											/>
 										</div>
 									</div>
+
 									<hr v-if="can.template.view">
+
 									<div 
-										v-if="loadingtemplate"
+										v-if="loading.template"
 										class="ocs-loader"
 									>
 										<Loader />
 									</div>
+
 									<div v-else>
 										<div class="page-header d-print-none">
 											<div class="row">
 												<div class="col-auto">
 													<h2>{{ $t("network.snmptemplates") }}</h2>
 												</div>
+
 												<SnmpTemplateModal
 													v-if="can.template.add"
-													@reloadDatatable="reloadDatatable"
+													@reloadDatatable="reloadDatatableTemp"
 												/>
+
 											</div>
 										</div>
+
 										<div>
 											<Datatable
 												id="templatesnmp-datatable"
@@ -138,35 +144,42 @@
 												:candelete="can.template.delete"
 												:canexport="false"
 												:importtemplate="true"
+												:isbusy="isbusy.template"
 												title="templates"
 												translationkey="template."
-												@reloadDatatable="reloadDatatable"
+												@reloadDatatable="reloadDatatableTemp"
 											/>
 										</div>
+
 									</div>
 								</b-tab>
+
 								<b-tab 
 									v-if="can.scanner.view"
 									:title="$t('network.snmpscanner')"
 								>
 									<div 
-										v-if="loadingscanner"
+										v-if="loading.scanner"
 										class="ocs-loader"
 									>
 										<Loader />
 									</div>
+
 									<div v-else>
 										<div class="page-header d-print-none">
 											<div class="row">
 												<div class="col-auto">
 													<h2>{{ $t("network.snmpscanner") }}</h2>
 												</div>
+
 												<SnmpScannerModal
 													v-if="can.scanner.add"
-													@reloadDatatable="reloadDatatable"
+													@reloadDatatable="reloadDatatableScan"
 												/>
+
 											</div>
 										</div>
+
 										<div>
 											<Datatable
 												id="scannersnmp-datatable"
@@ -175,10 +188,11 @@
 												:canedit="can.scanner.edit"
 												:candelete="can.scanner.delete"
 												:hiddenfields="hiddenscannerfields"
+												:isbusy="isbusy.scanner"
 												editcomponent="SnmpScannerModal"
 												title="snmp/scanner"
 												translationkey="network."
-												@reloadDatatable="reloadDatatable"
+												@reloadDatatable="reloadDatatableScan"
 												@assetsSearch="assetsSearch"
 											/>
 										</div>
@@ -194,48 +208,24 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Snmp",
 	data() {
 		return {
-			can: {
-				config: {
-					add: false,
-					view: false,
-					edit: false,
-					delete: false
-				},
-				community: {
-					add: false,
-					view: false,
-					edit: false,
-					delete: false
-				},
-				template: {
-					add: false,
-					view: false,
-					edit: false,
-					delete: false
-				},
-				scanner: {
-					add: false,
-					view: false,
-					edit: false,
-					delete: false
-				}
-			},
-			configs: [],
 			errormsg: null,
 			errored: false,
+
 			successmsg: null,
 			successed: false,
-			loading: true,
-			loadingconfig: true,
-			loadingcommunity: true,
-			loadingtemplate: true,
-			loadingscanner: true,
+
+			can: {
+				config: { add: false, view: false, edit: false, delete: false },
+				community: { add: false, view: false, edit: false, delete: false },
+				template: { add: false, view: false, edit: false, delete: false },
+				scanner: { add: false, view: false, edit: false, delete: false },
+			},
+
+			configs: [],
 			activetab: 0,
 			allconfigview: false,
 			rowsnmpcommheader: [
@@ -252,14 +242,22 @@ export default {
 				"priv_protocol", "priv_password"
 			],
 			hiddenscannerfields: ["last_updated"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
+
+			loading: {
+				global: true,
+				community: true,
+				template: true,
+				scanner: true
+			},
+			isbusy: {
+				community: true,
+				template: true,
+				scanner: true
 			}
 		}
 	},
 	watch: {
-		successed: function() {
+		successed() {
 			setTimeout(() => {
 				this.successed = false
 				this.successmsg = null
@@ -267,232 +265,235 @@ export default {
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("config_view_config")) {
 			this.allconfigview = true
 			this.can.config.view = true
-			if(localStorage.getItem('permissions').split(",").includes("config_add_config")) {
-				this.can.config.add = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
-				this.can.config.edit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("config_delete_config")) {
-				this.can.config.delete = true
-			}
+			this.can.config.add = permissions.includes("config_add_config")
+			this.can.config.edit = permissions.includes("config_change_config")
+			this.can.config.delete = permissions.includes("config_delete_config")
 			await this.getSnmpConfig()
 		}
 
-		if(localStorage.getItem('permissions').split(",").includes("snmp_config_view_snmpconfig")) {
+		if (permissions.includes("snmp_config_view_snmpconfig")) {
 			this.allconfigview = true
 			this.can.community.view = true
-			if(localStorage.getItem('permissions').split(",").includes("snmp_config_add_snmpconfig")) {
-				this.can.community.add = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("snmp_config_change_snmpconfig")) {
-				this.can.community.edit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("snmp_config_delete_snmpconfig")) {
-				this.can.community.delete = true
-			}
+			this.can.community.add = permissions.includes("snmp_config_add_snmpconfig")
+			this.can.community.edit = permissions.includes("snmp_config_change_snmpconfig")
+			this.can.community.delete = permissions.includes("snmp_config_delete_snmpconfig")
 			await this.getSnmpCommunities()
 		}
 
-		if(localStorage.getItem('permissions').split(",").includes("template_view_template")) {
+		if (permissions.includes("template_view_template")) {
 			this.allconfigview = true
 			this.can.template.view = true
-			if(localStorage.getItem('permissions').split(",").includes("template_add_template")) {
-				this.can.template.add = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("template_change_template")) {
-				this.can.template.edit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("template_delete_template")) {
-				this.can.template.delete = true
-			}
+			this.can.template.add = permissions.includes("template_add_template")
+			this.can.template.edit = permissions.includes("template_change_template")
+			this.can.template.delete = permissions.includes("template_delete_template")
 			await this.getSnmpTemplateHeader()
 		}
 
-		if(localStorage.getItem('permissions').split(",").includes("scanner_view_snmpscanner")) {
+		if (permissions.includes("scanner_view_snmpscanner")) {
 			this.allconfigview = true
 			this.can.scanner.view = true
-			if(localStorage.getItem('permissions').split(",").includes("scanner_add_snmpscanner")) {
-				this.can.scanner.add = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("scanner_change_snmpscanner")) {
-				this.can.scanner.edit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("scanner_delete_snmpscanner")) {
-				this.can.scanner.delete = true
-			}
+			this.can.scanner.add = permissions.includes("scanner_add_snmpscanner")
+			this.can.scanner.edit = permissions.includes("scanner_change_snmpscanner")
+			this.can.scanner.delete = permissions.includes("scanner_delete_snmpscanner")
 			await this.getSnmpScannerHeader()
 		}
-		
-		if(!this.allconfigview) {
+
+		if (!this.allconfigview) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading.global = false
 		}
-
-		this.loading = false
 	},
+
 	methods: {
-		async getSnmpConfig() {
-			this.loadingconfig = true
-			this.configs = []
-			
-			await axios.get(this.$config.BACKEND_API_ROUTE+"config/snmp/", { headers: this.header })
-				.then(response => {
-					this.configs = response.data
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loadingconfig = false)
+		setError(e) {
+			this.errormsg = (e?.response?.data?.error) ? e.response.data.error : (e?.message || String(e))
+			this.errored = true
 		},
+
+		clearError() {
+			this.errormsg = null
+			this.errored = false
+		},
+
+		async getSnmpConfig() {
+			this.loading.global = true
+			this.configs = []
+			try {
+				const data = await this.$api.generic.get("config/snmp/")
+				this.configs = data
+				this.clearError()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.loading.global = false
+			}
+		},
+
 		async getSnmpCommunities() {
-			this.loadingcommunity = true
+			this.isbusy.community = true
 			this.rowsnmpcomm = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/", { headers: this.header })
-				.then(response => {
-					this.rowsnmpcomm = response.data
-					for (const community of this.rowsnmpcomm) {
-						community.subnets = community.subnets.join('\n')
-					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loadingcommunity = false)
+			try {
+				const data = await this.$api.generic.get("snmp/config/")
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowsnmpcomm = rows.map((community) => ({
+					...community,
+					subnets: Array.isArray(community?.subnets) ? community.subnets.join("\n") : "",
+				}))
+
+				this.clearError()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.isbusy.community = false
+				this.loading.community = false
+			}
 		},
+
 		async getSnmpTemplateHeader() {
-			this.loadingtemplate = true
+			this.loading.template = true
 			this.rowtemplateheader = []
 
-			await axios.options(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "sections") {
-							this.rowtemplateheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getSnmpTemplates()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getSnmpTemplates() {
-			this.rowtemplatedata = []
+			try {
+				const data = await this.$api.generic.options("templates/")
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?os=SNMP", { headers: this.header })
-				.then(response => {
-					this.rowtemplatedata = response.data
-					this.errormsg = null
-					this.errored = false
+				Object.keys(data?.actions?.POST || {}).forEach((field) => {
+					if (!["sections", "is_protected"].includes(field)) this.rowtemplateheader.push(field)
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loadingtemplate = false)
+
+				this.clearError()
+				await this.getSnmpTemplates()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.loading.template = false
+			}
 		},
+
+		async getSnmpTemplates() {
+			this.isbusy.template = true
+			this.rowtemplatedata = []
+			try {
+				const data = await this.$api.generic.get(
+					"templates/",
+					{},
+					{ os: "SNMP" }
+				)
+
+				this.rowtemplatedata = Array.isArray(data) ? data : (data?.results || [])
+				this.clearError()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.isbusy.template = false
+			}
+		},
+
 		async getSnmpScannerHeader() {
-			this.loadingscanner = true
+			this.loading.scanner = true
 			this.rowscannerheader = []
 
-			await axios.options(this.$config.BACKEND_API_ROUTE+"snmp/scanner/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field == "configs") {
-							this.rowscannerheader.push("snmpcommunity")
-						} else {
-							this.rowscannerheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getSnmpScanners()
+			try {
+				const data = await this.$api.generic.options("snmp/scanner/")
+
+				Object.keys(data?.actions?.POST || {}).forEach((field) => {
+					this.rowscannerheader.push(field === "configs" ? "snmpcommunity" : field)
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+				this.clearError()
+				await this.getSnmpScanners()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.loading.scanner = false
+			}
 		},
+
 		async getSnmpScanners() {
+			this.isbusy.scanner = true
 			this.rowscannerdata = []
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/?expand=configs",
-				{ headers: this.header })
-				.then(response => {
-					this.rowscannerdata = response.data
-					for (const scan of this.rowscannerdata) {
-						scan.subnets = scan.subnets.join('\n')
+			try {
+				const data = await this.$api.generic.get(
+					"snmp/scanner/",
+					{},
+					{ expand: "configs" }
+				)
 
-						var configs = scan.configs
-						delete scan.configs
+				const rows = Array.isArray(data) ? data : (data?.results || [])
 
-						var communities = []
-						for (const community of configs) {
-							communities.push(community.name)
-						}
+				this.rowscannerdata = rows.map((scan) => {
+					const configs = Array.isArray(scan?.configs) ? scan.configs : []
+					const communities = configs.map((c) => c?.name).filter(Boolean)
 
-						scan.snmpcommunity = communities.join('\n')
-						scan.assets = scan.assets.length
+					return {
+						...scan,
+						subnets: Array.isArray(scan?.subnets) ? scan.subnets.join("\n") : "",
+						snmpcommunity: communities.join("\n"),
+						assets: Array.isArray(scan?.assets) ? scan.assets.length : scan.assets,
+						configs: undefined,
 					}
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loadingscanner = false)
+
+				this.clearError()
+			} catch (e) {
+				this.setError(e)
+			} finally {
+				this.isbusy.scanner = false
+			}
 		},
-		enableSnmp() {
-			axios.patch(this.$config.BACKEND_API_ROUTE+"config/snmp/", this.configs,
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = this.$t("message.success_saved")
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
+
+		async enableSnmp() {
+			try {
+				await this.$api.generic.patch("config/snmp/", this.configs)
+
+				this.successmsg = this.$t("message.success_saved")
+				this.successed = true
+				this.clearError()
+			} catch (e) {
+				this.setError(e)
+				this.successmsg = null
+				this.successed = false
+			}
 		},
-		reloadDatatable() {
-			this.getSnmpCommunities()
-			this.getSnmpTemplateHeader()
-			this.getSnmpScannerHeader()
+
+		async reloadDatatableComm() {
+			await this.getSnmpCommunities()
 		},
+
+		async reloadDatatableTemp() {
+			await this.getSnmpTemplates()
+		},
+
+		async reloadDatatableScan() {
+			await this.getSnmpScanners()
+		},
+
 		assetsSearch(params) {
-			var search = [
-				[
-					{
-						object: "snmpscanner",
-						route: "snmp/scanner",
-						field: "identifier",
-						fieldtype: "string",
-						operator: "iexact",
-						value: params[0],
-						link: ""
-					}
-				]
-			]
+			const search = [[
+				{
+					object: "snmpscanner",
+					route: "snmp/scanner",
+					field: "identifier",
+					fieldtype: "string",
+					operator: "iexact",
+					value: params[0],
+					link: ""
+				}
+			]]
 
 			localStorage.setItem('multisearch', JSON.stringify(search))
 			localStorage.setItem('useSavedSearch', true)
 
-			this.$router.push({
-				name: 'Multisearch',
-			});
+			this.$router.push({ name: 'Multisearch' })
 		}
 	}
 }

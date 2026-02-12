@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="history"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="history" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -34,6 +30,7 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:usecheckbox="false"
+								:isbusy="isbusy"
 								sortby="date"
 								sortdesc="desc"
 								title="automation/history"
@@ -49,70 +46,106 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "AutomationHistory",
 	data() {
 		return {
 			errored: false,
 			errormsg: null,
-			loading: true,
+
 			rowheader: [],
 			rowdata: [],
+
+			canview: false,
+
 			status: {
 				0: this.$t("scheduler.in_progress"),
 				1: this.$t("scheduler.success"),
 				2: this.$t("scheduler.in_error")
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (!permissions.includes("history_view_history")) {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
+		}
+
+		// Data init
+		await this.loadInitial()
+
 		await this.getHeader()
 		await this.getAutomationHistory()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"automation/history/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getAutomationHistory() {
-			this.rowdata = []
-			var id = ""
-			if(this.$route.params.id) id = this.$route.params.id
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/history/?scheduler="+id+"&expand=scheduler",
-				{ headers: this.header })
-				.then(response => {
-					this.rowdata = response.data
-					for (const history of response.data) {
-						history.scheduler = history.scheduler.name
-						history.status = this.status[history.status]
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("automation/history/")
+				this.rowheader = Object.keys(header.actions.POST)
+
+				// Get scheduler history
+				await this.getAutomationHistory()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getAutomationHistory() {
+			this.isbusy = true
+			this.rowdata = []
+
+			try {
+				const id = this.$route?.params?.id || ""
+
+				const data = await this.$api.generic.get(
+					"automation/history/",
+					{},
+					{
+						scheduler: id || null,
+						expand: "scheduler",
+					}
+				)
+
+				const histories = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = histories.map((h) => ({
+					...h,
+					scheduler: h?.scheduler?.name ?? h.scheduler,
+					status: this.status?.[h.status] ?? h.status,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error)
+					? e.response.data.error
+					: e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getAutomationHistory()
 		},
 	}

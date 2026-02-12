@@ -3,15 +3,11 @@
 		id="edit-rule"
 		class="container-xl"
 	>
-		<!-- Page header -->
-		<PageHeader 
-			page-title="rules"
-		/>
-		<!-- Display Datatable -->
+		<PageHeader page-title="rules" />
+
 		<div class="page-body">
 			<div class="card">
 				<div class="card-body">
-					<!-- Display success box message -->
 					<section v-if="successed">
 						<Alert 
 							:message="$t('message.success_saved')"
@@ -20,7 +16,6 @@
 						/>
 					</section>
 
-					<!-- Display error box message -->
 					<section v-if="errored && errorCode == null">
 						<Alert 
 							:message="errormsg.message"
@@ -38,7 +33,6 @@
 						</div>
 
 						<div v-else>
-							<!-- Display error box message -->
 							<div v-if="errored && errorCode != null">
 								<Alert 
 									:message="errormsg"
@@ -73,6 +67,7 @@
 										:logic="logic"
 										@reloadRule="reloadRule"
 									/>
+
 									<RuleAction
 										v-if="rulemenu.value == 'actions'"
 										:id="id"
@@ -92,8 +87,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "EditRule",
 	props: {
@@ -101,30 +94,32 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
 			errorCode: null,
-			loading: true,
-			errored: false,
+
 			successed: false,
 			successmsg: null,
+
 			trigger: null,
 			triggers: {},
 			logic: {},
 			actions: [],
 			rule: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+
 			rulemenus: [
 				{ value: "logic", text: this.$t("rule.logic"), enabled: true },
 				{ value: "actions", text: this.$t("rule.actions"), enabled: true },
-			]
+			],
+
+			loading: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(
+				() => this.successed = false, 5000
+			)
 		}
 	},
 	async mounted() {
@@ -132,33 +127,42 @@ export default {
 	},
 	methods: {
 		async getTriggerModels() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/triggers/", { headers: this.header })
-				.then(response => {
-					this.triggers = response.data
-					this.getRuleInfo()
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get("automation/triggers/")
+				this.triggers = Array.isArray(data) ? data : (data?.results || [])
+
+				await this.getRuleInfo()
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : (e.message || String(e))
+				this.errored = true
+			}
 		},
+
 		async getRuleInfo() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id+"/?expand=actions",
-				{ headers: this.header })
-				.then(response => {
-					this.rule = response.data
-					this.trigger = response.data.trigger
-					this.logic = response.data.logic
-					this.actions = response.data.actions
-					this.errormsg = null
-					this.errored = false
-					this.loading = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			this.loading = true
+
+			try {
+				const data = await this.$api.generic.get(
+					`automation/rule/${this.id}/`,
+					{},
+					{ expand: "actions" }
+				)
+
+				this.rule = data
+				this.trigger = data?.trigger
+				this.logic = data?.logic
+				this.actions = data?.actions
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : (e.message || String(e))
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async reloadRule() {
 			await this.getRuleInfo()
 		}

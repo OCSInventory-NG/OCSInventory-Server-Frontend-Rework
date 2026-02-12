@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="netgroup"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="netgroup" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -33,12 +29,14 @@
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="netgroup-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								:isbusy="isbusy"
 								editcomponent="NetworkGroupModal"
 								title="netgroups"
 								translationkey="network."
@@ -53,84 +51,106 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "NetworkGroup",
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canview: false,
+
 			rowdata: [],
 			rowheader: [],
-			errored: false,
-			errormsg: null,
+
+			isbusy: true,
 			loading: true,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("netgroup_view_netgroup")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("netgroup_view_netgroup")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("netgroup_add_netgroup")) {
+			if (permissions.includes("netgroup_add_netgroup")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("netgroup_change_netgroup")) {
+			if (permissions.includes("netgroup_change_netgroup")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("netgroup_delete_netgroup")) {
+			if (permissions.includes("netgroup_delete_netgroup")) {
 				this.candelete = true
 			}
-			await this.getHeader()
-			await this.getNetgroup()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.rowheader.push("networks")
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getNetgroup() {
-			this.rowdata = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/?expand=networks", { headers: this.header })
-				.then(response => {
-					const transformedData = response.data.map(netgroup => {
-						return {
-							...netgroup,
-							networks: netgroup.networks.map(n => n.netid).join(', ')
-						}
-					})
-					this.rowdata = transformedData
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("netgroups/")
+				this.rowheader = Object.keys(header.actions.POST)
+				this.rowheader.push("networks")
+
+				// Get netgroups
+				await this.getNetgroup()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getNetgroup() {
+			this.isbusy = true
+			this.rowdata = []
+
+			try {
+				const data = await this.$api.generic.get(
+					"netgroups/",
+					{},
+					{ expand: "networks" }
+				)
+
+				const netgroups = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = netgroups.map((netgroup) => ({
+					...netgroup,
+					networks: Array.isArray(netgroup?.networks)
+						? netgroup.networks.map((n) => n?.netid).filter(Boolean).join(", ")
+						: "",
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getNetgroup()
 		}
 	}
