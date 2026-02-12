@@ -365,11 +365,9 @@ export default {
 		}
 	},
 	async beforeMount() {
-		// Active layout (storage)
 		const storedActiveLayout = localStorage.getItem('active_layout')
 		this.activeLayout = storedActiveLayout ? parseInt(storedActiveLayout, 10) : 0
 
-		// Permissions (une seule lecture)
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
@@ -377,21 +375,17 @@ export default {
 		this.canedit = permissions.includes("layout_change_dashboardlayout")
 		this.candelete = permissions.includes("layout_delete_dashboardlayout")
 
-		// Reset états
 		this.loading = true
 		this.errored = false
 		this.errormsg = null
 
-		// 1) Toujours récupérer le compte d'abord (userid/groupids)
 		await this.getUserAccount()
 
-		// Si déjà en erreur, on stoppe (évite d'enchaîner des appels inutiles)
 		if (this.errored) {
 			this.loading = false
 			return
 		}
 
-		// 2) Le reste en parallèle
 		await Promise.all([
 			this.getGroups(),
 			this.getChartsList(),
@@ -402,7 +396,6 @@ export default {
 			this.loading = false
 		}
 
-		// Evite un flash/layout “vide” au montage
 		setTimeout(() => {
 			this.chartsVisible = true
 		}, 10)
@@ -485,7 +478,6 @@ export default {
 				const data = await this.$api.generic.get("dashboard/layout/")
 				const layouts = Array.isArray(data) ? data : (data?.results || [])
 
-				// filtre d'accès
 				this.layouts = layouts.filter((l) =>
 					l.visibility === "public"
 					|| l.user === this.userid
