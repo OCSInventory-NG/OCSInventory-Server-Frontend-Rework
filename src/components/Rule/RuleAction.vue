@@ -307,6 +307,7 @@ export default {
 	methods: {
 		async getFields(index, model, reload = false) {
 			const route = this.routetargets[this.trigger]?.[model]?.route
+			const component = this.routetargets[this.trigger]?.[model]?.key
 			if (!route) return
 			if(!Array.isArray(this.fieldopt[index])) {
 				this.fieldopt[index] = []
@@ -450,7 +451,7 @@ export default {
 			this.actionupdate = []
 			var actionremove = []
 			var actionupdateids = []
-			
+
 			for (const action of this.datavalues) {
 				if(action.id != null) {
 					actionupdateids.push(action.id)
@@ -528,8 +529,7 @@ export default {
 							this.successed = false
 						})
 				} else {
-					delete action.id
-
+					delete action.id		
 					await axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
 						{ headers: this.header })
 						.then(() => {

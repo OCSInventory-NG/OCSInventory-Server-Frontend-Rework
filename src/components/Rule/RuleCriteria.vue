@@ -303,7 +303,7 @@ export default {
 			this.loadingfield = true
 			this.fields = []
 			await axios.get(this.$config.BACKEND_API_ROUTE + "automation/triggers/", { headers: this.header })
-        	.then(triggerResponse => {
+			.then(triggerResponse => {
 				const trigger = triggerResponse.data.find(t => t.trigger === this.trigger)
 				if(trigger && trigger.context_fields) {
 					Object.keys(trigger.context_fields).forEach(parent => {
