@@ -70,7 +70,7 @@ export default {
 			accountinfoName: "",
 			total: 0,
 			query: {
-				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
 				ordering: '-last_seen',
 				search: null,
