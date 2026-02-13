@@ -137,7 +137,7 @@ export default {
 										name: permissionDetails.codename,
 										key: permissionKey,
 										type: type.replace("_", "")
-										}]
+									}]
 								} else {
 									this.permissions[key].push({
 										id: permissionDetails.id,
@@ -156,7 +156,7 @@ export default {
 						this.permissionslabel.push({
 							id: label,
 							trad: this.$t('permission.'+label.split("_")[0]) ? this.$t('permission.'+label.split("_")[0]) 
-							: label.split("_")[0]
+								: label.split("_")[0]
 						})
 					})
 
