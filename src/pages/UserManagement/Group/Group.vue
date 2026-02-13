@@ -128,37 +128,35 @@ export default {
 						array.forEach(type => {
 							if(~permissionDetails.codename.indexOf(type)) {
 								var permissionKey = permissionDetails.codename.replace(type, "")
-
-								if(this.$te("permission." + permissionKey)) {
-									var key = permissionKey + "_" + permissionDetails.content_type
+								var key = permissionKey + "_" + permissionDetails.content_type
 									
-									if(typeof this.permissions[key] === 'undefined') {
-										this.permissions[key] = [{
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
+								if(typeof this.permissions[key] === 'undefined') {
+									this.permissions[key] = [{
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
 										}]
-									} else {
-										this.permissions[key].push({
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
-										})
-									}
-
-									labeltmp.add(key)
+								} else {
+									this.permissions[key].push({
+										id: permissionDetails.id,
+										code: "permission_" + permissionDetails.id,
+										name: permissionDetails.codename,
+										key: permissionKey,
+										type: type.replace("_", "")
+									})
 								}
+
+								labeltmp.add(key)
 							}
 						})
 					})
 					labeltmp.forEach(label => {
 						this.permissionslabel.push({
 							id: label,
-							trad: this.$t('permission.'+label.split("_")[0])
+							trad: this.$t('permission.'+label.split("_")[0]) ? this.$t('permission.'+label.split("_")[0]) 
+							: label.split("_")[0]
 						})
 					})
 
