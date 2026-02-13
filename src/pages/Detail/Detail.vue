@@ -113,7 +113,6 @@
 												<Accountinfo
 													:id="device.id"
 													:type="type"
-													:canedit="canedit"
 													:slug="slug"
 												/>
 											</fieldset><br>
@@ -193,7 +192,7 @@
 									<Accountinfo
 										:id="device.id"
 										:type="type"
-										:canedit="canedit"
+										
 										:slug="slug"
 									/>
 								</fieldset><br>
@@ -213,8 +212,6 @@ export default {
 		return {
 			errored: false,
 			errormsg: null,
-			
-			canedit: true,
 
 			type: null,
 			slug: null,
