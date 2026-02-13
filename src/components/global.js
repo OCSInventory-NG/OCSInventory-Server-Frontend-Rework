@@ -70,7 +70,7 @@ const GlobalComponents = {
 		Vue.component('LineChart', LineChart)
 		Vue.component('ActionListModal', ActionListModal)
 		Vue.component('LdapModal', LdapModal)
-		Vue.component('draggable', draggable)
+		Vue.component('Draggable', draggable)
 	}
 }
 
