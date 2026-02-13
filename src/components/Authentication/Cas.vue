@@ -1,6 +1,5 @@
 <template>
 	<div id="cas">
-		<!-- Display success box message -->
 		<div v-if="successed">
 			<Alert 
 				:message="$t('message.success_saved')"
@@ -9,7 +8,6 @@
 			/>
 		</div>
 
-		<!-- Display error box message -->
 		<div v-if="errored">
 			<Alert 
 				:message="errormsg.message"
@@ -115,24 +113,23 @@ export default {
 	name: "Cas",
 	data() {
 		return {
-			errormsg: null,
-			loading: true,
 			errored: false,
-			canview: false,
-			canedit: false,
+			errormsg: null,
+
 			successed: false,
 			successmsg: null,
-			casdata: [],
+			
+			canedit: false,
 			canaddmapping: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+
+			casdata: [],
 			options: [
 				{ value: 1, text: "v1" },
 				{ value: 2, text: "v2" },
 				{ value: 3, text: "v3" }
-			]
+			],
+
+			loading: true,
 		}
 	},
 	watch: {
@@ -141,57 +138,71 @@ export default {
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("auth_config_view_authconfig")) {
-			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("auth_config_change_authconfig")) {
-				this.canedit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("auth_mapping_add_authmapping")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("auth_config_view_authconfig")) {
+			if (permissions.includes("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			await this.getCasConfiguration()
+			if (permissions.includes("auth_config_change_authconfig")) {
+				this.canedit = true
+			}
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.getCasConfiguration()
 	},
 	methods: {
 		async getCasConfiguration() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/?name=CAS&expand=configs",
-				{ headers: this.header })
-				.then(response => {
-					this.casdata = response.data[0].configs[0] ?? []
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(
+					"auth_method/",
+					{ name: "CAS" },
+					{ expand: "configs" }
+				)
+
+				const methods = Array.isArray(data) ? data : (data?.results || [])
+				this.casdata = methods?.[0]?.configs?.[0] ?? []
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		// Submit edit cas config
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 
-			delete this.casdata.mappings
-			
-			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_config/"+this.casdata.id+"/", this.casdata,
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-		}
+			try {
+				const { mappings: _mappings, ...payload } = this.casdata || {}
+
+				await this.$api.generic.patch(
+					`auth_config/${this.casdata.id}/`,
+					payload
+				)
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
+			}
+		},
 	}
 }
 </script>

@@ -242,7 +242,7 @@ export default {
 						? data.groups.map((g) => g?.name).filter(Boolean).join("\n")
 						: ""
 
-					const { ...groupinfo } = data
+					const { assets: _assets, ...groupinfo } = data
 
 					this.groupinfo = {
 						...groupinfo,
