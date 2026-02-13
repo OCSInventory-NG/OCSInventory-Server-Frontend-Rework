@@ -87,20 +87,8 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable'
-import axios from 'axios'
-import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
-import LdapModal from '@/components/Modals/Item/LdapModal.vue'
-import FieldModal from '@/components/Modals/Item/FieldModal.vue'
-
 export default {
 	name: "DraggableComponent",
-	components: { 
-		draggable,
-		ActionListModal,
-		LdapModal,
-		FieldModal
-	},
 	props: {
 		rowdata: { type: Array, default: null },
 		rowheader: { type: Array, default: null },
@@ -115,11 +103,7 @@ export default {
 	data() {
 		return {
 			rowdatas: [],
-			dateFields: ['last_update', 'last_updated', 'timestamp', 'date_created'],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}		
+			dateFields: ['last_update', 'last_updated', 'timestamp', 'date_created'],	
 		}
 	},
 	watch: {
@@ -128,51 +112,50 @@ export default {
 		}
 	},
 	mounted() {
-		this.rowdatas = this.rowdata
-		this.rowdatas.forEach(row => {
-			for (const dateValue of this.dateFields) {
-				if (row[dateValue]) {
-					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale)
-				}
-			}
-		});
-		this.rowdatas.sort((a,b) => a[this.field] - b[this.field])
+		this.rowdatas = Array.isArray(this.rowdata) ? this.rowdata.map(r => ({ ...r })) : []
+
+		this.updateDateFormat()
+		this.rowdatas.sort((a, b) => (a?.[this.field] ?? 0) - (b?.[this.field] ?? 0))
 	},
+
 	methods: {
-		onEnd(event) {
-			event.preventDefault
+		async onEnd(event) {
+			event?.preventDefault?.()
 
-			this.rowdatas[event.newIndex][this.field] = event.newIndex + 1
+			try {
+				const idx = event?.newIndex
+				if (idx == null || !this.rowdatas?.[idx]) return
 
-			// Prevent 400 bad request
-			if(this.rowdatas[event.newIndex].file) {
-				delete this.rowdatas[event.newIndex].file
+				this.rowdatas[idx][this.field] = idx + 1
+
+				const payload = { ...this.rowdatas[idx] }
+				if (payload.file) delete payload.file
+
+				await this.$api.generic.patch(
+					`${this.apiroute}/${payload.id}/`,
+					payload
+				)
+
+				this.$emit("reloadDatatable")
+			} catch (e) {
+				console.log(e)
 			}
+		},
 
-			axios.patch(
-				this.$config.BACKEND_API_ROUTE+this.apiroute+"/"+this.rowdatas[event.newIndex].id+"/",
-				this.rowdatas[event.newIndex],
-				{ headers: this.header }
-			)
-				.then(() => {
-					this.$emit('reloadDatatable')
-				})
-				.catch(e => {
-					console.log(e)
-				})			
-		},
 		reloadDatatable() {
-			this.$emit('reloadDatatable')
+			this.$emit("reloadDatatable")
 		},
-		updateDateFormat(){
-			this.rowdatas.forEach(row => {
-				for (const dateValue of this.dateFields) {
-					if (row[dateValue]) {
+
+		updateDateFormat() {
+			for (const row of this.rowdatas || []) {
+				for (const dateValue of this.dateFields || []) {
+					if (row?.[dateValue]) {
 						row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale)
+						break
 					}
 				}
-			});
-		}
+			}
+		},
 	}
 }
 </script>

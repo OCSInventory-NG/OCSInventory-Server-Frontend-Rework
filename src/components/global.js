@@ -30,6 +30,9 @@ import BarChart from '@/components/Dashboard/Chart/Bar.vue'
 import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import PieChart from '@/components/Dashboard/Chart/Pie.vue'
 import LineChart from '@/components/Dashboard/Chart/Line.vue'
+import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
+import LdapModal from '@/components/Modals/Item/LdapModal.vue'
+import draggable from 'vuedraggable'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -65,6 +68,9 @@ const GlobalComponents = {
 		Vue.component('Counter', Counter)
 		Vue.component('PieChart', PieChart)
 		Vue.component('LineChart', LineChart)
+		Vue.component('ActionListModal', ActionListModal)
+		Vue.component('LdapModal', LdapModal)
+		Vue.component('draggable', draggable)
 	}
 }
 
