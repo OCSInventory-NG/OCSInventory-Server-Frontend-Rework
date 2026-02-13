@@ -45,8 +45,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 	name: "Pie",
 	props: {
@@ -59,6 +57,9 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			chartOptions: {
 				chart: {
 					type: 'pie',
@@ -81,9 +82,8 @@ export default {
 				]
 			},
 			chartSeries: [],
+
 			loaded: false,
-			errored: false,
-			errormsg: null
 		}
 	},
 	computed: {
@@ -97,13 +97,13 @@ export default {
 	async mounted() {
 		if (this.options && this.series) {
 			if (this.options.labels && Array.isArray(this.series)) {
-				this.chartOptions.labels = this.options.labels;
+				this.chartOptions.labels = this.options.labels
 				if (this.options.colors) {
-					this.chartOptions.colors = this.options.colors;
+					this.chartOptions.colors = this.options.colors
 				}
-				this.chartSeries = this.series;
+				this.chartSeries = this.series
 			}
-			this.loaded = true;
+			this.loaded = true
 			return
 		}
 
@@ -113,24 +113,24 @@ export default {
 		}
 
 		try {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			const response = await axios.get(
-				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
-				{ headers: header }
+			const data = await this.$api.generic.get(
+				`dashboard/chart/${this.chartName}/`
 			)
-			if (response.data.options?.labels && Array.isArray(response.data.series)) {
-				this.chartOptions.labels = response.data.options.labels;
-				this.chartSeries = response.data.series;
+
+			if (data?.options?.labels && Array.isArray(data?.series)) {
+				this.chartOptions.labels = data.options.labels
+				this.chartSeries = data.series
 			} else {
-				throw new Error("Format de données inattendu");
+				throw new Error("Format de données inattendu")
 			}
-			this.loaded = true;
-		} catch(e) {
+
+			this.errored = false
+			this.errormsg = null
+		} catch (e) {
 			this.errored = true
 			this.errormsg = e.response?.data?.error || e.message
+		} finally {
+			this.loaded = true
 		}
 	},
 	methods: {

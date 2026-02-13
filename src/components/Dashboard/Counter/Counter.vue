@@ -52,8 +52,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 	name: "Counter",
 	props: {
@@ -68,11 +66,12 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			loadedFirstCount: null,
 			loadedSecondCount: null,
 			loaded: false,
-			errored: false,
-			errormsg: null
 		}
 	},
 	computed: {
@@ -104,20 +103,20 @@ export default {
 		}
 
 		try {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			const response = await axios.get(
-				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
-				{ headers: header }
+			const data = await this.$api.generic.get(
+				`dashboard/chart/${this.chartName}/`
 			)
-			this.loadedFirstCount = response.data.total
-			this.loadedSecondCount = response.data.contacted
-			this.loaded = true
-		} catch(e) {
+
+			this.loadedFirstCount = data?.total ?? 0
+			this.loadedSecondCount = data?.contacted ?? 0
+
+			this.errored = false
+			this.errormsg = null
+		} catch (e) {
 			this.errored = true
 			this.errormsg = e.response?.data?.error || e.message
+		} finally {
+			this.loaded = true
 		}
 	},
 	methods: {
