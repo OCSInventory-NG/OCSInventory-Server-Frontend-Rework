@@ -89,6 +89,7 @@
 							<div v-else>
 								<Alert 
 									:message="$t('message.no_section')" 
+									:cols="true"
 									variant="info"
 								/>
 							</div>

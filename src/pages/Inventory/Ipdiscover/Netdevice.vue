@@ -179,9 +179,6 @@ export default {
 					if (out.accountinfo && typeof out.accountinfo === "object") {
 						for (const [k, v] of Object.entries(out.accountinfo)) {
 							const col = "Account info : " + k
-							if (!this.rowheader.includes(col)) {
-								this.rowheader.push(col)
-							}
 							out[col] = v
 						}
 					}

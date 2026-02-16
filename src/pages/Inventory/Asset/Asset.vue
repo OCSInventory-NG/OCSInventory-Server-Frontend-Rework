@@ -168,7 +168,6 @@ export default {
 					if (!item.accountinfo) return
 					Object.keys(item.accountinfo).forEach((k) => {
 						const label = "Account info : " + k
-						if (!this.rowheader.includes(label)) this.rowheader.push(label)
 						item[label] = item.accountinfo[k]
 					})
 				})
