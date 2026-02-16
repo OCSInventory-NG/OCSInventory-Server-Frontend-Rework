@@ -273,8 +273,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Search',
 	props: {
@@ -283,14 +281,14 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
+
 			errormsg: null,
 			successmsg: null,
-			errored: false,
 			successed: false,
-			loading: true,
-			loadingadmin: true,
-			loadingtemplate: true,
-			loadingsection: true,
+
+			cansave: false,
+
 			datavalues: [
 				[
 					{
@@ -375,249 +373,259 @@ export default {
 			selectfield: ["select", "checkbox", "choice"],
 			excludefield: ["id", "asset", "package"],
 			scope: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
-			cansave: false
+
+			loading: true,
+			loadingadmin: true,
+			loadingtemplate: true,
+			loadingsection: true,
 		}
 	},
 	mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("search_add_search")) {
-			this.cansave = true
-		}
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		this.cansave = permissions.includes("search_add_search")
 
-		this.routeopt.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+		this.routeopt.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
 
-		this.datavalues = JSON.parse(localStorage.getItem('multisearch')) ?? [
-			[
-				{
-					object: "InventoryBase",
-					route: "asset/bases",
-					field: "",
-					fieldtype: "string",
-					operator: "iexact",
-					value: "",
-					link: ""
-				}
+		this.datavalues =
+			JSON.parse(localStorage.getItem("multisearch")) ?? [
+				[
+					{
+						object: "InventoryBase",
+						route: "asset/bases",
+						field: "",
+						fieldtype: "string",
+						operator: "iexact",
+						value: "",
+						link: "",
+					},
+				],
 			]
-		]
 
-		if(this.searchgroup) {
+		if (this.searchgroup) {
 			this.datavalues = this.searchgroup
 		}
 
-		Object.keys(this.datavalues).forEach(index => {
-			Object.keys(this.datavalues[index]).forEach(search => {
-				this.getFields(this.datavalues[index][search].route, index, search, false, true)
-				if(
-					this.datavalues[index][search].route == "templates"
-					&& this.datavalues[index][search].template != null
-					&& this.datavalues[index][search].section != null
+		Object.keys(this.datavalues).forEach((masterindex) => {
+			Object.keys(this.datavalues[masterindex]).forEach((index) => {
+				const row = this.datavalues[masterindex][index]
+
+				this.getFields(row.route, masterindex, index, false, true)
+
+				if (
+					row.route === "templates" &&
+					row.template != null &&
+					row.section != null
 				) {
-					this.getSections(this.datavalues[index][search].template, index, search, true)
-					this.getFields(this.datavalues[index][search].section, index, search, true, true)
+					this.getSections(row.template, masterindex, index, true)
+					this.getFields(row.section, masterindex, index, true, true)
 				}
-				this.setFieldType(this.datavalues[index][search], index, search)
+
+				this.setFieldType(row, masterindex, index)
 			})
 		})
 	},
 	methods: {
-		// Submit dynamic datas
+		ensureNestedArray(container, masterindex) {
+			if (!Array.isArray(container[masterindex])) container[masterindex] = []
+		},
+
+		sortByText(a, b) {
+			return a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)
+		},
+
+		resetSearchRow(masterindex, index) {
+			const row = this.datavalues[masterindex][index]
+			row.field = ""
+			row.value = ""
+			row.operator = "iexact"
+			row.fieldtype = "string"
+		},
+
+		cleanupTemplateSection(masterindex, index) {
+			delete this.datavalues[masterindex][index].template
+			delete this.datavalues[masterindex][index].section
+		},
+
+		resolveComponentFromRoute(route) {
+			let component = route.split("/")[0]
+			if (component === "asset") component = "inventory"
+			if (component === "snmp") component = "network"
+			if (component === "software_dictionary") component = "software"
+			return component
+		},
+
+		setObjectFromRoute(route, masterindex, index) {
+			this.datavalues[masterindex][index].object = this.obj[route]
+		},
+
 		onSubmit(event) {
 			event.preventDefault()
-
-			// Save param in local storage
-			localStorage.setItem('multisearch', JSON.stringify(this.datavalues))
-
-			this.$emit('reloadDatatable', this.datavalues)
+			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
+			this.$emit("reloadDatatable", this.datavalues)
 		},
+
 		async getFields(route, masterindex, index, section = false, loadingdata = false) {
-			if(!loadingdata) {
-				this.datavalues[masterindex][index].field = ""
-				this.datavalues[masterindex][index].value = ""
-				this.datavalues[masterindex][index].operator = "iexact"
-				this.datavalues[masterindex][index].fieldtype = "string"
-			}
+			try {
+				if (!loadingdata) this.resetSearchRow(masterindex, index)
 
-			if(!section) {
-				var component = route.split("/")[0]
-
-				if(component == "asset") {
-					component = "inventory"
+				let component = null
+				if (!section) {
+					component = this.resolveComponentFromRoute(route)
+					this.setObjectFromRoute(route, masterindex, index)
 				}
 
-				if(component == "snmp") {
-					component = "network"
+				this.ensureNestedArray(this.fieldopt, masterindex)
+				this.fieldopt[masterindex][index] = []
+
+				if (route === "accountinfo/config?datatarget=ASSET") {
+					await this.handleAccountinfoConfigFields(masterindex, index)
+					return
 				}
 
-				if(component == "software_dictionary") {
-					component = "software"
+				if (route === "templates") {
+					await this.handleTemplatesFields(masterindex, index)
+					return
 				}
 
-				this.datavalues[masterindex][index].object = this.obj[route]
-			}
+				if (section) {
+					await this.handleSectionFields(route, masterindex, index)
+					return
+				}
 
-			if(!Array.isArray(this.fieldopt[masterindex])) {
-				this.fieldopt[masterindex] = []
-			}
+				await this.handleOptionsFields(route, component, masterindex, index)
 
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.loadingtemplate = false
+			}
+		},
+
+		async handleAccountinfoConfigFields(masterindex, index) {
+			this.loading = true
+			this.ensureNestedArray(this.fieldopt, masterindex)
 			this.fieldopt[masterindex][index] = []
 
-			if(route == "accountinfo/config?datatarget=ASSET") {
-				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
-					.then(response => {
-						this.loading = true
-						this.fieldopt[masterindex][index] = []
+			this.cleanupTemplateSection(masterindex, index)
 
-						delete this.datavalues[masterindex][index].template
-						delete this.datavalues[masterindex][index].section
+			const data = await this.$api.generic.get(
+				"accountinfo/config/",
+				{},
+				{ expand: "accountinfo_values", datatarget: "ASSET" }
+			)
+			const rows = Array.isArray(data) ? data : (data?.results || [])
 
-						response.data.forEach(field => {
-							this.fieldopt[masterindex][index].push({
-								value: field.id,
-								text: field.name,
-								fieldtype: this.linktype[field.datatype]
-							})
-						})
+			this.fieldopt[masterindex][index] = rows
+				.map((field) => ({
+					value: field.id,
+					text: field.name,
+					fieldtype: this.linktype[field.datatype],
+				}))
+				.sort(this.sortByText)
 
-						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-					.finally(() => this.loading = false)
-			} else if(route == "templates") {
-				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
-					.then(response => {
-						this.loadingtemplate = true
-						if(!Array.isArray(this.templateopt[masterindex])) {
-							this.templateopt[masterindex] = []
-						}
-
-						this.templateopt[masterindex][index] = []
-
-						response.data.forEach(field => {
-							this.templateopt[masterindex][index].push({
-								value: field.id,
-								text: field.name
-							})
-						})
-
-						this.templateopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-
-						this.loadingtemplate = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-			} else if (section) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+route, { headers: this.header })
-					.then(response => {
-						this.loading = true
-
-						this.fieldopt[masterindex][index] = []
-
-						response.data.forEach(field => {
-							this.fieldopt[masterindex][index].push({
-								value: field.id,
-								text: field.name,
-								fieldtype: "string"
-							})
-						})
-
-						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-					.finally(() => this.loading = false)
-			} else {
-				await axios.options(this.$config.BACKEND_API_ROUTE+route+"/", { headers: this.header })
-					.then(response => {
-						this.loading = true
-
-						this.fieldopt[masterindex][index] = []
-
-						delete this.datavalues[masterindex][index].template
-						delete this.datavalues[masterindex][index].section
-
-						Object.keys(response.data.actions.POST).forEach(field => {
-							if(!this.excludefield.includes(field) &&
-								response.data.actions.POST[field]["type"] != "field") {
-								this.fieldopt[masterindex][index].push({
-									value: field,
-									text: this.$t(component+"."+field),
-									fieldtype: response.data.actions.POST[field]["type"]
-								})
-								if(response.data.actions.POST[field]["type"] == "choice") {
-									this.scope = []
-									response.data.actions.POST[field]["choices"].forEach(choice => {
-										this.scope.push({
-											value: choice.value,
-											text: this.$t("inventory."+choice.value)
-										})
-									})
-
-									this.scope.sort((a,b) => (a.text > b.text) ?
-										1 : ((b.text > a.text) ? -1 : 0))
-
-									this.loadingadmin = false
-								}
-							}
-						})
-
-						this.fieldopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-					.finally(() => this.loading = false)
-			}
-			
+			this.loading = false
 		},
+
+		async handleTemplatesFields(masterindex, index) {
+			this.loadingtemplate = true
+
+			this.ensureNestedArray(this.templateopt, masterindex)
+			this.templateopt[masterindex][index] = []
+
+			const data = await this.$api.generic.get("templates/")
+			const rows = Array.isArray(data) ? data : (data?.results || [])
+
+			this.templateopt[masterindex][index] = rows
+				.map((t) => ({ value: t.id, text: t.name }))
+				.sort(this.sortByText)
+
+			this.loadingtemplate = false
+		},
+
+		async handleSectionFields(sectionId, masterindex, index) {
+			this.loading = true
+
+			this.ensureNestedArray(this.fieldopt, masterindex)
+			this.fieldopt[masterindex][index] = []
+
+			const data = await this.$api.generic.get(
+				"fields/",
+				{},
+				{ section: sectionId }
+			)
+			const rows = Array.isArray(data) ? data : (data?.results || [])
+
+			this.fieldopt[masterindex][index] = rows
+				.map((f) => ({ value: f.id, text: f.name, fieldtype: "string" }))
+				.sort(this.sortByText)
+
+			this.loading = false
+		},
+
+		async handleOptionsFields(route, component, masterindex, index) {
+			this.loading = true
+
+			this.ensureNestedArray(this.fieldopt, masterindex)
+			this.fieldopt[masterindex][index] = []
+
+			this.cleanupTemplateSection(masterindex, index)
+
+			const opts = await this.$api.generic.options(`${route}/`)
+			const post = opts?.actions?.POST || {}
+
+			Object.keys(post).forEach((field) => {
+				const def = post[field]
+				if (this.excludefield.includes(field)) return
+				if (def?.type === "field") return
+
+				this.fieldopt[masterindex][index].push({
+					value: field,
+					text: this.$t(`${component}.${field}`),
+					fieldtype: def?.type,
+				})
+
+				if (def?.type === "choice") {
+					this.scope = (def.choices || [])
+						.map((c) => ({ value: c.value, text: this.$t("inventory." + c.value) }))
+						.sort(this.sortByText)
+
+					this.loadingadmin = false
+				}
+			})
+
+			this.fieldopt[masterindex][index].sort(this.sortByText)
+			this.loading = false
+		},
+
 		async getSections(templateId, masterindex, index, loadingdata = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+templateId, { headers: this.header })
-				.then(response => {
-					this.loadingsection = true
-					if(!Array.isArray(this.sectionopt[masterindex])) {
-						this.sectionopt[masterindex] = []
-					}
+			try {
+				this.loadingsection = true
 
-					this.sectionopt[masterindex][index] = []
+				const data = await this.$api.generic.get("sections/", {}, { template: templateId })
+				const rows = Array.isArray(data) ? data : (data?.results || [])
 
-					if(!loadingdata) {
-						this.datavalues[masterindex][index].section = null
-						this.datavalues[masterindex][index].field = ""
-					}
+				this.ensureNestedArray(this.sectionopt, masterindex)
+				this.sectionopt[masterindex][index] = rows
+					.map((s) => ({ value: s.id, text: s.name }))
+					.sort(this.sortByText)
 
-					response.data.forEach(field => {
-						this.sectionopt[masterindex][index].push({
-							value: field.id,
-							text: field.name
-						})
-					})
-
-					this.sectionopt[masterindex][index].sort((a,b) => (a.text > b.text) ?
-						1 : ((b.text > a.text) ? -1 : 0))
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => this.loadingsection = false)
+				if (!loadingdata) {
+					this.datavalues[masterindex][index].section = null
+					this.datavalues[masterindex][index].field = ""
+				}
+			} catch (e) {
+				this.errormsg = e
+				this.errored = true
+			} finally {
+				this.loadingsection = false
+			}
 		},
+
 		addField(masterindex, index, fieldType) {
 			fieldType[masterindex].push(
 				{
@@ -632,10 +640,12 @@ export default {
 			)
 			this.getFields("asset/bases", masterindex, index+1)
 		},
+
 		removeField(masterindex, index, fieldType) {
 			fieldType[masterindex].splice(index, 1)
 			this.fieldopt[masterindex].splice(index, 1)
 		},
+
 		addGroup(fieldType) {
 			var masterindex = fieldType.length
 			fieldType[masterindex] = []
@@ -655,67 +665,71 @@ export default {
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
 			this.getFields("asset/bases", masterindex, 0)
 		},
+
 		removeGroup(masterindex, fieldType) {
 			fieldType.splice(masterindex, 1)
 			this.fieldopt.splice(masterindex, 1)
 		},
+
 		async setFieldType(input, masterindex, index) {
-			this.fieldopt[masterindex][index].forEach(element => {
-				if(element.value == input.field) {
+			for (const element of this.fieldopt?.[masterindex]?.[index] || []) {
+				if (element.value == input.field) {
 					input.fieldtype = element.fieldtype
+					break
 				}
-			})
+			}
 
-			if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
-					{ headers: this.header })
-					.then(response => {
-						this.loadingadmin = true
+			if (input.fieldtype === "select" || input.fieldtype === "checkbox") {
+				try {
+					this.loadingadmin = true
 
-						if(!Array.isArray(this.adminopt[masterindex])) {
-							this.adminopt[masterindex] = []
-						}
+					const data = await this.$api.generic.get(
+						"accountinfo/value",
+						{},
+						{ accountinfo_config: input.field }
+					)
 
-						this.adminopt[masterindex][index] = []
+					const rows = Array.isArray(data) ? data : (data?.results || [])
 
-						response.data.forEach(element => {
-							this.adminopt[masterindex][index].push({
-								value: element.id,
-								text: element.value
-							})
-						})
-
-						this.loadingadmin = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
+					this.ensureNestedArray(this.adminopt, masterindex)
+					this.adminopt[masterindex][index] = rows.map((el) => ({
+						value: el.id,
+						text: el.value,
+					}))
+				} catch (e) {
+					this.errormsg = e
+					this.errored = true
+				} finally {
+					this.loadingadmin = false
+				}
 			}
 		},
+
 		useSaveSearch(search) {
 			this.datavalues = JSON.parse(JSON.stringify(search))
 
-			Object.keys(this.datavalues).forEach(index => {
-				Object.keys(this.datavalues[index]).forEach(search => {
-					this.getFields(this.datavalues[index][search].route, index, search, false, true)
-					if(
-						this.datavalues[index][search].route == "templates"
-						&& this.datavalues[index][search].template != null
-						&& this.datavalues[index][search].section != null
+			Object.keys(this.datavalues).forEach((masterindex) => {
+				Object.keys(this.datavalues[masterindex]).forEach((index) => {
+					const row = this.datavalues[masterindex][index]
+
+					this.getFields(row.route, masterindex, index, false, true)
+
+					if (
+						row.route === "templates" &&
+						row.template != null &&
+						row.section != null
 					) {
-						this.getSections(this.datavalues[index][search].template, index, search, true)
-						this.getFields(this.datavalues[index][search].section, index, search, true, true)
+						this.getSections(row.template, masterindex, index, true)
+						this.getFields(row.section, masterindex, index, true, true)
 					}
-					this.setFieldType(this.datavalues[index][search], index, search)
+
+					this.setFieldType(row, masterindex, index)
 				})
 			})
 
-			// Save param in local storage
-			localStorage.setItem('multisearch', JSON.stringify(this.datavalues))
-
-			this.$emit('reloadDatatable', this.datavalues)
-		}
+			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
+			this.$emit("reloadDatatable", this.datavalues)
+		},
 	}
 }
 </script>
