@@ -120,7 +120,6 @@ export default {
 				}
 			})
 			.catch(e => {
-				this.errored = true
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 			})
 	},
