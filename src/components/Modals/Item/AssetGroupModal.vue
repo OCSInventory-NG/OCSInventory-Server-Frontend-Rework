@@ -35,8 +35,8 @@
 			v-model="assetgroupmodal"
 			:title="(!update) ? $t('assetgroup.saveasgroup') : $t('assetgroup.editassetgroup')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -244,13 +244,11 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "AssetGroupModal",
 	props: {
-		search: { type: Array, default: null },
-		assetrow: { type: Array, default: null},
+		search: { type: [Array, Object], default: () => [] },
+		assetrow: { type: [Array, Object], default: () => []},
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
 		datatable: { type: Boolean, default: false },
@@ -258,6 +256,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			rowgroup: {
 				name: null,
 				description: null,
@@ -269,13 +274,6 @@ export default {
 				user: null,
 				groups: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			assetgroupmodal: false,
 			optvisibility: [
 				{ value: "public", text: this.$t("assetgroup.public") },
@@ -296,10 +294,9 @@ export default {
 			groupaction: "create",
 			updategroup: [],
 			updategroupid: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -325,222 +322,206 @@ export default {
 		}
 	},
 	methods: {
-		loadData(id) {
-			this.assetgroupmodal = true
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
+		_resetRowgroup() {
 			this.rowgroup = {
 				name: null,
 				description: null,
 				search: [],
-				is_dynamic: (this.datatable) ? false : true,
+				is_dynamic: this.datatable ? false : true,
 				assets: [],
 				visibility: "public",
 				allow_group_modification: false,
 				user: null,
-				groups: []
+				groups: [],
 			}
+		},
+
+		loadData(id) {
+			this.assetgroupmodal = true
+			this._resetRowgroup()
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getAssetGroupInfo(id)
 			}
 		},
-		async getAssetGroupInfo() {
+
+		async getAssetGroupInfo(id) {
 			this.loading = true
 			this.assetgroupmodal = true
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.id+"/", { headers: this.header })
-				.then(response => {
-					delete response.data.search
-					delete response.data.assets
+			try {
+				const data = await this.$api.generic.get(`asset/groups/${id}/`)
 
-					this.rowgroup = response.data
-					
-					this.errormsg = null
-					this.errored = false
-					this.getUserName()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				const cleaned = { ...data }
+				delete cleaned.search
+				delete cleaned.assets
+
+				this.rowgroup = cleaned
+				this.errormsg = null
+				this.errored = false
+
+				await this.getUserName()
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getUserName() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+this.rowgroup.user+"/", { headers: this.header })
-				.then(response => {
-					this.user = response.data
-					if(response.data.first_name != "") {
-						this.rowgroup.user = response.data.last_name.concat(" ", response.data.first_name)
-					} else {
-						this.rowgroup.user = response.data.username
-					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-			this.getGroups(this.user.groups)
+			try {
+				const data = await this.$api.generic.get(`users/${this.rowgroup.user}/`)
+				this.user = data
+
+				if (data.first_name && data.first_name !== "") {
+					this.rowgroup.user = data.last_name.concat(" ", data.first_name)
+				} else {
+					this.rowgroup.user = data.username
+				}
+
+				await this.getGroups(this.user.groups || [])
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
+
 		async getUserInfo() {
 			this.loading = true
-			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 			this.assetgroupmodal = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
-				.then(response => {
-					this.user = response.data
-					this.errormsg = null
-					this.errored = false
-					if(this.user.groups) {
-						this.getGroups(this.user.groups)
-					}
-					this.loading = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+			try {
+				this.optvisibility.sort((a, b) =>
+					a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)
+				)
+
+				const data = await this.$api.generic.get("myaccount/")
+				this.user = data
+
+				this.errormsg = null
+				this.errored = false
+
+				if (this.user.groups) {
+					await this.getGroups(this.user.groups)
+				}
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getGroups(groups) {
+			this.loading = true
 			this.groups = []
-			for (const group of groups) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
-					.then(response => {
-						this.groups.push({
-							value: response.data.id,
-							text: response.data.name
-						})
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-					})
+
+			try {
+				const results = await Promise.all(
+					(groups || []).map((groupId) => this.$api.generic.get(`groups/${groupId}/`))
+				)
+
+				this.groups = results
+					.map((g) => ({ value: g.id, text: g.name }))
+					.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
 			}
-			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			this.loading = false
 		},
+
 		async getMyAssetGroups() {
-			this.rowgroup = {
-				name: null,
-				description: null,
-				search: [],
-				is_dynamic: (this.datatable) ? false : true,
-				assets: [],
-				visibility: "public",
-				allow_group_modification: false,
-				user: null,
-				groups: []
-			}
+			this.loading = true
+			this._resetRowgroup()
 
-			var parameter = ""
-
-			if (this.datatable) {
-				parameter = "?is_dynamic=false"
-			}
-
+			const parameter = this.datatable ? { is_dynamic: false } : {}
 			this.optgroup = []
 			this.updategroupid = null
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+parameter, { headers: this.header })
-				.then(response => {
-					for (const assetgroup of response.data) {
-						this.optgroup.push({
-							value: assetgroup.id,
-							text: assetgroup.name
-						})
+			try {
+				const data = await this.$api.generic.get("asset/groups/", parameter)
 
-						this.updategroup[assetgroup.id] = assetgroup
-					}
-					
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				for (const assetgroup of data) {
+					this.optgroup.push({ value: assetgroup.id, text: assetgroup.name })
+					this.updategroup[assetgroup.id] = assetgroup
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		setAssetGroupInfo(id) {
 			this.loading = true
 			this.rowgroup = this.updategroup[id]
-			this.loading = false 
+			this.loading = false
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-			if(!this.update) {
-				if (!this.datatable) {
-					this.rowgroup.assets = this.assetrow
-					this.rowgroup.search = this.search
-				} else {
-					for (const asset of this.assetrow) {
-						if (!this.rowgroup.assets.includes(asset.id)) {
-							this.rowgroup.assets.push(asset.id)
+			try {
+				if (!this.update) {
+					if (!this.datatable) {
+						this.rowgroup.assets = this.assetrow
+						this.rowgroup.search = this.search
+					} else {
+						for (const asset of this.assetrow) {
+							if (!this.rowgroup.assets.includes(asset.id)) {
+								this.rowgroup.assets.push(asset.id)
+							}
 						}
 					}
 				}
 
 				this.rowgroup.user = this.user.id
 
-				if(this.rowgroup.visibility != "private_group") {
+				if (this.rowgroup.visibility !== "private_group") {
 					this.rowgroup.groups = []
 					this.rowgroup.allow_group_modification = false
 				}
 
-				if(this.groupaction == "create") {
-					axios.post(this.$config.BACKEND_API_ROUTE+"asset/groups/", this.rowgroup, { headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => { this.loadingcreate = false })
+				if (!this.update && this.groupaction === "create") {
+					await this.$api.generic.post("asset/groups/", this.rowgroup)
 				} else {
-					axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
-						{ headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => { this.loadingcreate = false })
-				}
-			} else {
-				this.rowgroup.user = this.user.id
-
-				if(this.rowgroup.visibility != "private_group") {
-					this.rowgroup.groups = []
-					this.rowgroup.allow_group_modification = false
+					await this.$api.generic.patch(`asset/groups/${this.rowgroup.id}/`, this.rowgroup)
 				}
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.rowgroup.id+"/", this.rowgroup, 
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => { this.loadingcreate = false })
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

@@ -24,8 +24,8 @@
 			v-model="assetoptmodal"
 			:title="$t('inventory.options')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -154,26 +154,24 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "AssetOptionsModal",
 	props: {
-		item: { type: Array, default: null }
+		item: { type: [Array, Object], default: () => [] }
 	},
 	data() {
 		return {
-			assetoptmodal: false,
 			errored: false,
 			errormsg: null,
+
+			successed: false,
+
+			assetoptmodal: false,
 			rowdatatmp: [],
 			rowdatagrp: [],
 			rowtmp: [],
 			rowgrp: [],
 			template: null,
-			loading: false,
-			loadingcreate: false,
-			successed: false,
 			selectedopt: null,
 			selectedgrp: null,
 			options: [
@@ -181,10 +179,9 @@ export default {
 				{ value: 'assign_grp', text: this.$t('inventory.assign') },
 				{ value: 'reset_temp', text: this.$t('inventory.reset_template') }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: false,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -203,90 +200,94 @@ export default {
 		this.template = this.item[0].template ?? null
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		async getTemplate() {
 			this.rowtmp = this.item
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?os!=SNMP", { headers: this.header })
-				.then(response => {
-					this.rowdatatmp = []
-					response.data.forEach(template => {
-						this.rowdatatmp.push({
-							value: template.id,
-							text: template.name
-						})
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+			try {
+				const data = await this.$api.generic.get("templates/", { "os!": "SNMP" })
+
+				this.rowdatatmp = data.map((template) => ({
+					value: template.id,
+					text: template.name,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
+
 		async getStaticGroup() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/?is_dynamic=false", { headers: this.header })
-				.then(response => {
-					this.rowdatagrp = []
-					response.data.forEach(assetgrp => {
-						this.rowgrp[assetgrp.id] = assetgrp
-						this.rowdatagrp.push({
-							value: assetgrp.id,
-							text: assetgrp.name
-						})
+			try {
+				const data = await this.$api.generic.get("asset/groups/", { is_dynamic: false })
+
+				this.rowdatagrp = []
+				data.forEach((assetgrp) => {
+					this.rowgrp[assetgrp.id] = assetgrp
+					this.rowdatagrp.push({
+						value: assetgrp.id,
+						text: assetgrp.name,
 					})
-					this.errormsg = null
-					this.errored = false
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			this.successed = false
+			this.errored = false
+			this.errormsg = null
 
-			if(this.selectedopt == "assign_temp" || this.selectedopt == "reset_temp") {
+			try {
+				if (this.selectedopt === "assign_temp" || this.selectedopt === "reset_temp") {
+					const patch = {
+						template: this.selectedopt === "assign_temp" ? this.template : null,
+						is_template_forced: this.selectedopt === "assign_temp",
+					}
 
-				var patch = {
-					template: (this.selectedopt == "assign_temp") ? this.template : null,
-					is_template_forced: (this.selectedopt == "assign_temp") ? true : false
+					await this.$api.generic.patch(
+						`asset/bases/${this.item[0].id}/`,
+						patch
+					)
+
+					this.successed = true
+				} else if (this.selectedopt === "assign_grp") {
+					const grp = this.rowgrp[this.selectedgrp]
+
+					grp.assets = grp.assets || []
+
+					if (!grp.assets.includes(this.rowtmp[0].id)) {
+						grp.assets.push(this.rowtmp[0].id)
+					}
+
+					await this.$api.generic.patch(
+						`asset/groups/${this.selectedgrp}/`,
+						grp
+					)
+
+					this.successed = true
 				}
-
-				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.item[0].id+"/", patch,
-					{ headers: this.header })
-					.then(() => {
-						this.successed = true
-						this.errored = null
-						this.errormsg = false
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-						this.successed = false
-					})
-					.finally(() => {
-						this.loadingcreate = false
-					})
-			} else if(this.selectedopt == "assign_grp") {
-				this.rowgrp[this.selectedgrp].assets.push(this.rowtmp[0].id)
-
-				axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.selectedgrp+"/",
-					this.rowgrp[this.selectedgrp], { headers: this.header })
-					.then(() => {
-						this.successed = true
-						this.errored = null
-						this.errormsg = false
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-						this.successed = false
-					})
-					.finally(() => {
-						this.loadingcreate = false
-					})
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.successed = false
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

@@ -17,8 +17,8 @@
 			:title="$t('generic.duplicate')"
 			hide-footer
 			size="md"
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

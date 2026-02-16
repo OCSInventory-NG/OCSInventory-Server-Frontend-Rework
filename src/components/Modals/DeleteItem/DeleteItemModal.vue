@@ -17,9 +17,9 @@
 			v-model="deleteact"
 			:title="$t('generic.deleteitem')"
 			hide-footer
-			modal-class="modal modal-blur"
+			modal-class="modal"
 			size="sm"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
