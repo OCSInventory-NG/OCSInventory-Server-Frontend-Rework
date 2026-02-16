@@ -83,8 +83,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'ExportTemplateModal',
 	props: {
@@ -94,14 +92,13 @@ export default {
 		return {
 			errormsg: null,
 			errored: false,
-			exporttemplate: false,
-			loadingexport: false,
+
 			exportwithsuccess: false,
+
+			exporttemplate: false,
 			templatetoexport: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loadingexport: false,
 		}
 	},
 	watch: {
@@ -119,41 +116,55 @@ export default {
 			this.errormsg = null
 			this.errored = false
 		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingexport = true
 			this.errored = false
 			this.exportwithsuccess = false
+			this.errormsg = null
 
-			for (const id of this.templatetoexport) {
-				try {
-					const response = await axios.get(
-						this.$config.BACKEND_API_ROUTE + 'templates/' + id + '/export/',
-						{ headers: this.header }
-					)
+			const errors = []
 
-					const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' })
-					const url = window.URL.createObjectURL(blob)
-					const link = document.createElement('a')
-					link.href = url
-					link.download = response.data.name + '.json'
+			try {
+				for (const id of (this.templatetoexport || [])) {
+					try {
+						const data = await this.$api.generic.get(`templates/${id}/export/`)
 
-					document.body.appendChild(link)
-					link.click()
+						const filename = `${(data?.name || `template_${id}`)}.json`
+						const blob = new Blob([JSON.stringify(data, null, 2)], {
+							type: "application/json;charset=utf-8",
+						})
 
-					document.body.removeChild(link)
-					window.URL.revokeObjectURL(url)
-				} catch (error) {
-					this.errormsg = error.message
-					this.errored = true
+						const url = window.URL.createObjectURL(blob)
+						const link = document.createElement("a")
+						link.href = url
+						link.download = filename
+
+						document.body.appendChild(link)
+						link.click()
+						document.body.removeChild(link)
+						window.URL.revokeObjectURL(url)
+					} catch (e) {
+						errors.push({
+							id,
+							message: e?.response?.data?.error || e?.message || String(e),
+						})
+					}
 				}
-			}
 
-			if (!this.errored) {
-				this.exportwithsuccess = true
+				if (errors.length) {
+					this.errored = true
+					// message lisible (multi-lignes)
+					this.errormsg = errors.map((e) => `Template ${e.id} : ${e.message}`).join("\n")
+					this.exportwithsuccess = false
+				} else {
+					this.exportwithsuccess = true
+				}
+			} finally {
 				this.loadingexport = false
 			}
-		}
+		},
 	}
 }
 </script>

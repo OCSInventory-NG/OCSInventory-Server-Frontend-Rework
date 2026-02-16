@@ -132,8 +132,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'DoAllActionsItemModal',
 	props: {
@@ -145,25 +143,24 @@ export default {
 	},
 	data() {
 		return {
-			row: {
-				id: this.id
-			},
 			submitErrorMsg: null,
 			loadErrorMsg: null,
 			updateErrorMsg: null,
 			deleteErrorMsg: null,
-			idModal: 'manage-item'+this.id,
-			loading: true,
-			loadingcreate: false,
+
 			createwithsuccess: false,
+
+			row: {
+				id: this.id
+			},
+			idModal: 'manage-item'+this.id,
 			doallaction: false,
 			text: null,
 			datavalues: [{value: ""}],
 			get: this.reconciliationname+"="+this.id,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	computed: {
@@ -190,72 +187,69 @@ export default {
 		}))
 	},
 	methods: {
-		// Submit dynamic datas
 		async onSubmit(event) {
 			event.preventDefault()
 			this.submitErrorMsg = null
 			this.loadingcreate = true
 
 			const jsonAdd = []
-			this.datavalues.forEach(data => {
-				const valueStr = (data && data.value !== undefined && data.value !== null) ? String(data.value).trim() : ''
-				if(!data.id && valueStr !== '') {
+			for (const data of (this.datavalues || [])) {
+				const valueStr =
+					data && data.value !== undefined && data.value !== null
+						? String(data.value).trim()
+						: ""
+
+				if (!data?.id && valueStr !== "") {
 					jsonAdd.push({
 						[this.reconciliationname]: this.id,
-						value: valueStr
+						value: valueStr,
 					})
 				}
-			})
+			}
 
-			const updates = this.datavalues
-				.filter(data => {
-					const valueStr = (data && data.value !== undefined && data.value !== null) ? String(data.value).trim() : ''
-					return data.id && data._dirty && valueStr !== ''
+			const updates = (this.datavalues || [])
+				.filter((data) => {
+					const valueStr =
+						data && data.value !== undefined && data.value !== null
+							? String(data.value).trim()
+							: ""
+					return data?.id && data?._dirty && valueStr !== ""
 				})
-				.map(data => ({ id: data.id, payload: { value: String(data.value).trim() } }))
+				.map((data) => ({
+					id: data.id,
+					payload: { value: String(data.value).trim() },
+				}))
 
 			try {
 				const requests = []
-				if(jsonAdd.length > 0) {
-					requests.push(
-						axios.post(
-							this.$config.BACKEND_API_ROUTE+this.route+"/",
-							jsonAdd,
-							{ headers: this.header }
-						)
-					)
+
+				// POST bulk
+				if (jsonAdd.length > 0) {
+					requests.push(this.$api.generic.post(`${this.route}/`, jsonAdd))
 				}
-				if(updates.length > 0) {
-					updates.forEach(u => {
-						requests.push(
-							axios.patch(
-								this.$config.BACKEND_API_ROUTE+this.route+"/"+u.id+"/",
-								u.payload,
-								{ headers: this.header }
-							)
-						)
-					})
+
+				// unit PATCH
+				for (const u of updates) {
+					requests.push(this.$api.generic.patch(`${this.route}/${u.id}/`, u.payload))
 				}
-				if(requests.length > 0) {
-					await Promise.all(requests)
-				}
+
+				if (requests.length > 0) await Promise.all(requests)
+
 				this.createwithsuccess = true
-				this.datavalues = this.datavalues.map(v => ({
-					...v,
-					_dirty: false
-				}))
+				this.datavalues = (this.datavalues || []).map((v) => ({ ...v, _dirty: false }))
 			} catch (e) {
-				this.submitErrorMsg = e && e.message ? e.message : String(e)
+				this.submitErrorMsg =
+					e?.response?.data?.error || e?.message || String(e)
 			} finally {
 				this.loadingcreate = false
 			}
 		},
+
 		onUpdate(input) {
 			this.updateErrorMsg = null
-			if (input) {
-				input._dirty = true
-			}
+			if (input) input._dirty = true
 		},
+
 		async getData() {
 			this.loading = true
 			this.doallaction = true
@@ -263,71 +257,73 @@ export default {
 			this.loadErrorMsg = null
 			this.updateErrorMsg = null
 			this.deleteErrorMsg = null
+
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+this.route+"/?"+this.get,
-					{ headers: this.header }
-				)
-				if(response.data.length > 0) {
-					this.datavalues = []
+				// this.get = "a=1&b=2"
+				const query = {}
+				if (this.get) {
+					for (const [k, v] of new URLSearchParams(this.get)) {
+						if (v !== "" && v != null) query[k] = v
+					}
 				}
-				response.data.forEach(details => {
+
+				const data = await this.$api.generic.get(`${this.route}/`, query)
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				if (rows.length > 0) this.datavalues = []
+
+				for (const details of rows) {
 					this.datavalues.push(details)
-				})
-				this.datavalues = this.datavalues.map(v => ({
+				}
+
+				this.datavalues = this.datavalues.map((v) => ({
 					...v,
-					_localId: v._localId || (
-						Date.now().toString(36)+
-						Math.random().toString(36).slice(2)
-					)
+					_localId:
+						v._localId ||
+						(Date.now().toString(36) + Math.random().toString(36).slice(2)),
 				}))
 			} catch (e) {
-				this.loadErrorMsg = e && e.message ? e.message : String(e)
+				this.loadErrorMsg =
+					e?.response?.data?.error || e?.message || String(e)
 			} finally {
 				this.loading = false
 			}
 		},
+
 		addField(value, fieldType) {
 			fieldType.push({
 				value: "",
-				_localId: (
-					Date.now().toString(36)+
-					Math.random().toString(36).slice(2)
-				)
+				_localId: Date.now().toString(36) + Math.random().toString(36).slice(2),
 			})
 		},
+
 		async removeField(index, fieldType) {
 			this.deleteErrorMsg = null
-			if(typeof fieldType[index].id !== 'undefined') {
-				try {
-					await axios.delete(
-						this.$config.BACKEND_API_ROUTE+this.route+"/"+fieldType[index].id+"/",
-						{ headers: this.header }
-					)
-					fieldType.splice(index, 1)
-					if (fieldType.length === 0) {
-						fieldType.push({
-							value: "",
-							_localId: (
-								Date.now().toString(36)+
-								Math.random().toString(36).slice(2)
-							)
-						})
-					}
-				} catch (e) {
-					this.deleteErrorMsg = e && e.message ? e.message : String(e)
-				}
-			} else {
-				fieldType.splice(index, 1)
+
+			const pushEmptyIfNeeded = () => {
 				if (fieldType.length === 0) {
 					fieldType.push({
 						value: "",
-						_localId: (
-							Date.now().toString(36)+
-							Math.random().toString(36).slice(2)
-						)
+						_localId: Date.now().toString(36) + Math.random().toString(36).slice(2),
 					})
 				}
+			}
+
+			const row = fieldType?.[index]
+			if (!row) return
+
+			if (row.id !== undefined && row.id !== null) {
+				try {
+					await this.$api.generic.delete(`${this.route}/${row.id}/`)
+					fieldType.splice(index, 1)
+					pushEmptyIfNeeded()
+				} catch (e) {
+					this.deleteErrorMsg =
+						e?.response?.data?.error || e?.message || String(e)
+				}
+			} else {
+				fieldType.splice(index, 1)
+				pushEmptyIfNeeded()
 			}
 		},
 	}
