@@ -448,6 +448,7 @@
     "extension": "Extensions",
     "field": "Modèles - Champs",
     "group": "Groupes",
+    "history": "Actions automatisées - Logs",
     "inventory": "Inventaire",
     "inventorybase": "Inventaire - Actifs",
     "inventoryfield": "Inventaire - Champs",
@@ -466,6 +467,8 @@
     "section": "Modèles - Sections",
     "snmpconfig": "SNMP - Communautés",
     "snmpscanner": "SNMP - Scanners",
+    "softwaredictionary": "Logiciels",
+    "softwaremapping": "Logiciels - Mapping",
     "template": "Modèles",
     "user": "Utilisateurs"
   },

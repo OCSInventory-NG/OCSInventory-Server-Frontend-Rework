@@ -135,45 +135,74 @@ export default {
 				const perms = Array.isArray(data) ? data : (data?.results || [])
 
 				const prefixes = ["add_", "change_", "delete_", "view_"]
-				const labelSet = new Set()
+
+				const djangoCoreApps = [
+					"admin",
+					"contenttype",
+					"session",
+					"token",
+					"logentry",
+					"proxy",
+					"filemanager"
+				]
 
 				this.permissions = {}
 				this.permissionslabel = []
 
+				const labelMap = new Map()
+
 				for (const p of perms) {
+					const codename = p?.codename || ""
+					if (!codename) continue
+
+					const appLabel =
+						p?.content_type?.app_label ||
+						p?.content_type?.app ||
+						p?.app_label ||
+						p?.codename ||
+						null
+
+					if (appLabel && djangoCoreApps.some(core => appLabel.includes(core))) {
+						continue
+					}
+
 					for (const prefix of prefixes) {
-						if (!p?.codename?.includes(prefix)) continue
+						if (!codename.startsWith(prefix)) continue
 
-						const permissionKey = p.codename.replace(prefix, "")
-						if (!this.$te("permission." + permissionKey)) continue
+						const permissionKey = codename.slice(prefix.length)
+						const labelId = `${permissionKey}_${p.content_type}`
 
-						const key = `${permissionKey}_${p.content_type}`
 						const entry = {
 							id: p.id,
 							code: `permission_${p.id}`,
-							name: p.codename,
+							name: codename,
 							key: permissionKey,
 							type: prefix.replace("_", ""),
 						}
 
-						if (!this.permissions[key]) this.permissions[key] = []
-						this.permissions[key].push(entry)
+						if (!this.permissions[labelId]) this.permissions[labelId] = []
+						this.permissions[labelId].push(entry)
 
-						labelSet.add(key)
+						if (!labelMap.has(labelId)) {
+							const trad = this.$te("permission." + permissionKey)
+								? this.$t("permission." + permissionKey)
+								: permissionKey
+
+							labelMap.set(labelId, trad)
+						}
 					}
 				}
 
-				this.permissionslabel = Array.from(labelSet).map((label) => ({
-					id: label,
-					trad: this.$t("permission." + label.split("_")[0]),
-				}))
-
-				this.permissionslabel.sort((a, b) => (a.trad || "").localeCompare(b.trad || ""))
+				this.permissionslabel = Array.from(labelMap.entries())
+					.map(([id, trad]) => ({ id, trad }))
+					.sort((a, b) => (a.trad || "").localeCompare(b.trad || ""))
 
 				await this.getGroups()
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
+			} finally {
+				this.isbusy = false
 			}
 		},
 
@@ -204,7 +233,7 @@ export default {
 				for (const p of list) {
 					permById.set(p.id, {
 						labelTrad: label.trad,
-						typeTrad: this.$t("generic." + p.type),
+						typeTrad: this.$te("generic." + p.type) ? this.$t("generic." + p.type) : p.type,
 					})
 				}
 			}

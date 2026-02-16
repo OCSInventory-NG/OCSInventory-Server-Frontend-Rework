@@ -448,6 +448,7 @@
     "extension": "Extensions",
     "field": "Templates - Fields",
     "group": "Groups",
+    "history": "Automated actions - Logs",
     "inventory": "Inventory",
     "inventorybase": "Inventory - Assets",
     "inventoryfield": "Inventory - Fields",
@@ -466,6 +467,8 @@
     "software_mapping": "Software mapping",
     "snmpconfig": "SNMP - Communities",
     "snmpscanner": "SNMP - Scanners",
+    "softwaredictionary": "Softwares",
+    "softwaremapping": "Softwares - Mapping",
     "template": "Templates",
     "user": "Users"
   },
