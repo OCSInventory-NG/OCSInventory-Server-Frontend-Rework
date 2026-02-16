@@ -111,6 +111,7 @@
 					<div v-else>
 						<Alert
 							:message="$t('message.no_field')"
+							:cols="true"
 							variant="info"
 						/>
 					</div>

@@ -50,7 +50,7 @@ export default {
 		edit: { type: Boolean, default: false },
 		i: { type: Number, default: 0 },
 		options: { type: Object, default: null },
-		series: { type: Array, default: null }
+		series: { type: [Array, Object], default: () => [] }
 	},
 	data() {
 		return {

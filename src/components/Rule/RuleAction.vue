@@ -179,8 +179,8 @@ export default {
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
-		triggers: { type: Array, default: null },
-		actions: { type: Array, default: null }
+		triggers: { type: [Array, Object], default: () => [] },
+		actions: { type: [Array, Object], default: () => [] }
 	},
 	data() {
 		return {

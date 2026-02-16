@@ -90,8 +90,8 @@
 export default {
 	name: "DraggableComponent",
 	props: {
-		rowdata: { type: Array, default: null },
-		rowheader: { type: Array, default: null },
+		rowdata: { type: [Array, Object], default: () => [] },
+		rowheader: { type: [Array, Object], default: () => [] },
 		translationkey: { type: String, default: "deployment." },
 		apiroute: { type: String, default: "deployment/actions" },
 		editcomponent: { type: String, default: "ActionListModal" },

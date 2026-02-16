@@ -276,7 +276,7 @@
 export default {
 	name: 'Search',
 	props: {
-		searchgroup: { type: Array, default: null },
+		searchgroup: { type: [Array, Object], default: () => [] },
 		disableforgroup: { type: Boolean, default: false }
 	},
 	data() {
@@ -402,7 +402,7 @@ export default {
 				],
 			]
 
-		if (this.searchgroup) {
+		if (this.searchgroup.length) {
 			this.datavalues = this.searchgroup
 		}
 
