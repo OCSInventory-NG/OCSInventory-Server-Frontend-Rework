@@ -393,7 +393,9 @@ export default {
 														: null),
 											})
 										} else {
-											this.datavalues[masterindex][this.datavalues[masterindex].length - 1].case_sensitive =
+											this.datavalues[masterindex][
+												this.datavalues[masterindex].length - 1
+											].case_sensitive =
 												this.logic[key][or][key2][and][operator]
 										}
 									})
@@ -412,7 +414,9 @@ export default {
 									})
 									masterindex++
 								} else {
-									this.datavalues[masterindex - 1][this.datavalues[masterindex - 1].length - 1].case_sensitive =
+									this.datavalues[masterindex - 1][
+										this.datavalues[masterindex - 1].length - 1
+									].case_sensitive =
 										this.logic[key][or][key2]
 								}
 							}

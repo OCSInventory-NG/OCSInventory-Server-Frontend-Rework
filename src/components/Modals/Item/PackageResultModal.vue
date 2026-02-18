@@ -209,7 +209,7 @@ export default {
 				const data = await this.$api.generic.get("deployment/packages/")
 
 				this.rowdata = (data || []).map((pkg) => {
-					const { result, ...rest } = pkg
+					const { result: _result, ...rest } = pkg
 					return {
 						...rest,
 						actions_list: Array.isArray(rest.actions_list) ? rest.actions_list.length : 0,
