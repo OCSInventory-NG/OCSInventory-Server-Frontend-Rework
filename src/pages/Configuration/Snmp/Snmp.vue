@@ -270,7 +270,7 @@ export default {
 			this.can.config.add = permissions.includes("config_add_config")
 			this.can.config.edit = permissions.includes("config_change_config")
 			this.can.config.delete = permissions.includes("config_delete_config")
-			await this.getSnmpConfig()
+			
 		}
 
 		if (permissions.includes("snmp_config_view_snmpconfig")) {
@@ -279,7 +279,6 @@ export default {
 			this.can.community.add = permissions.includes("snmp_config_add_snmpconfig")
 			this.can.community.edit = permissions.includes("snmp_config_change_snmpconfig")
 			this.can.community.delete = permissions.includes("snmp_config_delete_snmpconfig")
-			await this.getSnmpCommunities()
 		}
 
 		if (permissions.includes("template_view_template")) {
@@ -288,7 +287,6 @@ export default {
 			this.can.template.add = permissions.includes("template_add_template")
 			this.can.template.edit = permissions.includes("template_change_template")
 			this.can.template.delete = permissions.includes("template_delete_template")
-			await this.getSnmpTemplateHeader()
 		}
 
 		if (permissions.includes("scanner_view_snmpscanner")) {
@@ -297,8 +295,12 @@ export default {
 			this.can.scanner.add = permissions.includes("scanner_add_snmpscanner")
 			this.can.scanner.edit = permissions.includes("scanner_change_snmpscanner")
 			this.can.scanner.delete = permissions.includes("scanner_delete_snmpscanner")
-			await this.getSnmpScannerHeader()
 		}
+
+		if (this.can.config.view) await this.getSnmpConfig()
+		if (this.can.community.view) await this.getSnmpCommunities()
+		if (this.can.template.view) await this.getSnmpTemplateHeader()
+		if (this.can.scanner.view) await this.getSnmpScannerHeader()
 
 		if (!this.allconfigview) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
