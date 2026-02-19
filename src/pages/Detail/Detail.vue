@@ -116,6 +116,10 @@
 													:slug="slug"
 												/>
 											</fieldset><br>
+											<ExtensionSlot
+												name="inventory.asset.detail.afterAccountInfo"
+												:context="{ assetId: device?.id }"
+											/><br>
 										</div>
 										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">

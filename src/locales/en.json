@@ -251,6 +251,16 @@
     "viewhistory": "View result history",
     "waiting": "Pending"
   },
+  "extensions": {
+    "author": "Author",
+    "description": "Description",
+    "editextension": "Update an extension",
+    "enable_disclaimer": "Enabling an extension requires restarting the API server",
+    "enabled": "Enabled",
+    "id": "ID",
+    "name": "Name",
+    "version": "Version"
+  },
   "generic": {
     "add": "Add",
     "actions": "Actions",
@@ -435,6 +445,7 @@
     "category": "Inventory - Categories",
     "config": "General Configuration",
     "deploymenthistory": "Deployment - History",
+    "extension": "Extensions",
     "field": "Templates - Fields",
     "group": "Groups",
     "inventory": "Inventory",
@@ -651,6 +662,7 @@
     "deployment": "Deployment",
     "details": "Details",
     "edittemplate": "Edit template",
+    "extensions": "Extensions",
     "general": "General",
     "general_configuration": "General configuration",
     "group": "Group",
