@@ -16,8 +16,8 @@
 			v-model="extensionmodal"
 			:title="$t('extensions.editextension')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -105,8 +105,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "ExtensionModal",
 	props: {
@@ -115,21 +113,20 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				enabled: false
 			},
-			errormsg: null,
-			errored: false,
+			extensionmodal: false,
+			
 			loading: true,
 			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
-			extensionmodal: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	watch: {
@@ -145,54 +142,64 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.extensionmodal = true
 			this.row = {
-				enabled: false
+				enabled: false,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
-				this.getExtension(id);
+				this.getExtension(id)
 			}
 		},
-		async getExtension(id){
+
+		async getExtension(id) {
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE + "extensions/" + id + "/",
-					{ headers: this.header }
-				)
-				this.row = response.data
+				const data = await this.$api.generic.get(`extensions/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
 			} catch (e) {
 				this.errored = true
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 			} finally {
 				this.loading = false
 			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			axios.patch(
-				this.$config.BACKEND_API_ROUTE + "extensions/" + this.id + "/",
-				{enabled: this.row.enabled},
-				{ headers: this.header }
-			)
-				.then(() => {
-					this.createwithsuccess = true
-					this.createerror = false
-				})
-				.catch(e => {
-					this.createerror = true
-					this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.createwithsuccess = false
-				})
-		}
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				await this.$api.generic.patch(
+					`extensions/${this.id}/`,
+					{ enabled: this.row.enabled }
+				)
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

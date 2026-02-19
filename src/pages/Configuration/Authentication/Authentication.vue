@@ -3,15 +3,11 @@
 		id="authentication" 
 		class="container-xl"
 	>
-		<!-- Page header -->
-		<PageHeader 
-			page-title="authentication"
-		/>
-		<!-- Display Datatable -->
+		<PageHeader page-title="authentication" />
+
 		<div class="page-body">
 			<div class="card">
 				<div class="card-body">
-					<!-- Display success box message -->
 					<section v-if="successed">
 						<Alert 
 							:message="$t('message.success_saved')"
@@ -20,8 +16,7 @@
 						/>
 					</section>
 
-					<!-- Display error box message -->
-					<section v-if="errored && errorCode == null">
+					<section v-if="errored && errorcode == null">
 						<Alert 
 							:message="errormsg.message"
 							:cols="true"
@@ -35,8 +30,7 @@
 						</div>
 
 						<div v-else>
-							<!-- Display error box message -->
-							<div v-if="errored && errorCode != null">
+							<div v-if="errored && errorcode != null">
 								<Alert 
 									:message="errormsg"
 									:cols="true"
@@ -110,112 +104,122 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Authentication',
 	data() {
 		return {
-			errormsg: null,
-			errorCode: null,
-			loading: true,
 			errored: false,
-			canview: false,
-			canedit: false,
+			errormsg: null,
+			errorcode: null,
+
 			successed: false,
 			successmsg: null,
+
+			canview: false,
+			canedit: false,
+
 			authmethods: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			authmenus: [
 				{ value: "global", text: this.$t("authentication.global"), enabled: true },
 				{ value: "LDAP", text: this.$t("authentication.LDAP"), enabled: false },
 				{ value: "OIDC", text: this.$t("authentication.OIDC"), enabled: false },
 				{ value: "CAS", text: this.$t("authentication.CAS"), enabled: false },
-			]
+			],
+
+			loading: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(
+				() => this.successed = false, 5000
+			)
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("auth_method_view_authmethod")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("auth_method_view_authmethod")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("auth_method_change_authmethod")) {
+			if (permissions.includes("auth_method_change_authmethod")) {
 				this.canedit = true
 			}
-			await this.getAuthMethod()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+			return
 		}
+
+		// Data init
+		await this.getAuthMethod()
 	},
 	methods: {
 		async getAuthMethod() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_method/", { headers: this.header })
-				.then(response => {
-					this.authmethods = response.data
-					this.authmethods.forEach(authmethod => {
-						this.authmenus.forEach(authmenu => {
-							if(authmethod.name == authmenu.value) {
-								authmenu.enabled = authmethod.enabled
-							}
-						})
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		enableAuthentication(authid, authname, state) {
-			this.authmenus.forEach(authmenu => {
-				if(authmenu.value == authname) {
-					authmenu.enabled = state
-				}
-			})
+			try {
+				const data = await this.$api.generic.get("auth_method/")
 
-			var rowupdate = {
-				enabled: state
+				this.authmethods = Array.isArray(data) ? data : (data?.results || [])
+
+				const enabledByName = new Map(
+					this.authmethods.map((m) => [m?.name, !!m?.enabled])
+				)
+
+				this.authmenus = this.authmenus.map((menu) => ({
+					...menu,
+					enabled: enabledByName.has(menu.value)
+						? enabledByName.get(menu.value)
+						: menu.enabled,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
 			}
+		},
 
-			axios.patch(this.$config.BACKEND_API_ROUTE+"auth_method/"+authid+"/", rowupdate, { headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					if(e.response.data) {
-						this.errorCode = e.response.status
-						this.errormsg = e.response.data[0]
-					} else {
-						this.errormsg = e
-					}
+		async enableAuthentication(authid, authname, state) {
+			const prevMenus = this.authmenus.map(m => ({ ...m }))
+			const prevMethods = (this.authmethods || []).map(m => ({ ...m }))
 
-					this.authmethods.forEach(authmethod => {
-						this.authmenus.forEach(authmenu => {
-							if(authmethod.name == authmenu.value && authmethod.id == authid) {
-								authmenu.enabled = false
-								authmethod.enabled = false
-							}
-						})
-					})
-					
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-		}
+			this.authmenus = this.authmenus.map((m) =>
+				m.value === authname ? { ...m, enabled: state } : m
+			)
+
+			try {
+				await this.$api.generic.patch(`auth_method/${authid}/`, { enabled: state })
+
+				this.authmethods = (this.authmethods || []).map((m) =>
+					m.id === authid ? { ...m, enabled: state } : m
+				)
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errorcode = e?.response?.status
+				const apiMsg =
+					e?.response?.data?.error ??
+					(Array.isArray(e?.response?.data) ? e.response.data[0] : null) ??
+					e?.message ??
+					String(e)
+
+				this.errormsg = apiMsg
+
+				this.authmenus = prevMenus
+				this.authmethods = prevMethods
+
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
+			}
+		},
 	}
 }
 </script>

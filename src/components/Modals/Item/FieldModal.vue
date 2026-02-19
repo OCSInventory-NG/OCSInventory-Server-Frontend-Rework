@@ -36,8 +36,8 @@
 			v-model="fieldmodal"
 			:title="(!update) ? $t('template.addfield') : $t('template.editfield')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -267,8 +267,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "FieldModal",
 	props: {
@@ -279,6 +277,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				id: null,
 				name: null,
@@ -291,13 +296,6 @@ export default {
 				section: null
 			},
 			routetypemut: "assets",
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			fieldmodal: false,
 			options: {},
 			methodoptions: [
@@ -317,10 +315,9 @@ export default {
 					{ id: "submap", type: "text", default: null }
 				]
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -357,6 +354,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.fieldmodal = true
 			this.row = {
@@ -368,79 +369,86 @@ export default {
 				retrieval_method: null,
 				retrieval_output: null,
 				options: {},
-				section: this.section
+				section: this.section,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getField(id)
 			}
 		},
+
 		async getField(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.options = this.row.options
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {this.loading = false})
+			try {
+				const data = await this.$api.generic.get(`fields/${id}/`)
+				this.row = data
+
+				this.options = this.row.options || {}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-			if (!this.row.override_target || this.row.override_target === "false") {
-				this.row.retrieval_method = null
-				this.row.new_target = null
-				this.row.retrieval_output = null
-				this.row.options = {}
-			}
+			try {
+				const payload = {
+					...this.row,
+					options: {},
+				}
 
-			if(this.row.override_target == true && this.outputoptionoptions[this.row.retrieval_output] != undefined) {
-				this.row.options = {}
-				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
-					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
-						this.options[element.id] : element.default
-				})
+				const override = payload.override_target === true || payload.override_target === "true"
+
+				if (!override) {
+					payload.retrieval_method = null
+					payload.new_target = null
+					payload.retrieval_output = null
+					payload.options = {}
+				} else if (this.outputoptionoptions[payload.retrieval_output] !== undefined) {
+					const currentOptions = this.options || {}
+
+					this.outputoptionoptions[payload.retrieval_output].forEach((element) => {
+						payload.options[element.id] =
+							currentOptions[element.id] !== undefined
+								? currentOptions[element.id]
+								: element.default
+					})
+				} else {
+					payload.options = {}
+				}
+
+				if (!this.update) {
+					await this.$api.generic.post("fields/", payload)
+				} else {
+					await this.$api.generic.patch(`fields/${payload.id}/`, payload)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
 			}
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"fields/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => { this.loadingcreate = false })
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"fields/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => { this.loadingcreate = false })
-			}			
-		}
+		},
 	}
 }
 </script>

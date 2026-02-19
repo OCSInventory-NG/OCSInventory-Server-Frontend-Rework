@@ -35,8 +35,8 @@
 			v-model="snmpscannermodal"
 			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -177,8 +177,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SnmpScannerModal",
 	props: {
@@ -187,6 +185,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				identifier: null,
 				ip: null,
@@ -194,21 +199,11 @@ export default {
 				notes: null,
 				configs: []
 			},
-			errormsg: null,
-			errored: false,
-			successmsg: null,
-			successed: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			snmpscannermodal: false,
 			configs: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -231,6 +226,10 @@ export default {
 		await this.getCommunities()
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		async loadData(id) {
 			this.snmpscannermodal = true
 			this.row = {
@@ -238,106 +237,108 @@ export default {
 				ip: null,
 				subnets: null,
 				notes: null,
-				configs: []
+				configs: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
-				
-				await this.getSnmpScanner(id)
-			}
-		},
-		async getSnmpScanner(id) {
-			this.row = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+id+"/?expand=configs",
-				{ headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.row.subnets = this.row.subnets.join(",")
-					var configs = this.row.configs
-					this.row.configs = []
-					for (const config of configs) {
-						this.row.configs.push(config.id)
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async getCommunities() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/", { headers: this.header })
-				.then(response => {
-					this.configs = []
-					for (const config of response.data) {
-						this.configs.push({
-							value: config.id,
-							text: config.name
-						})
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		onSubmit(event) {
-			event.preventDefault()
-			this.createerror = false
-			this.createerrormsg = null
-			this.loadingcreate = true
-
-			if(!Array.isArray(this.row.subnets)) {
-				if(
-					this.row.subnets != null
-					&& this.row.subnets.trim() != ""
-				) {
-					this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
-				} else {
-					this.row.subnets = []
+				try {
+					await this.getSnmpScanner(id)
+				} finally {
+					this.loading = false
 				}
 			}
+		},
 
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"snmp/scanner/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"snmp/scanner/"+this.id+"/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
+		async getSnmpScanner(id) {
+			try {
+				const data = await this.$api.generic.get(
+					`snmp/scanner/${id}/`,
+					{ expand: "configs" }
+				)
+
+				this.row = data
+
+				const subnetsArr = Array.isArray(this.row.subnets) ? this.row.subnets : []
+				this.row.subnets = subnetsArr.join(",")
+
+				const configs = Array.isArray(this.row.configs) ? this.row.configs : []
+				this.row.configs = configs.map((c) => c.id)
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				throw e
 			}
-		}
+		},
+
+		async getCommunities() {
+			try {
+				const data = await this.$api.generic.get("snmp/config/")
+
+				this.configs = (data || []).map((config) => ({
+					value: config.id,
+					text: config.name,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async onSubmit(event) {
+			event.preventDefault()
+			this.loadingcreate = true
+
+			this.createerror = false
+			this.createerrormsg = null
+			this.createwithsuccess = false
+
+			try {
+				const payload = { ...this.row }
+
+				if (!Array.isArray(payload.subnets)) {
+					if (payload.subnets != null && String(payload.subnets).trim() !== "") {
+						payload.subnets = String(payload.subnets)
+							.replace(/[^0-9./`,]+/g, "")
+							.split(",")
+							.map((s) => s.trim())
+							.filter((s) => s !== "")
+					} else {
+						payload.subnets = []
+					}
+				}
+
+				if (!this.update) {
+					await this.$api.generic.post("snmp/scanner/", payload)
+				} else {
+					await this.$api.generic.patch(`snmp/scanner/${this.id}/`, payload)
+				}
+
+				this.createwithsuccess = true
+				this.createerror = false
+				this.createerrormsg = null
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

@@ -20,9 +20,9 @@
 			v-model="massprocessingmodal"
 			:title="$t('accountinfo.massprocessing')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="xl"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -52,9 +52,9 @@
 			v-model="emptyselection"
 			:title="$t('accountinfo.massprocessing')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="lg"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -90,16 +90,15 @@ export default {
 	},
 	data() {
 		return {
-			emptyselection: false,
-			massprocessingmodal: false,
 			errored: false,
 			errormsg: null,
-			loadingcreate: false,
+
 			successed: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			emptyselection: false,
+			massprocessingmodal: false,
+			
+			loadingcreate: false,
 		}
 	},
 	watch: {

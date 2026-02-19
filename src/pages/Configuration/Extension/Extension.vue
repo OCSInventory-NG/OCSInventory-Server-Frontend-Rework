@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="extensions"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="extensions" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -55,89 +51,82 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Extensions',
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
+
 			rowdata: [],
 			rowheader: [],
-			loading: true,
-			errored: false,
-			hiddenfields: [],
-			canedit: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			total: 0,
+
+			canedit: false,
+
+			hiddenfields: [],
 			query: {
-				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
 				ordering: '-name',
 				search: null,
 			},
+
 			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
 		if(permissions.includes("extension_view_extension")) {
 			if(permissions.includes("extension_change_extension")) {
 				this.canedit = true
 			}
-			await this.getHeader()
-			await this.getExtensions(this.query)
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"extensions/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(!["django_app"].includes(field)) {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getExtensions(query = null) {
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
 			try {
-				const q = query || this.query
-
-				const params = {}
-
-				if (q.limit != null) params.limit = q.limit
-				if (q.offset != null) params.offset = q.offset
-				if (q.ordering) params.ordering = q.ordering
-				if (q.search) params.search = q.search
-
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"extensions/",
-					{ headers: this.header, params }
+				// Get header
+				const header = await this.$api.generic.options("extensions/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["django_app"].includes(f)
 				)
 
-				const data = response.data
-				const results = data.results || data
+				// Get extensions
+				await this.getExtensions()
 
-				if (typeof data.count === 'number') {
-					this.total = data.count
-				} else {
-					this.total = results.length
-				}
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getExtensions(query = null) {
+			this.isbusy = true
+			try {
+				const data = await this.$api.generic.get("extensions/", query)
+
+				const results = data.results || data
+				this.total = typeof data.count === "number" ? data.count : results.length
 
 				this.rowdata = results
 
@@ -147,14 +136,14 @@ export default {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			} finally {
-				this.loading = false
 				this.isbusy = false
 			}
 		},
+
 		async reloadDatatable() {
-			this.isbusy = true
 			await this.getExtensions(this.query)
 		},
+
 		async handleQueryChange(newQuery) {
 			if (!this.isbusy) {
 				this.isbusy = true
@@ -166,6 +155,8 @@ export default {
 				await this.getExtensions(this.query)
 			}
 		},
+
+		// Export functions
 		handleExport({ scope, rows }) {
 			const csv = this.buildCsvFromRows(rows)
 			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -178,6 +169,7 @@ export default {
 			link.remove()
 			URL.revokeObjectURL(url)
 		},
+
 		buildCsvFromRows(rows) {
 			if (!rows || !rows.length) return ''
 			const headers = Object.keys(rows[0])
@@ -194,17 +186,15 @@ export default {
 
 			return csvRows.join('\n')
 		},
+
 		async exportAllExtensions({ filter, ordering }) {
 			const allRows = []
+			const params = {
+				ordering: ordering,
+				search: filter,
+			}
 
-			const params = {}
-			if (filter) params.search = filter
-			if (ordering) params.ordering = ordering
-
-			const { data } = await axios.get(
-				this.$config.BACKEND_API_ROUTE + "extensions/",
-				{ headers: this.header, params }
-			)
+			const data = await this.$api.generic.get("extensions/", params)
 
 			const results = data.results || data
 			allRows.push(...results)

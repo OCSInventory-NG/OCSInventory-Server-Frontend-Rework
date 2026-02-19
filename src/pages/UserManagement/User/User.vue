@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="user"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="user" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -34,12 +30,14 @@
 								:groupsprop="groups"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="users-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								:isbusy="isbusy"
 								editcomponent="UserModal"
 								title="users"
 								translationkey="user."
@@ -54,111 +52,131 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "User",
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
-			canview: false,
+
 			rowdata: [],
 			rowheader: [],
-			errored: false,
-			errormsg: null,
-			loading: true,
 			groups: [],
 			groupsLabel: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("auth_view_user")) {
-			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("auth_add_user")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("auth_view_user")) {
+			if (permissions.includes("auth_add_user")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("auth_change_user")) {
+			if (permissions.includes("auth_change_user")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("auth_delete_user")) {
+			if (permissions.includes("auth_delete_user")) {
 				this.candelete = true
 			}
-			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "user_permissions" && field != "password") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getGroups()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getGroups() {
-			this.groups = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(groupDetails => {
-						this.groups.push({
-							id: groupDetails.id,
-							code: "group_"+groupDetails.id,
-							name: groupDetails.name
-						})
-						this.groupsLabel[groupDetails.id] = groupDetails.name
-					})
-					this.getUsers()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getUsers() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"users/", { headers: this.header })
-				.then(response => {
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
-					this.permissionsGroupsTreatment()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		permissionsGroupsTreatment() {
-			this.rowdata.forEach(rowDetails => {
-				var tmpGroups = []
-				rowDetails.groups.forEach(groupsDetails => {
-					tmpGroups.push(this.groupsLabel[groupsDetails])
-				})
-				rowDetails.groups = tmpGroups.join('\n')
-			})
-			this.loading = false
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("users/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["user_permissions", "password"].includes(f)
+				)
+
+				// Get groups
+				await this.getGroups()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+		
+		async getGroups() {
+			this.isbusy = true
+			this.groups = []
+			this.groupsLabel = {}
+
+			try {
+				const data = await this.$api.generic.get("groups/")
+				const groups = Array.isArray(data) ? data : (data?.results || [])
+
+				this.groups = groups.map((g) => ({
+					id: g.id,
+					code: `group_${g.id}`,
+					name: g.name,
+				}))
+
+				for (const g of groups) {
+					this.groupsLabel[g.id] = g.name
+				}
+
+				await this.getUsers()
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
+
+		async getUsers() {
+			try {
+				const data = await this.$api.generic.get("users/")
+				this.rowdata = Array.isArray(data) ? data : (data?.results || [])
+
+				this.errormsg = null
+				this.errored = false
+
+				this.permissionsGroupsTreatment()
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
+
+		permissionsGroupsTreatment() {
+			for (const row of this.rowdata || []) {
+				const ids = Array.isArray(row?.groups) ? row.groups : []
+				row.groups = ids
+					.map((id) => this.groupsLabel[id])
+					.filter(Boolean)
+					.join("\n")
+			}
+			this.isbusy = false
+		},
+
+		async reloadDatatable() {
 			await this.getGroups()
-		}
+		},
 	}
 }
 </script>

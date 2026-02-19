@@ -115,7 +115,7 @@ export default {
 			this.isbusy = true
 			try {
 				// Get header
-				const header = await this.$api.generic.getHeader("asset/bases/")
+				const header = await this.$api.generic.options("asset/bases/")
 				this.rowheader = Object.keys(header.actions.POST).filter((f) => f !== "matched")
 
 				// Get accountinfo config to complete header
@@ -168,7 +168,6 @@ export default {
 					if (!item.accountinfo) return
 					Object.keys(item.accountinfo).forEach((k) => {
 						const label = "Account info : " + k
-						if (!this.rowheader.includes(label)) this.rowheader.push(label)
 						item[label] = item.accountinfo[k]
 					})
 				})
@@ -229,6 +228,7 @@ export default {
 				ordering: ordering,
 				search: filter,
 			}
+
 			const data = await this.$api.generic.get("asset/bases/", params, { accountinfo: true })
 
 			const results = data.results || data

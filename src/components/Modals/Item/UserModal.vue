@@ -36,8 +36,8 @@
 			v-model="usermodal"
 			:title="(!update) ? $t('user.adduser') : $t('user.edituser')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -224,17 +224,22 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "UserModal",
 	props: {
-		groupsprop: { type: Array, default: null },
+		groupsprop: { type: [Array, Object], default: () => [] },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				username: null,
 				password: null,
@@ -245,19 +250,11 @@ export default {
 				groups: [],
 				user_permissions: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			usermodal: false,
 			groups: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -286,6 +283,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.usermodal = true
 			this.row = {
@@ -296,83 +297,89 @@ export default {
 				last_name: null,
 				is_superuser: false,
 				groups: [],
-				user_permissions: []
+				user_permissions: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getUser(id)
 			}
 		},
-		async getUser(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"users/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-					this.getGroups()
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-		},
-		async getGroups() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/", { headers: this.header })
-				.then(response => {
-					this.groups = []
-					response.data.forEach(groupDetails => {
-						this.groups.push({
-							id: groupDetails.id,
-							code: "group_"+groupDetails.id,
-							name: groupDetails.name
-						})
-					})
 
-					this.loading = false
-				})
+		async getUser(id) {
+			try {
+				const data = await this.$api.generic.get(`users/${id}/`)
+				this.row = data
+
+				this.errormsg = null
+				this.errored = false
+
+				await this.getGroups()
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async getGroups() {
+			try {
+				const data = await this.$api.generic.get("groups/")
+
+				this.groups = (data || []).map((groupDetails) => ({
+					id: groupDetails.id,
+					code: "group_" + groupDetails.id,
+					name: groupDetails.name,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"users/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						console.log(e)
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				if(this.row.password == "") {
-					delete this.row.password
+
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("users/", this.row)
+				} else {
+					const payload = { ...this.row }
+
+					if (payload.password === "") {
+						delete payload.password
+					}
+
+					await this.$api.generic.patch(`users/${this.row.id}/`, payload)
 				}
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"users/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
+				this.createwithsuccess = true
+				this.createerrormsg = null
+				this.createerror = false
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

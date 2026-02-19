@@ -20,7 +20,6 @@ export function createApiClient(baseURLOrConfig) {
 		const token = localStorage.getItem("token_authentication")
 		if (token) config.headers.Authorization = `Token ${token}`
 		else delete config.headers.Authorization
-		config.headers["Content-Type"] = "application/json;charset=utf-8"
 		return config
 	})
 

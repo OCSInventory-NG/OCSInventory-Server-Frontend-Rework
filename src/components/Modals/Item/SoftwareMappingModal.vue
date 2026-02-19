@@ -36,8 +36,8 @@
 			v-model="softwaremappingmodal"
 			:title="(!update) ? $t('software.addsoftwaremapping') : $t('software.editsoftwaremapping')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -189,8 +189,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SoftwareMappingModal",
 	props: {
@@ -199,6 +197,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				template: null,
 				section: null,
@@ -209,13 +214,6 @@ export default {
 				minor_version: null,
 				patch_version: null
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			softwaremappingmodal: false,
 			templates: [],
 			sections: [],
@@ -228,10 +226,9 @@ export default {
 				"minor_version",
 				"patch_version"
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -260,6 +257,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		async loadData(id) {
 			this.softwaremappingmodal = true
 			this.row = {
@@ -270,97 +271,109 @@ export default {
 				version: null,
 				major_version: null,
 				minor_version: null,
-				patch_version: null
+				patch_version: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
-			
+			this.createwithsuccess = false
+
 			if (id) {
 				this.loading = true
 				await this.getSoftwareMapping(id)
 			}
 		},
+
 		async getSoftwareMapping(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"software_mapping/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-			
-			if (!this.errored) {
-				await this.getSections(this.row.template)
-				await this.getFields(this.row.section)
+			try {
+				const data = await this.$api.generic.get(`software_mapping/${id}/`)
+				this.row = data
+
+				this.errormsg = null
+				this.errored = false
+
+				if (this.row.template) {
+					await this.getSections(this.row.template)
+				}
+				if (this.row.section) {
+					await this.getFields(this.row.section)
+				}
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
 			}
-			this.loading = false
 		},
+
 		async getTemplates() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/", { headers: this.header })
-				.then(response => {
-					this.templates = response.data
-					this.templates = response.data.map(template => ({
-						value: template.id,
-						text: template.name
-					}))
-				})
+			try {
+				const data = await this.$api.generic.get("templates/")
+				this.templates = (data || []).map((template) => ({
+					value: template.id,
+					text: template.name,
+				}))
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
+
 		async getSections(templateId) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+templateId, { headers: this.header })
-				.then(response => {
-					this.sections = response.data.map(section => ({
-						value: section.id,
-						text: section.name
-					}))
-				})
+			try {
+				const data = await this.$api.generic.get("sections/", { template: templateId })
+				this.sections = (data || []).map((section) => ({
+					value: section.id,
+					text: section.name,
+				}))
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
+
 		async getFields(sectionId) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+sectionId, { headers: this.header })
-				.then(response => {
-					this.fields = response.data.map(field => ({
-						value: field.id,
-						text: field.name
-					}))
-				})
+			try {
+				const data = await this.$api.generic.get("fields/", { section: sectionId })
+				this.fields = (data || []).map((field) => ({
+					value: field.id,
+					text: field.name,
+				}))
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"software_mapping/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"software_mapping/"+this.row.id+"/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("software_mapping/", this.row)
+				} else {
+					await this.$api.generic.patch(
+						`software_mapping/${this.row.id}/`,
+						this.row
+					)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>
