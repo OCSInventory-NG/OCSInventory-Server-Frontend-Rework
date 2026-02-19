@@ -139,8 +139,6 @@ export default {
 		},
 
 		async getRuleInfo() {
-			this.loading = true
-
 			try {
 				const data = await this.$api.generic.get(
 					`automation/rule/${this.id}/`,

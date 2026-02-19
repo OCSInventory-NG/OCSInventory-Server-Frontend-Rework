@@ -261,7 +261,7 @@ export default {
 			setTimeout(() => {
 				this.successed = false
 				this.$emit("reloadRule")
-			, 5000})
+			}, 5000)
 		}
 	},
 	async mounted() {

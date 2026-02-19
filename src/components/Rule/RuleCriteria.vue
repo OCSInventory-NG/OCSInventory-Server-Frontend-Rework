@@ -2,14 +2,16 @@
 	<div id="rule-criteria">
 		<section v-if="successed">
 			<Alert 
-				:message="$t('message.success_saved')" 
+				:message="$t('message.success_saved')"
+				:cols="true"
 				variant="success"
 			/>
 		</section>
 
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errormsg.message" 
+				:message="errormsg.message"
+				:cols="true"
 				variant="danger"
 			/>
 		</section>
@@ -307,7 +309,7 @@ export default {
 				this.fields = []
 
 				Object.keys(data.actions.POST).forEach((field) => {
-					if (field !== "inventory_sections") {
+					if (!["inventory_sections", "matched"].includes(field)) {
 						this.fields.push({
 							value: field,
 							text: this.$t(key + field),
