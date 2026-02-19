@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="deployment"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="deployment" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -33,6 +29,7 @@
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="packages-datatable"
 								:rowdata="rowdata"
@@ -40,6 +37,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:canviewaction="canviewaction"
+								:isbusy="isbusy"
 								editcomponent="PackageModal"
 								title="deployment/packages"
 								translationkey="deployment."
@@ -54,83 +52,107 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Packages',
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canview: false,
 			canviewaction: false,
+
 			rowdata: [],
 			rowheader: [],
+			
+			isbusy:true,
 			loading: true,
-			errormsg: null,
-			errored: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("package_view_package")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("package_view_package")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("package_add_package")) {
+			if (permissions.includes("package_add_package")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("package_change_package")) {
+			if (permissions.includes("package_change_package")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("package_delete_package")) {
+			if (permissions.includes("package_delete_package")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("action_view_deploymentaction")) {
+			if (permissions.includes("action_view_deploymentaction")) {
 				this.canviewaction = true
 			}
-			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "result") this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getPackages()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getPackages() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(packages => {
-						packages.actions_list = packages.actions_list.length
-					})
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("deployment/packages/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["result"].includes(f)
+				)
+
+				// Get packages
+				await this.getPackages()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getPackages() {
+			try {
+				this.isbusy = true
+
+				const data = await this.$api.generic.get("deployment/packages/")
+				const packages = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = packages.map((pkg) => ({
+					...pkg,
+					actions_list: Array.isArray(pkg?.actions_list)
+						? pkg.actions_list.length
+						: pkg.actions_list,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error)
+					? e.response.data.error
+					: e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getPackages()
 		}
 	}

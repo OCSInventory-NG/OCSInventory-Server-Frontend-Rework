@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="config"
-			/>
+			<PageHeader page-title="config" />
 
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
 						<section v-if="successed">
 							<Alert 
 								:message="$t('message.success_saved')"
@@ -21,7 +17,6 @@
 							/>
 						</section>
 
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -217,95 +212,114 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'General',
 	data() {
 		return {
-			configs: [],
-			errormsg: null,
-			successmsg: null,
 			errored: false,
+			errormsg: null,
+
 			successed: false,
-			loading: true,
+			successmsg: null,
+
+			configs: [],
+
 			canedit: false,
 			canview: false,
+
 			activetab: 0,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			inputtype: {
 				"number input": "number",
 				"text input": "text"
-			}
+			},
+
+			loading: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(
+				() => this.successed = false, 5000
+			)
 		},
 		errored: function() {
-			setTimeout(() => this.errored = false, 5000)
+			setTimeout(
+				() => this.errored = false, 5000
+			)
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("config_view_config")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("config_view_config")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("config_change_config")) {
+			if (permissions.includes("config_change_config")) {
 				this.canedit = true
 			}
-			await this.getConfig()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
-		}	
+			this.loading = false
+			return
+		}
+
+		// Data init
+		await this.getConfig()
 	},
 	methods: {
-		// Get all config
 		async getConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"config/", { headers: this.header })
-				.then(response => {
-					for(const config of response.data) {
-						if(!["snmp", "ipdiscover"].includes(config.name)) {
-							this.configs.push(config)
-						}
-					}
-					this.loading = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.loading = false
-				})
+			try {
+				const data = await this.$api.generic.get("config/")
+				const configs = Array.isArray(data) ? data : (data?.results || [])
+
+				this.configs = configs.filter((c) => !["snmp", "ipdiscover"].includes(c.name))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 
-			var configToUpdate = this.configs[this.activetab].name
+			try {
+				const activeConfig = this.configs?.[this.activetab]
+				if (!activeConfig) throw new Error("No active config selected")
 
-			for (const config of this.configs[this.activetab].value) {
-				if (config.type == "number input") {
-					config.value = parseInt(config.value)
+				const configToUpdate = activeConfig.name
+
+				const payload = {
+					...activeConfig,
+					value: Array.isArray(activeConfig.value)
+						? activeConfig.value.map((item) => {
+							if (item?.type === "number input") {
+								const n = parseInt(item.value, 10)
+								return { ...item, value: Number.isNaN(n) ? item.value : n }
+							}
+							return item
+						})
+						: activeConfig.value,
 				}
-			}
 
-			axios.patch(this.$config.BACKEND_API_ROUTE+"config/"+configToUpdate+"/", this.configs[this.activetab],
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-		}
+				await this.$api.generic.patch(`config/${configToUpdate}/`, payload)
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
+			}
+		},
 	}
 }
 </script>

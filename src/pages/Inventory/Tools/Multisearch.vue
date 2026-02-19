@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="multisearch"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="multisearch" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -53,10 +49,12 @@
 								:multisearch="true"
 								:candelete="candelete"
 								:usecheckbox="candelete"
+								:isbusy="isbusy"
 								title="asset/bases"
 								translationkey="inventory."
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<AssetGroupModal 
 								:assetrow="assetids"
 								:search="rowsearch"
@@ -70,21 +68,20 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Multisearch",
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
+
+			candelete: false,
+
 			rowdata: [],
 			rowheader: [],
 			rowsearch: [],
 			assetids: [],
-			loading: true,
-			errored: false,
 			noresult: null,
-			candelete: false,
 			translation_col_keys: {
 				"results": "deployment",
 				"logs": "inventory",
@@ -99,91 +96,79 @@ export default {
 				"inventory_sections": "inventory",
 				"software_dictionary_entries": "software_dictionary"
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("inventory_base_view_inventorybase")) {
-			if(localStorage.getItem('permissions').split(",").includes("inventory_base_delete_inventorybase")) {
-				this.candelete = true
-			}
-			await this.getAccountinfoCfg()
-			await this.getHeader()
-			if(localStorage.getItem("useSavedSearch")) {
-				this.reloadDatatable()
-				localStorage.removeItem("useSavedSearch")
-			}
-		} else {
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (!permissions.includes("inventory_base_view_inventorybase")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
+			this.isbusy = false
+			return
+		}
+		this.candelete = permissions.includes("inventory_base_delete_inventorybase")
+
+		// Data init
+		await this.loadInitial()
+
+		if(localStorage.getItem("useSavedSearch")) {
+			this.reloadDatatable()
+			localStorage.removeItem("useSavedSearch")
 		}
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(!["matched"].includes(field)) {
-							this.rowheader.push(field)
-						}
-					})
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async getAccountinfoCfg() {
-			this.rowheader = []
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
 			try {
-				var params = {
-					datatarget: "ASSET"
-				}
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"accountinfo/config/",
-					{ headers: this.header, params }
-				)
+				// Get header
+				const header = await this.$api.generic.options("asset/bases/")
+				this.rowheader = Object.keys(header.actions.POST).filter((f) => f !== "matched")
 
-				for (const accountinfo of response.data) {
-					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
-						this.rowheader.push("Account info : " + accountinfo.name)
+				// Get accountinfo config to complete header
+				const accountCfg = await this.$api.generic.get("accountinfo/config/", {}, { datatarget: "ASSET" })
+				for (let i = accountCfg.length - 1; i >= 0; i--) {
+					const a = accountCfg[i]
+					const label = "Account info : " + a.name
+					if (!this.rowheader.includes(label)) {
+						this.rowheader.unshift(label)
 					}
 				}
+
+				this.errored = false
+				this.errormsg = null
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
 				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
 			}
 		},
+
 		async reloadDatatable(search) {
-			await this.getAccountinfoCfg()
-			await this.getHeader()
+			this.isbusy = true
 			this.loading = true
 			this.rowsearch = search ?? JSON.parse(localStorage.getItem("multisearch"))
 
-			var params = {
-				accountinfo: true
-			}
-
 			try {
-				const response = await axios.post(
-					this.$config.BACKEND_API_ROUTE + "search/",
+				const data = await this.$api.generic.post(
+					"search/",
 					this.rowsearch,
-					{ headers: this.header, params }
+					{ accountinfo: true } // customParams -> query params
 				)
 
 				this.rowdata = []
 				this.assetids = []
 				this.noresult = null
 
-				for (const element of response.data) {
+				for (const element of data || []) {
 					const row = { ...element }
 
 					const flatMatches = this.flattenMatches(element.matched)
@@ -195,13 +180,12 @@ export default {
 
 					delete row.matched
 
-					if(row.accountinfo) {
-						Object.keys(row.accountinfo).forEach(accountinfo => {
-							if(!this.rowheader.includes("Account info : " + accountinfo)) {
-								this.rowheader.push("Account info : " + accountinfo)
-							}
-							row["Account info : " + accountinfo] = row.accountinfo[accountinfo]
-						})
+					if (row.accountinfo && typeof row.accountinfo === "object") {
+						for (const [accountinfo, value] of Object.entries(row.accountinfo)) {
+							const col = "Account info : " + accountinfo
+							if (!this.rowheader.includes(col)) this.rowheader.push(col)
+							row[col] = value
+						}
 					}
 
 					this.rowdata.push(row)
@@ -216,37 +200,40 @@ export default {
 				this.successed = true
 				this.errormsg = null
 				this.errored = false
-
 			} catch (e) {
 				this.errormsg = e.response?.data?.error ?? e.message
 				this.errored = true
 				this.successmsg = null
 				this.successed = false
 			} finally {
+				this.isbusy = false
 				this.loading = false
 			}
 		},
+
 		flattenMatches(matched) {
 			const flat = {}
 
 			for (const [type, matches] of Object.entries(matched || {})) {
 				for (const match of matches || []) {
 					for (const [key, value] of Object.entries(match || {})) {
-						var col = null
-						if (this.$te(this.translation_col_keys[type]+"."+key)) {
-							col = `
-								${this.$t("title."+this.translation_title_keys[type])}: 
-								${this.$t(this.translation_col_keys[type]+"."+key)}
-							`
-						} else if(type == "inventory_sections") {
-							col = `${this.$t("title."+this.translation_title_keys[type])}: ${key}`
+						let col = null
+
+						const title = this.$t("title." + this.translation_title_keys[type])
+
+						if (this.$te(this.translation_col_keys[type] + "." + key)) {
+							const label = this.$t(this.translation_col_keys[type] + "." + key)
+							col = `${title}: ${label}`
+						} else if (type === "inventory_sections") {
+							col = `${title}: ${key}`
 						}
 
-						if (col && !flat[col]) flat[col] = []
+						if (!col) continue
 
-						if (col && value !== null && value !== undefined) {
-							flat[col].push(String(value))
-						}
+						col = this.normalizeHeaderKey(col)
+
+						if (!flat[col]) flat[col] = []
+						if (value !== null && value !== undefined) flat[col].push(String(value))
 					}
 				}
 			}
@@ -257,11 +244,19 @@ export default {
 
 			return flat
 		},
+
 		ensureHeaderKey(key) {
-			if (!this.rowheader.includes(key)) {
-				this.rowheader.push(key)
+			const k = this.normalizeHeaderKey(key)
+			if (!this.rowheader.includes(k)) {
+				this.rowheader.push(k)
 			}
-		}
+		},
+
+		normalizeHeaderKey(key) {
+			return String(key)
+				.replace(/\s+/g, " ")
+				.trim()
+		},
 	}
 }
 </script>

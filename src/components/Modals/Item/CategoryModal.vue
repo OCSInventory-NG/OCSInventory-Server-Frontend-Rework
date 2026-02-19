@@ -36,8 +36,8 @@
 			v-model="categorymodal"
 			:title="(!update) ? $t('template.addcategory') : $t('template.editcategory')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -164,8 +164,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "CategoryModal",
 	props: {
@@ -174,25 +172,24 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				description: null,
 				inventory_sections: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			categorymodal: false,
 			sections: [],
 			selectedsections: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -215,104 +212,108 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.categorymodal = true
 			this.row = {
 				name: null,
 				description: null,
-				inventory_sections: []
+				inventory_sections: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getCategory(id)
 			}
 		},
+
 		async getCategory(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-					this.getTemplates()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get(`categories/${id}/`)
+				this.row = data
+
+				this.errormsg = null
+				this.errored = false
+
+				await this.getTemplates()
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.loading = false
+			}
 		},
+
 		async getTemplates() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/?expand=sections", { headers: this.header })
-				.then(response => {
-					this.sections = []
-					this.selectedsections = []
-					for (const template of response.data) {
-						for (const section of template.sections) {
-							this.sections.push({
-								value: section.id,
-								text: template.name.concat(" - ", section.name)
-							})
-							if (this.row.inventory_sections.includes(section.id)) {
-								this.selectedsections.push({
-									value: section.id,
-									text: template.name.concat(" - ", section.name)
-								})
-							}
+			try {
+				const data = await this.$api.generic.get("templates/", { expand: "sections" })
+
+				this.sections = []
+				this.selectedsections = []
+
+				for (const template of data) {
+					for (const section of template.sections) {
+						const entry = {
+							value: section.id,
+							text: template.name.concat(" - ", section.name),
+						}
+
+						this.sections.push(entry)
+
+						if (this.row.inventory_sections.includes(section.id)) {
+							this.selectedsections.push(entry)
 						}
 					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
-		onSubmit(event) {
-			event.preventDefault()
-			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"categories/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => {
-						this.loadingcreate = false
-					})
-			} else {
-				this.row.inventory_sections = []
-
-				for (const selected of this.selectedsections) {
-					this.row.inventory_sections.push(selected.value)
 				}
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"categories/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}		
-		}
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async onSubmit(event) {
+			event.preventDefault()
+			this.loadingcreate = true
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("categories/", this.row)
+				} else {
+					this.row.inventory_sections = this.selectedsections.map(
+						(selected) => selected.value
+					)
+
+					await this.$api.generic.patch(
+						`categories/${this.row.id}/`,
+						this.row
+					)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="actionlist"
-			/>
+			<PageHeader page-title="actionlist" />
 
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<b-row align="center">
 								<h2>{{ rowpackagedata.name }}</h2>
@@ -41,15 +39,16 @@
 								</b-col>
 							</b-row><br>
 							<ActionListModal
-								v-if="canaddaction"
+								v-if="canadd"
 								:package="id"
 								@reloadPackage="reloadPackage"
 							/>
+
 							<Draggable 
 								:rowdata="rowactiondata"
 								:rowheader="rowheader"
-								:canedit="caneditaction"
-								:candelete="candeleteaction"
+								:canedit="canedit"
+								:candelete="candelete"
 								@reloadDatatable="reloadDatatable"
 							/>
 						</div>
@@ -61,8 +60,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'EditPackage',
 	props: {
@@ -71,23 +68,23 @@ export default {
 	data() {
 		return {
 			errormsg: null,
+			errored: false,
+
+			successmsg: null,
+			successed: false,
+			
+			canadd: false,
+			canedit: false,
+			candelete: false,
+
 			rowpackagedata: [],
 			rowactiondata: [],
 			rowheader: [],
-			successmsg: null,
-			successed: false,
-			loading: true,
-			errored: false,
-			canaddaction: false,
-			caneditaction: false,
-			candeleteaction: false,
 			excludedFields: [
 				"uploaded_file"
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
 		}
 	},
 	watch: {
@@ -96,69 +93,95 @@ export default {
 		}
 	},
 	async mounted() {
-		await this.getHeader()
-		if(localStorage.getItem('permissions').split(",").includes("action_add_deploymentaction")) {
-			this.canaddaction = true
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("action_view_deploymentaction")) {
+			if (permissions.includes("action_add_deploymentaction")) {
+				this.canadd = true
+			}
+			if (permissions.includes("action_change_deploymentaction")) {
+				this.canedit = true
+			}
+			if (permissions.includes("action_delete_deploymentaction")) {
+				this.candelete = true
+			}
+		} else {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+			return
 		}
-		if(localStorage.getItem('permissions').split(",").includes("action_change_deploymentaction")) {
-			this.caneditaction = true
-		}
-		if(localStorage.getItem('permissions').split(",").includes("action_delete_deploymentaction")) {
-			this.candeleteaction = true
-		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/actions?package="+this.id, { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if (!this.excludedFields.includes(field)) {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getPackage()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getPackage(reload = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.id+"/?expand=actions_list",
-				{ headers: this.header })
-				.then(response => {
-					if(!reload) {
-						this.rowpackagedata = response.data
-					}
-					this.rowactiondata = []
-					for (const action of response.data.actions_list) {
-						if (action.file instanceof Object) {
-							action.file = action.file.name
-						}
-						this.rowactiondata.push(action)
-					}
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("deployment/actions/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !this.excludedFields.includes(f)
+				)
+
+				// Get package
+				await this.getPackage()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async getPackage(reload = false) {
+			try {
+				this.loading = true
+
+				const data = await this.$api.generic.get(
+					`deployment/packages/${this.id}/`,
+					{},
+					{ expand: "actions_list" }
+				)
+
+				if (!reload) {
+					this.rowpackagedata = data
+				}
+
+				const actions = Array.isArray(data?.actions_list) ? data.actions_list : []
+
+				this.rowactiondata = actions.map((action) => ({
+					...action,
+					file: (action?.file && typeof action.file === "object")
+						? action.file.name
+						: action?.file,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getPackage(true)
 		},
+
 		async reloadPackage() {
-			this.loading = true
-			await this.getPackage()
+			await this.getPackage(false)
 		},
+
 		formatDate(value, key) {
-			const dateFields = ['last_updated', 'created_at', 'updated_at','date_created']
+			const dateFields = ['last_updated', 'created_at', 'updated_at', 'date_created']
 			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
 			if (dateFields.includes(key)) {
 				return new Date(value).toLocaleString(this.$i18n.locale)

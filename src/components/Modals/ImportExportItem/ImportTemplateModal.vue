@@ -17,8 +17,8 @@
 			:title="$t('template.import_template')"
 			hide-footer
 			size="md"
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -88,23 +88,20 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'ImportTemplateModal',
 	data() {
 		return {
 			errormsg: null,
 			errored: false,
-			loadingimport: false,
+
 			importwithsuccess: false,
+			
 			importtemplate: false,
 			file: null,
 			jsonToSend: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loadingimport: false,
 		}
 	},
 	watch: {
@@ -121,38 +118,72 @@ export default {
 			this.importtemplate = true
 			this.file = null
 			this.jsonToSend = null
-			this.$refs.fileInput.reset()
 			this.errormsg = null
 			this.errored = false
+			this.importwithsuccess = false
+
+			this.$refs?.fileInput?.reset?.()
 		},
+
 		processFile(event) {
-			this.file = event.target.files[0]
-			const reader = new FileReader();
-			if (this.file.name.includes(".json")) {
-				reader.onload = (res) => {
-					this.jsonToSend = res.target.result
-				};
-				reader.onerror = (err) => this.errormsg = err
-				reader.readAsText(this.file);
+			this.errormsg = null
+			this.errored = false
+			this.importwithsuccess = false
+
+			this.file = event?.target?.files?.[0] || null
+			if (!this.file) return
+
+			if (!this.file.name.toLowerCase().endsWith(".json")) {
+				this.errormsg = "Le fichier doit être un .json"
+				this.errored = true
+				this.jsonToSend = null
+				return
+			}
+
+			const reader = new FileReader()
+
+			reader.onload = (res) => {
+				try {
+					const text = res?.target?.result ?? ""
+					this.jsonToSend = JSON.parse(text)
+				} catch (e) {
+					this.jsonToSend = null
+					this.errormsg = "JSON invalide"
+					this.errored = true
+				}
+			}
+
+			reader.onerror = (err) => {
+				this.jsonToSend = null
+				this.errormsg = err?.message || String(err)
+				this.errored = true
+			}
+
+			reader.readAsText(this.file)
+		},
+
+		async onSubmit() {
+			this.loadingimport = true
+			this.errormsg = null
+			this.errored = false
+			this.importwithsuccess = false
+
+			try {
+				if (!this.jsonToSend) {
+					throw new Error("No JSON to import (missing or invalid file).")
+				}
+
+				await this.$api.generic.post("templates/", this.jsonToSend)
+
+				this.importwithsuccess = true
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+				this.importwithsuccess = false
+			} finally {
+				this.loadingimport = false
 			}
 		},
-		// Submit group creation and call getGroups to reload datatable datas
-		onSubmit() {
-			this.loadingimport = true
-			
-			axios.post(this.$config.BACKEND_API_ROUTE+"templates/", this.jsonToSend, { headers: this.header })
-				.then(() => {
-					this.errormsg = null
-					this.errored = false
-					this.importwithsuccess = true
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.importwithsuccess = false
-				})
-				.finally(() => this.loadingimport = false)
-		}
 	}
 }
 </script>

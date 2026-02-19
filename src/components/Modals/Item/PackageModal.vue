@@ -36,8 +36,8 @@
 			v-model="packagemodal"
 			:title="(!update) ? $t('deployment.addpackage') : $t('deployment.editpackage')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -150,8 +150,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "PackageModal",
 	props: {
@@ -160,6 +158,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				description: null,
@@ -167,23 +172,15 @@ export default {
 				actions_list: [],
 				result: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			packagemodal: false,
 			options: [
 				{ value: 'WIN', text: this.$t('template.WIN') },
 				{ value: 'LIN', text: this.$t('template.LIN') },
 				{ value: 'MAC', text: this.$t('template.MAC') }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -208,74 +205,77 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.packagemodal = true
+
 			this.row = {
 				name: null,
 				description: null,
-				target_os: 'WIN',
+				target_os: "WIN",
 				actions_list: [],
-				result: []
+				result: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getPackages(id)
 			}
 		},
+
 		async getPackages(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`deployment/packages/${id}/`)
+				this.row = data
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/packages/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				delete this.row.actions_list
-				delete this.row.result
-				
-				axios.patch(this.$config.BACKEND_API_ROUTE+"deployment/packages/"+this.row.id+"/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
-		}
+
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("deployment/packages/", this.row)
+				} else {
+					const { actions_list: _actions_list, result: _result, ...payload } = this.row
+
+					await this.$api.generic.patch(
+						`deployment/packages/${this.row.id}/`,
+						payload
+					)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

@@ -251,6 +251,16 @@
     "viewhistory": "View result history",
     "waiting": "Pending"
   },
+  "extensions": {
+    "author": "Author",
+    "description": "Description",
+    "editextension": "Update an extension",
+    "enable_disclaimer": "Enabling an extension requires restarting the API server",
+    "enabled": "Enabled",
+    "id": "ID",
+    "name": "Name",
+    "version": "Version"
+  },
   "generic": {
     "add": "Add",
     "actions": "Actions",
@@ -435,8 +445,10 @@
     "category": "Inventory - Categories",
     "config": "General Configuration",
     "deploymenthistory": "Deployment - History",
+    "extension": "Extensions",
     "field": "Templates - Fields",
     "group": "Groups",
+    "history": "Automated actions - Logs",
     "inventory": "Inventory",
     "inventorybase": "Inventory - Assets",
     "inventoryfield": "Inventory - Fields",
@@ -455,6 +467,8 @@
     "software_mapping": "Software mapping",
     "snmpconfig": "SNMP - Communities",
     "snmpscanner": "SNMP - Scanners",
+    "softwaredictionary": "Softwares",
+    "softwaremapping": "Softwares - Mapping",
     "template": "Templates",
     "user": "Users"
   },
@@ -651,6 +665,7 @@
     "deployment": "Deployment",
     "details": "Details",
     "edittemplate": "Edit template",
+    "extensions": "Extensions",
     "general": "General",
     "general_configuration": "General configuration",
     "group": "Group",

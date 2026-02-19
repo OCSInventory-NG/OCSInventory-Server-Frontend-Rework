@@ -1,6 +1,5 @@
 <template>
 	<div id="Accountinfo">		
-		<!-- Error box message -->
 		<section v-if="errored || massprocerrored">
 			<Alert 
 				:message="(errored) ? errormsg : massprocerrormsg" 
@@ -8,7 +7,6 @@
 			/>
 		</section>
 
-		<!-- Accountinf form -->
 		<section v-else>
 			<div 
 				v-if="loading"
@@ -43,6 +41,7 @@
 							<b-form-input
 								:id="'field_'+value.id"
 								v-model="value.value"
+								:disabled="!canedit"
 								class="mb-2 me-sm-2 mb-sm-0"
 							/>
 						</b-col>
@@ -60,6 +59,7 @@
 							<v-select
 								v-model="value.value"
 								:options="value.values"
+								:disabled="!canedit"
 								label="text"
 							/>
 						</b-col>
@@ -72,6 +72,7 @@
 								:id="'field_'+value.id"
 								v-model="value.value"
 								:options="value.values"
+								:disabled="!canedit"
 							/>
 						</b-col>
 						<b-col
@@ -98,6 +99,7 @@
 							<b-button 
 								type="submit"
 								variant="success"
+								:disabled="!canedit"
 							>
 								{{ $t('generic.update') }}
 							</b-button>
@@ -134,35 +136,33 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Accountinfo',
 	props: {
 		type: { type: String, default: '' },
 		id: { type: Number, default: null },
-		canedit: { type: Boolean, default: false },
 		slug: { type: String, default: 'inventory_base.inventorybase' },
 		massprocessing: { type: Boolean, default: false },
 		items: { type: Array, default: () => [] }
 	},
 	data() {
 		return {
-			rowdata: [],
-			loading: true,
 			errormsg: null,
 			errored: false,
 			massprocerrored: false,
 			massprocerrormsg: [],
+
 			massprocsuccessed: false,
 			successed: false,
-			loadingcreate: false,
+
+			canedit: false,
+
+			rowdata: [],
 			create: true,
 			accountid : null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -179,102 +179,120 @@ export default {
 		}
 	},
 	async mounted() {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		this.canedit = permissions.includes("accountinfo_add_accountinfovalue")
+
 		await this.getAccountinfoConfig()
 	},
 	methods: {
 		async getAccountinfoConfig() {
-			await axios.get(
-				this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values&datatarget="+this.type,
-				{ headers: this.header }
-			)
-				.then(response => {
-					for (const rowDetails of response.data) {
-						this.rowdata.push({
-							id: rowDetails.id,
-							name: rowDetails.name,
-							type: rowDetails.datatype,
-							value: (rowDetails.datatype == "CHECKBOX") ? [] : null,
-							values: this.getAccountinfoValue(rowDetails.accountinfo_values)
-						})
-					}
-					this.errormsg = null
-					this.errored = false
-					if (!this.massprocessing) {
-						this.getAccountinfoData()
-					} else {
-						this.loading = false
-					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		getAccountinfoValue(values) {
-			var array = []
-			values.forEach(value => {
-				array.push({
-					value: value.id,
-					text: value.value
-				})
-			})
-
-			return array
-		},
-		async getAccountinfoData() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/data/?object_slug="
-			+this.slug+"&object_id="+this.id, { headers: this.header })
-				.then(response => {
-					response.data.forEach(rowDetails => {
-						for (const [key, value] of Object.entries(this.rowdata)) {
-							if(rowDetails.accountdata[value.id]) {
-								this.rowdata[key].value = rowDetails.accountdata[value.id]
-							}
-							this.accountid = rowDetails.id
-							this.create = false
-						}
-					})
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async onPatch(id, json) {
-			await axios.patch(
-				this.$config.BACKEND_API_ROUTE+"accountinfo/data/"+id+"/",
-				json, 
-				{ headers: this.header }
-			)
-		},
-		async onPost(json) {
-			await axios.post(
-				this.$config.BACKEND_API_ROUTE+"accountinfo/data/", json,
-				{ headers: this.header }
-			)
-		},
-		async get(itemid) {
 			try {
-				const parameter = "object_id="+itemid+"&object_sulg="+this.slug
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"accountinfo/data/?"+parameter,
-					{ headers: this.header }
+				const data = await this.$api.generic.get(
+					"accountinfo/config/",
+					{},
+					{ expand: "accountinfo_values", datatarget: this.type }
 				)
 
-				for (const accountdata of response.data) {
-					return accountdata
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				for (const r of rows) {
+					this.rowdata.push({
+						id: r.id,
+						name: r.name,
+						type: r.datatype,
+						value: (r.datatype === "CHECKBOX") ? [] : null,
+						values: this.getAccountinfoValue(r.accountinfo_values),
+					})
+				}
+
+				this.errormsg = null
+				this.errored = false
+
+				if (!this.massprocessing) {
+					await this.getAccountinfoData()
+				} else {
+					this.loading = false
 				}
 			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
+
+		getAccountinfoValue(values) {
+			return (values || []).map((v) => ({
+				value: v.id,
+				text: v.value,
+			}))
+		},
+
+		async getAccountinfoData() {
+			try {
+				const data = await this.$api.generic.get(
+					"accountinfo/data/",
+					{},
+					{ object_slug: this.slug, object_id: this.id }
+				)
+
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				for (const rowDetails of rows) {
+					for (const [idx, row] of Object.entries(this.rowdata)) {
+						if (rowDetails?.accountdata?.[row.id] !== undefined) {
+							this.rowdata[idx].value = rowDetails.accountdata[row.id]
+						}
+					}
+					this.accountid = rowDetails.id
+					this.create = false
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async onPatch(id, json) {
+			return this.$api.generic.patch(`accountinfo/data/${id}/`, json)
+		},
+
+		async onPost(json) {
+			return this.$api.generic.post("accountinfo/data/", json)
+		},
+
+		async get(itemid) {
+			try {
+				const data = await this.$api.generic.get(
+					"accountinfo/data/",
+					{},
+					{ object_id: itemid, object_slug: this.slug }
+				)
+
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				return rows[0]
+			} catch (e) {
 				this.massprocerrormsg.push({
-					itemid: itemid,
-					message: (e.response?.data?.error) ? e.response.data.error : e.message
+					itemid,
+					message: (e.response?.data?.error) ? e.response.data.error : e.message,
 				})
 			}
 		},
+
+		buildAccountdataPayload({ onlyUpdated = false } = {}) {
+			return this.rowdata.reduce((acc, row) => {
+				if (!onlyUpdated || row.update) {
+					acc[row.id] = row.value
+				}
+				return acc
+			}, {})
+		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
@@ -282,7 +300,7 @@ export default {
 			const json = {
 				object_id: null,
 				object_slug: this.slug,
-				accountdata: {}
+				accountdata: {},
 			}
 
 			if (this.massprocessing) {
@@ -290,41 +308,39 @@ export default {
 				this.massprocerrormsg = []
 				this.massprocsuccessed = false
 
-				var patch = false
 				for (const item of this.items) {
-					if (item.accountinfo) {
-						patch = true
-					}
+					const patch = !!item.accountinfo
 
 					json.object_id = item.id
-					json.accountdata = this.rowdata.reduce((acc, row) => {
-						if (row.update) acc[row.id] = row.value
-						return acc
-					}, {})
+					json.accountdata = this.buildAccountdataPayload({ onlyUpdated: true })
 
 					if (patch) {
-						var accountdata_item = await this.get(item.id)
-						Object.keys(json.accountdata).forEach(key => {
+						const accountdata_item = await this.get(item.id)
+						if (!accountdata_item) continue
+
+						for (const key of Object.keys(json.accountdata)) {
 							if (accountdata_item.accountdata[key] !== json.accountdata[key]) {
 								accountdata_item.accountdata[key] = json.accountdata[key]
 							}
-						})
+						}
+
 						json.accountdata = accountdata_item.accountdata
+
 						try {
 							await this.onPatch(accountdata_item.id, json)
-						} catch(e) {
+						} catch (e) {
 							this.massprocerrormsg.push({
 								itemid: item.id,
-								message: (e.response?.data?.error) ? e.response.data.error : e.message
+								message: (e.response?.data?.error) ? e.response.data.error : e.message,
 							})
 						}
 					} else {
 						try {
 							await this.onPost(json)
-						} catch(e) {
+						} catch (e) {
 							this.massprocerrormsg.push({
 								itemid: item.id,
-								message: (e.response?.data?.error) ? e.response.data.error : e.message
+								message: (e.response?.data?.error) ? e.response.data.error : e.message,
 							})
 						}
 					}
@@ -332,7 +348,7 @@ export default {
 
 				if (this.massprocerrormsg.length > 0) {
 					this.massprocerrormsg = this.massprocerrormsg
-						.map(e => `Item ${e.itemid} : ${e.message}`)
+						.map((e) => `Item ${e.itemid} : ${e.message}`)
 						.join('\n')
 					this.massprocerrored = true
 				}
@@ -342,38 +358,36 @@ export default {
 				}
 
 				this.loadingcreate = false
-			} else {
-				json.object_id = this.id
-				json.accountdata = this.rowdata.reduce((acc, row) => {
-					acc[row.id] = row.value
-					return acc
-				}, {})
+				return
+			}
 
-				if (this.create) {
-					try {
-						await this.onPost(json)
-						this.successed = true
-						this.rowdata = []
-						this.getAccountinfoConfig()
-					} catch(e) {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-					} finally {
-						this.loadingcreate = false
-					}
-				} else {
-					try {
-						await this.onPatch(this.accountid, json)
-						this.successed = true
-					} catch(e) {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-					} finally {
-						this.loadingcreate = false
-					}
+			json.object_id = this.id
+			json.accountdata = this.buildAccountdataPayload()
+
+			if (this.create) {
+				try {
+					await this.onPost(json)
+					this.successed = true
+					this.rowdata = []
+					await this.getAccountinfoConfig()
+				} catch (e) {
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+					this.errored = true
+				} finally {
+					this.loadingcreate = false
+				}
+			} else {
+				try {
+					await this.onPatch(this.accountid, json)
+					this.successed = true
+				} catch (e) {
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+					this.errored = true
+				} finally {
+					this.loadingcreate = false
 				}
 			}
-		}
+		},
 	}
 }
 </script>

@@ -3,16 +3,12 @@
 		id="result"
 		class="container-xl"
 	>
-		<!-- Header page -->
 		<div>
-			<PageHeader 
-				page-title="result"
-			/>
-			<!-- Display datatable -->
+			<PageHeader page-title="result" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<div class="row row-deck row-cards">
 								<Counter 
@@ -49,6 +47,7 @@
 									classstyle="col-sm-6 col-lg-3"
 								/>
 							</div>
+
 							<div class="row">
 								<div class="col-lg-6">
 									<PieChart 
@@ -65,7 +64,9 @@
 									/>
 								</div>
 							</div>
+
 							<br><br>
+
 							<div>
 								<b-tabs
 									content-class="mt-4"
@@ -78,6 +79,8 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											:canaccesspackagedetails="true"
+											:isbusy="isbusy"
+											:canrefresh="false"
 											title="history-all"
 											translationkey="deployment."
 										/>
@@ -89,6 +92,8 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											:canaccesspackagedetails="true"
+											:isbusy="isbusy"
+											:canrefresh="false"
 											title="history-waiting"
 											translationkey="deployment."
 										/>
@@ -100,6 +105,8 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											:canaccesspackagedetails="true"
+											:isbusy="isbusy"
+											:canrefresh="false"
 											title="history-notified"
 											translationkey="deployment."
 										/>
@@ -111,6 +118,8 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											:canaccesspackagedetails="true"
+											:isbusy="isbusy"
+											:canrefresh="false"
 											title="history-success"
 											translationkey="deployment."
 										/>
@@ -122,6 +131,8 @@
 											:rowheader="rowheader"
 											:usecheckbox="false"
 											:canaccesspackagedetails="true"
+											:isbusy="isbusy"
+											:canrefresh="false"
 											title="history-error"
 											translationkey="deployment."
 										/>
@@ -137,19 +148,16 @@
 </template>
 
 <script>
-import axios from 'axios'
-import Counter from '@/components/Dashboard/Counter/Counter.vue'
-import PieChart from '@/components/Dashboard/Chart/Pie.vue'
-import BarChart from '@/components/Dashboard/Chart/Bar.vue'
-
 export default {
 	name: "Result",
-	components: { Counter, PieChart, BarChart },
 	props: {
 		id: { type: String, required: true }
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+
 			rowdata: [],
 			rowheader: [],
 			rowdatawaiting: [],
@@ -157,9 +165,6 @@ export default {
 			rowdatanotified: [],
 			rowdataerror: [],
 			count: [],
-			errormsg: null,
-			errored: false,
-			loading: true,
 			resultcount: {
 				options: {
 					labels: [],
@@ -187,119 +192,162 @@ export default {
 					data: []
 				}]
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		await this.getHeader()
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("deployment/results/")
+				this.rowheader = Object.keys(header.actions.POST)
 
-					this.errormsg = null
-					this.errored = false
-					this.getPackageResult()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				// Get package results
+				await this.getPackageResult()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getPackageResult() {
-			await axios.get(
-				this.$config.BACKEND_API_ROUTE+
-					"deployment/results/?package="+
-					this.id+
-					"&expand=asset,group",
-				{ headers: this.header }
+			try {
+				this.loading = true
+
+				this.resetPackageResultState()
+				this.resetPackageResultCharts()
+
+				const results = await this.fetchPackageResults()
+				this.rowdata = results
+
+				const stats = this.computePackageStats(results)
+				this.applyPackageStats(stats)
+
+				this.updateTopErrorChart(stats.topErrors)
+				this.updateResultCountChart(stats.count)
+				
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		resetPackageResultState() {
+			this.rowdata = []
+			this.rowdataerror = []
+			this.rowdatasuccess = []
+			this.rowdatanotified = []
+			this.rowdatawaiting = []
+			this.count = { error: 0, waiting: 0, notified: 0, success: 0 }
+		},
+
+		resetPackageResultCharts() {
+			this.toperroropt.options.xaxis.categories = []
+			this.toperroropt.series[0].data = []
+
+			this.resultcount.options.labels = []
+			this.resultcount.options.colors = []
+			this.resultcount.series = []
+		},
+
+		async fetchPackageResults() {
+			const data = await this.$api.generic.get(
+				"deployment/results/",
+				{},
+				{ package: this.id, expand: "asset,group" }
 			)
-				.then(response => {
-					this.rowdata = response.data
 
-					this.count.error = 0
-					this.count.waiting = 0
-					this.count.notified = 0
-					this.count.success = 0
+			return Array.isArray(data) ? data : (data?.results || [])
+		},
 
-					var tmpError = []
+		computePackageStats(results) {
+			const count = { error: 0, waiting: 0, notified: 0, success: 0 }
+			const buckets = {
+				error: [],
+				waiting: [],
+				notified: [],
+				success: [],
+			}
 
-					response.data.forEach(result => {
-						if(result.status == 3) {
-							this.count.error += 1
-							this.rowdataerror.push(result)
+			const errorCounts = new Map()
 
-							if(tmpError[result.comment]) {
-								tmpError[result.comment] += 1
-							} else {
-								tmpError[result.comment] = 1
-							}
-						} else if(result.status == 0) {
-							this.count.success += 1
-							this.rowdatasuccess.push(result)
-						} else if(result.status == 2) {
-							this.count.notified += 1
-							this.rowdatanotified.push(result)
-						} else {
-							this.count.waiting += 1
-							this.rowdatawaiting.push(result)
-						}
-					})
+			for (const r of results) {
+				if (r?.status === 3) {
+					count.error += 1
+					buckets.error.push(r)
 
-					var errorArray = []
+					const key = r?.comment || this.$t("generic.unknown")
+					errorCounts.set(key, (errorCounts.get(key) || 0) + 1)
+				} else if (r?.status === 0) {
+					count.success += 1
+					buckets.success.push(r)
+				} else if (r?.status === 2) {
+					count.notified += 1
+					buckets.notified.push(r)
+				} else {
+					count.waiting += 1
+					buckets.waiting.push(r)
+				}
+			}
 
-					Object.keys(tmpError).forEach(error => {
-						errorArray.push({
-							error: error,
-							value: tmpError[error]
-						})
-					})
+			const topErrors = Array.from(errorCounts.entries())
+				.map(([error, value]) => ({ error, value }))
+				.sort((a, b) => b.value - a.value)
+				.slice(0, 6)
 
-					errorArray.sort(function(a, b) {
-						return b.value - a.value;
-					});
+			return { count, buckets, topErrors }
+		},
 
-					var index = 0
+		applyPackageStats({ count, buckets }) {
+			this.count = count
+			this.rowdataerror = buckets.error
+			this.rowdatasuccess = buckets.success
+			this.rowdatanotified = buckets.notified
+			this.rowdatawaiting = buckets.waiting
+		},
 
-					errorArray.forEach(error => {
-						if(index <= 5) {
-							this.toperroropt.options.xaxis.categories.push(error.error)
-							this.toperroropt.series[0].data.push(error.value)
-						}
-						index += 1
-					})
+		updateTopErrorChart(topErrors) {
+			topErrors.forEach((e) => {
+				this.toperroropt.options.xaxis.categories.push(e.error)
+				this.toperroropt.series[0].data.push(e.value)
+			})
+		},
 
-					this.resultcount.options.labels.push(this.$t("deployment.waiting"))
-					this.resultcount.options.labels.push(this.$t("deployment.notified"))
-					this.resultcount.options.labels.push(this.$t("deployment.success"))
-					this.resultcount.options.labels.push(this.$t("deployment.error"))
+		updateResultCountChart(count) {
+			this.resultcount.options.labels.push(
+				this.$t("deployment.waiting"),
+				this.$t("deployment.notified"),
+				this.$t("deployment.success"),
+				this.$t("deployment.error")
+			)
 
-					this.resultcount.options.colors.push("#3B82F6")
-					this.resultcount.options.colors.push("#F97316")
-					this.resultcount.options.colors.push("#22C55E")
-					this.resultcount.options.colors.push("#EF4444")
+			this.resultcount.options.colors.push("#3B82F6", "#F97316", "#22C55E", "#EF4444")
 
-					this.resultcount.series.push(this.count.waiting)
-					this.resultcount.series.push(this.count.notified)
-					this.resultcount.series.push(this.count.success)
-					this.resultcount.series.push(this.count.error)
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		}
+			this.resultcount.series.push(
+				count.waiting,
+				count.notified,
+				count.success,
+				count.error
+			)
+		},
 	}
 }
 </script>

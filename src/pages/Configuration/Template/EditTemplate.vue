@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="edittemplate"
-			/>
+			<PageHeader page-title="edittemplate" />
 
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<b-row class="text-center">
 								<b-col cols="4" />
@@ -34,6 +32,7 @@
 										<h2 class="mb-0 mr-2">
 											{{ template.name }}
 										</h2>
+
 										<TemplateModal
 											:id="id"
 											:update="true"
@@ -90,6 +89,7 @@
 							<div v-else>
 								<Alert 
 									:message="$t('message.no_section')" 
+									:cols="true"
 									variant="info"
 								/>
 							</div>
@@ -102,8 +102,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'EditTemplate',
 	props: {
@@ -111,23 +109,22 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
-			template: [],
-			sections: [],
+
 			successmsg: null,
 			successed: false,
-			loading: true,
-			errored: false,
+
+			template: [],
+			sections: [],
 			routetype: "assets",
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			loading: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => this.successed = false, 5000)
 		}
 	},
 	beforeMount() {
@@ -141,37 +138,59 @@ export default {
 	},
 	methods: {
 		async getTemplate() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+this.id+"/?expand=*", { headers: this.header })
-				.then(response => {
-					this.template = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getSections() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/?template="+this.id,
-				{ headers: this.header })
-				.then(response => {
-					this.sections = response.data
-					this.sections.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {this.loading = false})
-		},
-		async reloadTemplate() {
 			this.loading = true
-			await this.getTemplate()
-			await this.getSections()
+
+			try {
+				const data = await this.$api.generic.get(
+					`templates/${this.id}/`,
+					{},
+					{ expand: "*" }
+				)
+
+				this.template = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
+		async getSections() {
+			try {
+				const data = await this.$api.generic.get(
+					"sections/",
+					{},
+					{ template: this.id }
+				)
+
+				const sections = Array.isArray(data) ? data : (data?.results || [])
+
+				this.sections = sections.sort((a, b) =>
+					(a?.name || "").localeCompare(b?.name || "")
+				)
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
+
+		async reloadTemplate() {
+			try {
+				await Promise.all([
+					this.getTemplate(),
+					this.getSections(),
+				])
+			} finally {
+				this.loading = false
+			}
+		},
+
 		formatDate(value, key) {
 			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created']
 			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
@@ -179,7 +198,7 @@ export default {
 				return new Date(value).toLocaleString(this.$i18n.locale)
 			}
 			return value
-		}
+		},
 	}
 }
 </script>

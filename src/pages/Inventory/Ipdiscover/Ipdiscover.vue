@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="ipdiscover"
-			/>
-			<!-- Display Collapse -->
+			<PageHeader page-title="ipdiscover" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<b-tabs
 								content-class="col-10"
@@ -49,6 +47,7 @@
 										:canedit="canedit"
 										:canaccesschild="true"
 										:hiddenfields="hiddenfields"
+										:isbusy="isbusy"
 										editcomponent="NetworkModal"
 										translationkey="network."
 										@reloadDatatable="reloadDatatable"
@@ -64,121 +63,146 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Ipdiscover",
 	data() {
 		return {
 			errormsg: null,
+			errored: false,
+
 			rowdata: [],
 			rowheader: [],
 			netgroups: [],
-			loading: true,
-			errored: false,
+			hiddenfields: ["id"],
+
 			canedit: false,
 			candelete: false,
 			canviewnetdevice: false,
-			hiddenfields: ["id"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("network_view_network")) {
-			if(localStorage.getItem('permissions').split(",").includes("network_change_network")) {
-				this.canedit = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("network_delete_network")) {
-				this.candelete = true
-			}
-			if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("network_view_network")) {
+			if (permissions.includes("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
-			await this.getHeader()
-			await this.getNetgroups()
-			await this.getNetworks()
-			this.loading = false
+			if (permissions.includes("network_change_network")) {
+				this.canedit = true
+			}
+			if (permissions.includes("network_delete_network")) {
+				this.candelete = true
+			}
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"networks", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "group") {
-							this.rowheader.push(field)
-						}
-					})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("networks/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["group"].includes(f)
+				)
 
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				// Get netgroups
+				await this.getNetgroups()
+				// Get networks
+				await this.getNetworks()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getNetgroups() {
+			this.loading = true
 			this.netgroups = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/", { headers: this.header })
-				.then(response => {
-					this.netgroups.push({
+
+			try {
+				const data = await this.$api.generic.get("netgroups/")
+				const netgroups = Array.isArray(data) ? data : (data?.results || [])
+
+				this.netgroups = [
+					{
 						id: 0,
 						name: this.$t("network.unknown_network"),
 						description: "",
-						networks: []
-					})
+						networks: [],
+					},
+					...netgroups.map((g) => ({
+						id: g.id,
+						name: g.name,
+						description: g.description,
+						networks: [],
+					})),
+				]
 
-					for (const netgroup of response.data) {
-						this.netgroups.push({
-							id: netgroup.id,
-							name: netgroup.name,
-							description: netgroup.description,
-							networks: []
-						})
-					}
-
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getNetworks() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
-				.then(response => {
-					for (const network of response.data) {
-						const group = this.netgroups.find(g => g.id === network.group)
-						network.netdevices = network.netdevices.length
-						if (group) {
-							group.networks.push(network)
-						} else {
-							this.netgroups[0].networks.push(network)
-						}
-					}
+			this.isbusy = true
 
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get("networks/")
+				const networks = Array.isArray(data) ? data : (data?.results || [])
+
+				for (const g of this.netgroups) {
+					g.networks = []
+				}
+
+				const byId = new Map(this.netgroups.map((g) => [g.id, g]))
+
+				for (const n of networks) {
+					const group = byId.get(n.group) || byId.get(0)
+
+					group.networks.push({
+						...n,
+						netdevices: Array.isArray(n?.netdevices) ? n.netdevices.length : n.netdevices,
+					})
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
 		},
+
 		async reloadDatatable() {
-			this.loading = true
-			await this.getNetgroups()
 			await this.getNetworks()
-			this.loading = false
-		}
+		},
 	}
 }
 </script>
