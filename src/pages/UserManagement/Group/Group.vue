@@ -85,6 +85,7 @@ export default {
 		if (permissions.includes("auth_view_group")) {
 			if (permissions.includes("auth_add_group")) {
 				this.canadd = true
+				this.duplicateitem = true
 			}
 			if (permissions.includes("auth_change_group")) {
 				this.canedit = true
