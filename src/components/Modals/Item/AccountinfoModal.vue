@@ -194,8 +194,7 @@ export default {
 			accountinfomodal: false,
 			datatargetoptions: [
 				{ value: 'ASSET', text: this.$t("title.assets") },
-				{ value: 'IPDISCOVER', text: this.$t("title.ipdiscover") },
-				{ value: 'SNMP', text: this.$t("title.snmp") }
+				{ value: 'IPDISCOVER', text: this.$t("title.ipdiscover") }
 			],
 			datatypeoptions: [
 				{ value: 'TEXT', text: 'TEXT' },
