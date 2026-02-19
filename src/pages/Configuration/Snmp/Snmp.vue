@@ -270,7 +270,6 @@ export default {
 			this.can.config.add = permissions.includes("config_add_config")
 			this.can.config.edit = permissions.includes("config_change_config")
 			this.can.config.delete = permissions.includes("config_delete_config")
-			
 		}
 
 		if (permissions.includes("snmp_config_view_snmpconfig")) {
