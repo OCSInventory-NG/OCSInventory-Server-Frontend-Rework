@@ -577,7 +577,7 @@
 			<b-col align="right">
 				<!-- Delete button -->
 				<DeleteItemModal
-					v-if="candelete && !selected.some(item => item.is_protected)"
+					v-if="candelete && !selected.some(item => item.is_protected) && deletemultiple"
 					:ids="selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
@@ -626,7 +626,7 @@ export default {
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
-		deletemultiple: { type: Boolean, default: false },
+		deletemultiple: { type: Boolean, default: true },
 		deleteids: { type: [Array, Object], default: () => [] },
 		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters

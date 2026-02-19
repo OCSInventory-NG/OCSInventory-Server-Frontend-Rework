@@ -183,6 +183,8 @@
 												:rowheader="rowscannerheader"
 												:canedit="can.scanner.edit"
 												:candelete="can.scanner.delete"
+												:deletemultiple="false"
+												:usecheckbox="false"
 												:hiddenfields="hiddenscannerfields"
 												:isbusy="isbusy.scanner"
 												editcomponent="SnmpScannerModal"
