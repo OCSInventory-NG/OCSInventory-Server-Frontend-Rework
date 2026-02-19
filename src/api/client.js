@@ -28,9 +28,8 @@ export function createApiClient(baseURLOrConfig) {
 		(res) => res,
 		async (err) => {
 			const status = err?.response?.status
-			const code = err?.code
 
-			if (status === 401 || code == "ERR_NETWORK") {
+			if (status === 401) {
 				// purge auth
 				localStorage.removeItem("token_authentication")
 				localStorage.removeItem("permissions")
