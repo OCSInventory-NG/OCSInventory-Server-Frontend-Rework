@@ -119,7 +119,6 @@
 							<b-form-input
 								id="email"
 								v-model="row.email"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -133,7 +132,6 @@
 							<b-form-input
 								id="first_name"
 								v-model="row.first_name"
-								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -145,7 +143,6 @@
 							<b-form-input
 								id="last_name"
 								v-model="row.last_name"
-								required
 							/>
 						</b-form-group>
 					</b-col>
