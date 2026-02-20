@@ -94,12 +94,18 @@
 									<v-select
 										id="field"
 										v-model="input.field" 
-										:options="fields" 
+										:options="fields"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
+									/>
+									<b-form-input
+										v-if="input.field && input.field.includes('metadata')"
+										v-model="input.metadata_field"
+										placeholder="Metadata field"
+										class="mb-3"
 									/>
 								</b-form-group>
 							</b-col>
@@ -206,6 +212,7 @@
 </template>
 
 <script>
+
 export default {
 	name: "RuleCriteria",
 	props: {
@@ -270,7 +277,8 @@ export default {
 						field: "id",
 						operator: "==",
 						value: null,
-						case_sensitive: false
+						case_sensitive: false,
+						metadata_field: null
 					}
 				]
 			],
@@ -316,6 +324,23 @@ export default {
 						})
 					}
 				})
+				const triggers = await this.$api.generic.get("automation/triggers/")
+				const triggerObj = triggers.find(t => t.trigger === this.trigger)
+
+				if (triggerObj?.context_fields) {
+					Object.keys(triggerObj.context_fields).forEach(parent => {
+						Object.keys(triggerObj.context_fields[parent]).forEach(child => {
+							const fullPath = `${parent}.${child}`
+
+							if (!this.fields.find(f => f.value === fullPath)) {
+								this.fields.push({
+									value: fullPath,
+									text: fullPath,
+								})
+							}
+						})
+					})	
+				}
 
 				this.errormsg = null
 				this.errored = false
@@ -338,10 +363,18 @@ export default {
 			Object.keys(this.logic || {}).forEach((key) => {
 				if (!this.links.includes(key)) {
 					if (key !== "case_sensitive") {
+						let fullVar = this.logic[key][0].var ?? this.logic[key][1].var
+						let metadata_field = null
+
+						if (fullVar && fullVar.includes(".metadata.")) {
+							metadata_field = fullVar.split(".metadata.")[1]
+							fullVar = fullVar.split(".metadata.")[0] + ".metadata"
+						}
 						this.datavalues = [
 							[
 								{
-									field: this.logic[key][0].var ?? this.logic[key][1].var,
+									field: fullVar,
+									metadata_field,
 									operator: key,
 									value: (this.logic[key][1] && this.logic[key][1].var)
 										? this.logic[key][0]
@@ -438,6 +471,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
+				metadata_field: null
 			})
 		},
 
@@ -454,6 +488,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
+				metadata_field: null
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -464,19 +499,23 @@ export default {
 		},
 
 		pushInLogicComplexe(object, key, logics) {
+			let fieldVar = logics[key].field
+			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
+			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
 				object.push({
-					[logics[key].operator]: [{ var: logics[key].field }],
+					[logics[key].operator]: [{ var: fieldVar }],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			} else if (logics[key].operator === "in") {
 				object.push({
-					[logics[key].operator]: [logics[key].value, { var: logics[key].field }],
+					[logics[key].operator]: [logics[key].value, { var: fieldVar }],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			} else {
 				object.push({
-					[logics[key].operator]: [{ var: logics[key].field }, logics[key].value],
+					[logics[key].operator]: [{ var: fieldVar }, logics[key].value],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			}
@@ -485,14 +524,18 @@ export default {
 		},
 
 		pushInLogicSimple(object, key, logics) {
+			let fieldVar = logics[key].field
+			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
+			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
-				object[logics[key].operator] = [{ var: logics[key].field }]
+				object[logics[key].operator] = [{ var: fieldVar }]
 				object.case_sensitive = logics[key].case_sensitive
 			} else if (logics[key].operator === "in") {
-				object[logics[key].operator] = [logics[key].value, { var: logics[key].field }]
+				object[logics[key].operator] = [logics[key].value, { var: fieldVar }]
 				object.case_sensitive = logics[key].case_sensitive
 			} else {
-				object[logics[key].operator] = [{ var: logics[key].field }, logics[key].value]
+				object[logics[key].operator] = [{ var: fieldVar }, logics[key].value]
 				object.case_sensitive = logics[key].case_sensitive
 			}
 
