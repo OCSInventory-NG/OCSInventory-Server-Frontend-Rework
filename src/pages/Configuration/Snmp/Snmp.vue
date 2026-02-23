@@ -183,7 +183,7 @@
 												:rowheader="rowscannerheader"
 												:canedit="can.scanner.edit"
 												:candelete="can.scanner.delete"
-												:deletemultiple="false"
+												:candeletemultiple="false"
 												:usecheckbox="false"
 												:hiddenfields="hiddenscannerfields"
 												:isbusy="isbusy.scanner"
