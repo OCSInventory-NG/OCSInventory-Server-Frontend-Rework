@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('rule.addrule') : $t('rule.editrule')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
