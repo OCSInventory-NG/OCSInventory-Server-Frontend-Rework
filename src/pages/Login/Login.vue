@@ -169,13 +169,8 @@ export default {
 					this.errored = true
 					this.errormsg = this.$t("message.error_no_permissions")
 				}
-<<<<<<< HEAD
-			})
-			.catch(e => {
-=======
 			} catch (e) {
 				this.errored = true
->>>>>>> dev
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 			}
 		},
