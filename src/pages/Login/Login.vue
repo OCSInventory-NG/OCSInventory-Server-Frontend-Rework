@@ -173,51 +173,7 @@ export default {
 			} catch (e) {
 				this.errored = true
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-<<<<<<< HEAD
-			})
-	},
-	methods: {
-		setSSOAuth() {
-			localStorage.setItem('auth_method', 'sso');
-		},
-		onSubmit(event) {
-			event.preventDefault()
-			this.loadingLogin = true
-			const loginOptions = { 
-				"username": this.username,
-				"password": this.password
 			}
-
-			const header = {
-				"Access-Control-Allow-Origin" : "*",
-				"Access-Control-Allow-Methods" : "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-				"Content-Type": "application/json;charset=utf-8"
-			}
-
-			axios.post(this.$config.BACKEND_API_ROUTE+"api-auth/token", loginOptions, { header })
-				.then(response => {
-					this.errored = false
-					this.errormsg = null
-					localStorage.setItem('token_authentication', response.data.token)
-					localStorage.setItem('authenticated', true)
-					localStorage.setItem('locale', this.$root.$i18n.locale)
-					localStorage.setItem('auth_method', 'local')
-					this.getPermissions()
-				})
-				.catch(e => {
-					this.errored = true
-					if(e.response.data.non_field_errors) {
-						this.errormsg = e.response.data.non_field_errors[0]
-					} else {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					}
-				})
-				.finally(() => {
-					this.loadingLogin = false
-				})
-=======
-			}
->>>>>>> dev
 		},
 	},
 }
