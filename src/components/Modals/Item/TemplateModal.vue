@@ -39,7 +39,6 @@
 			:title="(!update) ? $t('template.addtemplate') : $t('template.editname')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

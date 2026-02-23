@@ -39,7 +39,6 @@
 			:title="(!update) ? $t('template.addsection') : $t('template.editsection')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

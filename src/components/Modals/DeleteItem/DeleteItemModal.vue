@@ -19,7 +19,6 @@
 			hide-footer
 			modal-class="modal"
 			size="sm"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -141,6 +140,11 @@ export default {
 			loadingdelete: false,
 		}
 	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
+		}
+	},
 	watch: {
 		deletewithsuccess: function() {
 			setTimeout(() => {
@@ -150,11 +154,6 @@ export default {
 				this.$emit('reloadTemplate')
 				this.$emit('reloadDashboard')
 			}, 500)
-		}
-	},
-	computed: {
-		viewOnly() {
-			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
 		}
 	},
 	methods: {
