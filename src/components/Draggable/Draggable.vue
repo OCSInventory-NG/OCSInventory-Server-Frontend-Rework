@@ -42,12 +42,12 @@
 							v-for="theader in rowheader" 
 							:key="theader"
 						>
-						<span v-if="isSensitiveField(theader)">
-							*********
-						</span>
-						<span v-else>
-							{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
-						</span>
+							<span v-if="isSensitiveField(theader)">
+								*********
+							</span>
+							<span v-else>
+								{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
+							</span>
 						</td>
 						<td 
 							v-if="candelete || canedit"
