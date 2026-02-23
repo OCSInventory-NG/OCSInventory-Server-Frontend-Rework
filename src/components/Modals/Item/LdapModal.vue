@@ -168,6 +168,7 @@
 							name="enabled"
 							:value="true"
 							unchecked
+							inline
 						>
 							{{ $t('authentication.enabled') }}
 						</b-form-checkbox>

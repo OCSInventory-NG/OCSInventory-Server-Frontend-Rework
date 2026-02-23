@@ -165,6 +165,7 @@
 							:name="group.code"
 							:value="group.id"
 							unchecked
+							inline
 						>
 							{{ group.name }}
 						</b-form-checkbox>
@@ -188,6 +189,7 @@
 								name="is_superuser"
 								:value="true"
 								:unchecked-value="false"
+								inline
 							>
 								{{ $t('user.is_superuser') }}
 							</b-form-checkbox>
