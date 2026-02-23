@@ -79,9 +79,9 @@
 export default {
 	name: "Matrix",
 	props: {
-		rowtab: { type: Array, default: null },
-		rowlabel: { type: Array, default: null },
-		rowpermissions: { type: Array, default: null },
+		rowtab: { type: [Array, Object], default: () => [] },
+		rowlabel: { type: [Array, Object], default: () => [] },
+		rowpermissions: { type: [Array, Object], default: () => [] },
 		id: { type: Number, default: 0 }
 	},
 	data() {

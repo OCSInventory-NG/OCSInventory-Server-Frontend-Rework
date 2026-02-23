@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="rules"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="rules" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -33,6 +29,7 @@
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="rules-datatable"
 								:rowdata="rowdata"
@@ -40,6 +37,7 @@
 								:candelete="candelete"
 								:canedit="canedit"
 								:canviewruleaction="canviewaction"
+								:isbusy="isbusy"
 								editcomponent="RuleModal"
 								title="automation/rule"
 								translationkey="rule."
@@ -53,86 +51,107 @@
 	</div>
 </template>
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Rule",
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canview: false,
 			canviewaction: false,
+
 			rowdata: [],
 			rowheader: [],
-			loading: true,
-			errormsg: null,
-			errored: false,
+
 			excludefields: ["logic", "actions"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("rule_view_rule")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("rule_view_rule")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("rule_add_rule")) {
+			if (permissions.includes("rule_add_rule")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("rule_change_rule")) {
+			if (permissions.includes("rule_change_rule")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("rule_delete_rule")) {
+			if (permissions.includes("rule_delete_rule")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("rule_view_action")) {
+			if (permissions.includes("rule_view_action")) {
 				this.canviewaction = true
 			}
-			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(!this.excludefields.includes(field)) {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getRules()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getRules() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(element => {
-						element.trigger = this.$t("rule." + element.trigger)
-					})
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async reloadDatatable() {
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("automation/rule/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !this.excludefields.includes(f)
+				)
+
+				// Get rules
+				await this.getRules()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
+		},
+
+		async getRules() {
+			try {
+				this.isbusy = true
+
+				const data = await this.$api.generic.get("automation/rule/")
+				const rules = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = rules.map((rule) => ({
+					...rule,
+					trigger: this.$t("rule." + rule.trigger),
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error)
+					? e.response.data.error
+					: e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getRules()
 		}
 	}

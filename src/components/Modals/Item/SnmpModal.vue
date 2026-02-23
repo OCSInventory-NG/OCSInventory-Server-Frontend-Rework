@@ -36,8 +36,8 @@
 			v-model="snmpmodal"
 			:title="(!update) ? $t('network.addsnmpcommunity') : $t('network.editsnmpcommunity')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -267,8 +267,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SnmpModal",
 	props: {
@@ -277,6 +275,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				version: "2c",
@@ -289,15 +294,6 @@ export default {
 				timeout: 30,
 				subnets: null
 			},
-			errormsg: null,
-			errored: false,
-			successmsg: null,
-			successed: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			snmpmodal: false,
 			voptions: [
 				{value: "1", text: "1"},
@@ -320,10 +316,9 @@ export default {
 				{value: "DES", text: "DES"},
 				{value: "AES", text: "AES"},
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -353,6 +348,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.snmpmodal = true
 			this.row = {
@@ -365,72 +364,75 @@ export default {
 				priv_protocol: null,
 				retries: 1,
 				timeout: 30,
-				subnets: null
+				subnets: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getSnmpConfig(id)
 			}
 		},
+
 		async getSnmpConfig(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"snmp/config/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.row.subnets = this.row.subnets.join(",")
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`snmp/config/${id}/`)
+				this.row = data
+
+				const subnetsArr = Array.isArray(this.row.subnets) ? this.row.subnets : []
+				this.row.subnets = subnetsArr.join(",")
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.row.subnets != null && this.row.subnets.trim() != "") {
-				this.row.subnets = this.row.subnets.replace(/[^0-9./`,]+/g, "").split(",")
-			} else {
-				this.row.subnets = []
-			}
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"snmp/config/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"snmp/config/"+this.id+"/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
+			try {
+				const payload = { ...this.row }
+
+				if (payload.subnets != null && String(payload.subnets).trim() !== "") {
+					payload.subnets = String(payload.subnets)
+						.replace(/[^0-9./`,]+/g, "")
+						.split(",")
+						.map((s) => s.trim())
+						.filter((s) => s !== "")
+				} else {
+					payload.subnets = []
+				}
+
+				if (!this.update) {
+					await this.$api.generic.post("snmp/config/", payload)
+				} else {
+					await this.$api.generic.patch(`snmp/config/${this.id}/`, payload)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

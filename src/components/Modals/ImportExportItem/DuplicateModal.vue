@@ -17,8 +17,8 @@
 			:title="$t('generic.duplicate')"
 			hide-footer
 			size="md"
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -117,8 +117,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'DuplicateModal',
 	props: {
@@ -129,17 +127,16 @@ export default {
 		return {
 			errormsg: null,
 			errored: false,
-			loading: true,
-			duplicateitem: false,
-			loadingduplicate: false,
+
 			duplicatewithsuccess: false,
+			
+			duplicateitem: false,
 			duplicatename: null,
 			itemopt: [],
 			selected: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingduplicate: false,
 		}
 	},
 	watch: {
@@ -159,67 +156,74 @@ export default {
 			this.selected = null
 			this.duplicatename = null
 			this.errormsg = null
-			this.errored = false,
+			this.errored = false
+
 			await this.getItem()
 		},
+
 		async getItem() {
 			this.itemopt = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/", { headers: this.header })
-				.then(response => {
-					for (const item of response.data) {
-						if(!item.os || (item.os && item.os != "SNMP")) {
-							this.itemopt.push({
-								value: item.id,
-								text: item.name
-							})
-						}
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			this.loading = true
+
+			try {
+				const data = await this.$api.generic.get(`${this.route}/`)
+				const items = Array.isArray(data) ? data : (data?.results || [])
+
+				this.itemopt = items
+					.filter((item) => !item?.os || item.os !== "SNMP")
+					.map((item) => ({
+						value: item.id,
+						text: item.name,
+					}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingduplicate = true
+			this.duplicatewithsuccess = false
+			this.errormsg = null
+			this.errored = false
 
-			var item = {}
-			
-			await axios.get(this.$config.BACKEND_API_ROUTE+this.route+"/"+this.selected+"/?expand=*",
-				{ headers: this.header })
-				.then(response => {
-					item = response.data
-					item.name = this.duplicatename
-					if (item.is_protected) {
-						item.is_protected = false
-					}
-					this.errored = false
-					this.errormsg = null
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				if (!this.selected || !this.duplicatename) {
+					throw new Error("Sélection et nom de duplication requis.")
+				}
 
-			if(item) {
-				await axios.post(this.$config.BACKEND_API_ROUTE+this.route+"/", item, { headers: this.header })
-					.then(() => {
-						this.errored = false
-						this.errormsg = null
-						this.loadingduplicate = false
-						this.duplicatewithsuccess = true
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-						this.duplicatewithsuccess = false
-					})
+				const item = await this.$api.generic.get(
+					`${this.route}/${this.selected}/`,
+					{},
+					{ expand: "*" }
+				)
+
+				const payload = { ...(item || {}) }
+				payload.name = this.duplicatename
+
+				delete payload.id
+
+				if (payload.is_protected) payload.is_protected = false
+
+				await this.$api.generic.post(`${this.route}/`, payload)
+
+				this.duplicatewithsuccess = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+				this.duplicatewithsuccess = false
+			} finally {
+				this.loadingduplicate = false
 			}
-		}
+		},
 	}
 }
 </script>

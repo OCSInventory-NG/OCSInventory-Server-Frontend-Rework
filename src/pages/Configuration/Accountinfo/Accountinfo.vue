@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="accountinfo"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="accountinfo" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -33,6 +29,7 @@
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="accountinfodatatable"
 								:rowdata="rowdata"
@@ -40,6 +37,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:canaddvalue="canaddvalue"
+								:isbusy="isbusy"
 								editcomponent="AccountinfoModal"
 								title="accountinfo/config"
 								titlevalue="accountinfo_param"
@@ -57,94 +55,113 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Accountinfo",
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
+			rowdata: [],
+			rowheader: [],
+			config: [],
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canaddvalue: false,
 			canview: false,
-			rowdata: [],
-			rowheader: [],
-			config: [],
-			errored: false,
-			errormsg: null,
+
+			isbusy: true,
 			loading: true,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("accountinfo_view_accountinfoconfig")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("accountinfo_view_accountinfoconfig")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfoconfig")) {
+			if (permissions.includes("accountinfo_add_accountinfoconfig")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("accountinfo_change_accountinfoconfig")) {
+			if (permissions.includes("accountinfo_change_accountinfoconfig")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("accountinfo_delete_accountinfoconfig")) {
+			if (permissions.includes("accountinfo_delete_accountinfoconfig")) {
 				this.candelete = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("accountinfo_add_accountinfovalue")) {
+			if (permissions.includes("accountinfo_add_accountinfovalue")) {
 				this.canaddvalue = true
 			}
-			await this.getHeader()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"accountinfo/config", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getAccountinfoConfig()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("accountinfo/config/")
+				this.rowheader = Object.keys(header.actions.POST)
+
+				// Get accountinfo config
+				await this.getAccountinfoConfig()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getAccountinfoConfig() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/?expand=accountinfo_values",
-				{ headers: this.header })
-				.then(response => {
-					this.config = response.data
-					this.accountinfovaluesTreatment()
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		accountinfovaluesTreatment() {
-			Object.keys(this.config).forEach(key => {
-				var tmpValues = []
-				for (const accountvalue of this.config[key].accountinfo_values) {
-					tmpValues.push(accountvalue.value)
+			this.isbusy = true
+			try {
+				const params = {
+					expand: "accountinfo_values"
 				}
-				this.config[key].accountinfo_values = tmpValues.join('\n')
-			})
+
+				const data = await this.$api.generic.get("accountinfo/config/", {}, params)
+				this.config = data.results || data
+
+				this.accountinfovaluesTreatment()
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			}
+		},
+
+		accountinfovaluesTreatment() {
+			for (const key of Object.keys(this.config || {})) {
+				const values = Array.isArray(this.config[key]?.accountinfo_values)
+					? this.config[key].accountinfo_values
+					: []
+
+				this.config[key].accountinfo_values = values
+					.map(v => v?.value)
+					.filter(v => v !== null && v !== undefined && v !== "")
+					.join("\n")
+			}
 
 			this.rowdata = this.config
-			this.loading = false
+			this.isbusy = false
 		},
+
 		async reloadDatatable() {
-			this.loading = true
 			await this.getAccountinfoConfig()
 		}
 	}

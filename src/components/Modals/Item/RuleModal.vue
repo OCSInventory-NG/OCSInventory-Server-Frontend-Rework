@@ -36,8 +36,8 @@
 			v-model="rulemodal"
 			:title="(!update) ? $t('rule.addrule') : $t('rule.editrule')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -152,8 +152,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "RuleModal",
 	props: {
@@ -162,6 +160,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				description: null,
 				trigger: 'inventory_received',
@@ -169,23 +174,15 @@ export default {
 				logic: {},
 				actions: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			rulemodal: false,
 			options: [
 				{ value: 'inventory_received', text: this.$t('rule.inventory_received') },
 				{ value: 'user_login', text: this.$t('rule.user_login') },
 				{ value: 'netdevice_received', text: this.$t('rule.netdevice_received') }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -210,74 +207,75 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.rulemodal = true
 			this.row = {
 				description: null,
-				trigger: 'inventory_received',
+				trigger: "inventory_received",
 				enabled: false,
 				logic: {},
-				actions: []
+				actions: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getRules(id)
 			}
 		},
+
 		async getRules(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/rule/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`automation/rule/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"automation/rule/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				delete this.row.logic
-				delete this.row.actions
-				
-				axios.patch(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.row.id+"/", this.row,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
-		}
+
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("automation/rule/", this.row)
+				} else {
+					const { logic: _logic, actions: _actions, ...payload } = this.row
+
+					await this.$api.generic.patch(
+						`automation/rule/${this.row.id}/`,
+						payload
+					)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

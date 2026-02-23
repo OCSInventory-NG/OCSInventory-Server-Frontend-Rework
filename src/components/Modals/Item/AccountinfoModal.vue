@@ -36,8 +36,8 @@
 			v-model="accountinfomodal"
 			:title="(!update) ? $t('accountinfo.addaccountinfo') : $t('accountinfo.editaccountinfo')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -170,8 +170,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "AccountinfoModal",
 	props: {
@@ -180,24 +178,23 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				description: null,
 				datatype: 'TEXT',
 				datatarget: 'ASSET'
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			accountinfomodal: false,
 			datatargetoptions: [
 				{ value: 'ASSET', text: this.$t("title.assets") },
-				{ value: 'IPDISCOVER', text: this.$t("title.ipdiscover") },
-				{ value: 'SNMP', text: this.$t("title.snmp") }
+				{ value: 'IPDISCOVER', text: this.$t("title.ipdiscover") }
 			],
 			datatypeoptions: [
 				{ value: 'TEXT', text: 'TEXT' },
@@ -205,10 +202,9 @@ export default {
 				{ value: 'SELECT', text: 'SELECT' },
 				{ value: 'CHECKBOX', text: 'CHECKBOX' },
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -237,70 +233,62 @@ export default {
 			this.row = {
 				name: null,
 				description: null,
-				datatype: 'TEXT',
-				datatarget: 'ASSET'
+				datatype: "TEXT",
+				datatarget: "ASSET",
 			}
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getAccountinfo(id)
 			}
 		},
+
 		async getAccountinfo(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`accountinfo/config/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"accountinfo/config/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				var update = {
-					name: this.row.name,
-					description: this.row.description
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("accountinfo/config/", this.row)
+				} else {
+					const payload = {
+						name: this.row.name,
+						description: this.row.description,
+					}
+					await this.$api.generic.patch(`accountinfo/config/${this.row.id}/`, payload)
 				}
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"accountinfo/config/"+this.row.id+"/", update,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
-		}
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = e?.response?.data?.error || e?.message || String(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

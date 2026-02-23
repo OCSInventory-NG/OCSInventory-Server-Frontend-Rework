@@ -38,8 +38,8 @@
 			v-model="sectionmodal"
 			:title="(!update) ? $t('template.addsection') : $t('template.editsection')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -262,8 +262,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SectionModal",
 	props: {
@@ -276,6 +274,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				id: null,
 				name: null,
@@ -297,13 +302,6 @@ export default {
 				options: {}
 			},
 			routetypemut: "assets",
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			sectionmodal: false,
 			options : {},
 			methodoptions: [
@@ -340,10 +338,9 @@ export default {
 			selectedcategory: null,
 			oldcategory: null,
 			allcategories: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -358,7 +355,6 @@ export default {
 					retrieval_output: null,
 					target: null,
 					fields: [],
-					template: null,
 					options: {}
 				}
 				this.selectedcategory = null
@@ -386,147 +382,177 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		async loadData() {
 			this.loading = true
 			this.sectionmodal = true
-			this.row = {
-				id: null,
-				name: null,
-				retrieval_method: 'FILE',
-				retrieval_output: null,
-				target: null,
-				fields: [],
-				template: null,
-				options: {}
+
+			if (this.routetype != "snmp" && this.routetypemut != "snmp") {
+				this.row = {
+					id: null,
+					name: null,
+					retrieval_method: "FILE",
+					retrieval_output: null,
+					target: null,
+					template: this.template,
+					fields: [],
+					options: {},
+				}
+			} else {
+				this.row = {
+					id: null,
+					name: null,
+					retrieval_method: "SNMP_GET",
+					retrieval_output: "JSON",
+					target: "SNMP",
+					template: this.template,
+					fields: [],
+					options: {}
+				}
 			}
+
 			this.selectedcategory = null
 			this.oldcategory = null
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
+
+			this.options = {}
 
 			if (this.update && this.rowsectiondata) {
 				this.row = JSON.parse(JSON.stringify(this.rowsectiondata))
-				this.options = JSON.parse(JSON.stringify(this.row.options))
+				this.options = JSON.parse(JSON.stringify(this.row.options || {}))
 			}
 
 			await this.getCategories()
 		},
+
 		async getCategories() {
 			this.categories = []
 			this.allcategories = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
-				.then(response => {
-					for (const category of response.data) {
-						this.categories.push({
-							value: category.id,
-							text: category.name
-						})
-						if (category.inventory_sections.includes(this.row.id)) {
-							this.selectedcategory = category.id
-							this.oldcategory = category.id
-						}
-					}
-					this.allcategories = response.data
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
 
+			try {
+				const data = await this.$api.generic.get("categories/")
+
+				for (const category of data) {
+					this.categories.push({
+						value: category.id,
+						text: category.name,
+					})
+
+					if (Array.isArray(category.inventory_sections) && category.inventory_sections.includes(this.row.id)) {
+						this.selectedcategory = category.id
+						this.oldcategory = category.id
+					}
+				}
+
+				this.allcategories = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async updateCategories(category, remove = false) {
+			const current = Array.isArray(category.inventory_sections) ? category.inventory_sections : []
+
+			let next = []
 			if (remove) {
-				category.inventory_sections = category.inventory_sections.filter(
-					sectionId => sectionId !== this.row.id
-				)
+				next = current.filter((sectionId) => sectionId !== this.row.id)
 			} else {
-				category.inventory_sections.push(this.row.id)
+				next = current.includes(this.row.id) ? [...current] : [...current, this.row.id]
 			}
 
-			var json = {
-				inventory_sections: category.inventory_sections
+			const payload = {
+				inventory_sections: next,
 			}
 
-			await axios.patch(this.$config.BACKEND_API_ROUTE+"categories/"+category.id+"/", json,
-				{ headers: this.header })
-				.then(() => {
-					this.createerrormsg = null
-					this.createerror = false
-					if (!remove) {
-						this.createwithsuccess = true
-						this.loadingcreate = false
-					}
-				})
-				.catch(e => {
-					this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.createerror = true
-					this.createwithsuccess = false
-					this.loadingcreate = false
-				})
+			await this.$api.generic.patch(`categories/${category.id}/`, payload)
 		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.outputoptionoptions[this.row.retrieval_output] != undefined) {
-				this.row.options = {}
-				this.outputoptionoptions[this.row.retrieval_output].forEach(element => {
-					this.row.options[element.id] = (this.options[element.id] != undefined) ? 
-						this.options[element.id] : element.default
-				})
-			}
-			
-			if(!this.update) {
-				await axios.post(this.$config.BACKEND_API_ROUTE+"sections/", this.row, { headers: this.header })
-					.then((response) => {
-						this.row.id = response.data.id
-						if (this.selectedcategory) {
-							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
-							this.updateCategories(selectedCat)
-						} else {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-							this.loadingcreate = false
-						}
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-						this.loadingcreate = false
-					})
-			} else {
-				delete this.row.fields
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"sections/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						if (this.oldcategory && this.oldcategory != this.selectedcategory) {
-							var oldSelectedCat = this.allcategories.find(cat => cat.id === this.oldcategory)
-							this.updateCategories(oldSelectedCat, true)
-						}
+			try {
+				const payload = {
+					...this.row,
+					options: {},
+				}
 
-						if (this.selectedcategory && this.oldcategory != this.selectedcategory) {
-							var selectedCat = this.allcategories.find(cat => cat.id === this.selectedcategory)
-							this.updateCategories(selectedCat)
-						} else {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-							this.loadingcreate = false
+				if (this.outputoptionoptions[payload.retrieval_output] !== undefined) {
+					const currentOptions = this.options || {}
+
+					this.outputoptionoptions[payload.retrieval_output].forEach((element) => {
+						payload.options[element.id] =
+							currentOptions[element.id] !== undefined
+								? currentOptions[element.id]
+								: element.default
+					})
+				} else {
+					payload.options = payload.options || {}
+				}
+
+				if (!this.update) {
+					const created = await this.$api.generic.post("sections/", payload)
+
+					this.row.id = created.id
+
+					if (this.selectedcategory) {
+						const selectedCat = this.allcategories.find((cat) => cat.id === this.selectedcategory)
+						if (selectedCat) {
+							await this.updateCategories(selectedCat)
 						}
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-						this.loadingcreate = false
-					})
+					}
+
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
+				} else {
+					const { fields: _fields, ...payloadNoFields } = payload
+
+					await this.$api.generic.patch(`sections/${this.row.id}/`, payloadNoFields)
+
+					if (this.oldcategory && this.oldcategory !== this.selectedcategory) {
+						const oldSelectedCat = this.allcategories.find((cat) => cat.id === this.oldcategory)
+						if (oldSelectedCat) {
+							await this.updateCategories(oldSelectedCat, true)
+						}
+					}
+
+					if (this.selectedcategory && this.oldcategory !== this.selectedcategory) {
+						const selectedCat = this.allcategories.find((cat) => cat.id === this.selectedcategory)
+						if (selectedCat) {
+							await this.updateCategories(selectedCat, false)
+						}
+					}
+
+					this.createwithsuccess = true
+					this.createerrormsg = null
+					this.createerror = false
+				}
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

@@ -272,6 +272,20 @@
 					</template>
 				</template>
 
+				<!-- Network redirection -->
+				<template 
+					v-if="canaccesschild"
+					#cell(network)="row"
+				>
+					<a
+						href="#"
+						class="ocs-link"
+						@click.prevent="filterByNetwork(row.item.network_id)"
+					>
+						{{ row.item.network }}
+					</a>
+				</template>
+
 				<!-- Netdevice redirection -->
 				<template 
 					v-if="canaccesschild"
@@ -435,6 +449,9 @@
 				<template #cell(updated_at)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
+				<template #cell(last_seen)="row">
+					{{ row.item.last_update_formatted }}
+				</template>
 
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
@@ -560,7 +577,7 @@
 			<b-col align="right">
 				<!-- Delete button -->
 				<DeleteItemModal
-					v-if="candelete && !selected.some(item => item.is_protected)"
+					v-if="candelete && !selected.some(item => item.is_protected) && candeletemultiple"
 					:ids="selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
@@ -580,8 +597,8 @@ export default {
 	name: 'Datatable',
 	props: {
 		title: { type: String, default: '' },
-		rowdata: { type: Array, default: null },
-		rowheader: { type: Array, default: null },
+		rowdata: { type: [Array, Object], default: () => [] },
+		rowheader: { type: [Array, Object], default: () => [] },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
 		canrefresh: { type: Boolean, default: true },
@@ -610,17 +627,18 @@ export default {
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
-		deleteids: { type: Array, default: null },
+		deleteids: { type: [Array, Object], default: () => [] },
+		candeletemultiple: { type: Boolean, default: true },
 		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
 		sortby: { type: String, default: null },
 		sortdesc: { type: String, default: null },
 		templateid: { type: Number, default: 0 },
-		hiddenfields: { type: Array, default: null },
+		hiddenfields: { type: [Array, Object], default: () => [] },
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
-		assets: { type: Array, default: () => [] },
+		assets: { type: [Array, Object], default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
@@ -784,6 +802,9 @@ export default {
 		} else {
 			this.deleterte = this.title
 		}
+		if(this.title == "netdevice") {
+			this.deleterte = "netdevices"
+		}
 
 		if(this.usecheckbox == true) {
 			this.fields.push({
@@ -917,7 +938,7 @@ export default {
 		this.json_data = this.rowdata
 
 		this.rowdata.forEach(row => {
-			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date'];
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at'];
 			const dateValue = dateFields.find(field => row[field]);
 			if (dateValue) {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
@@ -960,7 +981,7 @@ export default {
 
 			setTimeout(() => {
 				this.isReloading = false;
-			}, 3000);
+			}, 1000);
 		},
 		getOrdering() {
 			if (!this.sortByLocal) return null
@@ -1115,12 +1136,16 @@ export default {
 		},
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
-				const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'date', 'updated_at'];
+				const dateFields = ['last_update', 'last_updated', 'timestamp', 
+					'date_created', 'date', 'updated_at','last_seen'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 				}
 			});
+		},
+		filterByNetwork(networkId) {
+			this.$emit('filter-by-network', networkId);
 		},
 	}
 }

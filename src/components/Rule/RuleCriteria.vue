@@ -1,26 +1,28 @@
 <template lang="">
 	<div id="rule-criteria">
-		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('message.success_saved')" 
+				:message="$t('message.success_saved')"
+				:cols="true"
 				variant="success"
 			/>
 		</section>
 
-		<!-- Display error box message -->
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errormsg.message" 
+				:message="errormsg.message"
+				:cols="true"
 				variant="danger"
 			/>
 		</section>
+
 		<div 
 			v-if="loading"
 			class="ocs-loader"
 		>
 			<Loader />
 		</div>
+
 		<b-form
 			v-else
 			@submit="onSubmit"
@@ -211,8 +213,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "RuleCriteria",
 	props: {
@@ -223,20 +223,16 @@ export default {
 	},
 	data() {
 		return {
-			loading: true,
 			errormsg: null,
 			errorCode: null,
 			errored: false,
+
 			successed: false,
 			successmsg: null,
+
 			logicupdate: {
 				logic: {}
 			},
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
-			loadingfield: true,
 			fields: [],
 			operators: [
 				{ value: "==", text: this.$t("rule.equal") },
@@ -287,125 +283,151 @@ export default {
 				]
 			],
 			links: [ "and", "or" ],
-			disabledvalue: ["!!", "!"]
+			disabledvalue: ["!!", "!"],
+
+			loading: true,
+			loadingfield: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(() => {
+				this.successed = false
+				this.$emit("reloadRule")
+			}, 5000)
 		}
 	},
 	async mounted() {
 		await this.getLogicRow()
 	},
 	methods: {
-		async getModelField() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+this.triggermodel[this.trigger].route, { headers: this.header })
-				.then(response => {
-					this.loadingfield = true
-
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "inventory_sections") {
-							this.fields.push({
-								value: field,
-								text: this.$t(this.triggermodel[this.trigger].key + field)
-							})
-						}
-					})
-
-					this.loadingfield = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => { this.loading = false })
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
 		},
+
+		async getModelField() {
+			this.loadingfield = true
+
+			try {
+				const route = this.triggermodel[this.trigger].route
+				const key = this.triggermodel[this.trigger].key
+
+				const data = await this.$api.generic.options(route)
+
+				this.fields = []
+
+				Object.keys(data.actions.POST).forEach((field) => {
+					if (!["inventory_sections", "matched"].includes(field)) {
+						this.fields.push({
+							value: field,
+							text: this.$t(key + field),
+						})
+					}
+				})
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loadingfield = false
+				this.loading = false
+			}
+		},
+
 		async getLogicRow() {
-			if(this.logic.lenth > 0) {
+			if (this.logic && Object.keys(this.logic).length > 0) {
 				this.datavalues = []
 			}
 
-			var masterindex = 0
+			let masterindex = 0
 
-			Object.keys(this.logic).forEach(key => {
-				if(!this.links.includes(key)) {
-					if(key != "case_sensitive") {
+			Object.keys(this.logic || {}).forEach((key) => {
+				if (!this.links.includes(key)) {
+					if (key !== "case_sensitive") {
 						this.datavalues = [
 							[
 								{
-									field: this.logic[key][0].var 
-										?? this.logic[key][1].var,
+									field: this.logic[key][0].var ?? this.logic[key][1].var,
 									operator: key,
-									value: (this.logic[key][1] && this.logic[key][1].var) ? 
-										this.logic[key][0] : ((this.logic[key][1]) ?
-											this.logic[key][1] : null),
-								}
-							]
+									value: (this.logic[key][1] && this.logic[key][1].var)
+										? this.logic[key][0]
+										: (this.logic[key][1] ? this.logic[key][1] : null),
+								},
+							],
 						]
 					} else {
-						this.datavalues[0][0]["case_sensitive"] = this.logic[key]
+						this.datavalues[0][0].case_sensitive = this.logic[key]
 					}
-				} else if(key == "and") {
+				} else if (key === "and") {
 					this.datavalues[masterindex] = []
-					Object.keys(this.logic[key]).forEach(and => {
-						Object.keys(this.logic[key][and]).forEach(operator => {
-							if(operator != "case_sensitive") {
+
+					Object.keys(this.logic[key]).forEach((and) => {
+						Object.keys(this.logic[key][and]).forEach((operator) => {
+							if (operator !== "case_sensitive") {
 								this.datavalues[masterindex].push({
 									field: this.logic[key][and][operator][0].var
 										?? this.logic[key][and][operator][1].var,
 									operator: operator,
-									value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var) ? 
-										this.logic[key][and][operator][0]  : ((this.logic[key][and][operator][1]) ?
-											this.logic[key][and][operator][1] : null)
+									value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var)
+										? this.logic[key][and][operator][0]
+										: (this.logic[key][and][operator][1]
+											? this.logic[key][and][operator][1]
+											: null),
 								})
 							} else {
-								this.datavalues[masterindex][this.datavalues[masterindex].length - 1]["case_sensitive"]
-									= this.logic[key][and][operator]
+								this.datavalues[masterindex][this.datavalues[masterindex].length - 1].case_sensitive =
+									this.logic[key][and][operator]
 							}
 						})
 					})
-				} else if(key == "or") {
-					Object.keys(this.logic[key]).forEach(or => {
+				} else if (key === "or") {
+					Object.keys(this.logic[key]).forEach((or) => {
 						this.datavalues[masterindex] = []
 
-						Object.keys(this.logic[key][or]).forEach(key2 => {
-							if(key2 == "and") {
-								Object.keys(this.logic[key][or][key2]).forEach(and => {
-									Object.keys(this.logic[key][or][key2][and]).forEach(operator => {
-										if(operator != "case_sensitive") {
+						Object.keys(this.logic[key][or]).forEach((key2) => {
+							if (key2 === "and") {
+								Object.keys(this.logic[key][or][key2]).forEach((and) => {
+									Object.keys(this.logic[key][or][key2][and]).forEach((operator) => {
+										if (operator !== "case_sensitive") {
 											this.datavalues[masterindex].push({
 												field: this.logic[key][or][key2][and][operator][0].var
 													?? this.logic[key][or][key2][and][operator][1].var,
 												operator: operator,
-												value: (this.logic[key][or][key2][and][operator][1] 
-												&& this.logic[key][or][key2][and][operator][1].var) ? 
-													this.logic[key][or][key2][and][operator][0]  : 
-													((this.logic[key][or][key2][and][operator][1]) ?
-														this.logic[key][or][key2][and][operator][1] : null)
+												value: (this.logic[key][or][key2][and][operator][1]
+													&& this.logic[key][or][key2][and][operator][1].var)
+													? this.logic[key][or][key2][and][operator][0]
+													: (this.logic[key][or][key2][and][operator][1]
+														? this.logic[key][or][key2][and][operator][1]
+														: null),
 											})
 										} else {
-											this.datavalues[masterindex][this.datavalues[masterindex].length - 1][
-												"case_sensitive"
-											] = this.logic[key][or][key2][and][operator]
+											this.datavalues[masterindex][
+												this.datavalues[masterindex].length - 1
+											].case_sensitive =
+												this.logic[key][or][key2][and][operator]
 										}
 									})
 								})
 							} else {
-								if(key2 != "case_sensitive") {
+								if (key2 !== "case_sensitive") {
 									this.datavalues[masterindex].push({
 										field: this.logic[key][or][key2][0].var
 											?? this.logic[key][or][key2][1].var,
 										operator: key2,
-										value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var) ? 
-											this.logic[key][or][key2][0] : ((this.logic[key][or][key2][1]) ?
-												this.logic[key][or][key2][1] : null)
+										value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var)
+											? this.logic[key][or][key2][0]
+											: (this.logic[key][or][key2][1]
+												? this.logic[key][or][key2][1]
+												: null),
 									})
 									masterindex++
 								} else {
-									this.datavalues[masterindex - 1][this.datavalues[masterindex - 1].length - 1][
-										"case_sensitive"
-									] = this.logic[key][or][key2]
+									this.datavalues[masterindex - 1][
+										this.datavalues[masterindex - 1].length - 1
+									].case_sensitive =
+										this.logic[key][or][key2]
 								}
 							}
 						})
@@ -417,145 +439,138 @@ export default {
 
 			await this.getModelField()
 		},
+
 		addAndCondition(masterindex, index, fieldType) {
-			fieldType[masterindex].push(
-				{
-					field: "id",
-					operator: "==",
-					value: null,
-					case_sensitive: false
-				}
-			)
+			fieldType[masterindex].push({
+				field: "id",
+				operator: "==",
+				value: null,
+				case_sensitive: false,
+			})
 		},
+
 		removeAndCondition(masterindex, index, fieldType) {
 			fieldType[masterindex].splice(index, 1)
 		},
+
 		addOrCondition(fieldType) {
-			var masterindex = fieldType.length
+			const masterindex = fieldType.length
 			fieldType[masterindex] = []
 
-			fieldType[masterindex].push(
-				{
-					field: "id",
-					operator: "==",
-					value: null,
-					case_sensitive: false
-				}
-			)
+			fieldType[masterindex].push({
+				field: "id",
+				operator: "==",
+				value: null,
+				case_sensitive: false,
+			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
 		},
+
 		removeOrCondition(masterindex, fieldType) {
 			fieldType.splice(masterindex, 1)
 		},
+
 		pushInLogicComplexe(object, key, logics) {
-			if(this.disabledvalue.includes(logics[key].operator)) {
+			if (this.disabledvalue.includes(logics[key].operator)) {
 				object.push({
-					[logics[key].operator]: [
-						{ var: logics[key].field }
-					],
-					case_sensitive: logics[key].case_sensitive
+					[logics[key].operator]: [{ var: logics[key].field }],
+					case_sensitive: logics[key].case_sensitive,
 				})
-			} else if(logics[key].operator == "in") {
+			} else if (logics[key].operator === "in") {
 				object.push({
-					[logics[key].operator]: [
-						logics[key].value,
-						{ var: logics[key].field }
-					],
-					case_sensitive: logics[key].case_sensitive
+					[logics[key].operator]: [logics[key].value, { var: logics[key].field }],
+					case_sensitive: logics[key].case_sensitive,
 				})
 			} else {
 				object.push({
-					[logics[key].operator]: [
-						{ var: logics[key].field },
-						logics[key].value
-					],
-					case_sensitive: logics[key].case_sensitive
+					[logics[key].operator]: [{ var: logics[key].field }, logics[key].value],
+					case_sensitive: logics[key].case_sensitive,
 				})
 			}
 
 			return object
 		},
+
 		pushInLogicSimple(object, key, logics) {
-			if(this.disabledvalue.includes(logics[key].operator)) {
-				object[logics[key].operator] = [
-					{ var: logics[key].field }
-				]
-				object["case_sensitive"] = logics[key].case_sensitive
-			} else if(logics[key].operator == "in") {
-				object[logics[key].operator] = [
-					logics[key].value,
-					{ var: logics[key].field }
-				]
-				object["case_sensitive"] = logics[key].case_sensitive
+			if (this.disabledvalue.includes(logics[key].operator)) {
+				object[logics[key].operator] = [{ var: logics[key].field }]
+				object.case_sensitive = logics[key].case_sensitive
+			} else if (logics[key].operator === "in") {
+				object[logics[key].operator] = [logics[key].value, { var: logics[key].field }]
+				object.case_sensitive = logics[key].case_sensitive
 			} else {
-				object[logics[key].operator] = [
-					{ var: logics[key].field },
-					logics[key].value
-				]
-				object["case_sensitive"] = logics[key].case_sensitive
+				object[logics[key].operator] = [{ var: logics[key].field }, logics[key].value]
+				object.case_sensitive = logics[key].case_sensitive
 			}
 
 			return object
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
-			var logicTmp = {}
-			var firstKey = null
 
-			if(this.datavalues.length > 1) {
-				logicTmp.or = []
-				firstKey = "or"
-			}
+			this.successmsg = null
+			this.successed = false
+			this.errormsg = null
+			this.errored = false
 
-			this.datavalues.forEach(logics => {
-				if(logics.length > 1) {
-					if(firstKey == null) {
-						logicTmp.and = []
-						firstKey = "and"
-					}
+			try {
+				let logicTmp = {}
+				let firstKey = null
 
-					var tmpAnd = {}
-					tmpAnd.and = []
-
-					Object.keys(logics).forEach(key => {
-						if(firstKey == "and") {
-							logicTmp.and = this.pushInLogicComplexe(logicTmp.and, key, logics)
-						} else {
-							tmpAnd.and = this.pushInLogicComplexe(tmpAnd.and, key, logics)
-						}
-					})
-					
-					if(tmpAnd.and.length > 0) {
-						logicTmp.or.push(tmpAnd)
-					}
-				} else if(firstKey == null) {
-					logicTmp = this.pushInLogicSimple(logicTmp, 0, logics)
-				} else {
-					Object.keys(logics).forEach(key => {
-						logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
-					})
+				if (this.datavalues.length > 1) {
+					logicTmp.or = []
+					firstKey = "or"
 				}
-			})
 
-			this.logicupdate.logic = logicTmp
+				this.datavalues.forEach((logics) => {
+					if (logics.length > 1) {
+						if (firstKey == null) {
+							logicTmp.and = []
+							firstKey = "and"
+						}
 
-			axios.patch(this.$config.BACKEND_API_ROUTE+"automation/rule/"+this.id+"/", this.logicupdate, 
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-					this.$emit('reloadRule')
+						const tmpAnd = { and: [] }
+
+						Object.keys(logics).forEach((key) => {
+							if (firstKey === "and") {
+								logicTmp.and = this.pushInLogicComplexe(logicTmp.and, key, logics)
+							} else {
+								tmpAnd.and = this.pushInLogicComplexe(tmpAnd.and, key, logics)
+							}
+						})
+
+						if (tmpAnd.and.length > 0) {
+							logicTmp.or.push(tmpAnd)
+						}
+					} else if (firstKey == null) {
+						logicTmp = this.pushInLogicSimple(logicTmp, 0, logics)
+					} else {
+						Object.keys(logics).forEach((key) => {
+							logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
+						})
+					}
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-		}
+
+				this.logicupdate.logic = logicTmp
+
+				await this.$api.generic.patch(
+					`automation/rule/${this.id}/`,
+					this.logicupdate
+				)
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
+			}
+		},
 	}
 }
 </script>

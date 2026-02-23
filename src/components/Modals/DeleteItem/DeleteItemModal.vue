@@ -17,9 +17,9 @@
 			v-model="deleteact"
 			:title="$t('generic.deleteitem')"
 			hide-footer
-			modal-class="modal modal-blur"
+			modal-class="modal"
 			size="sm"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -106,8 +106,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'DeleteItemModal',
 	props: {
@@ -125,23 +123,22 @@ export default {
 	},
 	data() {
 		return {
+			deleteerror: false,
+			deleteerrormsg: null,
+
+			deletewithsuccess: false,
+
 			row: {
 				id: null
 			},
 			rows: {
 				ids: []
 			},
-			loadingdelete: false,
-			deleteerror: false,
-			deleteerrormsg: null,
-			deletewithsuccess: false,
 			deleteact: false,
 			idModal: 'delete-item'+this.id,
 			text: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loadingdelete: false,
 		}
 	},
 	watch: {
@@ -168,68 +165,66 @@ export default {
 			this.deleteerror = false
 			this.deleteerrormsg = null
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingdelete = true
 
-			if (this.removefromgroup) {
-				this.groupProcess()
-			} else if (!this.multiple) {
-				axios.delete(this.$config.BACKEND_API_ROUTE+this.parameter+"/"+this.id+"/", { headers: this.header })
-					.then(() => {
-						this.deleteerrormsg = null
-						this.deleteerror = false
-						this.deletewithsuccess = true
-					})
-					.catch(e => {
-						this.deleteerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.deleteerror = true
-						this.deletewithsuccess = false
-					})
-					.finally(() => this.loadingdelete = false)
-			} else {
-				axios.post(this.$config.BACKEND_API_ROUTE+this.parameter+"/?delete=true", this.rows,
-					{ headers: this.header })
-					.then(() => {
-						this.deleteerrormsg = null
-						this.deleteerror = false
-						this.deletewithsuccess = true
-					})
-					.catch(e => {
-						this.deleteerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.deleteerror = true
-						this.deletewithsuccess = false
-					})
-					.finally(() => this.loadingdelete = false)
-			}
-		},
-		groupProcess() {
-			var assetList = []
+			try {
+				if (this.removefromgroup) {
+					await this.groupProcess()
+				} else if (!this.multiple) {
+					// DELETE /<parameter>/<id>/
+					await this.$api.generic.delete(`${this.parameter}/${this.id}/`)
 
-			for (const asset of this.assets) {
-				if (!this.ids.includes(asset.id) && asset.id != this.id) {
-					assetList.push(asset.id)
-				}
-			}
-
-			var json = {
-				assets: assetList
-			}
-
-			axios.patch(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.assetgroupid+"/", json,
-				{ headers: this.header })
-				.then(() => {
 					this.deleteerrormsg = null
 					this.deleteerror = false
 					this.deletewithsuccess = true
-				})
-				.catch(e => {
-					this.deleteerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.deleteerror = true
-					this.deletewithsuccess = false
-				})
-				.finally(() => this.loadingdelete = false)
-		}
+				} else {
+					// POST /<parameter>/?delete=true (bulk delete)
+					await this.$api.generic.post(
+						`${this.parameter}/`,
+						this.rows,
+						{ delete: true } // customParams
+					)
+
+					this.deleteerrormsg = null
+					this.deleteerror = false
+					this.deletewithsuccess = true
+				}
+			} catch (e) {
+				this.deleteerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.deleteerror = true
+				this.deletewithsuccess = false
+			} finally {
+				this.loadingdelete = false
+			}
+		},
+
+		async groupProcess() {
+			const assetList = (this.assets || [])
+				.filter(a => a && a.id != null)
+				.filter(a => !this.ids.includes(a.id) && a.id !== this.id)
+				.map(a => a.id)
+
+			const payload = { assets: assetList }
+
+			try {
+				await this.$api.generic.patch(
+					`asset/groups/${this.assetgroupid}/`,
+					payload
+				)
+
+				this.deleteerrormsg = null
+				this.deleteerror = false
+				this.deletewithsuccess = true
+			} catch (e) {
+				this.deleteerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.deleteerror = true
+				this.deletewithsuccess = false
+				throw e
+			}
+		},
 	}
 }
 </script>
