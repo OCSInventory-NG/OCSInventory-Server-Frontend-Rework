@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="software_mapping"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader page-title="software_mapping" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -33,12 +29,14 @@
 								v-if="canadd"
 								@reloadDatatable="reloadDatatable"
 							/>
+
 							<Datatable
 								id="software-mapping-datatable"
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								:isbusy="isbusy"
 								editcomponent="SoftwareMappingModal"
 								title="software_mapping"
 								translationkey="software."
@@ -53,116 +51,155 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SoftwareMapping",
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			canadd: false,
 			canedit: false,
 			candelete: false,
 			canview: false,
+
 			rowdata: [],
 			rowheader: [],
 			softwaremappingdata: [],
-			errored: false,
-			errormsg: null,
+
+			isbusy: true,
 			loading: true,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("software_view_softwaremapping")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("software_view_softwaremapping")) {
 			this.canview = true
-			if(localStorage.getItem('permissions').split(",").includes("software_add_softwaremapping")) {
+			if (permissions.includes("software_add_softwaremapping")) {
 				this.canadd = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("software_change_softwaremapping")) {
+			if (permissions.includes("software_change_softwaremapping")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("software_delete_softwaremapping")) {
+			if (permissions.includes("software_delete_softwaremapping")) {
 				this.candelete = true
 			}
-			await this.getHeader()
-			await this.getSoftwareMapping()
-			await this.getRowdata()
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"software_mapping/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+		async loadInitial() {
+			this.loading = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("software_mapping/")
+				this.rowheader = Object.keys(header.actions.POST)
+
+				// Get software mappings
+				await this.getSoftwareMapping()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getSoftwareMapping() {
+			this.isbusy = true
 			this.softwaremappingdata = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"software_mapping/", { headers: this.header })
-				.then(response => {
-					this.softwaremappingdata = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.loading = false
-				})
+
+			try {
+				const data = await this.$api.generic.get("software_mapping/")
+				this.softwaremappingdata = Array.isArray(data) ? data : (data?.results || [])
+
+				// Get row data
+				await this.getRowdata()
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getRowdata() {
 			this.rowdata = []
-			for (const softwareMapping of this.softwaremappingdata) {
-				this.rowdata.push({
-					id: softwareMapping.id,
-					template: await this.getTemplate(softwareMapping.template),
-					section: await this.getSection(softwareMapping.section),
-					name: await this.getFields(softwareMapping.name),
-					publisher: await this.getFields(softwareMapping.publisher),
-					version: await this.getFields(softwareMapping.version),
-					major_version: await this.getFields(softwareMapping.major_version),
-					minor_version: await this.getFields(softwareMapping.minor_version),
-					patch_version: await this.getFields(softwareMapping.patch_version)
-				})
+
+			this._tplCache = this._tplCache || new Map()
+			this._sectionCache = this._sectionCache || new Map()
+			this._fieldCache = this._fieldCache || new Map()
+
+			try {
+				const rows = await Promise.all(
+					(this.softwaremappingdata || []).map(async (sm) => ({
+						id: sm.id,
+						template: await this.getTemplateName(sm.template),
+						section: await this.getSectionName(sm.section),
+						name: await this.getFieldName(sm.name),
+						publisher: await this.getFieldName(sm.publisher),
+						version: await this.getFieldName(sm.version),
+						major_version: await this.getFieldName(sm.major_version),
+						minor_version: await this.getFieldName(sm.minor_version),
+						patch_version: await this.getFieldName(sm.patch_version),
+					}))
+				)
+
+				this.rowdata = rows
+			} finally {
+				this.isbusy = false
 			}
-			this.loading = false
 		},
-		async getTemplate(templateId) {
-			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"templates/"+templateId+"/",
-				{ headers: this.header })
-			return response.data.name
+
+		async getTemplateName(templateId) {
+			if (!templateId) return null
+			if (this._tplCache?.has(templateId)) return this._tplCache.get(templateId)
+
+			const data = await this.$api.generic.get(`templates/${templateId}/`)
+			const name = data?.name ?? null
+
+			this._tplCache.set(templateId, name)
+			return name
 		},
-		async getSection(sectionId) {
-			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+sectionId+"/",
-				{ headers: this.header })
-			return response.data.name
+
+		async getSectionName(sectionId) {
+			if (!sectionId) return null
+			if (this._sectionCache?.has(sectionId)) return this._sectionCache.get(sectionId)
+
+			const data = await this.$api.generic.get(`sections/${sectionId}/`)
+			const name = data?.name ?? null
+
+			this._sectionCache.set(sectionId, name)
+			return name
 		},
-		async getFields(fieldsId) {
-			if (fieldsId) {
-				const response = await axios.get(this.$config.BACKEND_API_ROUTE+"fields/"+fieldsId+"/",
-					{ headers: this.header })
-				return response.data.name
-			}
-			return null
+
+		async getFieldName(fieldId) {
+			if (!fieldId) return null
+			if (this._fieldCache?.has(fieldId)) return this._fieldCache.get(fieldId)
+
+			const data = await this.$api.generic.get(`fields/${fieldId}/`)
+			const name = data?.name ?? null
+
+			this._fieldCache.set(fieldId, name)
+			return name
 		},
+
 		async reloadDatatable() {
-			this.loading = true
 			await this.getSoftwareMapping()
-			await this.getRowdata()
 		}
 	}
 }

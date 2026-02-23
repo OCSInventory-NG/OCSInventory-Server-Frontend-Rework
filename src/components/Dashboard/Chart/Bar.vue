@@ -42,8 +42,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 	name: "BarChart",
 	props: {
@@ -52,10 +50,13 @@ export default {
 		edit: { type: Boolean, default: false },
 		i: { type: Number, default: 0 },
 		options: { type: Object, default: null },
-		series: { type: Array, default: null }
+		series: { type: [Array, Object], default: () => [] }
 	},
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
 			chartOptions: {
 				chart: {
 					height: 275,
@@ -85,9 +86,8 @@ export default {
 				]
 			},
 			chartSeries: [],
+
 			loaded: false,
-			errored: false,
-			errormsg: null
 		}
 	},
 	computed: {
@@ -101,10 +101,10 @@ export default {
 	async mounted() {
 		if (this.options && this.series) {
 			if (this.options.xaxis) {
-				this.chartOptions.xaxis = this.options.xaxis;
+				this.chartOptions.xaxis = this.options.xaxis
 			}
-			this.chartSeries = this.series;
-			this.loaded = true;
+			this.chartSeries = this.series
+			this.loaded = true
 			return
 		}
 
@@ -114,20 +114,20 @@ export default {
 		}
 
 		try {
-			const header = {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
-			const response = await axios.get(
-				`${this.$config.BACKEND_API_ROUTE}dashboard/chart/${this.chartName}/`,
-				{ headers: header }
+			const data = await this.$api.generic.get(
+				`dashboard/chart/${this.chartName}/`
 			)
-			this.chartSeries = response.data.series
-			this.chartOptions.xaxis = response.data.options.xaxis
-			this.loaded = true
-		} catch(e) {
+
+			this.chartSeries = data?.series || []
+			this.chartOptions.xaxis = data?.options?.xaxis || {}
+
+			this.errored = false
+			this.errormsg = null
+		} catch (e) {
 			this.errored = true
 			this.errormsg = e.response?.data?.error || e.message
+		} finally {
+			this.loaded = true
 		}
 	},
 	methods: {

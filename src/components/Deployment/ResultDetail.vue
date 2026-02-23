@@ -1,6 +1,5 @@
 <template>
 	<div id="ResultDetail">		
-		<!-- Error box message -->
 		<section v-if="errored">
 			<Alert 
 				:message="errormsg" 
@@ -8,7 +7,6 @@
 			/>
 		</section>
 
-		<!-- Accountinf form -->
 		<section v-else>
 			<div 
 				v-if="loading"
@@ -26,6 +24,7 @@
 					:usecheckbox="true"
 					:deletemultiple="(group) ? true : false"
 					:deleteids="rows"
+					:isbusy="isbusy"
 					title="deployment/results"
 					translationkey="deployment."
 					@reloadDatatable="reloadDatatable"
@@ -36,8 +35,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'ResultDetail',
 	props: {
@@ -48,19 +45,19 @@ export default {
 	},
 	data() {
 		return {
+			errored: false,
+			errormsg: null,
+
+			successmsg: null,
+			successed: false,
+
 			rowdata: [],
 			rowheader: [],
 			rows: [],
-			loading: true,
-			errormsg: null,
-			successmsg: null,
-			errored: false,
-			successed: false,
 			parameter: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	watch: {
@@ -71,138 +68,126 @@ export default {
 		}
 	},
 	async mounted() {
-		await this.getHeader()
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"deployment/results/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "package") {
-							if(this.id && field != "asset") {
-								this.rowheader.push(field)
-							}
-						}
-					})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("deployment/results/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["package"].includes(f)
+				)
 
-					if(this.group) {
-						this.rowheader.push("package")
-						this.rowheader.push("name")
-						this.rowheader.push("total")
-						this.rowheader.push("waiting")
-						this.rowheader.push("notified")
-						this.rowheader.push("success")
-						this.rowheader.push("error")
-					}
+				if (this.group) {
+					this.rowheader = []
+					this.rowheader.push(
+						"package",
+						"name",
+						"total",
+						"waiting",
+						"notified",
+						"success",
+						"error"
+					)
+				}
 
-					this.errormsg = null
-					this.errored = false
-					this.getResult()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				// Get results
+				await this.getResult()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getResult() {
+			this.isbusy = true
 			this.rowdata = []
-			if(this.group) {
-				this.parameter = "group=" + this.group
-			} else {
-				this.parameter = "asset=" + this.id
-			}
 
-			await axios.get(
-				this.$config.BACKEND_API_ROUTE+
-					"deployment/results/?"+
-					this.parameter+
-					"&expand=group",
-				{ headers: this.header }
-			)
-				.then(response => {
-					if(this.group) {
-						this.calculForGroup(response.data)
-					} else {
-						this.rowdata = response.data
-					}
-					this.rowdata.forEach( result => {
-						if(result.group != undefined) {
-							result.group = result.group.name
-						}
-					})
+			try {
+				const customParams = {
+					expand: "group",
+					...(this.group ? { group: this.group } : { asset: this.id }),
+				}
 
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.loading = false
-					this.$emit('endReloadDeployment')
-				})
-		},
-		calculForGroup(data) {
-			this.loading = true
-			var tmprow = []
-			this.rows = []
+				const data = await this.$api.generic.get(
+					"deployment/results/",
+					{},
+					customParams
+				)
 
-			for (const pkg of data) {
-				if(tmprow[pkg.package] == undefined) {
-					tmprow[pkg.package] = {}
-					tmprow[pkg.package].id = pkg.package
-					tmprow[pkg.package].package = pkg.package
-					tmprow[pkg.package].name = pkg.name
-					tmprow[pkg.package].total = 1
-					if(pkg.status == 3) {
-						tmprow[pkg.package].error = 1
-						tmprow[pkg.package].success = 0
-						tmprow[pkg.package].waiting = 0
-						tmprow[pkg.package].notified = 0
-					} else if (pkg.status == 0) {
-						tmprow[pkg.package].error = 0
-						tmprow[pkg.package].succes = 1
-						tmprow[pkg.package].waiting = 0
-						tmprow[pkg.package].notified = 0
-					} else if (pkg.status == 2) {
-						tmprow[pkg.package].error = 0
-						tmprow[pkg.package].succes = 0
-						tmprow[pkg.package].waiting = 0
-						tmprow[pkg.package].notified = 1
-					} else {
-						tmprow[pkg.package].error = 0
-						tmprow[pkg.package].success = 0
-						tmprow[pkg.package].waiting = 1
-						tmprow[pkg.package].notified = 0
-					}
-					this.rows[pkg.package] = []
-					this.rows[pkg.package].push(pkg.id)
+				const results = Array.isArray(data) ? data : (data?.results || [])
+
+				if (this.group) {
+					await this.calculForGroup(results)
 				} else {
-					tmprow[pkg.package].total += 1
-					if(pkg.status == 3) {
-						tmprow[pkg.package].error += 1
-					} else if (pkg.status == 0) {
-						tmprow[pkg.package].success += 1
-					} else if (pkg.status == 2) {
-						tmprow[pkg.package].notified += 1
-					} else {
-						tmprow[pkg.package].waiting += 1
-					}
-					this.rows[pkg.package].push(pkg.id)
+					this.rowdata = results
 				}
-			}
 
-			for (const result of tmprow) {
-				if(result !== undefined) {
-					this.rowdata.push(result)
-				}
-			}
+				this.rowdata = (this.rowdata || []).map((r) => ({
+					...r,
+					group: r?.group?.name ?? r.group,
+				}))
 
-			this.loading = false
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+				this.$emit("endReloadDeployment")
+			}
 		},
+
+		async calculForGroup(data) {
+			this.isbusy = true
+			this.rows = {}
+
+			const byPackage = new Map()
+
+			for (const pkg of data || []) {
+				const key = pkg.package
+
+				if (!byPackage.has(key)) {
+					byPackage.set(key, {
+						id: key,
+						package: key,
+						name: pkg.name,
+						total: 0,
+						waiting: 0,
+						notified: 0,
+						success: 0,
+						error: 0,
+					})
+					this.rows[key] = []
+				}
+
+				const agg = byPackage.get(key)
+				agg.total += 1
+
+				if (pkg.status === 3) agg.error += 1
+				else if (pkg.status === 0) agg.success += 1
+				else if (pkg.status === 2) agg.notified += 1
+				else agg.waiting += 1
+
+				this.rows[key].push(pkg.id)
+			}
+
+			this.rowdata = Array.from(byPackage.values())
+			this.isbusy = false
+		},
+
 		async reloadDatatable() {
-			this.loading = true
 			await this.getResult()
 		}
 	}

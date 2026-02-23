@@ -36,8 +36,8 @@
 			v-model="snmptemplatemodal"
 			:title="(!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -118,8 +118,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SnmpTemplateModal",
 	props: {
@@ -128,23 +126,22 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				os: 'SNMP',
 				sections: []
 			},
-			loading: true,
-			errormsg: null,
-			errored: false,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			snmptemplatemodal: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -167,43 +164,53 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData() {
 			this.snmptemplatemodal = true
 			this.row = {
 				name: null,
-				os: 'SNMP',
-				sections: []
+				os: "SNMP",
+				sections: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (this.update) {
 				this.loading = true
 			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"templates/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => {
-						this.loadingcreate = false
-					})
-			}			
-		}
+
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("templates/", this.row)
+				}
+
+				this.createwithsuccess = true
+				this.createerror = false
+				this.createerrormsg = null
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

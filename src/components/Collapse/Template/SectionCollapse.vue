@@ -111,6 +111,7 @@
 					<div v-else>
 						<Alert
 							:message="$t('message.no_field')"
+							:cols="true"
 							variant="info"
 						/>
 					</div>
@@ -121,8 +122,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'SectionCollapse',
 	props: {
@@ -131,18 +130,16 @@ export default {
 	},
 	data() {
 		return {
-			loading: true,
-			loadingsection: true,
 			errored: false,
 			errormsg: null,
+
 			rowheader: [],
 			rowdata: [],
 			rowsection: [],
 			selectedcategory: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			loading: true,
+			loadingsection: true,
 		}
 	},
 	async mounted() {
@@ -152,107 +149,130 @@ export default {
 		await this.getCategories()
 		this.loadingsection = false
 	},
+
 	methods: {
+		formatFieldOptions(field) {
+			const f = { ...field }
+
+			if (f.options && typeof f.options === "object" && !Array.isArray(f.options)) {
+				f.options = Object.entries(f.options)
+					.map(([k, v]) => `${k} : ${v}`)
+					.join("\n")
+					.trim()
+			} else if (f.options != null) {
+				f.options = String(f.options).trim()
+			} else {
+				f.options = ""
+			}
+
+			return f
+		},
+
 		async getHeader() {
 			this.rowheader = []
-			await axios.options(this.$config.BACKEND_API_ROUTE+"fields/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "section") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
+			try {
+				const data = await this.$api.generic.options("fields/")
+
+				Object.keys(data?.actions?.POST || {}).forEach((field) => {
+					if (field !== "section") this.rowheader.push(field)
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getFields() {
 			this.rowdata = []
-			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+this.rowsection.id,
-				{ headers: this.header })
-				.then(response => {
-					for (const field of response.data) {
-						var options = ""
-						if (field.options && typeof field.options === 'object') {
-							for (const [key, value] of Object.entries(field.options)) {
-								options += key + " : " + value + "\n"
-							}
-						} else if (field.options != null) {
-							options = field.options
-						}
-						field.options = options.trim()
-						this.rowdata.push(field)
-					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get(
+					"fields/",
+					{},
+					{ section: this.rowsection.id }
+				)
+
+				const fields = Array.isArray(data) ? data : (data?.results || [])
+				this.rowdata = fields.map((f) => this.formatFieldOptions(f))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getCategories() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"categories/", { headers: this.header })
-				.then(response => {
-					for (const category of response.data) {
-						if (category.inventory_sections.includes(this.rowsection.id)) {
-							this.selectedcategory = category.name
-						}
+			try {
+				const data = await this.$api.generic.get("categories/")
+				const categories = Array.isArray(data) ? data : (data?.results || [])
+
+				for (const category of categories) {
+					if ((category?.inventory_sections || []).includes(this.rowsection.id)) {
+						this.selectedcategory = category.name
+						break
 					}
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.loading = false
-					this.loadingsection = false
-				})
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.loadingsection = false
+			}
 		},
-		// If new section
+
 		async reloadTemplate() {
-			this.$emit('reloadTemplate')
+			this.$emit("reloadTemplate")
 		},
-		// If update section
+
 		async reloadSection() {
 			this.loadingsection = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"sections/"+this.rowsection.id+"/?expand=fields",
-				{ headers: this.header })
-				.then(response => {
-					this.rowsection = response.data
-					this.errormsg = null
-					this.errored = false
-					this.getCategories()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get(
+					`sections/${this.rowsection.id}/`,
+					{},
+					{ expand: "fields" }
+				)
+
+				this.rowsection = data
+				this.errormsg = null
+				this.errored = false
+
+				await this.getCategories()
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async reloadDatatable() {
 			this.loading = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"fields/?section="+this.rowsection.id,
-				{ headers: this.header })
-				.then(response => {
-					this.rowdata = response.data
-					for (const field of this.rowdata) {
-						var options = ""
-						for (const [key, value] of Object.entries(field.options)) {
-							options += key + " : " + value + "\n"
-						}
-						field.options = options.trim()
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {this.loading = false})
-		}
+			try {
+				const data = await this.$api.generic.get(
+					"fields/",
+					{},
+					{ section: this.rowsection.id }
+				)
+
+				const fields = Array.isArray(data) ? data : (data?.results || [])
+				this.rowdata = fields.map((f) => this.formatFieldOptions(f))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
+		},
 	}
 }
 </script>

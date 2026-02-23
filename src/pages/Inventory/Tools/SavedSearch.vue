@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="savedsearch"
-			/>
-			<!-- Display Collapse -->
+			<PageHeader page-title="savedsearch" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<Datatable
 								id="savedsearch-datatable"
@@ -34,6 +32,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:hiddenfields="hiddenfields"
+								:isbusy="isbusy"
 								title="search/save"
 								translationkey="search."
 								editcomponent="SaveSearchModal"
@@ -60,103 +59,125 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SavedSearch",
 	data() {
 		return {
-			rowdata: [],
-			rowheader: [],
-			canedit: false,
-			candelete: false,
-			loading: true,
 			errored: false,
 			errormsg: null,
+
+			canedit: false,
+			candelete: false,
+
+			rowdata: [],
+			rowheader: [],
 			user: null,
 			groups: [],
 			hiddenfields: ["allow_group_modification"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("search_change_search")) {
-			this.canedit = true
-		}
-		if(localStorage.getItem('permissions').split(",").includes("search_delete_search")) {
-			this.candelete = true
-		}
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
-		await this.getHeader()
+		if (!permissions.includes("search_view_search")) {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
+		}
+		this.canedit = permissions.includes("search_change_search")
+		this.candelete = permissions.includes("search_delete_search")
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "search" && field != "last_updated") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getSavedSearches()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("search/save/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["search", "last_updated"].includes(f)
+				)
+
+				// Get saved searches
+				await this.getSavedSearches()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getSavedSearches() {
 			this.rowdata = []
-			this.loading = true
-			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save?expand=user,groups", { headers: this.header })
-				.then(response => {
-					for (const search of response.data) {
-						delete search.last_updated
-						search.visibility = this.$t("search."+search.visibility)
-						search.allow_group_modification = this.$t("generic."+search.allow_group_modification)
-						search.user = (search.user.first_name != "") ?
-							search.user.last_name.concat(" ", search.user.first_name) :
-							search.user.username
-						var tmpGroup = ""
-						if (search.groups) {
-							for (const expand of search.groups) {
-								tmpGroup += expand.name + "\n"
-							}
-						}
-						search.groups = tmpGroup
-						this.rowdata.push(search)
-					}
+			this.isbusy = true
 
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
+			try {
+				const data = await this.$api.generic.get(
+					"search/save/",
+					{},
+					{ expand: "user,groups" }
+				)
+
+				const searches = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = searches.map((s) => {
+					const user = s?.user || {}
+					const fullName = (user.first_name && user.first_name !== "")
+						? `${user.last_name} ${user.first_name}`
+						: user.username
+
+					const groupsText = Array.isArray(s?.groups)
+						? s.groups.map((g) => g?.name).filter(Boolean).join("\n")
+						: ""
+
+					const { ...rest } = s
+
+					return {
+						...rest,
+						visibility: this.$t("search." + s.visibility),
+						allow_group_modification: this.$t("generic." + s.allow_group_modification),
+						user: fullName,
+						groups: groupsText,
+					}
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => { this.loading = false })
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
 		},
+
 		async executeSavedSearch(id) {
-			this.rowdata.forEach(search => {
-				if(id == search.id) {
-					localStorage.setItem('multisearch', JSON.stringify(search.search))
-					localStorage.setItem('useSavedSearch', true)
-				}
-			})
-			this.$router.push({
-				name: 'Multisearch',
-			});
+			const found = (this.rowdata || []).find((s) => s.id === id)
+			if (found) {
+				localStorage.setItem('multisearch', JSON.stringify(found.search))
+				localStorage.setItem('useSavedSearch', true)
+			}
+
+			this.$router.push({ name: 'Multisearch' })
 		},
+
 		async reloadDatatable() {
-			this.loading = true
 			await this.getSavedSearches()
-		}
+		},
 	}
 }
 </script>

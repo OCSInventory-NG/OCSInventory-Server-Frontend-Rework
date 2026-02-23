@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				:page-title="groupinfo.name"
-			/>
-			<!-- Display Datatable -->
+			<PageHeader :page-title="groupinfo.name" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<div v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -123,14 +119,7 @@
 									<b-tab
 										:title="$t('assetgroup.allassetsincache')"
 									>
-										<div 
-											v-if="loadingasset"
-											class="ocs-loader"
-										>
-											<Loader />
-										</div>
 										<Datatable
-											v-else
 											id="assetgroupdetail-datatable"
 											:rowdata="rowdata"
 											:canaccessdetails="true"
@@ -142,6 +131,7 @@
 											:assetgroupid="id"
 											:assets="rowdata"
 											:hiddenfields="hiddenfields"
+											:isbusy="isbusy"
 											title="asset"
 											translationkey="inventory."
 											@reloadDatatable="reloadDatatable()"
@@ -176,99 +166,114 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'AssetGroupDetail',
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
+
 			rowdata: [],
 			groupinfo: [],
 			rowheader: [],
-			loading: true,
-			loadingasset: false,
-			errored: false,
 			user: null,
 			groups: [],
 			assets: [],
-			canedit: false,
-			candelete: true,
 			reload: false,
 			id: null,
 			hiddenfields: ["id", "uuid", "template", "agent", "is_template_forced"],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			canedit: false,
+			candelete: true,
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
 		this.id = this.$route.params.id
-		await this.getHeader()
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/bases/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "matched") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getAssetGroup()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
+			try {
+				// Get header
+				const header = await this.$api.generic.options("asset/bases/")
+				this.rowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["matched"].includes(f)
+				)
+
+				// Get asset group
+				await this.getAssetGroup()
+
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getAssetGroup(reload = false) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"asset/groups/"+this.$route.params.id+"/?expand=assets,user,groups",
-				{ headers: this.header })
-				.then(response => {
-					this.rowdata = []
-					this.rowdata = response.data.assets
-					delete response.data.assets
+			this.isbusy = true
 
-					if (!reload) {
-						this.groupinfo = response.data
-						this.groupinfo.user = (this.groupinfo.user.first_name != "") ?
-							this.groupinfo.user.last_name.concat(" ", this.groupinfo.user.first_name) :
-							this.groupinfo.user.username
-						var tmpGroup = ""
-						if (response.data.groups) {
-							for (const expand of response.data.groups) {
-								tmpGroup += expand.name + "\n"
-							}
-						}
-						this.groupinfo.groups = tmpGroup
+			try {
+				const data = await this.$api.generic.get(
+					`asset/groups/${this.$route.params.id}/`,
+					{},
+					{ expand: "assets,user,groups" }
+				)
+
+				this.rowdata = Array.isArray(data?.assets) ? data.assets : []
+
+				if (!reload) {
+					const user = data?.user || {}
+					const fullName = (user.first_name && user.first_name !== "")
+						? `${user.last_name} ${user.first_name}`
+						: user.username
+
+					const groupsText = Array.isArray(data?.groups)
+						? data.groups.map((g) => g?.name).filter(Boolean).join("\n")
+						: ""
+
+					const { assets: _assets, ...groupinfo } = data
+
+					this.groupinfo = {
+						...groupinfo,
+						user: fullName,
+						groups: groupsText,
 					}
+				}
 
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.loading = false
-					this.loadingasset = false
-				})
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		reloadDeployment() {
 			this.reload = true
 		},
+
 		endReloadDeployment() {
 			this.reload = false
 		},
+
 		async reloadDatatable() {
-			this.loadingasset = true
 			await this.getAssetGroup(true)
 		},
+
 		formatDate(value, key) {
 			const dateFields = ['last_updated', 'created_at', 'updated_at']
 			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)

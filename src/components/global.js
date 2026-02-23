@@ -24,6 +24,15 @@ import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 import Draggable from '@/components/Draggable/Draggable.vue'
+import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
+import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
+import BarChart from '@/components/Dashboard/Chart/Bar.vue'
+import Counter from '@/components/Dashboard/Counter/Counter.vue'
+import PieChart from '@/components/Dashboard/Chart/Pie.vue'
+import LineChart from '@/components/Dashboard/Chart/Line.vue'
+import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
+import LdapModal from '@/components/Modals/Item/LdapModal.vue'
+import draggable from 'vuedraggable'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -53,6 +62,15 @@ const GlobalComponents = {
 		Vue.component('SnmpModal', SnmpModal)
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)
+		Vue.component('ExtensionModal', ExtensionModal)
+		Vue.component('ExtensionSlot', ExtensionSlot)
+		Vue.component('BarChart', BarChart)
+		Vue.component('Counter', Counter)
+		Vue.component('PieChart', PieChart)
+		Vue.component('LineChart', LineChart)
+		Vue.component('ActionListModal', ActionListModal)
+		Vue.component('LdapModal', LdapModal)
+		Vue.component('draggable', draggable)
 	}
 }
 

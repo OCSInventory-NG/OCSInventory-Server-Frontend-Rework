@@ -8,7 +8,7 @@
 				:title="$t('deployment.attrpkg')"
 				class="form-control btn datatable-btn"
 				@click="
-					(items.length > 0) ? getHeader() : emptyselection = !emptyselection,
+					(items.length > 0) ? loadInitial() : emptyselection = !emptyselection,
 					loadData()
 				"
 			>
@@ -22,9 +22,9 @@
 			v-model="packageresultmodal"
 			:title="$t('deployment.attrpkg')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="xl"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -78,6 +78,8 @@
 						:canexport="false"
 						:canshowhide="false"
 						:rowheader="rowheader"
+						:isbusy="isbusy"
+						:canrefresh="false"
 						title="deployment"
 						translationkey="deployment."
 						@attributePackage="attributePackage"
@@ -106,9 +108,9 @@
 			v-model="emptyselection"
 			:title="$t('deployment.attrpkg')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="lg"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -136,30 +138,28 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "PackageResultModal",
 	props: {
-		items: { type: Array, default: null },
+		items: { type: [Array, Object], default: () => [] },
 		group: { type: String, default: null }
 	},
 	data() {
 		return {
-			emptyselection: false,
-			packageresultmodal: false,
 			errored: false,
 			errormsg: null,
+
+			successed: false,
+
+			emptyselection: false,
+			packageresultmodal: false,
 			rowheader: [],
 			rowdata: [],
-			loading: true,
 			selectedPkg: [],
+			
+			isbusy: true,
+			loading: true,
 			loadingcreate: false,
-			successed: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
 		}
 	},
 	watch: {
@@ -171,88 +171,108 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData() {
 			this.errormsg = null
 			this.errored = false
 		},
-		getHeader() {
+
+		async loadInitial() {
 			this.loading = true
+			this.isbusy = true,
 			this.packageresultmodal = true
-			axios.options(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						if(field != "result") {
-							this.rowheader.push(field)
-						}
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getPackages()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})	
+
+			try {
+				const header = await this.$api.generic.options("deployment/packages/")
+				this.rowheader = Object.keys(header.actions.POST).filter((f) => f !== "result")
+
+				this.errormsg = null
+				this.errored = false
+
+				await this.getPackages()
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
+			}
 		},
+
 		async getPackages() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/packages/", { headers: this.header })
-				.then(response => {
-					response.data.forEach(packages => {
-						delete packages.result
-						packages.actions_list = packages.actions_list.length
-					})
-					this.rowdata = response.data
-					this.errormsg = null
-					this.errored = false
+			this.isbusy = true
+
+			try {
+				const data = await this.$api.generic.get("deployment/packages/")
+
+				this.rowdata = (data || []).map((pkg) => {
+					const { result: _result, ...rest } = pkg
+					return {
+						...rest,
+						actions_list: Array.isArray(rest.actions_list) ? rest.actions_list.length : 0,
+					}
 				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
 		},
+
 		attributePackage(selectedItems) {
 			this.selectedPkg = selectedItems
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			var row = []
+			this.successed = false
+			this.errored = false
+			this.errormsg = null
 
-			for (const asset of this.items) {
-				for (const pkg of this.selectedPkg) {
-					var tmp = {
-						package: pkg.id,
-						asset: asset.id,
-						name: pkg.name,
-						status: 1,
-						comment: "Waiting notification",
-						group: parseInt(this.group)
+			try {
+				const row = []
+
+				for (const asset of this.items) {
+					for (const pkg of this.selectedPkg) {
+						row.push({
+							package: pkg.id,
+							asset: asset.id,
+							name: pkg.name,
+							status: 1,
+							comment: "Waiting notification",
+							group: parseInt(this.group, 10),
+						})
 					}
-
-					row.push(tmp)
 				}
-			}
 
-			if(row.length > 0) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/results/", row, { headers: this.header })
-					.then(() => {
-						this.successed = true
-						this.errored = null
-						this.errormsg = false
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-						this.successed = false
-					})
-					.finally(() => {
-						this.loadingcreate = false
-						this.$emit('reloadDeployment')
-					})
+				if (!row.length) {
+					this.successed = true
+					return
+				}
+
+				await this.$api.generic.post("deployment/results/", row)
+
+				this.successed = true
+				this.errored = false
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.successed = false
+			} finally {
+				this.loadingcreate = false
+				this.$emit("reloadDeployment")
 			}
-		}
+		},
 	}
 }
 </script>

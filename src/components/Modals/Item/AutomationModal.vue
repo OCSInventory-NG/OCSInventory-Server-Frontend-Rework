@@ -36,8 +36,8 @@
 			v-model="automationmodal"
 			:title="(!update) ? $t('scheduler.addscheduler') : $t('scheduler.editscheduler')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -221,8 +221,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "AutomationModal",
 	props: {
@@ -231,6 +229,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				description: null,
@@ -240,13 +245,6 @@ export default {
 				day_of_week: null,
 				day_of_month: null
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			automationmodal: false,
 			recurrences: [
 				{ value: 'hourly', text: this.$t('scheduler.hourly') },
@@ -263,10 +261,9 @@ export default {
 				{ value: 5, text: this.$t('scheduler.saturday') },
 				{ value: 6, text: this.$t('scheduler.sunday') }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -293,6 +290,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.automationmodal = true
 			this.row = {
@@ -302,69 +303,67 @@ export default {
 				recurrence: "daily",
 				hour: null,
 				day_of_week: null,
-				day_of_month: null
+				day_of_month: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getScheduler(id)
 			}
 		},
+
 		async getScheduler(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`automation/scheduler/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		cleanRow() {
 			this.row.hour = null
 			this.row.day_of_week = null
 			this.row.day_of_month = null
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"automation/scheduler/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"automation/scheduler/"+this.row.id+"/",
-					this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}		
-		}
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("automation/scheduler/", this.row)
+				} else {
+					await this.$api.generic.patch(
+						`automation/scheduler/${this.row.id}/`,
+						this.row
+					)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

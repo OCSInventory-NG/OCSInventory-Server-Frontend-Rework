@@ -1,13 +1,10 @@
 <template>
 	<div class="container-xl">
-		<PageHeader 
-			page-title="dashboard"
-		/>
+		<PageHeader page-title="dashboard" />
 		
 		<div class="page-body">
 			<div class="card">
 				<div class="card-body">
-					<!-- Error box message -->
 					<section v-if="errored">
 						<Alert 
 							:message="errormsg"
@@ -305,12 +302,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-import BarChart from '@/components/Dashboard/Chart/Bar.vue'
-import Counter from '@/components/Dashboard/Counter/Counter.vue'
-import PieChart from '@/components/Dashboard/Chart/Pie.vue'
-import LineChart from '@/components/Dashboard/Chart/Line.vue'
-
 const createEmptyLayout = () => ({
 	visibility: "public",
 	user: null,
@@ -322,23 +313,21 @@ const createEmptyLayout = () => ({
 
 export default {
 	name: "Dashboard",
-	components: { 
-		BarChart,
-		Counter,
-		PieChart,
-		LineChart,
-	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+
+			savewithsuccess: false,
+			saveerror: false,
+
 			canedit: false,
 			canadd: false,
 			candelete: false,
+
 			chartsVisible: false,
 			draggable: true,
 			resizable: true,
-			errormsg: null,
-			loading: true,
-			errored: false,
 			emptylayout: createEmptyLayout(),
 			layouts: [
 				{
@@ -349,23 +338,19 @@ export default {
 			activeLayout: 0,
 			optlayouts: [],
 			optcharts: [],
-			loadingsave: false,
-			savewithsuccess: false,
-			saveerror: false,
 			userid: null,
 			groupids: [],
 			groups: [],
 			addchartid: null,
-			loadingchart: false,
 			optvisibility: [
 				{ value: "public", text: this.$t("search.public") },
 				{ value: "private_personal", text: this.$t("search.private_personal") },
 				{ value: "private_group", text: this.$t("search.private_group") }
 			],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			loadingsave: false,
+			loading: true,
+			loadingchart: false,
 		}
 	},
 	watch: {
@@ -381,28 +366,36 @@ export default {
 	},
 	async beforeMount() {
 		const storedActiveLayout = localStorage.getItem('active_layout')
-		if (storedActiveLayout) {
-			this.activeLayout = parseInt(storedActiveLayout)
-		}
+		this.activeLayout = storedActiveLayout ? parseInt(storedActiveLayout, 10) : 0
+
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		if(permissions.includes("layout_add_dashboardlayout")) {
-			this.canadd = true
-		}
-		if(permissions.includes("layout_change_dashboardlayout")) {
-			this.canedit = true
-		}
-		if(permissions.includes("layout_delete_dashboardlayout")) {
-			this.candelete = true
-		}
+
+		this.canadd = permissions.includes("layout_add_dashboardlayout")
+		this.canedit = permissions.includes("layout_change_dashboardlayout")
+		this.candelete = permissions.includes("layout_delete_dashboardlayout")
+
+		this.loading = true
+		this.errored = false
+		this.errormsg = null
 
 		await this.getUserAccount()
-		await this.getGroups()
-		await this.getChartsList()
-		await this.getLayouts()
+
+		if (this.errored) {
+			this.loading = false
+			return
+		}
+
+		await Promise.all([
+			this.getGroups(),
+			this.getChartsList(),
+			this.getLayouts(),
+		])
+
 		if (!this.errored) {
 			this.loading = false
 		}
+
 		setTimeout(() => {
 			this.chartsVisible = true
 		}, 10)
@@ -410,176 +403,174 @@ export default {
 	methods: {
 		async getChartsList() {
 			this.optcharts = []
+			try {
+				const data = await this.$api.generic.get("dashboard/chart/")
+				const charts = Array.isArray(data) ? data : (data?.results || [])
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/chart/", { headers: this.header })
-				.then(response => {
-					for (const chart of response.data) {
-						this.optcharts.push({
-							value: chart.name + ";" + chart.charttype,
-							text: this.$t('dashboard.' + chart.description)
-						})
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+				this.optcharts = charts.map((chart) => ({
+					value: `${chart.name};${chart.charttype}`,
+					text: this.$t('dashboard.' + chart.description),
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getUserAccount() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
-				.then(response => {
-					this.userid = response.data.id
-					this.groupids = response.data.groups
-					this.ensureEmptyLayoutInitialized()
-					if (this.emptylayout.user === null || this.emptylayout.user === undefined) {
-						this.emptylayout.user = this.userid
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get("myaccount/")
+				this.userid = data?.id
+				this.groupids = data?.groups || []
+
+				this.ensureEmptyLayoutInitialized()
+				if (this.emptylayout.user === null || this.emptylayout.user === undefined) {
+					this.emptylayout.user = this.userid
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getGroups() {
 			this.groups = []
-			if (!Array.isArray(this.groupids) || !this.groupids.length) {
-				return
-			}
-			const requests = this.groupids.map(group =>
-				axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
-			)
-			const results = await Promise.allSettled(requests)
 
-			results.forEach(result => {
-				if (result.status === "fulfilled") {
-					const response = result.value
-					this.groups.push({
-						value: response.data.id,
-						text: response.data.name
-					})
+			if (!Array.isArray(this.groupids) || !this.groupids.length) return
+
+			try {
+				const results = await Promise.allSettled(
+					this.groupids.map((id) => this.$api.generic.get(`groups/${id}/`))
+				)
+
+				results.forEach((r) => {
+					if (r.status === "fulfilled") {
+						const g = r.value
+						this.groups.push({ value: g.id, text: g.name })
+					} else {
+						const e = r.reason
+						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+						this.errored = true
+					}
+				})
+
+				this.groups.sort((a, b) => (a.text || "").localeCompare(b.text || ""))
+
+				if (!this.errored) {
 					this.errormsg = null
 					this.errored = false
-				} else {
-					const e = result.reason
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
 				}
-			})
-
-			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async getLayouts() {
 			this.layouts = []
-			const response = await axios.get(this.$config.BACKEND_API_ROUTE+"dashboard/layout/", { headers: this.header })
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get("dashboard/layout/")
+				const layouts = Array.isArray(data) ? data : (data?.results || [])
 
-			if(
-				response
-				&& response.status == 200
-			) {
-				if(response.data.length) {
-					for (const layouts of response.data) {
-						if (
-							layouts.visibility == "public"
-							|| layouts.user == this.userid
-							|| (
-								layouts.visibility == "private_group"
-								&& this.hasGroupAccess(layouts.groups)
-							)
-						) {
-							this.layouts.push(layouts)
-						}
-						this.optlayouts = this.layouts.map((layout, index) => ({
-							value: index,
-							text: layout.name
-						}));
-					}
-				}
+				this.layouts = layouts.filter((l) =>
+					l.visibility === "public"
+					|| l.user === this.userid
+					|| (l.visibility === "private_group" && this.hasGroupAccess(l.groups))
+				)
+
+				this.optlayouts = this.layouts.map((layout, index) => ({
+					value: index,
+					text: layout.name,
+				}))
 
 				if (!this.layouts.length) {
-					this.layouts = [
-						{
-							layout: []
-						}
-					]
+					this.layouts = [{ layout: [] }]
 				} else {
-					if (!this.layouts[this.activeLayout]) {
-						this.activeLayout = 0
-					}
+					if (!this.layouts[this.activeLayout]) this.activeLayout = 0
 					this.syncEmptyLayoutFromActive()
 				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
 			}
 		},
-		saveDashboard() {
+
+		async saveDashboard() {
 			this.loadingsave = true
-			var layoutId = this.layouts[this.activeLayout].id
+			try {
+				const layoutId = this.layouts?.[this.activeLayout]?.id
+				if (!layoutId) throw new Error("No active layout id")
 
-			this.emptylayout.layout = this.layouts[this.activeLayout].layout
+				this.emptylayout.layout = this.layouts[this.activeLayout].layout
 
-			axios.patch(this.$config.BACKEND_API_ROUTE+"dashboard/layout/"+layoutId+"/", this.emptylayout,
-				{ headers: this.header })
-				.then(() => {
-					this.savewithsuccess = true
-					this.saveerror = false
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.savewithsuccess = false
-					this.saveerror = true
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loadingsave = false)
+				await this.$api.generic.patch(`dashboard/layout/${layoutId}/`, this.emptylayout)
+
+				this.savewithsuccess = true
+				this.saveerror = false
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.savewithsuccess = false
+				this.saveerror = true
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loadingsave = false
+			}
 		},
-		addDashboard() {
+
+		async addDashboard() {
 			this.loadingsave = true
+			try {
+				this.emptylayout.layout = this.layouts[this.activeLayout].layout
 
-			this.emptylayout.layout = this.layouts[this.activeLayout].layout
-			delete this.emptylayout.id
+				const { id: _id, ...payload } = this.emptylayout
 
-			axios.post(this.$config.BACKEND_API_ROUTE+"dashboard/layout/", this.emptylayout,
-				{ headers: this.header })
-				.then(() => {
-					this.savewithsuccess = true
-					this.saveerror = false
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.savewithsuccess = false
-					this.saveerror = true
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.loadingsave = false
-					this.reloadDashboard()
-				})
+				await this.$api.generic.post("dashboard/layout/", payload)
+
+				this.savewithsuccess = true
+				this.saveerror = false
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.savewithsuccess = false
+				this.saveerror = true
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.loadingsave = false
+				this.reloadDashboard()
+			}
 		},
+
 		onActiveLayoutChanged() {
 			this.loadingchart = true
 			localStorage.setItem('active_layout', this.activeLayout)
 			this.syncEmptyLayoutFromActive()
 			this.loadingchart = false
 		},
+
 		async reloadDashboard() {
 			this.loading = true
 			this.edit = false
-			await this.getLayouts()
-			if (!this.errored) {
-				this.loading = false
+			try {
+				await this.getLayouts()
+			} finally {
+				if (!this.errored) this.loading = false
 			}
 		},
+
 		removeItem(i) {
-			var index = this.layouts[this.activeLayout].layout.findIndex(item => item.i === i)
+			let index = this.layouts[this.activeLayout].layout.findIndex(item => item.i === i)
 
 			if (index > -1) {
 				this.layouts[this.activeLayout].layout.splice(index, 1)
@@ -591,54 +582,31 @@ export default {
 				}
 			}
 		},
-		async addItem() {
-			if (!this.addchartid) {
-				return
-			}
-			var chartInfo = this.addchartid.split(";")
-			var index = this.layouts[this.activeLayout].layout.length
 
-			if (chartInfo[1] == "Counter") {
-				this.layouts[this.activeLayout].layout.push({
-					x: 0,
-					y: 0,
-					w: 2,
-					h: 4,
-					i: index,
-					minw: 2,
-					minh: 4,
-					name: chartInfo[0],
-					type: "Counter",
-					resizable: true
-				})
-			} else {
-				this.layouts[this.activeLayout].layout.push({
-					x: 0,
-					y: 0,
-					w: 6,
-					h: 9,
-					i: index,
-					minw: 6,
-					minh: 9,
-					name: chartInfo[0],
-					type: chartInfo[1],
-					resizable: false
-				})
-			}
+		async addItem() {
+			if (!this.addchartid) return
+
+			const [name, type] = this.addchartid.split(";")
+			const index = this.layouts[this.activeLayout].layout.length
+
+			this.layouts[this.activeLayout].layout.push(
+				type === "Counter"
+					? { x: 0, y: 0, w: 2, h: 4, i: index, minw: 2, minh: 4, name, type: "Counter", resizable: true }
+					: { x: 0, y: 0, w: 6, h: 9, i: index, minw: 6, minh: 9, name, type, resizable: false }
+			)
 
 			this.addchartid = null
 		},
+
 		hasGroupAccess(groups = []) {
-			if (!Array.isArray(groups) || !Array.isArray(this.groupids)) {
-				return false
-			}
+			if (!Array.isArray(groups) || !Array.isArray(this.groupids)) return false
 			return groups.some(group => this.groupids.includes(group))
 		},
+
 		ensureEmptyLayoutInitialized() {
-			if (!this.emptylayout) {
-				this.emptylayout = createEmptyLayout()
-			}
+			if (!this.emptylayout) this.emptylayout = createEmptyLayout()
 		},
+
 		syncEmptyLayoutFromActive() {
 			const activeLayout = this.layouts[this.activeLayout]
 			if (activeLayout) {
@@ -650,7 +618,7 @@ export default {
 			if (this.userid && (this.emptylayout.user === null || this.emptylayout.user === undefined)) {
 				this.emptylayout.user = this.userid
 			}
-		}
+		},
 	}
 }
 </script>

@@ -36,8 +36,8 @@
 			v-model="actionlistmodal"
 			:title="(!update) ? $t('deployment.addaction') : $t('deployment.editaction')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -163,8 +163,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "ActionListModal",
 	props: {
@@ -174,6 +172,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				id: null,
 				name: null,
@@ -182,23 +187,15 @@ export default {
 				command: null,
 				original_file_name: null
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			actionlistmodal: false,
 			actionoptions: [
 				{ value: 'EXEC', text: this.$t('deployment.EXEC') },
 				{ value: 'LAUNCH', text: this.$t('deployment.LAUNCH') },
 				{ value: 'STORE', text: this.$t('deployment.STORE') }
 			],
-			header: {
-				"Content-Type": "multipart/form-data;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -238,87 +235,83 @@ export default {
 				action_type: "EXEC",
 				command: null,
 				original_file_name: null,
-				package: this.package
+				package: this.package,
+				uploaded_file: null,
 			}
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getAction(id)
 			}
 		},
+
 		async getAction(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"deployment/actions/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`deployment/actions/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		processFile(event){
-			this.row.uploaded_file = event.target.files[0];
+
+		processFile(event) {
+			this.row.uploaded_file = event?.target?.files?.[0] || null
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
+			this.createerror = false
+			this.createerrormsg = null
+			this.createwithsuccess = false
 
-			if(!this.row.uploaded_file) {
-				delete this.row.uploaded_file
-				this.row.original_file_name = null
-			} else {
-				this.row.original_file_name = this.row.uploaded_file.name
+			try {
+				const payload = { ...(this.row || {}) }
+
+				if (!payload.uploaded_file) {
+					delete payload.uploaded_file
+					payload.original_file_name = null
+				} else {
+					payload.original_file_name = payload.uploaded_file?.name || null
+				}
+
+				if (!(payload.uploaded_file instanceof File)) {
+					delete payload.uploaded_file
+					delete payload.original_file_name
+				}
+
+				delete payload.file
+
+				const formdata = new FormData()
+				for (const [key, value] of Object.entries(payload)) {
+					if (value !== undefined) formdata.append(key, value)
+				}
+
+				if (!this.update) {
+					await this.$api.generic.post("deployment/actions/", formdata)
+				} else {
+					await this.$api.generic.patch(`deployment/actions/${payload.id}/`, formdata)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = e?.response?.data?.error || e?.message || String(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
 			}
-
-			if(!(this.row.uploaded_file instanceof Object)) {
-				delete this.row.uploaded_file
-				delete this.row.original_file_name 
-			}
-
-			delete this.row.file
-
-			let formdata = new FormData()
-
-			Object.keys(this.row).forEach(key => {
-				formdata.append(key, this.row[key])
-			})
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"deployment/actions/", formdata, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"deployment/actions/"+this.row.id+"/", formdata,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
-		}
+		},
 	}
 }
 </script>

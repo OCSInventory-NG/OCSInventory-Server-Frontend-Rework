@@ -1,26 +1,28 @@
 <template lang="">
 	<div id="rule-action">
-		<!-- Display success box message -->
 		<section v-if="successed">
 			<Alert 
-				:message="$t('message.success_saved')" 
+				:message="$t('message.success_saved')"
+				:cols=true
 				variant="success"
 			/>
 		</section>
 
-		<!-- Display error box message -->
 		<section v-if="errored && errorCode == null">
 			<Alert 
-				:message="errormsg.message" 
+				:message="errormsg.message"
+				:cols=true
 				variant="danger"
 			/>
 		</section>
+
 		<div 
 			v-if="loading"
 			class="ocs-loader"
 		>
 			<Loader />
 		</div>
+
 		<b-form
 			v-else
 			@submit="onSubmit"
@@ -172,30 +174,24 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "RuleAction",
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
-		triggers: { type: Array, default: null },
-		actions: { type: Array, default: null }
+		triggers: { type: [Array, Object], default: () => [] },
+		actions: { type: [Array, Object], default: () => [] }
 	},
 	data() {
 		return {
-			loading: false,
 			errormsg: null,
 			errorCode: null,
 			errored: false,
+
 			successed: false,
 			successmsg: null,
+
 			actionupdate: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
-			loadingfield: true,
 			fields: [],
 			fieldopt: [],
 			actionstrigger: {},
@@ -237,7 +233,6 @@ export default {
 			},
 			selectfield: ["select", "checkbox", "field"],
 			selectfieldopt: [],
-			loadingselect: true,
 			inputype: {
 				"string": "text",
 				"integer": "number",
@@ -254,22 +249,29 @@ export default {
 				"SELECT": "select",
 				"CHECKBOX": "checkbox"
 			},
-			datavalues: []
+			datavalues: [],
+
+			loading: false,
+			loadingfield: true,
+			loadingselect: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(() => {
+				this.successed = false
+				this.$emit("reloadRule")
+			}, 5000)
 		}
 	},
 	async mounted() {
 		for (const trigger of this.triggers) {
-			if(trigger.trigger == this.trigger) {
+			if (trigger.trigger === this.trigger) {
 				this.actionstrigger = trigger.action_targets
 			}
 		}
 
-		if(this.actions.length == 0) {
+		if (this.actions.length === 0) {
 			this.datavalues = [
 				{
 					id: null,
@@ -279,22 +281,22 @@ export default {
 					fieldtype: "string",
 					action: "set",
 					value: null,
-				}
+				},
 			]
 		} else {
 			for (const action of this.actions) {
-				var model = (action.object_slug == null) ? this.defaultrouteopt[this.trigger] : action.object_slug
-				var field = action.field.split(":")
-				var regex = /\[|\]/g
+				const model = action.object_slug == null ? this.defaultrouteopt[this.trigger] : action.object_slug
+				const field = action.field.split(":")
+				const regex = /\[|\]/g
 
 				this.datavalues.push({
 					id: action.id,
 					object_slug: action.object_slug,
 					model: model,
-					field: (field.length > 1) ? field[1] : field[0],
-					fieldtype: (field == "template") ? "field" : action.description,
+					field: field.length > 1 ? field[1] : field[0],
+					fieldtype: field === "template" ? "field" : action.description,
 					action: "set",
-					value: (field.length == 2) ? action.value.replace(regex, "") : action.value,
+					value: field.length === 2 ? action.value.replace(regex, "") : action.value,
 				})
 			}
 		}
@@ -304,269 +306,242 @@ export default {
 			await this.setFieldType(this.datavalues[key], key)
 		}
 	},
-	methods: {
-		async getFields(index, model, reload = false) {
-			var route = this.routetargets[this.trigger][model].route
-			var component = this.routetargets[this.trigger][model].key
 
-			if(!Array.isArray(this.fieldopt[index])) {
+	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
+		async getFields(index, model, reload = false) {
+			const route = this.routetargets[this.trigger][model].route
+			const component = this.routetargets[this.trigger][model].key
+
+			if (!Array.isArray(this.fieldopt[index])) {
 				this.fieldopt[index] = []
 			}
 
 			if (reload) {
-				this.datavalues[index]["field"] = null
-				this.datavalues[index]["fieldtype"] = null
-				this.datavalues[index]["value"] = null
+				this.datavalues[index].field = null
+				this.datavalues[index].fieldtype = null
+				this.datavalues[index].value = null
 			}
 
 			this.loadingfield = true
 
-			if(model == "accountinfo.accountinfoconfig") {
-				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
-					.then(response => {
-						this.fieldopt[index] = []
+			try {
+				if (model === "accountinfo.accountinfoconfig") {
+					const data = await this.$api.generic.get(route)
 
-						for (const field of response.data) {
+					this.fieldopt[index] = (data || [])
+						.map((field) => ({
+							value: field.id.toString(),
+							text: field.name,
+							fieldtype: this.linktype[field.datatype],
+						}))
+						.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+
+					this.errormsg = null
+					this.errored = false
+				} else {
+					const opt = await this.$api.generic.options(route)
+
+					this.fieldopt[index] = []
+
+					for (const field in opt.actions.POST) {
+						if (this.actionstrigger[model].includes(field)) {
 							this.fieldopt[index].push({
-								value: field.id.toString(),
-								text: field.name,
-								fieldtype: this.linktype[field.datatype]
+								value: field.toString(),
+								text: this.$t(component + "." + field),
+								fieldtype: opt.actions.POST[field].type,
 							})
 						}
+					}
 
-						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-			} else {
-				await axios.options(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
-					.then(response => {
-						this.loadingfield = true
+					this.fieldopt[index].sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
 
-						this.fieldopt[index] = []
-
-						for (const field in response.data.actions.POST) {
-							if( this.actionstrigger[model].includes(field)) {
-								this.fieldopt[index].push({
-									value: field.toString(),
-									text: this.$t(component+"."+field),
-									fieldtype: response.data.actions.POST[field]["type"]
-								})
-							}
-						}
-
-						this.fieldopt[index].sort((a,b) => (a.text > b.text) ?
-							1 : ((b.text > a.text) ? -1 : 0))
-
-						this.errormsg = null
-						this.errored = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
+					this.errormsg = null
+					this.errored = false
+				}
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loadingfield = false
 			}
-
-			this.loadingfield = false
 		},
+
 		async setFieldType(input, index) {
-			for (const element of this.fieldopt[index]) {
-				if(element.value == input.field) {
+			for (const element of this.fieldopt[index] || []) {
+				if (element.value == input.field) {
 					input.fieldtype = element.fieldtype
 				}
 			}
 
-			if(input.fieldtype == "field") {
-				var route = input.field
-
-				if(route == "template") {
+			if (input.fieldtype === "field") {
+				let route = input.field
+				if (route === "template") {
 					route = "templates"
 				}
 
-				await axios.get(this.$config.BACKEND_API_ROUTE+route, { headers: this.header })
-					.then(response => {
-						this.loadingselect = true
-						this.selectfieldopt[index] = []
+				this.loadingselect = true
+				try {
+					const data = await this.$api.generic.get(`${route}/`)
 
-						for (const element of response.data) {
-							this.selectfieldopt[index].push({
-								value: element.id.toString(),
-								text: element.name
-							})
-						}
+					this.selectfieldopt[index] = (data || []).map((element) => ({
+						value: element.id.toString(),
+						text: element.name,
+					}))
 
-						this.loadingselect = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
-			} else if(input.fieldtype == "select" || input.fieldtype == "checkbox") {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"accountinfo/value?accountinfo_config="+input.field, 
-					{ headers: this.header })
-					.then(response => {
-						this.loadingselect = true
+					this.errormsg = null
+					this.errored = false
+				} catch (e) {
+					this.errormsg = this._apiError(e)
+					this.errored = true
+				} finally {
+					this.loadingselect = false
+				}
+			} else if (input.fieldtype === "select" || input.fieldtype === "checkbox") {
+				this.loadingselect = true
+				try {
+					const data = await this.$api.generic.get(
+						"accountinfo/value",
+						{ accountinfo_config: input.field }
+					)
 
-						this.selectfieldopt[index] = []
+					this.selectfieldopt[index] = (data || []).map((element) => ({
+						value: element.id.toString(),
+						text: element.value,
+					}))
 
-						for (const element of response.data) {
-							this.selectfieldopt[index].push({
-								value: element.id.toString(),
-								text: element.value
-							})
-						}
-
-						this.loadingselect = false
-					})
-					.catch(e => {
-						this.errormsg = e
-						this.errored = true
-					})
+					this.errormsg = null
+					this.errored = false
+				} catch (e) {
+					this.errormsg = this._apiError(e)
+					this.errored = true
+				} finally {
+					this.loadingselect = false
+				}
 			}
 		},
+
 		addAction(index, fieldType) {
-			fieldType.push(
-				{
-					id: null,
-					object_slug: null,
-					model: this.defaultrouteopt[this.trigger],
-					field: null,
-					fieldtype: "string",
-					action: "set",
-					value: null,
-				}
-			)
-			this.getFields(index+1, this.defaultrouteopt[this.trigger])
+			fieldType.push({
+				id: null,
+				object_slug: null,
+				model: this.defaultrouteopt[this.trigger],
+				field: null,
+				fieldtype: "string",
+				action: "set",
+				value: null,
+			})
+
+			this.getFields(index + 1, this.defaultrouteopt[this.trigger])
 		},
+
 		removeAction(index, fieldType) {
 			fieldType.splice(index, 1)
 			this.fieldopt.splice(index, 1)
 		},
-		async onSubmit(event) {
-			event.preventDefault();
 
-			this.actionupdate = []
-			var actionremove = []
-			var actionupdateids = []
-			
-			for (const action of this.datavalues) {
-				if(action.id != null) {
-					actionupdateids.push(action.id)
-				}
-				
-				if(action.model == "accountinfo.accountinfoconfig") {
-					if(action.fieldtype == "checkbox") {
-						this.actionupdate.push({
-							id: action.id,
-							description: action.fieldtype,
-							action: "set",
-							field: "accountdata:"+action.field,
-							value: "["+action.value+"]",
-							object_id: action.field,
-							object_slug: action.model.toLowerCase(),
-							rule: parseInt(this.id)
-						})
-					} else if(action.fieldtype == "select") {
-						this.actionupdate.push({
-							id: action.id,
-							description: action.fieldtype,
-							action: "set",
-							field: "accountdata:"+action.field+":value",
-							value: action.value,
-							object_id: action.field,
-							object_slug: action.model.toLowerCase(),
-							rule: parseInt(this.id)
-						})
+		async onSubmit(event) {
+			event.preventDefault()
+
+			this.successmsg = null
+			this.successed = false
+			this.errormsg = null
+			this.errored = false
+
+			try {
+				const actionupdate = []
+				const actionremove = []
+				const actionupdateids = []
+
+				for (const action of this.datavalues) {
+					if (action.id != null) {
+						actionupdateids.push(action.id)
+					}
+
+					if (action.model === "accountinfo.accountinfoconfig") {
+						if (action.fieldtype === "checkbox") {
+							actionupdate.push({
+								id: action.id,
+								description: action.fieldtype,
+								action: "set",
+								field: "accountdata:" + action.field,
+								value: "[" + action.value + "]",
+								object_id: action.field,
+								object_slug: action.model.toLowerCase(),
+								rule: parseInt(this.id, 10),
+							})
+						} else if (action.fieldtype === "select") {
+							actionupdate.push({
+								id: action.id,
+								description: action.fieldtype,
+								action: "set",
+								field: "accountdata:" + action.field + ":value",
+								value: action.value,
+								object_id: action.field,
+								object_slug: action.model.toLowerCase(),
+								rule: parseInt(this.id, 10),
+							})
+						} else {
+							actionupdate.push({
+								id: action.id,
+								description: action.fieldtype,
+								action: "set",
+								field: "accountdata:" + action.field,
+								value: action.value,
+								object_id: action.field,
+								object_slug: action.model.toLowerCase(),
+								rule: parseInt(this.id, 10),
+							})
+						}
 					} else {
-						this.actionupdate.push({
+						actionupdate.push({
 							id: action.id,
 							description: action.fieldtype,
 							action: "set",
-							field: "accountdata:"+action.field,
+							field: action.field,
 							value: action.value,
-							object_id: action.field,
-							object_slug: action.model.toLowerCase(),
-							rule: parseInt(this.id)
+							rule: parseInt(this.id, 10),
 						})
 					}
-				} else {
-					this.actionupdate.push({
-						id: action.id,
-						description: action.fieldtype,
-						action: "set",
-						field: action.field,
-						value: action.value,
-						rule: parseInt(this.id),
-						object_id: null,
-						object_slug: null
-					})
 				}
-			}
 
-			for (const action of this.actions) {
-				if(!actionupdateids.includes(action.id)) {
-					actionremove.push(action.id)
+				for (const action of this.actions) {
+					if (!actionupdateids.includes(action.id)) {
+						actionremove.push(action.id)
+					}
 				}
-			}
 
-			for (const action of this.actionupdate) {
-				if(action.id != null) {
-					await axios.patch(this.$config.BACKEND_API_ROUTE+"automation/action/"+action.id+"/", action, 
-						{ headers: this.header })
-						.then(() => {
-							this.successmsg = "success"
-							this.successed = true
-							this.errormsg = null
-							this.errored = false
-						})
-						.catch(e => {
-							this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.errored = true
-							this.successmsg = null
-							this.successed = false
-						})
-				} else {
-					delete action.id
+				const patchTasks = actionupdate
+					.filter((a) => a.id != null)
+					.map((a) => this.$api.generic.patch(`automation/action/${a.id}/`, a))
 
-					await axios.post(this.$config.BACKEND_API_ROUTE+"automation/action/", action, 
-						{ headers: this.header })
-						.then(() => {
-							this.successmsg = "success"
-							this.successed = true
-							this.errormsg = null
-							this.errored = false
-						})
-						.catch(e => {
-							this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.errored = true
-							this.successmsg = null
-							this.successed = false
-						})
-				}
-			}
-
-			for (const id of actionremove) {
-				await axios.delete(this.$config.BACKEND_API_ROUTE+"automation/action/"+id, { headers: this.header })
-					.then(() => {
-						this.successmsg = "success"
-						this.successed = true
-						this.errormsg = null
-						this.errored = false
+				const postTasks = actionupdate
+					.filter((a) => a.id == null)
+					.map((a) => {
+						const { id: _id, ...payload } = a
+						return this.$api.generic.post("automation/action/", payload)
 					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-						this.successmsg = null
-						this.successed = false
-					})
+
+				const deleteTasks = actionremove.map((id) =>
+					this.$api.generic.delete(`automation/action/${id}`)
+				)
+
+				await Promise.all([...patchTasks, ...postTasks, ...deleteTasks])
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
 			}
-
-
-			this.$emit('reloadRule')
-		}
+		},
 	}
 }
 </script>
