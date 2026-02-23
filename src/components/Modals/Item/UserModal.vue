@@ -205,6 +205,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
+							class="mt-3"
 						>
 							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
