@@ -16,8 +16,8 @@
 			v-model="mappingmodal"
 			:title="$t('authentication.editmapping')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -100,8 +100,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'MappingModal',
 	props: {
@@ -109,6 +107,13 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			rows: {
 				username: null,
 				last_name: null,
@@ -116,19 +121,11 @@ export default {
 				email: null
 			},
 			mapping: [],
-			loading: true,
-			errormsg: null,
-			errored: false,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			mappingmodal: false,
 			idmodal: 'edit-mapping.'+this.id,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -147,137 +144,138 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.loading = true
 			this.mappingmodal = true
+
 			this.rows = {
 				username: null,
 				last_name: null,
 				first_name: null,
-				email: null
+				email: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
+
 			this.getMappingConfig(id)
 		},
+
 		async getMappingConfig(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"auth_mapping/?auth_config="+id, { headers: this.header })
-				.then(response => {
-					this.mapping = response.data
+			try {
+				const data = await this.$api.generic.get("auth_mapping/", { auth_config: id })
+				this.mapping = data || []
 
-					if(this.mapping.length) {
-						this.mapping.forEach(map => {
-							if(map.internal_field in this.rows) {
-								this.rows[map.internal_field] = map.external_field
-							}
-						})
-					}
+				if (this.mapping.length) {
+					this.mapping.forEach((map) => {
+						if (map.internal_field in this.rows) {
+							this.rows[map.internal_field] = map.external_field
+						}
+					})
+				}
 
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			var jsonToUpdate = []
-			var jsonToAdd = []
-			var jsonToDelete = []
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-			if(this.mapping.length) {
-				this.mapping.forEach(map => {
-					if(map.internal_field in this.rows) {
-						if(this.rows[map.internal_field] != "" && this.rows[map.internal_field] != null) {
-							jsonToUpdate.push({
-								id: map.id,
+			try {
+				const jsonToUpdate = []
+				const jsonToAdd = []
+				const jsonToDelete = []
+
+				if (this.mapping?.length) {
+					this.mapping.forEach((map) => {
+						if (map.internal_field in this.rows) {
+							const value = this.rows[map.internal_field]
+
+							if (value !== "" && value !== null && value !== undefined) {
+								jsonToUpdate.push({
+									id: map.id,
+									auth_config: this.id,
+									internal_field: map.internal_field,
+									external_field: value,
+								})
+							} else {
+								jsonToDelete.push({ id: map.id })
+							}
+						}
+					})
+				}
+
+				Object.keys(this.rows).forEach((row) => {
+					const value = this.rows[row]
+					if (value !== "" && value !== null && value !== undefined) {
+						const exists = this.mapping?.some((map) => map.internal_field === row)
+						if (!exists) {
+							jsonToAdd.push({
 								auth_config: this.id,
-								internal_field: map.internal_field,
-								external_field: this.rows[map.internal_field]
-							})
-						} else {
-							jsonToDelete.push({
-								id: map.id
+								internal_field: row,
+								external_field: value,
 							})
 						}
 					}
 				})
-			}
 
-			Object.keys(this.rows).forEach(row => {
-				if(this.rows[row] != "" && this.rows[row] != null) {
-					const exists = this.mapping.some(map => map.internal_field === row)
-					if(!exists) {
-						jsonToAdd.push({
-							auth_config: this.id,
-							internal_field: row,
-							external_field: this.rows[row]
-						})
-					}
+				if (!jsonToUpdate.length && !jsonToAdd.length && !jsonToDelete.length) {
+					this.createwithsuccess = true
+					return
 				}
-			})
 
-			if(!jsonToUpdate.length && !jsonToAdd.length && !jsonToDelete.length) {
-				this.loadingcreate = false
+				// PATCH
+				if (jsonToUpdate.length) {
+					await Promise.all(
+						jsonToUpdate.map((payload) =>
+							this.$api.generic.patch(`auth_mapping/${payload.id}/`, payload)
+						)
+					)
+				}
+
+				// POST
+				if (jsonToAdd.length) {
+					await this.$api.generic.post("auth_mapping/", jsonToAdd)
+				}
+
+				// DELETE
+				if (jsonToDelete.length) {
+					await Promise.all(
+						jsonToDelete.map((payload) =>
+							this.$api.generic.delete(`auth_mapping/${payload.id}/`)
+						)
+					)
+				}
+
 				this.createwithsuccess = true
+				this.createerror = false
+				this.createerrormsg = null
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
 			}
-
-			if(jsonToUpdate.length) {
-				jsonToUpdate.forEach(data => {
-					axios.patch(this.$config.BACKEND_API_ROUTE+"auth_mapping/"+data.id+"/", data, { headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => this.loadingcreate = false)
-				})
-			}
-
-			if(jsonToAdd.length) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"auth_mapping/", jsonToAdd, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}
-
-			if(jsonToDelete.length) {
-				jsonToDelete.forEach(data => {
-					axios.delete(this.$config.BACKEND_API_ROUTE+"auth_mapping/"+data.id+"/", { headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => this.loadingcreate = false)
-				})
-			}
-		}
+		},
 	}
 }
 </script>

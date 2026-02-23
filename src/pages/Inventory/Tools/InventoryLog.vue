@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="inventory_logs"
-			/>
-			<!-- Display Collapse -->
+			<PageHeader page-title="inventory_logs" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<Datatable
 								id="logs-datatable"
@@ -54,95 +52,108 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "InventoryLog",
 	data() {
 		return {
+			errored: false,
 			errormsg: null,
+			
 			rowdata: [],
 			rowheader: [],
-			loading: true,
-			errored: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			total: 0,
 			query: {
-				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
 				ordering: '-timestamp',
 				search: null,
 			},
+
 			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		await this.getHeader()
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (!permissions.includes("log_view_log")) {
+			this.errormsg = this.$t("message.dont_have_right_to_see")
+			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
+		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"asset/logs/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-					this.getLogs()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		// Retrieve logs
-		async getLogs(query = null) {
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
 			try {
-				const q = query || this.query;
+				// Get header
+				const header = await this.$api.generic.options("asset/logs/")
+				this.rowheader = Object.keys(header.actions.POST)
 
-				const params = {
-					expand: 'asset',
-				}
+				// Get asset logs
+				await this.getLogs(this.query)
 
-				if (q.limit != null) params.limit = q.limit
-				if (q.offset != null) params.offset = q.offset
-				if (q.ordering) params.ordering = q.ordering
-				if (q.search) params.search = q.search
-
-				if(this.$route.params.id) params.asset = this.$route.params.id
-
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/logs/",
-					{ headers: this.header, params }
-				)
-
-				const data = response.data
-				const results = data.results || data
-
-				if (typeof data.count === 'number') {
-					this.total = data.count
-				} else {
-					this.total = results.length
-				}
-
-				this.rowdata = results
-				this.errormsg = null
 				this.errored = false
-			} catch(e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = null
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
 				this.errored = true
 			} finally {
 				this.loading = false
 				this.isbusy = false
 			}
 		},
-		async reloadDatatable() {
+
+		async getLogs(query = null) {
 			this.isbusy = true
+
+			try {
+				const q = query || this.query
+
+				const customParams = {
+					expand: "asset",
+					asset: this.$route.params.id || null,
+				}
+
+				const data = await this.$api.generic.get(
+					"asset/logs/",
+					{
+						limit: q.limit,
+						offset: q.offset,
+						ordering: q.ordering,
+						search: q.search,
+					},
+					customParams
+				)
+
+				const results = data?.results || data || []
+
+				this.total = (typeof data?.count === "number")
+					? data.count
+					: (Array.isArray(results) ? results.length : 0)
+
+				this.rowdata = results
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
+		async reloadDatatable() {
 			await this.getLogs(this.query)
 		},
+
 		async handleQueryChange(newQuery) {
 			if (!this.isbusy) {
 				this.isbusy = true
@@ -153,6 +164,7 @@ export default {
 				await this.getLogs(this.query)
 			}
 		},
+
 		handleExport({ scope, rows }) {
 			const csv = this.buildCsvFromRows(rows)
 			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -165,11 +177,11 @@ export default {
 			link.remove()
 			URL.revokeObjectURL(url)
 		},
+
 		buildCsvFromRows(rows) {
 			if (!rows || !rows.length) return ''
 			const headers = Object.keys(rows[0])
-			const csvRows = []
-			csvRows.push(headers.join(';'))
+			const csvRows = [headers.join(';')]
 
 			rows.forEach(row => {
 				const values = headers.map(h => {
@@ -181,25 +193,27 @@ export default {
 
 			return csvRows.join('\n')
 		},
+
 		async exportAllInventorylogs({ filter, ordering }) {
-			const allRows = []
-			const params = {}
+			try {
+				const data = await this.$api.generic.get(
+					"asset/logs/",
+					{},
+					{
+						expand: "asset",
+						asset: this.$route.params.id || null,
+						search: filter || null,
+						ordering: ordering || null,
+					}
+				)
 
-			if (filter) params.search = filter
-			if (ordering) params.ordering = ordering
-
-			if(this.$route.params.id) params.asset = this.$route.params.id
-
-			const { data } = await axios.get(
-				this.$config.BACKEND_API_ROUTE+"asset/logs/",
-				{ headers: this.header, params }
-			)
-
-			const results = data.results || data
-			allRows.push(...results)
-
-			this.handleExport({ scope: 'all', rows: allRows })
-		}
+				const results = data?.results || data || []
+				this.handleExport({ scope: 'all', rows: results })
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
+		},
 	}
 }
 </script>

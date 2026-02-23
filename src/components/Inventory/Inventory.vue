@@ -1,10 +1,9 @@
 <template>
 	<div id="inventory">
-		<!-- Display inventory section datatable -->
 		<div align="center">
 			<h2>{{ section.name }}</h2>
 		</div>
-		<!-- Error box message -->
+
 		<section v-if="errored">
 			<Alert 
 				:message="errormsg" 
@@ -18,6 +17,7 @@
 		>
 			<Loader />
 		</div>
+
 		<Datatable
 			v-else
 			:id="section.name"
@@ -26,14 +26,13 @@
 			:rowheader="rowheader"
 			:title="section.name"
 			:templateid="section.template"
+			:isbusy="isbusy"
 			@reloadDatatable="reloadDatatable"
 		/>
 	</div>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Inventory",
 	props: {
@@ -42,16 +41,15 @@ export default {
 	},
 	data() {
 		return {
-			rowheader: [],
-			rowdata: [],
-			loading: true,
 			errored: false,
 			errormsg: null,
+
+			rowheader: [],
+			rowdata: [],
 			fields: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
@@ -60,43 +58,59 @@ export default {
 	},
 	methods: {
 		async getHeader() {
+			this.loading = true
 			this.rowheader = []
-			for (const field of this.section.fields) {
-				this.rowheader.push(field.name)
-				if (!this.fields[field.id]) {
-					this.fields[field.id] = []
-				}
-				this.fields[field.id] = field.name
-			}
-		},
-		async getInventorySection() {
-			this.rowdata = []
+			this.fields = this.fields || {}
+
 			try {
-				var queryUrl = "asset/sections/?base="+this.base+"&template_section="+this.section.id+"&expand=fields"
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+queryUrl,
-					{ headers: this.header }
-				)
-				for (const inventory of response.data) {
-					var entry = {}
-					for (const row of inventory.fields) {
-						Object.assign(entry, {
-							[this.fields[row.template_field]]: row.value
-						})
-					}
-					this.rowdata.push(entry)
+				for (const field of (this.section?.fields || [])) {
+					this.rowheader.push(field.name)
+					this.fields[field.id] = field.name
 				}
-			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
 			} finally {
 				this.loading = false
 			}
 		},
+
+		async getInventorySection() {
+			this.isbusy = true
+			this.rowdata = []
+
+			try {
+				const data = await this.$api.generic.get(
+					"asset/sections/",
+					{},
+					{
+						base: this.base,
+						template_section: this.section.id,
+						expand: "fields",
+					}
+				)
+
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				this.rowdata = rows.map((inventory) => {
+					const entry = {}
+					for (const row of (inventory?.fields || [])) {
+						const colName = this.fields?.[row.template_field] || row.template_field
+						entry[colName] = row.value
+					}
+					return entry
+				})
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
+			}
+		},
+
 		async reloadDatatable() {
-			this.loading = true
 			await this.getInventorySection()
-		}
+		},
 	}
 }
 </script>

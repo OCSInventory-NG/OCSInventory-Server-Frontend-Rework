@@ -51,9 +51,9 @@
 			v-model="usesavesearchmodal"
 			:title="$t('search.usesavedsearch')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="lg"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -88,6 +88,8 @@
 				:canexport="false"
 				:canshowhide="false"
 				:rowheader="rowsavesearchheader"
+				:canrefresh="false"
+				:isbusy="isbusy"
 				title="usesavesearch"
 				translationkey="search."
 				@useSaveSearch="useSaveSearch"
@@ -98,8 +100,8 @@
 			v-model="savesearchmodal"
 			:title="(!update) ? $t('search.savemysearch') : $t('search.editsavesearch')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -281,18 +283,23 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "SaveSearchModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
-		rowsearch: { type: Array, default: null },
+		rowsearch: { type: [Array, Object], default: () => [] },
 		navbar: { type: Boolean, default: false }
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			savesearch: {
 				search: {},
 				visibility: "private_personal",
@@ -320,19 +327,12 @@ export default {
 			rowsavesearch: [],
 			updatesearchid: null,
 			updatesearch: [],
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			usesavesearchmodal: false,
 			savesearchmodal: false,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			isbusy: true,
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -356,6 +356,10 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.savesearchmodal = true
 			this.savesearch = {
@@ -365,184 +369,193 @@ export default {
 				description: null,
 				allow_group_modification: false,
 				user: null,
-				groups: []
+				groups: [],
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getSavedSearch(id)
 			}
 		},
+
 		async getSavedSearch(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.savesearch = response.data
-					this.errormsg = null
-					this.errored = false
-					this.getMyInfo()
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get(`search/save/${id}/`)
+				this.savesearch = data
+
+				this.errormsg = null
+				this.errored = false
+
+				await this.getMyInfo()
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getMySearches(searchaction) {
-			if(searchaction == undefined) {
+			this.isbusy = true
+
+			if (searchaction === undefined) {
 				this.usesavesearchmodal = true
 				this.loading = true
 			}
-			
+
 			this.rowsavesearch = []
 			this.optsearch = []
 			this.updatesearch = []
+			this.savedsearches = this.savedsearches || {}
 
-			await axios.get(this.$config.BACKEND_API_ROUTE+"search/save/", { headers: this.header })
-				.then(response => {
-					if(searchaction == undefined) {
-						this.rowsavesearchheader = [
-							"searchname", "description"
-						]
-						for (const savedsearch of response.data) {
-							this.savedsearches[savedsearch.id] = savedsearch.search
-							this.rowsavesearch.push({
-								id: savedsearch.id,
-								searchname: savedsearch.name,
-								description: savedsearch.description
-							})
-						}
-					} else {
-						for (const savedsearch of response.data) {
-							this.optsearch.push({
-								value: savedsearch.id,
-								text: savedsearch.name
-							})
+			try {
+				const data = await this.$api.generic.get("search/save/")
 
-							this.updatesearch[savedsearch.id] = savedsearch
-						}
+				if (searchaction === undefined) {
+					this.rowsavesearchheader = ["searchname", "description"]
+
+					for (const savedsearch of data) {
+						this.savedsearches[savedsearch.id] = savedsearch.search
+						this.rowsavesearch.push({
+							id: savedsearch.id,
+							searchname: savedsearch.name,
+							description: savedsearch.description,
+						})
 					}
-					
-					this.errormsg = null
-					this.errored = false
+				} else {
+					for (const savedsearch of data) {
+						this.optsearch.push({
+							value: savedsearch.id,
+							text: savedsearch.name,
+						})
+
+						this.updatesearch[savedsearch.id] = savedsearch
+					}
+				}
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				if (searchaction === undefined) {
 					this.loading = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+					this.isbusy = false
+				}
+			}
 		},
+
 		setSearchInfo(id) {
 			this.loading = true
 			this.savesearch = this.updatesearch[id]
-			this.loading = false 
+			this.loading = false
 		},
+
 		async getMyInfo() {
 			this.loading = true
 			this.savesearchmodal = true
-			this.optvisibility.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
-			await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
-				.then(response => {
-					this.rowuser = response.data
-					this.errormsg = null
-					this.errored = false
-					if(this.rowuser.groups) {
-						this.getGroups(this.rowuser.groups)
-					}
-					this.loading = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+			this.optvisibility.sort((a, b) =>
+				a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)
+			)
+
+			try {
+				const data = await this.$api.generic.get("myaccount/")
+				this.rowuser = data
+
+				this.errormsg = null
+				this.errored = false
+
+				if (this.rowuser.groups) {
+					await this.getGroups(this.rowuser.groups)
+				}
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
+
 		async getGroups(groups) {
 			this.groups = []
-			for (const group of groups) {
-				await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+group+"/", { headers: this.header })
-					.then(response => {
-						this.groups.push({
-							value: response.data.id,
-							text: response.data.name
-						})
-					})
-					.catch(e => {
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.errored = true
-					})
+
+			try {
+				const results = await Promise.all(
+					(groups || []).map((groupId) => this.$api.generic.get(`groups/${groupId}/`))
+				)
+
+				this.groups = results
+					.map((g) => ({ value: g.id, text: g.name }))
+					.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
 			}
-			this.groups.sort((a,b) => (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0))
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(this.savesearch.visibility != "private_group") {
-				this.savesearch.groups = []
-				this.savesearch.allow_group_modification = false
-			}
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-			if(!this.update) {
-				this.savesearch.user = this.rowuser.id
-				this.savesearch.search = this.rowsearch
-
-				if(this.searchaction == "create") {
-					axios.post(this.$config.BACKEND_API_ROUTE+"search/save/", this.savesearch, { headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => { this.loadingcreate = false })
-				} else {
-					axios.patch(this.$config.BACKEND_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch, 
-						{ headers: this.header })
-						.then(() => {
-							this.createwithsuccess = true
-							this.createerrormsg = null
-							this.createerror = false
-						})
-						.catch(e => {
-							this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-							this.createerror = true
-							this.createwithsuccess = false
-						})
-						.finally(() => { this.loadingcreate = false })
+			try {
+				const basePayload = {
+					...this.savesearch,
 				}
-			} else {
-				delete this.savesearch.search
-				delete this.savesearch.user
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"search/save/"+this.savesearch.id+"/", this.savesearch,
-					{ headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
+				if (basePayload.visibility !== "private_group") {
+					basePayload.groups = []
+					basePayload.allow_group_modification = false
+				}
+
+				if (!this.update) {
+					basePayload.user = this.rowuser.id
+					basePayload.search = this.rowsearch
+
+					if (this.searchaction === "create") {
+						await this.$api.generic.post("search/save/", basePayload)
+					} else {
+						await this.$api.generic.patch(`search/save/${basePayload.id}/`, basePayload)
+					}
+				} else {
+					const { search: _search, user: _user, ...payload } = basePayload
+
+					await this.$api.generic.patch(`search/save/${this.savesearch.id}/`, payload)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
+			} finally {
+				this.loadingcreate = false
+			}
 		},
+
 		useSaveSearch(id) {
-			this.$emit('useSaveSearch', this.savedsearches[id])
+			this.$emit("useSaveSearch", this.savedsearches[id])
 			this.usesavesearchmodal = false
 		},
-		goToSavedSearches(){
-			this.$router.push('/inventory/savedsearch');
+
+		goToSavedSearches() {
+			this.$router.push("/inventory/savedsearch")
 			this.usesavesearchmodal = false
-		}
+		},
 	}
 }
 </script>

@@ -36,9 +36,9 @@
 			v-model="groupmodal"
 			:title="(!update) ? $t('group.addgroup') : $t('group.editgroup')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
+			modal-class="custom-modal"
 			size="xl"
-			scrollable
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -139,36 +139,33 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "GroupModal",
 	props: {
-		permissionsprop: { type: Array, default: null },
-		permissionslabelprop: { type: Array, default: null },
+		permissionsprop: { type: [Array, Object], default: () => [] },
+		permissionslabelprop: { type: [Array, Object], default: () => [] },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				permissions: []
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			groupmodal: false,
 			permissions: [],
 			permissionslabel: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -192,118 +189,147 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		loadData(id) {
 			this.groupmodal = true
+
+			this.row = this.row || {}
 			this.row.name = null
-			this.row.permissions.splice(0, this.row.permissions.length)
+
+			if (!Array.isArray(this.row.permissions)) {
+				this.row.permissions = []
+			} else {
+				this.row.permissions.splice(0, this.row.permissions.length)
+			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
 				this.getPermissions(id)
 			}
 		},
+
 		async getPermissions(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"permissions/", { headers: this.header })
-				.then(response => {
-					var array = ["add_", "change_", "delete_", "view_"]
-					var labeltmp = new Set()
+			try {
+				const data = await this.$api.generic.get("permissions/")
+				const perms = Array.isArray(data) ? data : (data?.results || [])
 
-					this.permissionslabel = []
-					this.permissions = []
+				const prefixes = ["add_", "change_", "delete_", "view_"]
 
-					response.data.forEach(permissionDetails => {
-						array.forEach(type => {
-							if(~permissionDetails.codename.indexOf(type)) {
-								var permissionKey = permissionDetails.codename.replace(type, "")
+				const djangoCoreApps = [
+					"admin",
+					"contenttype",
+					"session",
+					"token",
+					"logentry",
+					"proxy",
+					"filemanager"
+				]
 
-								if(this.$te("permission." + permissionKey)) {
-									var key = permissionKey + "_" + permissionDetails.content_type
+				this.permissions = {}
+				this.permissionslabel = []
 
-									if(typeof this.permissions[key] === 'undefined') {
-										this.permissions[key] = [{
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
-										}]
-									} else {
-										this.permissions[key].push({
-											id: permissionDetails.id,
-											code: "permission_" + permissionDetails.id,
-											name: permissionDetails.codename,
-											key: permissionKey,
-											type: type.replace("_", "")
-										})
-									}
+				const labelMap = new Map()
 
+				for (const p of perms) {
+					const codename = p?.codename || ""
+					if (!codename) continue
 
-									labeltmp.add(key)
-								}
-							}
-						})
-					})
-					labeltmp.forEach(label => {
-						this.permissionslabel.push({
-							id: label,
-							trad: this.$t('permission.'+label.split("_")[0])
-						})
-					})
+					const appLabel =
+						p?.content_type?.app_label ||
+						p?.content_type?.app ||
+						p?.app_label ||
+						p?.codename ||
+						null
 
-					this.permissionslabel.sort((a,b) => (a.trad > b.trad) ? 1 : ((b.trad > a.trad) ? -1 : 0))
+					if (appLabel && djangoCoreApps.some(core => appLabel.includes(core))) {
+						continue
+					}
 
-					this.getGroup(id)
-				})
+					for (const prefix of prefixes) {
+						if (!codename.startsWith(prefix)) continue
+
+						const permissionKey = codename.slice(prefix.length)
+						const labelId = `${permissionKey}_${p.content_type}`
+
+						const entry = {
+							id: p.id,
+							code: `permission_${p.id}`,
+							name: codename,
+							key: permissionKey,
+							type: prefix.replace("_", ""),
+						}
+
+						if (!this.permissions[labelId]) this.permissions[labelId] = []
+						this.permissions[labelId].push(entry)
+
+						if (!labelMap.has(labelId)) {
+							const trad = this.$te("permission." + permissionKey)
+								? this.$t("permission." + permissionKey)
+								: permissionKey
+
+							labelMap.set(labelId, trad)
+						}
+					}
+				}
+
+				this.permissionslabel = Array.from(labelMap.entries())
+					.map(([id, trad]) => ({ id, trad }))
+					.sort((a, b) => (a.trad || "").localeCompare(b.trad || ""))
+
+				await this.getGroup(id)
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				this.loading = false
+			}
 		},
+
 		async getGroup(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"groups/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
+			try {
+				const data = await this.$api.generic.get(`groups/${id}/`)
+				this.row = data
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			} finally {
+				this.loading = false
+			}
 		},
-		onSubmit(event) {
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
-			
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"groups/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				axios.patch(this.$config.BACKEND_API_ROUTE+"groups/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
-			}			
-		}
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
+
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("groups/", this.row)
+				} else {
+					await this.$api.generic.patch(`groups/${this.row.id}/`, this.row)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
+			}
+		},
 	}
 }
 </script>

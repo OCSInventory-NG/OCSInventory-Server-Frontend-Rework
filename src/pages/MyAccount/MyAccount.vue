@@ -3,18 +3,12 @@
 		id="my-account" 
 		class="container-xl"
 	>
-		<!-- Header page -->
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="myaccount"
-			/>
+			<PageHeader page-title="myaccount" />
 
-			<!-- Display my account form -->
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Display success box message -->
 						<section v-if="successed">
 							<Alert 
 								:message="$t('message.success_saved')"
@@ -23,7 +17,6 @@
 							/>
 						</section>
 
-						<!-- Display error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -31,12 +24,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<b-form
 								@submit="onSubmit"
@@ -146,81 +141,74 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "MyAccount",
 	data() {
 		return {
-			errormsg: null,
-			successmsg: null,
-			rowdata: [{}],
-			loading: true,
 			errored: false,
+			errormsg: null,
+
 			successed: false,
+			successmsg: null,
+
+			rowdata: [{}],
 			password: null,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
 		}
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 10000)
+			setTimeout(() => this.successed = false, 5000)
 		}
 	},
 	async mounted() {
-		await axios.get(this.$config.BACKEND_API_ROUTE+"myaccount/", { headers: this.header })
-			.then(response => {
-				this.rowdata = response.data
-				this.errormsg = null
-				this.errored = false
-				this.loading = false
-			})
-			.catch(e => {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
-			})
+		try {
+			this.loading = true
+
+			const data = await this.$api.generic.get("myaccount/")
+			this.rowdata = data
+
+			this.errormsg = null
+			this.errored = false
+		} catch (e) {
+			this.errormsg = (e.response?.data?.error)
+				? e.response.data.error
+				: e.message
+			this.errored = true
+		} finally {
+			this.loading = false
+		}
 	},
 	methods: {
-		onSubmit(event) {
+		async onSubmit(event) {
 			event.preventDefault()
 
-			var jsonReturn = {}
+			try {
+				const payload = {
+					email: this.rowdata.email,
+					first_name: this.rowdata.first_name,
+					last_name: this.rowdata.last_name,
+					...(this.rowdata.password ? { password: this.rowdata.password } : {})
+				}
 
-			if(this.rowdata.password != '') {
-				jsonReturn = {
-					"password": this.rowdata.password,
-					"email": this.rowdata.email,
-					"first_name": this.rowdata.first_name,
-					"last_name": this.rowdata.last_name
-				}
-			} else {
-				jsonReturn = {
-					"email": this.rowdata.email,
-					"first_name": this.rowdata.first_name,
-					"last_name": this.rowdata.last_name
-				}
+				await this.$api.generic.patch(
+					`myaccount/${this.rowdata.id}/`,
+					payload
+				)
+
+				this.successmsg = "success"
+				this.successed = true
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error)
+					? e.response.data.error
+					: e.message
+				this.errored = true
+				this.successmsg = null
+				this.successed = false
 			}
-
-			axios.patch(this.$config.BACKEND_API_ROUTE+"myaccount/"+this.rowdata.id+"/", jsonReturn,
-				{ headers: this.header })
-				.then(() => {
-					this.successmsg = "success"
-					this.successed = true
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-					this.successmsg = null
-					this.successed = false
-				})
-				.finally(() => {
-					this.loading = false
-				})
 		}
 	}
 }

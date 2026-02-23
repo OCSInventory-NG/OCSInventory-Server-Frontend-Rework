@@ -36,8 +36,8 @@
 			v-model="netgroupmodal"
 			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
 			hide-footer
-			modal-class="custom-modal modal-blur"
-			scrollable
+			modal-class="custom-modal"
+			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -150,8 +150,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "NetworkGroupModal",
 	props: {
@@ -160,25 +158,24 @@ export default {
 	},
 	data() {
 		return {
+			errormsg: null,
+			errored: false,
+			createerror: false,
+			createerrormsg: null,
+
+			createwithsuccess: false,
+
 			row: {
 				name: null,
 				description: null
 			},
-			errormsg: null,
-			errored: false,
-			loading: true,
-			loadingcreate: false,
-			createerror: false,
-			createerrormsg: null,
-			createwithsuccess: false,
 			netgroupmodal: false,
 			networks: [],
 			netid: [],
 			oldnetid: [],
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+			
+			loading: true,
+			loadingcreate: false,
 		}
 	},
 	watch: {
@@ -200,123 +197,131 @@ export default {
 		}
 	},
 	methods: {
+		_apiError(e) {
+			return e?.response?.data?.error || e?.message || String(e)
+		},
+
 		async loadData(id) {
 			this.netgroupmodal = true
 			this.row = {
 				name: null,
-				description: null
+				description: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
 			this.createerrormsg = null
+			this.createwithsuccess = false
 
 			if (id) {
 				this.loading = true
+				try {
+					await this.getNetgroup(id)
+					await this.getNetworks()
+				} catch (e) {
+					this.errormsg = this._apiError(e)
+					this.errored = true
+					this.loading = false
+				}
+			}
+		},
 
-				await this.getNetgroup(id)
-				await this.getNetworks()
-			}
-		},
 		async getNetgroup(id) {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netgroups/"+id+"/", { headers: this.header })
-				.then(response => {
-					this.row = response.data
-					this.netid = this.row.networks
-					this.oldnetid = this.row.networks
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
+			try {
+				const data = await this.$api.generic.get(`netgroups/${id}/`)
+				this.row = data
+
+				this.netid = Array.isArray(this.row.networks) ? [...this.row.networks] : []
+				this.oldnetid = Array.isArray(this.row.networks) ? [...this.row.networks] : []
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				throw e
+			}
 		},
+
 		async getNetworks() {
-			await axios.get(this.$config.BACKEND_API_ROUTE+"networks/", { headers: this.header })
-				.then(response => {
-					this.networks = []
-					for (const network of response.data) {
-						this.networks.push({
-							value: network.id,
-							text: network.netid
-						})
-					}
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = e
-					this.errored = true
-				})
-				.finally(() => this.loading = false)
-		},
-		async updateNetworks() {
-			var json = {}
-			// remove old group link
-			for (const network of this.oldnetid) {
-				if (!this.netid.includes(network)) {
-					json = {
-						group: null
-					}
-					this.patchNetwork(network, json)
-				}
-			}
-			// add new group link
-			for (const network of this.netid) {
-				if (!this.oldnetid.includes(network)) {
-					json = {
-						group: this.row.id
-					}
-					this.patchNetwork(network, json)
-				}
+			try {
+				const data = await this.$api.generic.get("networks/")
+
+				this.networks = (data || []).map((network) => ({
+					value: network.id,
+					text: network.netid,
+				}))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				throw e
+			} finally {
+				this.loading = false
 			}
 		},
-		patchNetwork(network, json) {
-			axios.patch(this.$config.BACKEND_API_ROUTE+"networks/"+network+"/", json, { headers: this.header })
-				.then(() => {
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
+
+		async patchNetwork(networkId, payload) {
+			try {
+				await this.$api.generic.patch(`networks/${networkId}/`, payload)
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+				throw e
+			}
 		},
-		onSubmit(event) {
+
+		async updateNetworks(groupId) {
+			const oldIds = Array.isArray(this.oldnetid) ? this.oldnetid : []
+			const newIds = Array.isArray(this.netid) ? this.netid : []
+
+			const toRemove = oldIds.filter((nid) => !newIds.includes(nid))
+			const toAdd = newIds.filter((nid) => !oldIds.includes(nid))
+
+			const tasks = [
+				...toRemove.map((nid) => this.patchNetwork(nid, { group: null })),
+				...toAdd.map((nid) => this.patchNetwork(nid, { group: groupId })),
+			]
+
+			if (!tasks.length) {
+				return
+			}
+
+			await Promise.all(tasks)
+
+			this.oldnetid = [...newIds]
+		},
+
+		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
 
-			if(!this.update) {
-				axios.post(this.$config.BACKEND_API_ROUTE+"netgroups/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerror = false
-						this.createerrormsg = null
-					})
-					.catch(e => {
-						this.createwithsuccess = false
-						this.createerror = true
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					})
-					.finally(() => this.loadingcreate = false)
-			} else {
-				this.updateNetworks()
+			this.createwithsuccess = false
+			this.createerror = false
+			this.createerrormsg = null
 
-				axios.patch(this.$config.BACKEND_API_ROUTE+"netgroups/"+this.row.id+"/", this.row, { headers: this.header })
-					.then(() => {
-						this.createwithsuccess = true
-						this.createerrormsg = null
-						this.createerror = false
-					})
-					.catch(e => {
-						this.createerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-						this.createerror = true
-						this.createwithsuccess = false
-					})
-					.finally(() => this.loadingcreate = false)
+			try {
+				if (!this.update) {
+					await this.$api.generic.post("netgroups/", this.row)
+				} else {
+					await this.$api.generic.patch(`netgroups/${this.row.id}/`, this.row)
+					await this.updateNetworks(this.row.id)
+				}
+
+				this.createwithsuccess = true
+			} catch (e) {
+				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
+			} finally {
+				this.loadingcreate = false
 			}
-		}
+		},
 	}
 }
 </script>

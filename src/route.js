@@ -283,6 +283,14 @@ const routes = [
 		meta: {
 			layout: AppLayout
 		}
+	},
+	{
+		path: '/configurations/extensions',
+		name: 'Extension',
+		component: () => import('@/pages/Configuration/Extension/Extension.vue'),
+		meta: {
+			layout: AppLayout
+		}
 	}
 ]
 

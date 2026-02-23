@@ -4,15 +4,11 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header -->
-			<PageHeader 
-				page-title="netdevice"
-			/>
-			<!-- Display Collapse -->
+			<PageHeader page-title="netdevice" />
+
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -20,12 +16,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<Datatable
 								id="netdevice-datatable"
@@ -57,147 +55,152 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: "Netdevice",
 	data() {
 		return {
 			errormsg: null,
-			rowdata: [],
-			rowheader: [],
-			loading: true,
 			errored: false,
+
 			canedit: false,
 			candelete: false,
+
+			rowdata: [],
+			rowheader: [],
 			accountinfoName: "",
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			},
 			total: 0,
 			query: {
-				limit: (localStorage.getItem("perPage")) ? localStorage.getItem("perPage") : 5,
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
 				ordering: '-last_seen',
 				search: null,
 			},
+
 			isbusy: true,
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(localStorage.getItem('permissions').split(",").includes("netdevice_view_netdevice")) {
-			if(localStorage.getItem('permissions').split(",").includes("netdevice_change_netdevice")) {
+		const rawPermissions = localStorage.getItem('permissions')
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+
+		if (permissions.includes("netdevice_view_netdevice")) {
+			if (permissions.includes("netdevice_change_netdevice")) {
 				this.canedit = true
 			}
-			if(localStorage.getItem('permissions').split(",").includes("netdevice_delete_netdevice")) {
+			if (permissions.includes("netdevice_delete_netdevice")) {
 				this.candelete = true
 			}
-			await this.getAccountinfoCfg()
-			await this.getHeader()
-			await this.getNetdevice(this.query)
-			this.loading = false
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
+			this.loading = false
+			this.isbusy = false
+			return
 		}
+
+		// Data init
+		await this.loadInitial()
 	},
 	methods: {
-		async getHeader() {
-			await axios.options(this.$config.BACKEND_API_ROUTE+"netdevices/", { headers: this.header })
-				.then(response => {
-					Object.keys(response.data.actions.POST).forEach(field => {
-						this.rowheader.push(field)
-					})
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-		},
-		async getAccountinfoCfg() {
+		async loadInitial() {
+			this.loading = true
+			this.isbusy = true
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"accountinfo/config/?datatarget=IPDISCOVER",
-					{ headers: this.header }
-				)
-				for (const accountinfo of response.data) {
-					if(!this.rowheader.includes("Account info : " + accountinfo.name)) {
-						this.rowheader.push("Account info : " + accountinfo.name)
+				// Get header
+				const header = await this.$api.generic.options("netdevices/")
+				this.rowheader = Object.keys(header.actions.POST)
+
+				// Get accountinfo config to complete header
+				const accountCfg = await this.$api.generic.get("accountinfo/config/", {}, { datatarget: "IPDISCOVER" })
+				for (let i = accountCfg.length - 1; i >= 0; i--) {
+					const a = accountCfg[i]
+					const label = "Account info : " + a.name
+					if (!this.rowheader.includes(label)) {
+						this.rowheader.unshift(label)
 					}
 				}
+
+				// Get netdevices
+				await this.getNetdevice(this.query)
+
+				this.errored = false
+				this.errormsg = null
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
 				this.errored = true
+			} finally {
+				this.loading = false
+				this.isbusy = false
 			}
 		},
-		// Retrieve netdevice
+
 		async getNetdevice(query = null) {
+			this.isbusy = true
 			this.rowdata = []
 
 			const q = query || this.query
 
-			const params = {
-				expand: 'network',
-				accountinfo: true,
+			try {
+				const customParams = {
+					expand: "network",
+					accountinfo: true,
+					network: q.network || null,
+				}
+
+				if (this.$route.params.id) customParams.network = this.$route.params.id
+
+				const data = await this.$api.generic.get(
+					"netdevices/",
+					{
+						limit: q.limit,
+						offset: q.offset,
+						ordering: q.ordering,
+						search: q.search,
+					},
+					customParams
+				)
+
+				const results = data?.results || data || []
+
+				this.total = (typeof data?.count === "number")
+					? data.count
+					: (Array.isArray(results) ? results.length : 0)
+
+				const transformed = (results || []).map((row) => {
+					const out = { ...row }
+
+					if (out.network && typeof out.network === "object") {
+						out.network_name = out.network.name
+						out.network_id = out.network.id
+						out.network = out.network.name
+					}
+
+					if (out.accountinfo && typeof out.accountinfo === "object") {
+						for (const [k, v] of Object.entries(out.accountinfo)) {
+							const col = "Account info : " + k
+							out[col] = v
+						}
+					}
+
+					return out
+				})
+
+				this.rowdata = transformed
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			} finally {
+				this.isbusy = false
 			}
-
-			if (q.limit != null) params.limit = q.limit
-			if (q.offset != null) params.offset = q.offset
-			if (q.ordering) params.ordering = q.ordering
-			if (q.search) params.search = q.search
-			if (q.network) params.network = q.network
-
-			if(this.$route.params.id) params.network = this.$route.params.id
-
-			await axios.get(this.$config.BACKEND_API_ROUTE+"netdevices/",
-				{ headers: this.header, params })
-				.then(response => {
-					const data = response.data
-					const results = data.results || data
-
-					if (typeof data.count === 'number') {
-						this.total = data.count
-					} else {
-						this.total = results.length
-					}
-					results.forEach(data => {
-						if(data.network) {
-							data.network_name = data.network.name
-							data.network_id = data.network.id
-						}
-						if(data.accountinfo) {
-							Object.keys(data.accountinfo).forEach(accountinfo => {
-								if(!this.rowheader.includes("Account info : " + accountinfo)) {
-									this.rowheader.push("Account info : " + accountinfo)
-								}
-								data["Account info : " + accountinfo] = data.accountinfo[accountinfo]
-							})
-						}
-					})
-
-					for (const netdevice of results) {
-						netdevice.network = netdevice.network.name
-					}
-
-					this.rowdata = results
-					this.errormsg = null
-					this.errored = false
-				})
-				.catch(e => {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				})
-				.finally(() => {
-					this.isbusy = false
-				})
 		},
+
 		async reloadDatatable() {
-			this.isbusy = true
 			await this.getNetdevice(this.query)
 		},
+
 		async handleQueryChange(newQuery) {
 			if (!this.isbusy) {
 				this.isbusy = true
@@ -208,6 +211,8 @@ export default {
 				await this.getNetdevice(this.query)
 			}
 		},
+
+		// Export functions
 		handleExport({ scope, rows }) {
 			const csv = this.buildCsvFromRows(rows)
 			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -220,11 +225,11 @@ export default {
 			link.remove()
 			URL.revokeObjectURL(url)
 		},
+
 		buildCsvFromRows(rows) {
 			if (!rows || !rows.length) return ''
 			const headers = Object.keys(rows[0])
-			const csvRows = []
-			csvRows.push(headers.join(';'))
+			const csvRows = [headers.join(';')]
 
 			rows.forEach(row => {
 				const values = headers.map(h => {
@@ -236,31 +241,45 @@ export default {
 
 			return csvRows.join('\n')
 		},
+
 		async exportAllNetdevices({ filter, ordering }) {
-			const allRows = []
-			const params = {}
+			try {
+				const customParams = {
+					expand: "network",
+					accountinfo: true,
+					network: this.$route.params.id || null,
+				}
 
-			if (filter) params.search = filter
-			if (ordering) params.ordering = ordering
+				const data = await this.$api.generic.get(
+					"netdevices/",
+					{},
+					{
+						...customParams,
+						search: filter || null,
+						ordering: ordering || null,
+					}
+				)
 
-			if(this.$route.params.id) params.network = this.$route.params.id
+				const results = data?.results || data || []
 
-			const { data } = await axios.get(
-				this.$config.BACKEND_API_ROUTE + "netdevices/",
-				{ headers: this.header, params }
-			)
+				const rows = (results || []).map((row) => {
+					const out = { ...row }
+					if (out.network && typeof out.network === "object") out.network = out.network.name
+					return out
+				})
 
-			const results = data.results || data
-			allRows.push(...results)
-
-			this.handleExport({ scope: 'all', rows: allRows })
+				this.handleExport({ scope: 'all', rows })
+			} catch (e) {
+				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errored = true
+			}
 		},
+
 		async onFilterByNetwork(networkId) {
-			this.isbusy = true;
-			this.query.network = networkId;
-			this.query.offset = 0;
-			await this.getNetdevice(this.query);
-		}
+			this.query.network = networkId
+			this.query.offset = 0
+			await this.getNetdevice(this.query)
+		},
 	}
 }
 </script>

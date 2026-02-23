@@ -577,7 +577,7 @@
 			<b-col align="right">
 				<!-- Delete button -->
 				<DeleteItemModal
-					v-if="candelete && !selected.some(item => item.is_protected)"
+					v-if="candelete && !selected.some(item => item.is_protected) && candeletemultiple"
 					:ids="selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
@@ -597,8 +597,8 @@ export default {
 	name: 'Datatable',
 	props: {
 		title: { type: String, default: '' },
-		rowdata: { type: Array, default: null },
-		rowheader: { type: Array, default: null },
+		rowdata: { type: [Array, Object], default: () => [] },
+		rowheader: { type: [Array, Object], default: () => [] },
 		id: { type: String, default: '' },
 		editcomponent: { type: String, default: '' },
 		canrefresh: { type: Boolean, default: true },
@@ -627,17 +627,18 @@ export default {
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
 		deletemultiple: { type: Boolean, default: false },
-		deleteids: { type: Array, default: null },
+		deleteids: { type: [Array, Object], default: () => [] },
+		candeletemultiple: { type: Boolean, default: true },
 		canmassprocessing: { type: Boolean, default: false },
 		// Sort datatable parameters
 		sortby: { type: String, default: null },
 		sortdesc: { type: String, default: null },
 		templateid: { type: Number, default: 0 },
-		hiddenfields: { type: Array, default: null },
+		hiddenfields: { type: [Array, Object], default: () => [] },
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
-		assets: { type: Array, default: () => [] },
+		assets: { type: [Array, Object], default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
@@ -979,7 +980,7 @@ export default {
 
 			setTimeout(() => {
 				this.isReloading = false;
-			}, 3000);
+			}, 1000);
 		},
 		getOrdering() {
 			if (!this.sortByLocal) return null

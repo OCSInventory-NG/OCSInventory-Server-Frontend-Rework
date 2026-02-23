@@ -4,23 +4,19 @@
 		class="container-xl"
 	>
 		<div>
-			<!-- Page header for asset -->
 			<PageHeader 
 				v-if="device.name"
 				:page-title="device.name"
 			/>
 
-			<!-- Page header for netdevice -->
 			<PageHeader 
 				v-if="device.netname || device.ip"
 				:page-title="(device.netname) ? device.netname : device.ip"
 			/>
 
-			<!-- Display details -->
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<!-- Error box message -->
 						<section v-if="errored">
 							<Alert 
 								:message="errormsg"
@@ -28,12 +24,14 @@
 								variant="danger"
 							/>
 						</section>
+
 						<div 
 							v-if="loading"
 							class="ocs-loader"
 						>
 							<Loader />
 						</div>
+
 						<div v-else>
 							<div v-if="type == 'ASSET'">
 								<b-row class="asset-btn responsive">
@@ -51,15 +49,18 @@
 													:icon="['fas', 'arrows-rotate']"
 												/>
 											</button>&nbsp;&nbsp;
+
 											<PackageResultModal
 												v-if="device.osname != 'SNMP'"
 												:items="deployment"
 												@reloadDeployment="reloadDeployment"
 											/>&nbsp;
+
 											<AssetOptionsModal
 												:item="deployment"
 												@reloadInventory="reloadInventory"
 											/>&nbsp;&nbsp;
+
 											<router-link 
 												v-if="device.osname != 'SNMP'"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
@@ -112,15 +113,20 @@
 												<Accountinfo
 													:id="device.id"
 													:type="type"
-													:canedit="canedit"
 													:slug="slug"
 												/>
 											</fieldset><br>
+
+											<ExtensionSlot
+												name="inventory.asset.detail.afterAccountInfo"
+												:context="{ assetId: device?.id }"
+											/><br>
 										</div>
 										<div v-if="category.id == 2 && device.osname != 'SNMP'">
 											<div align="center">
 												<h2>{{ $t("title.deployment") }}</h2>
 											</div>
+
 											<ResultDetail
 												:id="$route.params.id"
 												:reload="reload"
@@ -186,7 +192,7 @@
 									<Accountinfo
 										:id="device.id"
 										:type="type"
-										:canedit="canedit"
+										
 										:slug="slug"
 									/>
 								</fieldset><br>
@@ -200,16 +206,13 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
 	name: 'Detail',
 	data() {
 		return {
-			errormsg: null,
-			loading: true,
 			errored: false,
-			canedit: true,
+			errormsg: null,
+
 			type: null,
 			slug: null,
 			translationkey: null,
@@ -220,37 +223,54 @@ export default {
 			categories: [],
 			sections: [],
 			activetab: 0,
-			header: {
-				"Content-Type": "application/json;charset=utf-8",
-				"Authorization": 'Token ' + localStorage.getItem('token_authentication')
-			}
+
+			loading: true,
 		}
 	},
 	async mounted() {
-		if(this.$route.params.type == 'asset') {
+		const { type, id } = this.$route.params || {}
+
+		if (type === "asset") {
 			this.type = "ASSET"
 			this.slug = "inventory_base.inventorybase"
 			this.translationkey = "inventory."
-			if(this.$route.params.id) this.id = this.$route.params.id
+			if (id) this.id = id
+
+			// Get inventory base
 			await this.getInventoryBase()
+			// Get categories
 			await this.getCategories()
+			return
 		}
-		if(this.$route.params.type == 'netdevice') {
+
+		if (type === "netdevice") {
 			this.type = "IPDISCOVER"
 			this.slug = "netdevice.netdevice"
 			this.translationkey = "network."
+
+			// Get netdevices
 			await this.getNetdevice()
 		}
 	},
+
 	methods: {
 		async getNetdevice() {
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"netdevices/"+this.$route.params.id+"/?expand=network",
-					{ headers: this.header }
+				this.loading = true
+
+				const data = await this.$api.generic.get(
+					`netdevices/${this.$route.params.id}/`,
+					{},
+					{ expand: "network" }
 				)
-				this.device = response.data
-				this.device.network = this.device.network.name
+
+				this.device = {
+					...data,
+					network: data?.network?.name ?? data?.network,
+				}
+
+				this.errormsg = null
+				this.errored = false
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
@@ -258,55 +278,60 @@ export default {
 				this.loading = false
 			}
 		},
+
 		async getInventoryBase() {
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"asset/bases/"+this.$route.params.id+"/",
-					{ headers: this.header }
-				)
+				const data = await this.$api.generic.get(`asset/bases/${this.$route.params.id}/`)
 
-				let templateResponse = null
-
-				if (response.data.template) {
-					templateResponse = await axios.get(
-						this.$config.BACKEND_API_ROUTE + "templates/" + response.data.template + "/",
-						{ headers: this.header }
-					)
+				let templateName = this.$t("generic.none")
+				if (data?.template) {
+					const tpl = await this.$api.generic.get(`templates/${data.template}/`)
+					templateName = tpl?.name ?? templateName
 				}
-				
-				response.data.templateid = response.data.template
-				response.data.template = (templateResponse) ? templateResponse.data.name : this.$t('generic.none')
-				this.device = response.data
-				this.deployment.push(response.data)
+
+				const device = {
+					...data,
+					templateid: data?.template,
+					template: templateName,
+				}
+
+				this.device = device
+				this.deployment = [device]
+
+				this.errormsg = null
+				this.errored = false
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			}
 		},
+
 		async getCategories() {
 			try {
-				const response = await axios.get(
-					this.$config.BACKEND_API_ROUTE+"categories/?expand=inventory_sections",
-					{ headers: this.header }
+				const data = await this.$api.generic.get(
+					"categories/",
+					{},
+					{ expand: "inventory_sections" }
 				)
-				response.data.sort((a, b) => a.id - b.id);
-				this.categories = []
-				for (const category of response.data) {
-					var allReadyPush = false
-					if (category.is_protected) {
-						this.categories.push(category)
-						allReadyPush = true
-					}
 
-					Object.keys(category.inventory_sections).forEach(item => {
-						var section = category.inventory_sections[item]
+				const categories = (Array.isArray(data) ? data : (data?.results || []))
+					.slice()
+					.sort((a, b) => (a?.id ?? 0) - (b?.id ?? 0))
 
-						if (!allReadyPush && section.template == this.device.templateid) {
-							this.categories.push(category)
-							allReadyPush = true
-						}
-					})
-				}
+				const templateId = this.device?.templateid
+
+				this.categories = categories.filter((category) => {
+					if (category?.is_protected) return true
+
+					const sections = Array.isArray(category?.inventory_sections)
+						? category.inventory_sections
+						: Object.values(category?.inventory_sections || {})
+
+					return sections.some((s) => s?.template === templateId)
+				})
+
+				this.errormsg = null
+				this.errored = false
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
@@ -314,29 +339,34 @@ export default {
 				this.loading = false
 			}
 		},
+
 		reloadDeployment() {
 			this.reload = true
 		},
+
 		async reloadInventory() {
 			const currentTab = this.activetab
 			this.loading = true
+
 			await this.getInventoryBase()
 			await this.getCategories()
+
 			this.$nextTick(() => {
 				this.activeTab = currentTab
 			})
 		},
+
 		endReloadDeployment() {
 			this.reload = false
 		},
-		scrollToTop(){
+
+		scrollToTop() {
 			this.$nextTick(() => {
-				const scrollContainer = this.$el.querySelector('.tab-content.col-10.sticky-tabs');
-				if (scrollContainer) {
-					scrollContainer.scrollTop = 0;
-				}
-			});
+				const scrollContainer = this.$el.querySelector('.tab-content.col-10.sticky-tabs')
+				if (scrollContainer) scrollContainer.scrollTop = 0
+			})
 		},
+
 		formatDate(value, key) {
 			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'last_seen']
 			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
@@ -344,7 +374,7 @@ export default {
 				return new Date(value).toLocaleString(this.$i18n.locale)
 			}
 			return value
-		}
+		},
 	}
 }
 </script>
