@@ -68,9 +68,9 @@
 					>
 						<span>SLO</span>
 						<b-form-checkbox
-						switch
-						v-model="sloEnabled"
-						@change.stop="onSLOChange"
+							v-model="sloEnabled"
+							switch
+							@change.stop="onSLOChange"
 						/>
 					</b-dropdown-item-button>
 				</BNavItemDropdown>
@@ -96,25 +96,25 @@ export default {
 			sso: false,
 		}
 	},
-	mounted() {
-		const header = {
-        "Content-Type": "application/json;charset=utf-8"
-		}
-		
-		axios.get(`${this.$config.BACKEND_API_ROUTE}login/`, { headers: header })
-		.then(response => {
-			if(response.data) {
-				this.endpoint_logout = response.data.endpoint_logout
-			}
-		})
-		.catch(e => {
-			console.error("Erreur récupération SSO URL:", e)
-		})
-	},
 	computed: {
 		isSSO() {
 			return localStorage.getItem('auth_method') === 'sso';
 		}
+	},
+	mounted() {
+		const header = {
+			"Content-Type": "application/json;charset=utf-8"
+		}
+		
+		axios.get(`${this.$config.BACKEND_API_ROUTE}login/`, { headers: header })
+			.then(response => {
+				if(response.data) {
+					this.endpoint_logout = response.data.endpoint_logout
+				}
+			})
+			.catch(e => {
+				console.error("Erreur récupération SSO URL:", e)
+			})
 	},
 	methods: {
 		onSLOChange() {
