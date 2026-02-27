@@ -123,6 +123,9 @@ export default {
 	},
 
 	methods: {
+		setSSOAuth() {
+			localStorage.setItem('auth_method', 'sso');
+		},
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loading = true

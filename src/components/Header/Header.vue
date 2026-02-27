@@ -96,20 +96,16 @@ export default {
 			sso: false,
 		}
 	},
-	mounted() {
-		const header = {
-        "Content-Type": "application/json;charset=utf-8"
-		}
-		
-		axios.get(`${this.$config.BACKEND_API_ROUTE}login/`, { headers: header })
-		.then(response => {
-			if(response.data) {
-				this.endpoint_logout = response.data.endpoint_logout
+	async mounted() {
+		try {
+			const data = await this.$api.generic.get("login/")
+
+			if (data) {
+				this.endpoint_logout = data.endpoint_logout
 			}
-		})
-		.catch(e => {
-			console.error("Erreur récupération SSO URL:", e)
-		})
+		} catch (e) {
+			console.error('Error fetching logout endpoint:', e)
+		}
 	},
 	computed: {
 		isSSO() {
@@ -124,9 +120,11 @@ export default {
 			const authMethod = localStorage.getItem('auth_method');
 			const sloEnabled = this.sloEnabled;
 
-			localStorage.setItem('authenticated', false);
+			localStorage.removeItem('authenticated');
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
+			localStorage.removeItem('auth_method');
+			localStorage.removeItem('slo_enabled');
 
 			if(authMethod === 'sso' && sloEnabled) {
 				window.location.href = this.endpoint_logout;
