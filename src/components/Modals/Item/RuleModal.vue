@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('rule.addrule') : $t('rule.editrule')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -115,13 +114,13 @@
 							:label="$t('rule.enabled')" 
 							label-for="enabled"
 						>
-							<label class="form-check form-switch">
+							<div class="form-check form-switch">
 								<input 
 									v-model="row.enabled"
 									class="form-check-input"
 									type="checkbox"
 								>
-							</label>
+							</div>
 						</b-form-group>
 					</b-col>
 				</b-row>

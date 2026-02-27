@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('scheduler.addscheduler') : $t('scheduler.editscheduler')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -116,13 +115,13 @@
 							:label="$t('scheduler.active')" 
 							label-for="active"
 						>
-							<label class="form-check form-switch">
+							<div class="form-check form-switch">
 								<input 
 									v-model="row.active"
 									class="form-check-input"
 									type="checkbox"
 								>
-							</label>
+							</div>
 						</b-form-group>
 					</b-col>
 				</b-row>
