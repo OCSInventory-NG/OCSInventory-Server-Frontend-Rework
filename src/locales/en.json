@@ -713,5 +713,12 @@
     "user_informations": "User information",
     "user_permissions": "Permissions",
     "username": "Username"
+  },
+  "trigger_fields": {
+    "auth_profile": {
+      "auth_config": "Authentication configuration",
+      "auth_method": "Authentication method",
+      "metadata": "Authentication metadata"
+    }
   }
 }

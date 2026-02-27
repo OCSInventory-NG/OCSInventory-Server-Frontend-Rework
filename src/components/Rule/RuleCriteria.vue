@@ -335,7 +335,7 @@ export default {
 							if (!this.fields.find(f => f.value === fullPath)) {
 								this.fields.push({
 									value: fullPath,
-									text: fullPath,
+									text: this.$t(`trigger_fields.${fullPath}`, fullPath)
 								})
 							}
 						})
