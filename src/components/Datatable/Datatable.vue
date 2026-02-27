@@ -305,14 +305,14 @@
 					#cell(name)="row"
 				>
 					<router-link
-					v-if="canaccessdetails"
+						v-if="canaccessdetails"
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
 					</router-link>
 					<router-link
-					v-if="canedittemplate" 
+						v-if="canedittemplate" 
 						:to="'/configurations/templates/'+row.item.id"
 						class="ocs-link"
 					>
