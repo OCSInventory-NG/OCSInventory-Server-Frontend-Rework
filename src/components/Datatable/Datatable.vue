@@ -417,6 +417,19 @@
 					</span>
 				</template>
 
+				<!-- Template redirection -->
+				<template 
+					v-if="canedittemplate"
+					#cell(name)="row"
+				>
+					<router-link 
+						:to="'/configurations/templates/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.name }}
+					</router-link>
+				</template>
+
 				<!-- Edit row for configuration -->
 				<template #cell(value)="row">
 					<div 

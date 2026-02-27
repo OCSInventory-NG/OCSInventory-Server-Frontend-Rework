@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('user.adduser') : $t('user.edituser')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -165,6 +164,7 @@
 							:name="group.code"
 							:value="group.id"
 							unchecked
+							inline
 						>
 							{{ group.name }}
 						</b-form-checkbox>
@@ -188,6 +188,7 @@
 								name="is_superuser"
 								:value="true"
 								:unchecked-value="false"
+								inline
 							>
 								{{ $t('user.is_superuser') }}
 							</b-form-checkbox>
@@ -203,6 +204,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
+							class="mt-3"
 						>
 							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>

@@ -56,6 +56,7 @@
 								v-if="!booleans.includes(index) && index != 'SIGN_ALGO'"
 								:id="index"
 								v-model="oidcdata.config[index]"
+								:type="index === 'CLIENT_SECRET' ? 'password' : 'text'"
 								:disabled="!canedit"
 							/>
 							<v-select
