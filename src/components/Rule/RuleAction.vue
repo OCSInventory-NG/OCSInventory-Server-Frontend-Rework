@@ -98,6 +98,8 @@
 										v-model="input.value" 
 										:options="selectfieldopt[index]" 
 										:reduce="text => text.value"
+										:multiple="input.fieldtype === 'checkbox'"
+										:close-on-select="input.fieldtype !== 'checkbox'"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
@@ -287,16 +289,20 @@ export default {
 			for (const action of this.actions) {
 				const model = action.object_slug == null ? this.defaultrouteopt[this.trigger] : action.object_slug
 				const field = action.field.split(":")
-				const regex = /\[|\]/g
 
 				this.datavalues.push({
 					id: action.id,
 					object_slug: action.object_slug,
 					model: model,
 					field: field.length > 1 ? field[1] : field[0],
-					fieldtype: field === "template" ? "field" : action.description,
+					fieldtype: field[0] === "template" ? "field" : action.description,
 					action: "set",
-					value: field.length === 2 ? action.value.replace(regex, "") : action.value,
+						value:
+							action.description === "checkbox"
+								? this.normalizeCheckboxValue(action.value)
+								: action.description === "select"
+									? this.normalizeSelectValue(action.value)
+								: action.value,
 				})
 			}
 		}
@@ -310,6 +316,93 @@ export default {
 	methods: {
 		_apiError(e) {
 			return e?.response?.data?.error || e?.message || String(e)
+		},
+
+			normalizeCheckboxValue(value) {
+			if (Array.isArray(value)) {
+				return value.map((item) => item.toString())
+			}
+
+			if (value === null || value === undefined || value === "") {
+				return []
+			}
+
+			if (typeof value === "string") {
+				const trimmed = value.trim()
+				if (!trimmed) {
+					return []
+				}
+
+				try {
+					const parsed = JSON.parse(trimmed)
+					if (Array.isArray(parsed)) {
+						return parsed.map((item) => item.toString())
+					}
+				} catch (e) {
+					// handled by fallback below
+				}
+
+				return trimmed
+					.split(",")
+					.map((item) => item.trim())
+					.filter((item) => item !== "")
+			}
+
+				return [value.toString()]
+			},
+
+			normalizeSelectValue(value) {
+				if (value === null || value === undefined || value === "") {
+					return null
+				}
+
+				if (Array.isArray(value)) {
+					return value.length > 0 ? value[0].toString() : null
+				}
+
+				if (typeof value === "object") {
+					if (value.value === null || value.value === undefined || value.value === "") {
+						return null
+					}
+					return value.value.toString()
+				}
+
+				return value.toString()
+			},
+
+			buildAccountinfoActionPayload(action, index) {
+				const payload = {
+					id: action.id,
+					description: action.fieldtype,
+					action: "set",
+					field: "accountdata:" + action.field,
+					object_id: action.field,
+					object_slug: action.model.toLowerCase(),
+					rule: parseInt(this.id, 10),
+				}
+
+				if (action.fieldtype === "checkbox") {
+					payload.value = this.normalizeCheckboxValue(action.value)
+						.map((item) => parseInt(item, 10))
+						.filter((item) => !Number.isNaN(item))
+					return payload
+				}
+
+				if (action.fieldtype === "select") {
+					const normalizedId = this.normalizeSelectValue(action.value)
+					const option = (this.selectfieldopt[index] || []).find(
+						(element) => element.value == normalizedId
+					)
+					const parsedId = parseInt(normalizedId, 10)
+					payload.value = {
+						value: Number.isNaN(parsedId) ? normalizedId : parsedId,
+						text: option ? option.text : "",
+					}
+					return payload
+				}
+
+				payload.value = action.value
+				return payload
 		},
 
 		async getFields(index, model, reload = false) {
@@ -375,6 +468,12 @@ export default {
 				if (element.value == input.field) {
 					input.fieldtype = element.fieldtype
 				}
+			}
+
+				if (input.fieldtype === "checkbox") {
+					input.value = this.normalizeCheckboxValue(input.value)
+				} else if (input.fieldtype === "select") {
+					input.value = this.normalizeSelectValue(input.value)
 			}
 
 			if (input.fieldtype === "field") {
@@ -456,46 +555,13 @@ export default {
 				const actionremove = []
 				const actionupdateids = []
 
-				for (const action of this.datavalues) {
+				for (const [index, action] of this.datavalues.entries()) {
 					if (action.id != null) {
 						actionupdateids.push(action.id)
 					}
 
 					if (action.model === "accountinfo.accountinfoconfig") {
-						if (action.fieldtype === "checkbox") {
-							actionupdate.push({
-								id: action.id,
-								description: action.fieldtype,
-								action: "set",
-								field: "accountdata:" + action.field,
-								value: "[" + action.value + "]",
-								object_id: action.field,
-								object_slug: action.model.toLowerCase(),
-								rule: parseInt(this.id, 10),
-							})
-						} else if (action.fieldtype === "select") {
-							actionupdate.push({
-								id: action.id,
-								description: action.fieldtype,
-								action: "set",
-								field: "accountdata:" + action.field + ":value",
-								value: action.value,
-								object_id: action.field,
-								object_slug: action.model.toLowerCase(),
-								rule: parseInt(this.id, 10),
-							})
-						} else {
-							actionupdate.push({
-								id: action.id,
-								description: action.fieldtype,
-								action: "set",
-								field: "accountdata:" + action.field,
-								value: action.value,
-								object_id: action.field,
-								object_slug: action.model.toLowerCase(),
-								rule: parseInt(this.id, 10),
-							})
-						}
+						actionupdate.push(this.buildAccountinfoActionPayload(action, index))
 					} else {
 						actionupdate.push({
 							id: action.id,
