@@ -83,7 +83,7 @@
     "Softwares": "Logiciels"
   },
   "configuration": {
-    "accountinfo_generation": "Génération des données administratives",
+    "admin_data_generation": "Génération des données administratives",
     "agent": "Agent",
     "Application log level": "Niveau de log du serveur",
     "automation": "Action automatique",

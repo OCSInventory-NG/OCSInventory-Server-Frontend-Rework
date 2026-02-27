@@ -42,7 +42,12 @@
 							v-for="theader in rowheader" 
 							:key="theader"
 						>
-							{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
+							<span v-if="isSensitiveField(theader)">
+								*********
+							</span>
+							<span v-else>
+								{{ dateFields.includes(theader) ? element.last_update_formatted : element[theader] }}
+							</span>
 						</td>
 						<td 
 							v-if="candelete || canedit"
@@ -146,6 +151,10 @@ export default {
 
 		reloadDatatable() {
 			this.$emit("reloadDatatable")
+		},
+
+		isSensitiveField(field) {
+			return field.toUpperCase().includes("PASSWORD") || field.toUpperCase().includes("SECRET")
 		},
 
 		updateDateFormat() {
