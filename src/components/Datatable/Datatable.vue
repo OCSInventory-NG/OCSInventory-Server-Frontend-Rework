@@ -214,7 +214,7 @@
 				striped
 				hover
 				bordered
-				:selectable="usecheckbox"
+				:selectable="showCheckbox"
 				:select-mode="selectMode"
 				:items="rowdata"
 				:fields="visibleFields"
@@ -604,7 +604,7 @@ export default {
 		canrefresh: { type: Boolean, default: true },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: null },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
@@ -695,6 +695,16 @@ export default {
 		};
 	},
 	computed: {
+		showCheckbox() {
+			if (this.usecheckbox !== null) {
+				return this.usecheckbox
+			}
+			return (
+				this.candelete ||
+				this.canmassprocessing
+			)
+		},
+
 		// Initialize visible fields
 		visibleFields() {
 			var key = this.title + "_" + this.templateid
@@ -806,7 +816,7 @@ export default {
 			this.deleterte = "netdevices"
 		}
 
-		if(this.usecheckbox == true) {
+		if(this.showCheckbox) {
 			this.fields.push({
 				key: "selected", 
 				label: this.$t('generic.selected'), 
@@ -944,6 +954,21 @@ export default {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 			}
 		});
+	},
+	watch: {
+		showCheckbox(val) {
+			this.fields = this.fields.filter(field => field.key !== 'selected')
+
+			if (val) {
+			this.fields.unshift({
+				key: "selected",
+				label: this.$t('generic.selected'),
+				sortable: false,
+				visible: true,
+				disabled: true
+			})
+			}
+		}
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering

@@ -85,6 +85,7 @@ export default {
 		if (permissions.includes("template_view_template")) {
 			this.canview = true
 			this.exporttemplate = true
+			this.canopenedit = true
 			if (permissions.includes("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true

@@ -106,6 +106,7 @@
 														<b-form-select 
 															v-model="subparameter.value" 
 															class="form-select mb-3"
+															:disabled="!canedit"
 														>
 															<b-form-select-option 
 																v-for="option in subparameter.options"
@@ -172,6 +173,7 @@
 												<b-form-select 
 													v-model="parameter.value" 
 													class="form-select mb-3"
+													:disabled="!canedit"
 												>
 													<b-form-select-option 
 														v-for="option in parameter.options"
@@ -197,6 +199,7 @@
 									<b-button 
 										type="submit"
 										variant="success"
+										:disabled="!canedit"
 									>
 										{{ $t('generic.save') }}
 									</b-button>
@@ -287,6 +290,7 @@ export default {
 
 		async onSubmit(event) {
 			event.preventDefault()
+			if(!this.canedit) return
 
 			try {
 				const activeConfig = this.configs?.[this.activetab]
