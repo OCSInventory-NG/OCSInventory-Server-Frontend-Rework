@@ -301,7 +301,7 @@
 
 				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails || canedittemplate"
+					v-if="canaccessdetails || canedittemplate"
 					#cell(name)="row"
 				>
 					<router-link
