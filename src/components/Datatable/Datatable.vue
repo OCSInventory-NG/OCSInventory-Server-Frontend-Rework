@@ -274,10 +274,10 @@
 
 				<!-- Network redirection -->
 				<template 
-					v-if="canaccesschild"
 					#cell(network)="row"
 				>
 					<a
+						v-if="canaccesschild"
 						href="#"
 						class="ocs-link"
 						@click.prevent="filterByNetwork(row.item.network_id)"
@@ -796,6 +796,19 @@ export default {
 				this.emitQueryChange()
 			}
 		},
+		showCheckbox(val) {
+			this.fields = this.fields.filter(field => field.key !== 'selected')
+
+			if (val) {
+				this.fields.unshift({
+					key: "selected",
+					label: this.$t('generic.selected'),
+					sortable: false,
+					visible: true,
+					disabled: true
+				})
+			}
+		}
 	},
 	created() {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
@@ -954,21 +967,6 @@ export default {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 			}
 		});
-	},
-	watch: {
-		showCheckbox(val) {
-			this.fields = this.fields.filter(field => field.key !== 'selected')
-
-			if (val) {
-			this.fields.unshift({
-				key: "selected",
-				label: this.$t('generic.selected'),
-				sortable: false,
-				visible: true,
-				disabled: true
-			})
-			}
-		}
 	},
 	methods: {
 		// Trigger pagination to update the number of buttons/pages due to filtering
