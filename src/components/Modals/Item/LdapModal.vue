@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('authentication.addldap') : $t('authentication.editldap')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -112,6 +111,7 @@
 							<b-form-input
 								id="BIND_PASSWORD"
 								v-model="row.config.BIND_PASSWORD"
+								type="password"
 							/>
 						</b-form-group>
 					</b-col>
