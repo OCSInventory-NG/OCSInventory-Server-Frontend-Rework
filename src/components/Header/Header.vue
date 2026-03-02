@@ -94,6 +94,11 @@ export default {
 			sso: false,
 		}
 	},
+	computed: {
+		isSSO() {
+			return localStorage.getItem('auth_method') === 'sso';
+		}
+	},
 	async mounted() {
 		try {
 			const data = await this.$api.generic.get("login/")
@@ -103,11 +108,6 @@ export default {
 			}
 		} catch (e) {
 			console.error('Error fetching logout endpoint:', e)
-		}
-	},
-	computed: {
-		isSSO() {
-			return localStorage.getItem('auth_method') === 'sso';
 		}
 	},
 	methods: {
