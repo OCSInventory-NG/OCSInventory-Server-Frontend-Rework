@@ -130,6 +130,7 @@
 									v-model="input.case_sensitive"
 									name="enabled"
 									:value="true"
+									inline
 								>
 									{{ $t("rule.case_sensitive") }}
 								</b-form-checkbox>
