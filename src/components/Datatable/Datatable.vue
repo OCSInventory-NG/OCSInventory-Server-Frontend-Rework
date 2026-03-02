@@ -318,7 +318,6 @@
 					>
 						{{ row.item.name }}
 					</router-link>
-					
 				</template>
 
 				<!-- Assets redirection -->
