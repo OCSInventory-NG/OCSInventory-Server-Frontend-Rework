@@ -117,7 +117,6 @@ export default {
 			this.sso = !!data?.SSO
 			this.redirect_url = data?.redirect_url ?? null
 		} catch (e) {
-			this.errored = true
 			this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 		}
 	},

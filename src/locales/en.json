@@ -83,7 +83,7 @@
     "Softwares": "Softwares"
   },
   "configuration": {
-    "accountinfo_generation": "Administrative data generation",
+    "admin_data_generation": "Administrative data generation",
     "agent": "Agent",
     "Application log level": "Server log level",
     "automation": "Automatic action",
