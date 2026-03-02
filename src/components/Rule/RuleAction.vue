@@ -297,11 +297,11 @@ export default {
 					field: field.length > 1 ? field[1] : field[0],
 					fieldtype: field[0] === "template" ? "field" : action.description,
 					action: "set",
-						value:
-							action.description === "checkbox"
-								? this.normalizeCheckboxValue(action.value)
-								: action.description === "select"
-									? this.normalizeSelectValue(action.value)
+					value:
+						action.description === "checkbox"
+							? this.normalizeCheckboxValue(action.value)
+							: action.description === "select"
+								? this.normalizeSelectValue(action.value)
 								: action.value,
 				})
 			}
@@ -318,7 +318,7 @@ export default {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
 
-			normalizeCheckboxValue(value) {
+		normalizeCheckboxValue(value) {
 			if (Array.isArray(value)) {
 				return value.map((item) => item.toString())
 			}
@@ -348,61 +348,61 @@ export default {
 					.filter((item) => item !== "")
 			}
 
-				return [value.toString()]
-			},
+			return [value.toString()]
+		},
 
-			normalizeSelectValue(value) {
-				if (value === null || value === undefined || value === "") {
+		normalizeSelectValue(value) {
+			if (value === null || value === undefined || value === "") {
+				return null
+			}
+
+			if (Array.isArray(value)) {
+				return value.length > 0 ? value[0].toString() : null
+			}
+
+			if (typeof value === "object") {
+				if (value.value === null || value.value === undefined || value.value === "") {
 					return null
 				}
+				return value.value.toString()
+			}
 
-				if (Array.isArray(value)) {
-					return value.length > 0 ? value[0].toString() : null
-				}
+			return value.toString()
+		},
 
-				if (typeof value === "object") {
-					if (value.value === null || value.value === undefined || value.value === "") {
-						return null
-					}
-					return value.value.toString()
-				}
+		buildAccountinfoActionPayload(action, index) {
+			const payload = {
+				id: action.id,
+				description: action.fieldtype,
+				action: "set",
+				field: "accountdata:" + action.field,
+				object_id: action.field,
+				object_slug: action.model.toLowerCase(),
+				rule: parseInt(this.id, 10),
+			}
 
-				return value.toString()
-			},
-
-			buildAccountinfoActionPayload(action, index) {
-				const payload = {
-					id: action.id,
-					description: action.fieldtype,
-					action: "set",
-					field: "accountdata:" + action.field,
-					object_id: action.field,
-					object_slug: action.model.toLowerCase(),
-					rule: parseInt(this.id, 10),
-				}
-
-				if (action.fieldtype === "checkbox") {
-					payload.value = this.normalizeCheckboxValue(action.value)
-						.map((item) => parseInt(item, 10))
-						.filter((item) => !Number.isNaN(item))
-					return payload
-				}
-
-				if (action.fieldtype === "select") {
-					const normalizedId = this.normalizeSelectValue(action.value)
-					const option = (this.selectfieldopt[index] || []).find(
-						(element) => element.value == normalizedId
-					)
-					const parsedId = parseInt(normalizedId, 10)
-					payload.value = {
-						value: Number.isNaN(parsedId) ? normalizedId : parsedId,
-						text: option ? option.text : "",
-					}
-					return payload
-				}
-
-				payload.value = action.value
+			if (action.fieldtype === "checkbox") {
+				payload.value = this.normalizeCheckboxValue(action.value)
+					.map((item) => parseInt(item, 10))
+					.filter((item) => !Number.isNaN(item))
 				return payload
+			}
+
+			if (action.fieldtype === "select") {
+				const normalizedId = this.normalizeSelectValue(action.value)
+				const option = (this.selectfieldopt[index] || []).find(
+					(element) => element.value == normalizedId
+				)
+				const parsedId = parseInt(normalizedId, 10)
+				payload.value = {
+					value: Number.isNaN(parsedId) ? normalizedId : parsedId,
+					text: option ? option.text : "",
+				}
+				return payload
+			}
+
+			payload.value = action.value
+			return payload
 		},
 
 		async getFields(index, model, reload = false) {
@@ -470,10 +470,10 @@ export default {
 				}
 			}
 
-				if (input.fieldtype === "checkbox") {
-					input.value = this.normalizeCheckboxValue(input.value)
-				} else if (input.fieldtype === "select") {
-					input.value = this.normalizeSelectValue(input.value)
+			if (input.fieldtype === "checkbox") {
+				input.value = this.normalizeCheckboxValue(input.value)
+			} else if (input.fieldtype === "select") {
+				input.value = this.normalizeSelectValue(input.value)
 			}
 
 			if (input.fieldtype === "field") {
