@@ -93,8 +93,11 @@
 								<b-form-group>
 									<v-select
 										id="field"
-										v-model="input.field" 
-										:options="fields"
+										v-model="input.field"
+										@update:modelValue="val => {
+    										onFieldChange(input)
+										}"
+										:options="fields.filter(f => f.value !== 'auth_profile.auth_config')"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
@@ -113,7 +116,8 @@
 								<b-form-group>
 									<v-select
 										id="operator"
-										v-model="input.operator" 
+										v-model="input.operator"
+										:disabled="input.field == 'auth_profile.auth_method'"
 										:options="operators" 
 										:reduce="text => text.value"
 										:clearable="false"
@@ -137,7 +141,27 @@
 							</b-col>
 							<b-col cols="3">
 								<b-form-group>
+									<v-select
+										v-if="input.field === 'auth_profile.auth_method'"
+										v-model="input.value"
+										:options="auth_methods"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+									/>
+									<v-select
+										v-if="input.field === 'auth_profile.auth_method' && input.value === '2'"
+										v-model="input.ldap_config"
+										:options="ldapConfigs"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+									/>
+									
 									<b-form-input
+										v-else
 										id="value"
 										v-model="input.value"
 										class="mb-3"
@@ -260,6 +284,15 @@ export default {
 					key: "network."
 				}
 			},
+			auth_methods: [
+				{ value: "1", text: this.$t("authentication.LOCAL") },
+				{ value: "2", text: this.$t("authentication.LDAP") },
+				{ value: "3", text: this.$t("authentication.OIDC") },
+				{ value: "4", text: this.$t("authentication.CAS")}
+			],
+
+			ldapConfigs: [],
+
 			operatortargets: {
 				"==": this.$t("rule.equal"),
 				"!=": this.$t("rule.notequal"),
@@ -279,7 +312,8 @@ export default {
 						operator: "==",
 						value: null,
 						case_sensitive: false,
-						metadata_field: null
+						metadata_field: null,
+						ldap_config: null
 					}
 				]
 			],
@@ -300,6 +334,7 @@ export default {
 	},
 	async mounted() {
 		await this.getLogicRow()
+		await this.getLdapConfigs()
 	},
 	methods: {
 		_apiError(e) {
@@ -472,7 +507,8 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null
+				metadata_field: null,
+				ldap_config: null
 			})
 		},
 
@@ -489,7 +525,8 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null
+				metadata_field: null,
+				ldap_config: null
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -581,7 +618,23 @@ export default {
 							logicTmp.or.push(tmpAnd)
 						}
 					} else if (firstKey == null) {
-						logicTmp = this.pushInLogicSimple(logicTmp, 0, logics)
+						if (
+							logics[0].field === "auth_profile.auth_method"
+							&& logics[0].value === "2"
+						) {
+							const firstCondition = this.pushInLogicSimple({}, 0, logics)
+							const secondCondition = {
+								"==": [
+									{ var: "auth_profile.auth_config" },
+									logics[0].ldap_config.toString()
+								]
+							}
+							logicTmp = {
+								and: [ firstCondition, secondCondition ]
+							}
+						} else {
+							logicTmp = this.pushInLogicSimple({}, 0, logics)
+						}
 					} else {
 						Object.keys(logics).forEach((key) => {
 							logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
@@ -607,6 +660,25 @@ export default {
 				this.successed = false
 			}
 		},
+		async getLdapConfigs() {
+			try {
+				const configs = await this.$api.generic.get("auth_config/")
+				this.ldapConfigs = configs
+				.filter(c => c.auth_method === 2)
+				.map(c => ({
+					value: c.id,
+					text: c.name
+				}))
+			} catch(e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},	
+		onFieldChange(input) {
+			if (input.field === "auth_profile.auth_method") {
+				input.operator = "=="
+			}
+		}
 	}
 }
 </script>

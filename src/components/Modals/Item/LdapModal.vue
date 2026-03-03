@@ -79,6 +79,33 @@
 				<b-row>
 					<b-col>
 						<b-form-group
+							:label="$t('generic.name')"
+							label-for="name"
+						>
+							<b-form-input
+								id="name"
+								v-model="row.name"
+								required
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('generic.description')"
+							label-for="description"
+						>
+							<b-form-input
+								id="description"
+								v-model="row.description"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
 							label="SERVER_URI" 
 							label-for="SERVER_URI"
 						>
@@ -219,6 +246,8 @@ export default {
 
 			row: {
 				auth_method: this.authid,
+				name: null,
+    			description: null,
 				enabled: true,
 				priority: 1,
 				mappings: [],
@@ -249,6 +278,8 @@ export default {
 				this.createwithsuccess = false
 				this.row = {
 					auth_method: this.authid,
+					name: null,
+    				description: null,
 					enabled: true,
 					priority: 1,
 					mappings: [],
@@ -280,6 +311,8 @@ export default {
 			this.ldapmodal = true
 			this.row = {
 				auth_method: this.authid,
+				name: null,
+				description: null,
 				enabled: true,
 				priority: 1,
 				mappings: [],

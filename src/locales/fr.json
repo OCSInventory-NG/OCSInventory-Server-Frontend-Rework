@@ -286,6 +286,7 @@
     "loading_data": "Chargement des données...",
     "login": "Connexion",
     "logout": "Déconnexion",
+    "name":"Nom",
     "no": "Non",
     "none": "Aucun",
     "no_data": "Aucune donnée disponible",
