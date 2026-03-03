@@ -94,15 +94,15 @@
 									<v-select
 										id="field"
 										v-model="input.field"
-										@update:modelValue="val => {
-    										onFieldChange(input)
-										}"
 										:options="fields.filter(f => f.value !== 'auth_profile.auth_config')"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
+										@update:modelValue="val => {
+											onFieldChange(input)
+										}"
 									/>
 									<b-form-input
 										v-if="input.field && input.field.includes('metadata')"
@@ -664,11 +664,11 @@ export default {
 			try {
 				const configs = await this.$api.generic.get("auth_config/")
 				this.ldapConfigs = configs
-				.filter(c => c.auth_method === 2)
-				.map(c => ({
-					value: c.id,
-					text: c.name
-				}))
+					.filter(c => c.auth_method === 2)
+					.map(c => ({
+						value: c.id,
+						text: c.name
+					}))
 			} catch(e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
