@@ -247,7 +247,7 @@ export default {
 			row: {
 				auth_method: this.authid,
 				name: null,
-    			description: null,
+				description: null,
 				enabled: true,
 				priority: 1,
 				mappings: [],
@@ -279,7 +279,7 @@ export default {
 				this.row = {
 					auth_method: this.authid,
 					name: null,
-    				description: null,
+					description: null,
 					enabled: true,
 					priority: 1,
 					mappings: [],
