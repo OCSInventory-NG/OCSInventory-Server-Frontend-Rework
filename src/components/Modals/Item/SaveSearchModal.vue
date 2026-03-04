@@ -53,7 +53,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="lg"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -101,7 +100,6 @@
 			:title="(!update) ? $t('search.savemysearch') : $t('search.editsavesearch')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
