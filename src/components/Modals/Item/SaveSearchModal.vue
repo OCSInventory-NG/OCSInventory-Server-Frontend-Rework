@@ -310,15 +310,8 @@ export default {
 				groups: []
 			},
 			searchaction: "create",
-			optvisibility: [
-				{ value: "public", text: this.$t("search.public") },
-				{ value: "private_personal", text: this.$t("search.private_personal") },
-				{ value: "private_group", text: this.$t("search.private_group") }
-			],
-			optactions : [
-				{ value: "create", text: this.$t("search.create") },
-				{ value: "update", text: this.$t("search.update") }
-			],
+			optvisibility: [],
+			optactions : [],
 			optsearch: [],
 			groups : [],
 			rowuser : [],
@@ -336,6 +329,9 @@ export default {
 		}
 	},
 	watch: {
+		'$i18n.locale'() {
+			this.updateTranslations()
+		},
 		createwithsuccess: function() {
 			setTimeout(() => {
 				this.savesearchmodal = false
@@ -355,7 +351,22 @@ export default {
 			}, 500)
 		}
 	},
+	mounted() {
+		this.updateTranslations()
+	},
 	methods: {
+		updateTranslations() {
+			this.optvisibility = [
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") }
+			]
+			this.optactions = [
+				{ value: "create", text: this.$t("search.create") },
+				{ value: "update", text: this.$t("search.update") }
+			]
+		},
+
 		_apiError(e) {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
