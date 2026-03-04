@@ -243,6 +243,7 @@
 				<b-row v-if="savesearch.visibility == 'private_group'">
 					<b-col>
 						<b-form-group
+							class="allow-group-modification"
 							:label="$t('search.allow_group_modification')" 
 							label-for="allow_group_modification"
 						>
