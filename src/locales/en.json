@@ -541,7 +541,7 @@
   },
   "search": {
     "action": "Action",
-    "addgroup": "Add a grouped search",
+    "addgroup": "Add a search group",
     "addquerytogroup": "Add search to group",
     "allow_group_modification": "Allow modification by groups",
     "and": "AND",
