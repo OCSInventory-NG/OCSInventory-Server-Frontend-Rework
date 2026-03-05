@@ -61,18 +61,6 @@
 						/>
 						<p>{{ $t('generic.logout') }}</p>
 					</b-dropdown-item-button>
-
-					<b-dropdown-item-button
-						v-if="isSSO"
-						class="d-flex align-items-center justify-content-between"
-					>
-						<span>SLO</span>
-						<b-form-checkbox
-							v-model="sloEnabled"
-							switch
-							@change.stop="onSLOChange"
-						/>
-					</b-dropdown-item-button>
 				</BNavItemDropdown>
 			</div>
 
@@ -89,20 +77,7 @@ export default {
 	data() {
 		return {
 			showmobilemenu: false,
-			sloEnabled: localStorage.getItem('slo_enabled') === 'true',
-			endpoint_logout: null,
 			sso: false,
-		}
-	},
-	async mounted() {
-		try {
-			const data = await this.$api.generic.get("login/")
-
-			if (data) {
-				this.endpoint_logout = data.endpoint_logout
-			}
-		} catch (e) {
-			console.error('Error fetching logout endpoint:', e)
 		}
 	},
 	computed: {
@@ -111,24 +86,18 @@ export default {
 		}
 	},
 	methods: {
-		onSLOChange() {
-			localStorage.setItem('slo_enabled', this.sloEnabled)
-		},
 		logout() {
 			const authMethod = localStorage.getItem('auth_method');
-			const sloEnabled = this.sloEnabled;
-
 			localStorage.removeItem('authenticated');
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
 			localStorage.removeItem('auth_method');
-			localStorage.removeItem('slo_enabled');
 
-			if(authMethod === 'sso' && sloEnabled) {
-				window.location.href = this.endpoint_logout;
-				return;
-			}
-			this.$router.push('/login');
+			let backendLogout = `${this.$api.http.defaults.baseURL}logout/`;
+			if (authMethod === 'sso') {
+        		backendLogout += "?method=sso";
+    		}
+			window.location.href = backendLogout;
 		},
 		account() {
 			this.$router.push('/myaccount');

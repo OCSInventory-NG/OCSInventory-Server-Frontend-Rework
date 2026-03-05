@@ -124,6 +124,7 @@ export default {
 			oidcdata: [],
 			booleans: [
 				"AUTO_REDIRECT",
+				"SLO_ENABLED",
 			],
 			options: [
 				{ value: "HS256", text: "HS256" },
