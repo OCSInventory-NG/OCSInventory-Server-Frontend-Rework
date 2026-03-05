@@ -526,7 +526,7 @@ export default {
 					})
 
 				const deleteTasks = actionremove.map((id) =>
-					this.$api.generic.delete(`automation/action/${id}`)
+					this.$api.generic.delete(`automation/action/${id}/`)
 				)
 
 				await Promise.all([...patchTasks, ...postTasks, ...deleteTasks])
