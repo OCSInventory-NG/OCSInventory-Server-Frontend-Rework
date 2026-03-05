@@ -95,8 +95,8 @@ export default {
 
 			let backendLogout = `${this.$api.http.defaults.baseURL}logout/`;
 			if (authMethod === 'sso') {
-        		backendLogout += "?method=sso";
-    		}
+				backendLogout += "?method=sso";
+			}
 			window.location.href = backendLogout;
 		},
 		account() {
