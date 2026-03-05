@@ -291,6 +291,14 @@ const routes = [
 		meta: {
 			layout: AppLayout
 		}
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		name: 'NotFound',
+		component: () => import('@/pages/NotFound/NotFound.vue'),
+		meta: {
+			layout: AppLayout
+		}
 	}
 ]
 
