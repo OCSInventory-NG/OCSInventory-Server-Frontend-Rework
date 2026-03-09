@@ -1,12 +1,12 @@
 <template>
   <div>
     <button
-      v-if="update" 
+      v-if="update"
       :title="$t('note.edit')"
       class="btn btn-ghost-dark"
       @click="loadData(id)"
     >
-      <font-awesome-icon 
+      <font-awesome-icon
         :icon="['fas', 'pencil']"
       />
     </button>
@@ -49,10 +49,10 @@ export default {
   name: "NoteModal",
 
   props: {
-    id: { type: Number, rdefault: null },
+    id: { type: Number, default: null },
     update: { type: Boolean, default: false },
-    object_slug: { type: String, default: null },
-    object_id: { type: Number, default: null },
+    objectSlug: { type: String, default: null },
+    objectId: { type: Number, default: null },
     contentType: { type: Number, required: true },
   },
 
@@ -114,11 +114,11 @@ export default {
         if(this.update) {
           await this.$api.generic.patch(`notes/${this.row.id}/`, { text: this.row.text })
         } else {
-          await this.$api.generic.post("notes/", { 
+          await this.$api.generic.post("notes/", {
             text: this.row.text,
             creator: this.creator,
-            object_slug: this.object_slug,
-            object_id: this.object_id,
+            object_slug: this.objectSlug,
+            object_id: this.objectId,
             content_type: this.contentType
           })
         }

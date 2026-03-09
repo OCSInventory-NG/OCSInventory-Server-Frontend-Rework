@@ -1,7 +1,7 @@
 <template>
   <div id="Notes">
     <section v-if="errored">
-      <Alert 
+      <Alert
         :message="errormsg"
         variant="danger"
       />
@@ -22,11 +22,11 @@
               class="d-sm-inline-block btn-modal"
               @click="openCreateModal"
             >
-              <font-awesome-icon 
+              <font-awesome-icon
                 :icon="['fas', 'plus']"
               />
               {{ $t('note.addnote') }}
-            </b-button> 
+            </b-button>
           </div>
         </div>
 
@@ -48,8 +48,8 @@
         <NoteModal
           ref="noteModal"
           :update="false"
-          :object_slug="slug"
-          :object_id="id"
+          :objectSlug="slug"
+          :objectId="id"
           :contentType="Number(type)"
           @reloadDatatable="reloadDatatable"
         />
@@ -119,15 +119,15 @@ export default {
         const creatorIds = [...new Set(notes.map(n => n.creator).filter(id => id))]
         const users = {}
         for (const id of creatorIds) {
-          try { users[id] = await this.$api.generic.get(`users/${id}/`) } 
+          try { users[id] = await this.$api.generic.get(`users/${id}/`) }
           catch { users[id] = { username: `User ${id}` } }
         }
 
         this.rowdata = notes.map(note => {
           const creator = users[note.creator] || {}
           const creatorName = creator.first_name ? `${creator.last_name} ${creator.first_name}` : creator.username || `User ${note.creator}`
-          return { 
-            ...note, 
+          return {
+            ...note,
             creator: creatorName,
             object_slug: note.object_slug || this.slug,
             object_id: note.object_id || this.id,

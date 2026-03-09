@@ -299,19 +299,27 @@
 					</router-link>
 				</template>
 
-				<!-- Assets redirection -->
-				<template 
-					v-if="canaccessdetails"
-					#cell(name)="row"
-				>
-					<router-link  
+				<!-- Template redirection -->
+				<template #cell(name)="row">
+					<router-link
+						v-if="canedittemplate"
+						:to="'/configurations/templates/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.name }}
+					</router-link>
+					<router-link
+						v-else-if="canaccessdetails"
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
 					</router-link>
+					<span v-else>
+						{{ row.item.name }}
+					</span>
 				</template>
-
+				
 				<!-- Assets redirection -->
 				<template 
 					v-if="canaccessdetails || canaccesspackagedetails"
@@ -415,19 +423,6 @@
 					<span style="color:#2fb344">
 						{{ row.item.success }}
 					</span>
-				</template>
-
-				<!-- Template redirection -->
-				<template 
-					v-if="canedittemplate"
-					#cell(name)="row"
-				>
-					<router-link 
-						:to="'/configurations/templates/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.name }}
-					</router-link>
 				</template>
 
 				<!-- Edit row for configuration -->
@@ -959,7 +954,8 @@ export default {
 		this.json_data = this.rowdata
 
 		this.rowdata.forEach(row => {
-			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at','created_at'];
+			const dateFields = ['last_update', 'last_updated', 'timestamp',
+			'date_created','date','last_seen','updated_at','created_at'];
 			const dateValue = dateFields.find(field => row[field]);
 			if (dateValue) {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
