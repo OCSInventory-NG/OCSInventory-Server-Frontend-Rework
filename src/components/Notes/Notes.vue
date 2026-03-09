@@ -125,11 +125,13 @@ export default {
 
         this.rowdata = notes.map(note => {
           const creator = users[note.creator] || {}
-          const creatorName = creator.first_name ? `${creator.last_name} ${creator.first_name}` : creator.username || `User ${note.creator}`
+          const creatorName = creator.first_name
+            ? `${creator.last_name} ${creator.first_name}`
+            : creator.username || `User ${note.creator}`
           return {
             ...note,
             creator: creatorName,
-            object_slug: note.object_slug || this.slug,
+            object_slug: note.object_slug || this.slug,
             object_id: note.object_id || this.id,
             content_type: Number(note.content_type),
           }
