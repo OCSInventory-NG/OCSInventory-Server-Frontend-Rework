@@ -115,6 +115,11 @@ export default {
 			this.errormsg = null
 			this.sso = !!data?.SSO
 			this.redirect_url = data?.redirect_url ?? null
+
+			const token = localStorage.getItem('token_authentication')
+			if (token) {
+				await this.getPermissions()
+			}
 		} catch (e) {
 			this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 		}
