@@ -462,6 +462,9 @@
 				<template #cell(updated_at)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
+				<template #cell(created_at)="row">
+					{{ new Date(row.item.created_at).toLocaleString($i18n.locale) }}
+				</template>
 				<template #cell(last_seen)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
@@ -469,7 +472,7 @@
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
 					<b-button-toolbar>
-						<b-button-group class="mx-1">
+						<b-button-group class="mx-1">	
 							<slot
 								name="cell(firstActions)"
 								:row="row"
@@ -540,7 +543,13 @@
 							<component
 								:is="editcomponent"
 								v-if="canedit"
-								v-bind="{ id: row.item.id || row.item.identifier }"
+								v-bind="{ 
+									id: row.item.id || row.item.identifier,
+									update: true,
+									object_slug: row.item.object_slug,
+									object_id: row.item.object_id,
+									contentType: row.item.content_type
+								}"
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -950,7 +959,7 @@ export default {
 		this.json_data = this.rowdata
 
 		this.rowdata.forEach(row => {
-			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at'];
+			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at','created_at'];
 			const dateValue = dateFields.find(field => row[field]);
 			if (dateValue) {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
@@ -1149,7 +1158,7 @@ export default {
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
 				const dateFields = ['last_update', 'last_updated', 'timestamp', 
-					'date_created', 'date', 'updated_at','last_seen'];
+					'date_created', 'date', 'updated_at','last_seen','created_at'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);

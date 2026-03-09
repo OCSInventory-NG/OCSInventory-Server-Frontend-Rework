@@ -431,6 +431,11 @@
     "user": "Utilisateur",
     "version": "Version"
   },
+  "note": {
+    "addnote": "Ajouter une nouvelle note",
+    "edit": "Modifier la note",
+    "text": "Note"
+  },
   "permission": {
     "accountinfoconfig": "Données administratives - Configuration",
     "accountinfodata": "Données administratives - Données",
@@ -681,6 +686,7 @@
     "netdevices": "Périphériques réseau",
     "netgroup": "Groupes réseaux",
     "network": "Réseaux",
+    "notes": "Notes",
     "ocsreports": "OCS Inventory",
     "packages": "Paquets",
     "result": "Résultats",

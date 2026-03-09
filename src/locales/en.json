@@ -431,6 +431,11 @@
     "user": "User",
     "version": "Version"
   },
+  "note": {
+    "addnote": "Add a new note",
+    "edit": "Edit note",
+    "text": "Note"
+  },
   "permission": {
     "accountinfoconfig": "Administrative data - Configuration",
     "accountinfodata": "Administrative data - Data",
@@ -681,6 +686,7 @@
     "netdevices": "Network devices",
     "netgroup": "Network groups",
     "network": "Networks",
+    "notes": "Notes",
     "ocsreports": "OCS Inventory",
     "packages": "Packages",
     "result": "Results",
