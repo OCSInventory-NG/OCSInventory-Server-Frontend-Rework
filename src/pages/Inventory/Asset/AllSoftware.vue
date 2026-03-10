@@ -102,7 +102,6 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("software_dictionary/")
 				this.rowheader = Object.keys(header.actions.POST).filter((f) => f !== "assets")
-				this.rowheader.push("installation_number")
 
 				// Get softwares
 				await this.getSoftwares(this.query)
@@ -125,10 +124,6 @@ export default {
 
 				const results = data.results || data
 				this.total = typeof data.count === "number" ? data.count : results.length
-
-				results.forEach(data => {
-					data.installation_number = data.assets.length 
-				})
 
 				this.rowdata = results
 
