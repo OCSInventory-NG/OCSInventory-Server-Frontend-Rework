@@ -127,9 +127,10 @@
 									/>
 								</b-form-group>
 								<b-form-checkbox
-									v-if="input.operator == 'in'
+									v-if="input.field !== 'auth_profile.auth_method' 
+										&& (input.operator == 'in'
 										|| input.operator == '=='
-										|| input.operator == '!='"
+										|| input.operator == '!=')"
 									id="case_sensitive"
 									v-model="input.case_sensitive"
 									name="enabled"
@@ -144,17 +145,17 @@
 									<v-select
 										v-if="input.field === 'auth_profile.auth_method'"
 										v-model="input.value"
-										:options="auth_methods"
-										:reduce="opt => opt.value"
+										:options="auth_methods.filter(m => m.value.toString() === ldapMethodId)"
+										:reduce="opt => opt.value.toString()"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 									/>
 									<v-select
-										v-if="input.field === 'auth_profile.auth_method' && input.value === '2'"
+										v-if="input.field === 'auth_profile.auth_method' && input.value == ldapMethodId"
 										v-model="input.ldap_config"
 										:options="ldapConfigs"
-										:reduce="opt => opt.value"
+										:reduce="opt => opt.value.toString()"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
@@ -284,13 +285,8 @@ export default {
 					key: "network."
 				}
 			},
-			auth_methods: [
-				{ value: "1", text: this.$t("authentication.LOCAL") },
-				{ value: "2", text: this.$t("authentication.LDAP") },
-				{ value: "3", text: this.$t("authentication.OIDC") },
-				{ value: "4", text: this.$t("authentication.CAS")}
-			],
-
+			auth_methods: [],
+			ldapMethodId: null,
 			ldapConfigs: [],
 
 			operatortargets: {
@@ -334,6 +330,7 @@ export default {
 	},
 	async mounted() {
 		await this.getLogicRow()
+		await this.getAuthMethods()
 		await this.getLdapConfigs()
 	},
 	methods: {
@@ -495,7 +492,14 @@ export default {
 					})
 				}
 			})
-
+			this.datavalues.forEach(masterInput => {
+				masterInput.forEach(input => {
+					if (input.field.includes(".metadata.") && input.metadata_field == null) {
+						input.metadata_field = input.field.split(".metadata.")[1]
+						input.field = input.field.split(".metadata.")[0] + ".metadata"
+					}
+				})
+			})
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
 
 			await this.getModelField()
@@ -620,7 +624,7 @@ export default {
 					} else if (firstKey == null) {
 						if (
 							logics[0].field === "auth_profile.auth_method"
-							&& logics[0].value === "2"
+							&& logics[0].value === this.ldapMethodId
 						) {
 							const firstCondition = this.pushInLogicSimple({}, 0, logics)
 							const secondCondition = {
@@ -660,23 +664,40 @@ export default {
 				this.successed = false
 			}
 		},
+		onFieldChange(input) {
+			if (input.field === "auth_profile.auth_method") {
+				input.operator = "=="
+			}
+		},
+		async getAuthMethods() {
+			try {
+				const methods = await this.$api.generic.get("auth_method/")
+				this.auth_methods = methods.map(m => ({
+					value: m.id,
+					text: m.name
+				}))
+
+				const ldap = methods.find(m => m.name === "LDAP")
+				if (ldap) {
+					this.ldapMethodId = ldap.id.toString()
+				}
+			} catch(e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
 		async getLdapConfigs() {
 			try {
 				const configs = await this.$api.generic.get("auth_config/")
 				this.ldapConfigs = configs
-				.filter(c => c.auth_method === 2)
+				.filter(c => c.auth_method.toString() == this.ldapMethodId)
 				.map(c => ({
-					value: c.id,
+					value: c.id.toString(),
 					text: c.name
 				}))
 			} catch(e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
-			}
-		},	
-		onFieldChange(input) {
-			if (input.field === "auth_profile.auth_method") {
-				input.operator = "=="
 			}
 		}
 	}
