@@ -541,7 +541,7 @@
   },
   "search": {
     "action": "Action",
-    "addgroup": "Ajouter une recherche groupée",
+    "addgroup": "Ajouter un groupe à la recherche",
     "addquerytogroup": "Ajouter une recherche au groupe",
     "allow_group_modification": "Autoriser la modification par les groupes",
     "and": "ET",
