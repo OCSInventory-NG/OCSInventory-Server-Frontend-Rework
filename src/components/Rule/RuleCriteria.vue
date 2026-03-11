@@ -129,8 +129,8 @@
 								<b-form-checkbox
 									v-if="input.field !== 'auth_profile.auth_method' 
 										&& (input.operator == 'in'
-										|| input.operator == '=='
-										|| input.operator == '!=')"
+											|| input.operator == '=='
+											|| input.operator == '!=')"
 									id="case_sensitive"
 									v-model="input.case_sensitive"
 									name="enabled"
@@ -690,11 +690,11 @@ export default {
 			try {
 				const configs = await this.$api.generic.get("auth_config/")
 				this.ldapConfigs = configs
-				.filter(c => c.auth_method.toString() == this.ldapMethodId)
-				.map(c => ({
-					value: c.id.toString(),
-					text: c.name
-				}))
+					.filter(c => c.auth_method.toString() == this.ldapMethodId)
+					.map(c => ({
+						value: c.id.toString(),
+						text: c.name
+					}))
 			} catch(e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
