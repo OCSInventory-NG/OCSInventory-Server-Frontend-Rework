@@ -3,7 +3,7 @@
 		<section v-if="successed">
 			<Alert 
 				:message="$t('message.success_saved')"
-				:cols=true
+				:cols="true"
 				variant="success"
 			/>
 		</section>
@@ -11,7 +11,7 @@
 		<section v-if="errored && errorCode == null">
 			<Alert 
 				:message="errormsg.message"
-				:cols=true
+				:cols="true"
 				variant="danger"
 			/>
 		</section>
@@ -526,7 +526,7 @@ export default {
 					})
 
 				const deleteTasks = actionremove.map((id) =>
-					this.$api.generic.delete(`automation/action/${id}`)
+					this.$api.generic.delete(`automation/action/${id}/`)
 				)
 
 				await Promise.all([...patchTasks, ...postTasks, ...deleteTasks])
