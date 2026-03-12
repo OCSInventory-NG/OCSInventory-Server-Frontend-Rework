@@ -36,7 +36,6 @@
 			:title="(!update) ? $t('assetgroup.saveasgroup') : $t('assetgroup.editassetgroup')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
