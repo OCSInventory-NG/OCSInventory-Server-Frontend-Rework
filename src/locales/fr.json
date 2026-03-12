@@ -433,6 +433,7 @@
   },
   "note": {
     "addnote": "Ajouter une nouvelle note",
+    "create": "Créer une nouvelle note",
     "edit": "Modifier la note",
     "text": "Note"
   },

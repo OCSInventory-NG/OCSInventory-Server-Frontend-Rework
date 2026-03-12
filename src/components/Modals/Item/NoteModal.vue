@@ -11,8 +11,56 @@
 			/>
 		</button>
 		<b-modal
+			v-if="update"
 			v-model="notemodal"
 			:title="$t('note.edit')"
+			hide-footer
+			modal-class="custom-modal"
+		>
+			<Alert
+				v-if="createerror || errored"
+				:message="createerror ? createerrormsg : errormsg"
+				variant="danger"
+			/>
+
+			<b-form
+				v-if="!loading"
+				@submit="onSubmit"
+			>
+				<b-form-group
+					:label="$t('note.text')"
+					label-for="note"
+				>
+					<b-form-textarea
+						id="note"
+						v-model="row.text"
+						rows="6"
+						required
+					/>
+				</b-form-group>
+
+				<div class="text-center">
+					<b-button
+						type="submit"
+						variant="success"
+					>
+						{{ $t('generic.save') }}
+					</b-button>
+				</div>
+			</b-form>
+
+			<div
+				v-if="loading"
+				class="ocs-loader"
+			>
+				<Loader />
+			</div>
+		</b-modal>
+
+		<b-modal
+			v-else
+			v-model="notemodal"
+			:title="$t('note.create')"
 			hide-footer
 			modal-class="custom-modal"
 		>
