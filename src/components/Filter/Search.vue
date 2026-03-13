@@ -302,15 +302,7 @@ export default {
 					}
 				]
 			],
-			routeopt: [
-				{ value: "asset/bases", text: this.$t("title.assets") },
-				{ value: "accountinfo/config?datatarget=ASSET", text: this.$t("title.accountinfo") },
-				{ value: "deployment/results", text: this.$t("title.deployment") },
-				{ value: "asset/logs", text: this.$t("title.inventory_logs") },
-				{ value: "templates", text: this.$t("title.inventory") },
-				{ value: "snmp/scanner", text: this.$t("network.snmpscanner") },
-				{ value: "software_dictionary", text: this.$t("title.software_dictionary") },
-			],
+			routeopt: [],
 			obj: {
 				"asset/bases": "InventoryBase",
 				"accountinfo/config?datatarget=ASSET": "AccountinfoConfig",
@@ -321,7 +313,104 @@ export default {
 				"software_dictionary": "software_dictionary_entries",
 			},
 			fieldopt: [],
-			operatoropt: {
+			operatoropt: {},
+			linktype: {
+				"TEXT": "string",
+				"TEXTAREA": "string",
+				"SELECT": "select",
+				"CHECKBOX": "checkbox"
+			},
+			linkopt: [],
+			adminopt: [],
+			templateopt: [],
+			sectionopt: [],
+			inputype: {
+				"string": "text",
+				"integer": "number",
+				"datetime": "datetime-local"
+			},
+			selectfield: ["select", "checkbox", "choice"],
+			excludefield: ["id", "asset", "package"],
+			scope: [],
+
+			loading: true,
+			loadingadmin: true,
+			loadingtemplate: true,
+			loadingsection: true,
+		}
+	},
+	watch: {
+		'$i18n.locale'() {
+			this.updateTranslations()
+		}
+	},
+	mounted() {
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		this.cansave = permissions.includes("search_add_search")
+
+		this.datavalues =
+			JSON.parse(localStorage.getItem("multisearch")) ?? [
+				[
+					{
+						object: "InventoryBase",
+						route: "asset/bases",
+						field: "",
+						fieldtype: "string",
+						operator: "iexact",
+						value: "",
+						link: "",
+					},
+				],
+			]
+
+		if (this.searchgroup.length) {
+			this.datavalues = this.searchgroup
+		}
+		this.loadFieldsAndUpdateTranslations()
+	},
+
+	methods: {
+		async loadFieldsAndUpdateTranslations() {
+			const promises = []
+			
+			Object.keys(this.datavalues).forEach((masterindex) => {
+				Object.keys(this.datavalues[masterindex]).forEach((index) => {
+					const row = this.datavalues[masterindex][index]
+					promises.push(this.getFields(row.route, masterindex, index, false, true))
+
+					if (
+						row.route === "templates" &&
+						row.template != null &&
+						row.section != null
+					) {
+						promises.push(this.getSections(row.template, masterindex, index, true))
+						promises.push(this.getFields(row.section, masterindex, index, true, true))
+					}
+				})
+			})
+			await Promise.all(promises)
+			Object.keys(this.datavalues).forEach((masterindex) => {
+				Object.keys(this.datavalues[masterindex]).forEach((index) => {
+					const row = this.datavalues[masterindex][index]
+					this.setFieldType(row, masterindex, index)
+				})
+			})
+			this.updateTranslations()
+		},
+		updateTranslations() {
+			this.routeopt = [
+				{ value: "asset/bases", text: this.$t("title.assets") },
+				{ value: "accountinfo/config?datatarget=ASSET", text: this.$t("title.accountinfo") },
+				{ value: "deployment/results", text: this.$t("title.deployment") },
+				{ value: "asset/logs", text: this.$t("title.inventory_logs") },
+				{ value: "templates", text: this.$t("title.inventory") },
+				{ value: "snmp/scanner", text: this.$t("network.snmpscanner") },
+				{ value: "software_dictionary", text: this.$t("title.software_dictionary") },
+			]
+			this.routeopt.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+
+			this.operatoropt = {
 				"string": [
 					{ value: "iexact", text: this.$t("search.iexact") },
 					{ value: "icontains", text: this.$t("search.icontains") },
@@ -351,81 +440,40 @@ export default {
 				"choice": [
 					{ value: "iexact", text: this.$t("search.iexact") },
 				]
-			},
-			linktype: {
-				"TEXT": "string",
-				"TEXTAREA": "string",
-				"SELECT": "select",
-				"CHECKBOX": "checkbox"
-			},
-			linkopt: [
+			}
+
+			this.linkopt = [
 				{ value: "AND", text: this.$t("search.and") },
 				{ value: "OR", text: this.$t("search.or") }
-			],
-			adminopt: [],
-			templateopt: [],
-			sectionopt: [],
-			inputype: {
-				"string": "text",
-				"integer": "number",
-				"datetime": "datetime-local"
-			},
-			selectfield: ["select", "checkbox", "choice"],
-			excludefield: ["id", "asset", "package"],
-			scope: [],
-
-			loading: true,
-			loadingadmin: true,
-			loadingtemplate: true,
-			loadingsection: true,
-		}
-	},
-	mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		this.cansave = permissions.includes("search_add_search")
-
-		this.routeopt.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
-
-		this.datavalues =
-			JSON.parse(localStorage.getItem("multisearch")) ?? [
-				[
-					{
-						object: "InventoryBase",
-						route: "asset/bases",
-						field: "",
-						fieldtype: "string",
-						operator: "iexact",
-						value: "",
-						link: "",
-					},
-				],
 			]
 
-		if (this.searchgroup.length) {
-			this.datavalues = this.searchgroup
-		}
-
-		Object.keys(this.datavalues).forEach((masterindex) => {
-			Object.keys(this.datavalues[masterindex]).forEach((index) => {
-				const row = this.datavalues[masterindex][index]
-
-				this.getFields(row.route, masterindex, index, false, true)
-
-				if (
-					row.route === "templates" &&
-					row.template != null &&
-					row.section != null
-				) {
-					this.getSections(row.template, masterindex, index, true)
-					this.getFields(row.section, masterindex, index, true, true)
-				}
-
-				this.setFieldType(row, masterindex, index)
+			Object.keys(this.datavalues).forEach((masterindex) => {
+				Object.keys(this.datavalues[masterindex]).forEach((index) => {
+					const row = this.datavalues[masterindex][index]
+					if (row.route && this.fieldopt?.[masterindex]?.[index]?.length > 0) {
+						this.retranslateFieldsForRoute(row.route, masterindex, index)
+					}
+				})
 			})
-		})
-	},
-	methods: {
+		},
+
+		retranslateFieldsForRoute(route, masterindex, index) {
+			const component = this.resolveComponentFromRoute(route)
+			
+			if (route === "accountinfo/config?datatarget=ASSET" || route === "templates") {
+				return
+			}
+			
+			if (this.fieldopt?.[masterindex]?.[index]) {
+				const retranslatedFields = this.fieldopt[masterindex][index].map((field) => ({
+					...field,
+					text: this.$t(`${component}.${field.value}`)
+				}))
+				retranslatedFields.sort(this.sortByText)
+				this.fieldopt[masterindex][index] = retranslatedFields
+			}
+		},
+
 		ensureNestedArray(container, masterindex) {
 			if (!Array.isArray(container[masterindex])) container[masterindex] = []
 		},

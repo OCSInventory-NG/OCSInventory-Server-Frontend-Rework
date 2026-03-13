@@ -77,14 +77,27 @@ export default {
 	data() {
 		return {
 			showmobilemenu: false,
+			sso: false,
+		}
+	},
+	computed: {
+		isSSO() {
+			return localStorage.getItem('auth_method') === 'sso';
 		}
 	},
 	methods: {
 		logout() {
-			localStorage.setItem('authenticated', false);
+			const authMethod = localStorage.getItem('auth_method');
+			localStorage.removeItem('authenticated');
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
-			this.$router.push('/login');
+			localStorage.removeItem('auth_method');
+
+			let backendLogout = `${this.$api.http.defaults.baseURL}logout/`;
+			if (authMethod === 'sso') {
+				backendLogout += "?method=sso";
+			}
+			window.location.href = backendLogout;
 		},
 		account() {
 			this.$router.push('/myaccount');
