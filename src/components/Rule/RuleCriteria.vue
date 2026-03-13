@@ -94,14 +94,19 @@
 									<v-select
 										id="field"
 										v-model="input.field"
-										:options="fields.filter(f => f.value !== 'auth_profile.auth_config')"
+										:options="fields"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
+										:selectable="option => {
+											if (option.value !== 'auth_profile.auth_config') return true
+											return index > 0
+										}"
 										@update:modelValue="val => {
-											onFieldChange(input)
+											input.value = null
+											onFieldChange(input, masterindex, input.value)
 										}"
 									/>
 									<b-form-input
@@ -150,17 +155,17 @@
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
+										@update:modelValue="val => onFieldChange(input, masterindex, val)"
 									/>
 									<v-select
-										v-if="input.field === 'auth_profile.auth_method' && input.value == ldapMethodId"
-										v-model="input.ldap_config"
+										v-else-if="input.field === 'auth_profile.auth_config'"
+										v-model="input.value"
 										:options="ldapConfigs"
 										:reduce="opt => opt.value.toString()"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 									/>
-									
 									<b-form-input
 										v-else
 										id="value"
@@ -329,9 +334,9 @@ export default {
 		}
 	},
 	async mounted() {
-		await this.getLogicRow()
 		await this.getAuthMethods()
 		await this.getLdapConfigs()
+		await this.getLogicRow()
 	},
 	methods: {
 		_apiError(e) {
@@ -500,6 +505,19 @@ export default {
 					}
 				})
 			})
+			this.datavalues.forEach(master => {
+				master.forEach(input => {
+					if (
+						input.field === "auth_profile.auth_method" && 
+						input.value === this.ldapMethodId
+					) {
+						const ldapCondition = master.find(cond => cond.field === "auth_profile.auth_config")
+						if (ldapCondition) {
+							input.ldap_config = ldapCondition.value?.toString() || null
+						}
+					}
+				})
+			})
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
 
 			await this.getModelField()
@@ -664,9 +682,25 @@ export default {
 				this.successed = false
 			}
 		},
-		onFieldChange(input) {
+		onFieldChange(input, masterindex, val) {
 			if (input.field === "auth_profile.auth_method") {
 				input.operator = "=="
+
+				if (val === this.ldapMethodId) {
+
+					const exists = this.datavalues[masterindex]
+						.some(c => c.field === 'auth_profile.auth_config')
+
+					if(!exists) {
+						this.addAndCondition(masterindex, 0, this.datavalues)
+						const lastIndex = this.datavalues[masterindex].length - 1
+						const newCondition = this.datavalues[masterindex][lastIndex]
+
+						newCondition.field = "auth_profile.auth_config"
+						newCondition.operator = "=="
+						newCondition.value = null
+					}
+				}
 			}
 		},
 		async getAuthMethods() {
