@@ -103,8 +103,8 @@
 				</b-row>
 				<b-row>
 					<Matrix
-						:key="matrixKey"
 						:id="id"
+						:key="matrixKey"
 						v-model="row.permissions"
 						:rowtab="permissions"
 						:rowlabel="permissionslabel"
