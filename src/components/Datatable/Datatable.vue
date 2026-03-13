@@ -301,11 +301,19 @@
 
 				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails"
+					v-if="canaccessdetails || canedittemplate"
 					#cell(name)="row"
 				>
-					<router-link  
+					<router-link
+						v-if="canaccessdetails"
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.name }}
+					</router-link>
+					<router-link
+						v-if="canedittemplate" 
+						:to="'/configurations/templates/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
@@ -415,19 +423,6 @@
 					<span style="color:#2fb344">
 						{{ row.item.success }}
 					</span>
-				</template>
-
-				<!-- Template redirection -->
-				<template 
-					v-if="canedittemplate"
-					#cell(name)="row"
-				>
-					<router-link 
-						:to="'/configurations/templates/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.name }}
-					</router-link>
 				</template>
 
 				<!-- Edit row for configuration -->
