@@ -25,7 +25,7 @@
 				v-if="rowdatas.length > 0"
 				v-model="rowdatas" 
 				item-key="id"
-				:disabled="!canedit"
+				:disabled="!canedit || viewOnly"
 				tag="tbody"
 				handle=".handle"
 				@end="onEnd"
