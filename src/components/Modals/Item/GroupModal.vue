@@ -38,7 +38,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="xl"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
