@@ -231,7 +231,8 @@ export default {
 					"token",
 					"logentry",
 					"proxy",
-					"filemanager"
+					"filemanager",
+					"groupprotection"
 				]
 
 				this.permissions = {}
