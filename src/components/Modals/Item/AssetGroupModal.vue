@@ -36,7 +36,6 @@
 			:title="(!update) ? $t('assetgroup.saveasgroup') : $t('assetgroup.editassetgroup')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -159,7 +158,7 @@
 								<label class="form-check form-switch">
 									<input 
 										v-model="rowgroup.is_dynamic"
-										class="form-check-input"
+										class="is-dynamic form-check-input"
 										type="checkbox"
 									>
 								</label>
@@ -203,6 +202,7 @@
 					<b-row v-if="rowgroup.visibility == 'private_group'">
 						<b-col>
 							<b-form-group
+								class="allow-group-modification"
 								:label="$t('assetgroup.allow_group_modification')" 
 								label-for="allow_group_modification"
 							>
