@@ -123,7 +123,7 @@
 										id="operator"
 										v-model="input.operator"
 										:disabled="input.field == 'auth_profile.auth_method' 
-										|| isLdapConfigRow(masterindex, input)"
+											|| isLdapConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
 										:clearable="false"
@@ -143,7 +143,6 @@
 									name="enabled"
 									:value="true"
 									inline
-									
 								>
 									{{ $t("rule.case_sensitive") }}
 								</b-form-checkbox>
@@ -181,13 +180,13 @@
 							<b-col cols="1">
 								<b-form-group>
 									<b-button 
+										v-if="!isLdapConfigRow(masterindex, input)"
 										:id="'addfield'+masterindex+index"
 										v-b-modal="1"
 										variant="primary"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.addandcondition')"
 										@click="addAndCondition(masterindex, index, datavalues)"
-										v-if="!isLdapConfigRow(masterindex, input)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'plus']"
@@ -201,13 +200,13 @@
 							>
 								<b-form-group>
 									<b-button 
+										v-if="!isLdapConfigRow(masterindex, input)"
 										:id="'removefield'+masterindex+index"
 										v-b-modal="1"
 										variant="danger"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
 										@click="removeAndCondition(masterindex, index, datavalues)"
-										v-if="!isLdapConfigRow(masterindex, input)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
