@@ -356,6 +356,9 @@ export default {
 			this.createerrormsg = null
 
 			try {
+				['email', 'first_name', 'last_name'].forEach(key => {
+					if (!this.row[key]) this.row[key] = ""
+				})
 				if (!this.update) {
 					await this.$api.generic.post("users/", this.row)
 				} else {

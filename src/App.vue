@@ -32,6 +32,7 @@ export default {
 			const loginInfo = await this.$api.generic.get("login/")
 
 			if (loginInfo?.auto_redirect && !noAuto) {
+				localStorage.setItem('auth_method', 'sso')
 				window.location.href = loginInfo.redirect_url
 				return
 			}
