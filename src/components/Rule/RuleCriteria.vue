@@ -744,8 +744,8 @@ export default {
 				return false
 			}
 			return this.datavalues[masterindex].some(c => 
-				c.field === "auth_profile.auth_method" &&
-				 c.value === this.ldapMethodId
+				c.field === "auth_profile.auth_method" && 
+				c.value === this.ldapMethodId
 			)
 		}
 	}
