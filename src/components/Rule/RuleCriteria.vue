@@ -122,7 +122,8 @@
 									<v-select
 										id="operator"
 										v-model="input.operator"
-										:disabled="input.field == 'auth_profile.auth_method'"
+										:disabled="input.field == 'auth_profile.auth_method' 
+										|| isLdapConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
 										:clearable="false"
@@ -133,6 +134,7 @@
 								</b-form-group>
 								<b-form-checkbox
 									v-if="input.field !== 'auth_profile.auth_method' 
+										&& !isLdapConfigRow(masterindex, input)
 										&& (input.operator == 'in'
 											|| input.operator == '=='
 											|| input.operator == '!=')"
@@ -141,6 +143,7 @@
 									name="enabled"
 									:value="true"
 									inline
+									
 								>
 									{{ $t("rule.case_sensitive") }}
 								</b-form-checkbox>
@@ -184,6 +187,7 @@
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.addandcondition')"
 										@click="addAndCondition(masterindex, index, datavalues)"
+										v-if="!isLdapConfigRow(masterindex, input)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'plus']"
@@ -203,6 +207,7 @@
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
 										@click="removeAndCondition(masterindex, index, datavalues)"
+										v-if="!isLdapConfigRow(masterindex, input)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
@@ -733,6 +738,15 @@ export default {
 				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
+		},
+		isLdapConfigRow(masterindex, input) {
+			if (input.field !== "auth_profile.auth_config") {
+				return false
+			}
+			return this.datavalues[masterindex].some(c => 
+				c.field === "auth_profile.auth_method" &&
+				 c.value === this.ldapMethodId
+			)
 		}
 	}
 }
