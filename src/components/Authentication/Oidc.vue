@@ -1,5 +1,5 @@
 <template>
-	<div id="cas">
+	<div id="oidc">
 		<div v-if="successed">
 			<Alert 
 				:message="$t('message.success_saved')"
@@ -91,14 +91,33 @@
 					<b-col 
 						align-self="center"
 						align="center"
+						class="d-flex justify-content-center align-items-center gap-2"
 					>
 						<b-button 
 							type="submit"
 							variant="success"
-							:disabled="!canedit"
+							:disabled="!canedit || loadingcreate"
 						>
 							{{ $t('generic.save') }}
 						</b-button>
+
+						<b-spinner
+							v-if="loadingcreate"
+							small
+							class="ms-2"
+						/>
+						<font-awesome-icon
+							v-if="createwithsuccess"
+							:icon="['fas', 'check']"
+							class="ms-2"
+							color="green"
+						/>
+						<font-awesome-icon
+							v-if="createerror"
+							:icon="['fas', 'xmark']"
+							class="ms-2"
+							color="red"
+						/>
 					</b-col>
 					<b-col align-self="end" />
 				</b-row>
@@ -117,6 +136,10 @@ export default {
 
 			successed: false,
 			successmsg: null,
+
+			loadingcreate: false,
+			createwithsuccess: false,
+			createerror: false,
 			
 			canedit: false,
 			canaddmapping: false,
@@ -136,7 +159,11 @@ export default {
 	},
 	watch: {
 		successed: function() {
-			setTimeout(() => this.successed = false, 5000)
+			setTimeout(() => {
+				this.successed = false
+				this.createwithsuccess = false
+				this.createerror = false
+			}, 5000)
 		}
 	},
 	async mounted() {
@@ -185,6 +212,9 @@ export default {
 
 		async onSubmit(event) {
 			event.preventDefault()
+			this.loadingcreate = true
+			this.createwithsuccess = false
+			this.createerror = false
 
 			try {
 				const { mappings: _mappings, ...payload } = this.oidcdata || {}
@@ -196,6 +226,7 @@ export default {
 
 				this.successmsg = "success"
 				this.successed = true
+				this.createwithsuccess = true
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
@@ -203,6 +234,9 @@ export default {
 				this.errored = true
 				this.successmsg = null
 				this.successed = false
+				this.createerror = true
+			} finally {
+				this.loadingcreate = false
 			}
 		},
 	}
