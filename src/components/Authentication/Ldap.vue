@@ -61,6 +61,7 @@
 					</div>
 					<LdapModal 
 						:authid="authid"
+						:viewOnly="viewOnly"
 						@reloadDatatable="reloadDatatable"
 					/>
 				</div>
@@ -70,7 +71,7 @@
 					v-if="!loading"
 					:rowdata="rowdata"
 					:rowheader="rowheader"
-					:canedit="canedit"
+					:canedit="canedit && !viewOnly"
 					:candelete="candelete"
 					:canaddmapping="canaddmapping"
 					editcomponent="LdapModal"
@@ -86,6 +87,11 @@
 <script>
 export default {
 	name: "Ldap",
+
+	props: {
+	viewOnly: { type: Boolean, default: false }
+	},
+
 	data() {
 		return {
 			errored: false,

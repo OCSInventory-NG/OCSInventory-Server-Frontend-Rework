@@ -8,6 +8,7 @@
 			<b-button
 				:title="$t('assetgroup.saveasgroup')"
 				:class="cssclass + ' d-none d-sm-inline-block btn-teal'"
+				:disabled="viewOnly"
 				@click="
 					loadData(),
 					getUserInfo()
@@ -319,6 +320,11 @@ export default {
 					this.$emit("reloadDatatable")
 				}
 			}, 500)
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions')?.split(',').includes("asset_group_change_assetgroup")
 		}
 	},
 	methods: {
