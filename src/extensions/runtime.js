@@ -6,7 +6,14 @@ export async function ensureExtensionsLoaded(loadFn) {
 	if (_loadingPromise) return _loadingPromise
 
 	_loadingPromise = (async () => {
-		await loadFn()
+		try {
+			await loadFn()
+		} catch (e) {
+			console.error("Error, extensions not loaded:", e)
+			_loaded = false
+			_loadingPromise = null
+		}
+
 		_loaded = true
 	})()
 
