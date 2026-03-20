@@ -1,15 +1,14 @@
 <template>
-  <div 
+  <div
     id="back-to-top"
     v-show="isVisible"
     aria-label="Back to top"
   >
-
-    <b-button 
+    <b-button
         @click="scrollToTop"
         class="rounded-circle"
     >
-      <font-awesome-icon 
+      <font-awesome-icon
 					:icon="['fas', 'arrow-up']"
 					size="1x"
 			/>
