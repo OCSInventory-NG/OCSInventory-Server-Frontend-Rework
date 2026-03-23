@@ -106,6 +106,7 @@
 														<b-form-select 
 															v-model="subparameter.value" 
 															class="form-select mb-3"
+															:disabled="!canedit"
 														>
 															<b-form-select-option 
 																v-for="option in subparameter.options"
@@ -172,6 +173,7 @@
 												<b-form-select 
 													v-model="parameter.value" 
 													class="form-select mb-3"
+													:disabled="!canedit"
 												>
 													<b-form-select-option 
 														v-for="option in parameter.options"
@@ -316,6 +318,7 @@ export default {
 
 		async onSubmit(event) {
 			event.preventDefault()
+			if(!this.canedit) return
 			this.loadingcreate = true
 			this.createwithsuccess = false
 			this.createerror = false

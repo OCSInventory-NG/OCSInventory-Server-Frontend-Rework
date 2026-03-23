@@ -36,7 +36,6 @@
 								:rowheader="rowheader"
 								:candelete="candelete"
 								:canedit="canedit"
-								:usecheckbox="true"
 								:viewautomationhistory="true"
 								:isbusy="isbusy"
 								editcomponent="AutomationModal"

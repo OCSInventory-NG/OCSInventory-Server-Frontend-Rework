@@ -4,7 +4,7 @@
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			:class="'btn ' + customclass"
-			:disabled="disabled"
+			:disabled="disabled || viewOnly"
 			@click="refreshIds()"
 		>
 			<font-awesome-icon 
@@ -19,7 +19,6 @@
 			hide-footer
 			modal-class="modal"
 			size="sm"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -139,6 +138,11 @@ export default {
 			text: null,
 			
 			loadingdelete: false,
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
 		}
 	},
 	watch: {

@@ -25,7 +25,7 @@
 				v-if="rowdatas.length > 0"
 				v-model="rowdatas" 
 				item-key="id"
-				:disabled="!canedit"
+				:disabled="!canedit || viewOnly"
 				tag="tbody"
 				handle=".handle"
 				@end="onEnd"
@@ -65,6 +65,7 @@
 										v-if="canedit"
 										v-bind="{ id: element.id }"
 										:update="true"
+										:view-only="viewOnly"
 										@reloadDatatable="reloadDatatable"
 									/>
 									<DeleteItemModal 
@@ -103,7 +104,8 @@ export default {
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false },
-		field: { type: String, default: 'priority' }
+		field: { type: String, default: 'priority' },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

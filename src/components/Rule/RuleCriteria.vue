@@ -100,6 +100,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
+										:disabled="viewOnly"
 									/>
 								</b-form-group>
 							</b-col>
@@ -114,6 +115,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										required
+										:disabled="viewOnly"
 									/>
 								</b-form-group>
 								<b-form-checkbox
@@ -124,7 +126,7 @@
 									v-model="input.case_sensitive"
 									name="enabled"
 									:value="true"
-									inline
+									:disabled="viewOnly"
 								>
 									{{ $t("rule.case_sensitive") }}
 								</b-form-checkbox>
@@ -135,7 +137,7 @@
 										id="value"
 										v-model="input.value"
 										class="mb-3"
-										:disabled="(disabledvalue.includes(input.operator)) ? true : false"
+										:disabled="viewOnly || (disabledvalue.includes(input.operator)) ? true : false"
 									/>
 								</b-form-group>
 							</b-col>
@@ -147,6 +149,7 @@
 										variant="primary"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.addandcondition')"
+										:disabled="viewOnly"
 										@click="addAndCondition(masterindex, index, datavalues)"
 									>
 										<font-awesome-icon 
@@ -166,6 +169,7 @@
 										variant="danger"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
+										:disabled="viewOnly"
 										@click="removeAndCondition(masterindex, index, datavalues)"
 									>
 										<font-awesome-icon 
@@ -189,6 +193,7 @@
 						type="button"
 						variant="info"
 						class="multisearch-btn"
+						:disabled="viewOnly"
 						@click="addOrCondition(datavalues)"
 					>
 						{{ $t('rule.addorcondition') }}
@@ -196,6 +201,7 @@
 					<b-button 
 						type="submit"
 						variant="success"
+						:disabled="viewOnly"
 					>
 						{{ $t('generic.save') }}
 					</b-button>
@@ -212,7 +218,8 @@ export default {
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
-		logic: { type: Object, default: null }
+		logic: { type: Object, default: null },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

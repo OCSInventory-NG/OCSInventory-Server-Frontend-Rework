@@ -32,7 +32,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:canaccessdetails="true"
-								:canmassprocessing="true"
+								:canmassprocessing="candelete"
 								:canaccesschild="true"
 								editcomponent="NetdeviceModal"
 								title="netdevice"

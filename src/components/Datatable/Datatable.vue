@@ -214,7 +214,7 @@
 				striped
 				hover
 				bordered
-				:selectable="usecheckbox"
+				:selectable="showCheckbox"
 				:select-mode="selectMode"
 				:items="rowdata"
 				:fields="visibleFields"
@@ -274,10 +274,10 @@
 
 				<!-- Network redirection -->
 				<template 
-					v-if="canaccesschild"
 					#cell(network)="row"
 				>
 					<a
+						v-if="canaccesschild"
 						href="#"
 						class="ocs-link"
 						@click.prevent="filterByNetwork(row.item.network_id)"
@@ -299,25 +299,25 @@
 					</router-link>
 				</template>
 
-				<!-- Template redirection -->
-				<template #cell(name)="row">
+				<!-- Assets redirection -->
+				<template 
+					v-if="canaccessdetails || canedittemplate"
+					#cell(name)="row"
+				>
 					<router-link
-						v-if="canedittemplate"
-						:to="'/configurations/templates/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.name }}
-					</router-link>
-					<router-link
-						v-else-if="canaccessdetails"
+						v-if="canaccessdetails"
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
 					</router-link>
-					<span v-else>
+					<router-link
+						v-if="canedittemplate" 
+						:to="'/configurations/templates/'+row.item.id"
+						class="ocs-link"
+					>
 						{{ row.item.name }}
-					</span>
+					</router-link>
 				</template>
 				
 				<!-- Assets redirection -->
@@ -621,7 +621,7 @@ export default {
 		canrefresh: { type: Boolean, default: true },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: null },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
@@ -712,6 +712,16 @@ export default {
 		};
 	},
 	computed: {
+		showCheckbox() {
+			if (this.usecheckbox !== null) {
+				return this.usecheckbox
+			}
+			return (
+				this.candelete ||
+				this.canmassprocessing
+			)
+		},
+
 		// Initialize visible fields
 		visibleFields() {
 			var key = this.title + "_" + this.templateid
@@ -803,6 +813,19 @@ export default {
 				this.emitQueryChange()
 			}
 		},
+		showCheckbox(val) {
+			this.fields = this.fields.filter(field => field.key !== 'selected')
+
+			if (val) {
+				this.fields.unshift({
+					key: "selected",
+					label: this.$t('generic.selected'),
+					sortable: false,
+					visible: true,
+					disabled: true
+				})
+			}
+		}
 	},
 	created() {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
@@ -823,7 +846,7 @@ export default {
 			this.deleterte = "netdevices"
 		}
 
-		if(this.usecheckbox == true) {
+		if(this.showCheckbox) {
 			this.fields.push({
 				key: "selected", 
 				label: this.$t('generic.selected'), 
@@ -935,7 +958,8 @@ export default {
 			tdClass: 'sticky-col right actions-col'
 		}
 
-		if(this.canedit == true || this.candelete == true || this.canviewhistory) {
+		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction || 
+		this.canviewaction || this.canedittemplate) {
 			this.fields.push(actions)
 		}
 

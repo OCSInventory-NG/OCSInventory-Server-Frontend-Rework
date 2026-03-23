@@ -1,7 +1,7 @@
 <template>
 	<div id="field-modal">
-		<div 
-			v-if="!update"
+		<div
+			v-if="!update"		
 			class="page-header d-print-none"
 		>
 			<div class="row">
@@ -10,6 +10,7 @@
 						:title="$t('template.addfield')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
+						:disabled="viewOnly"
 						@click="loadData()"
 					>
 						<font-awesome-icon 
@@ -24,6 +25,7 @@
 			<button 
 				:title="$t('template.editfield')"
 				class="btn btn-ghost-dark"
+				:disabled="viewOnly"
 				@click="loadData(id)"
 			>
 				<font-awesome-icon 
@@ -37,7 +39,6 @@
 			:title="(!update) ? $t('template.addfield') : $t('template.editfield')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -273,7 +274,8 @@ export default {
 		routetype: { type: String, default: "assets" },
 		section: { type: Number, default: null },
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

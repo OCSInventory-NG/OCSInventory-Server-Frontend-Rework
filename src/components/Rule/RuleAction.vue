@@ -46,6 +46,7 @@
 									:clearable="false"
 									label="text"
 									class="mb-3 ocs-select"
+									:disabled="viewOnly"
 									@option:selected="getFields(index, input.model, true)"
 								/>
 							</b-form-group>
@@ -61,6 +62,7 @@
 									label="text"
 									class="mb-3 ocs-select"
 									:loading="(loadingfield) ? true : false"
+									:disabled="viewOnly"
 									@option:selected="setFieldType(input, index)"
 								>
 									<template #search="{attributes, events}">
@@ -102,6 +104,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingselect) ? true : false"
+										:disabled="viewOnly"
 									>
 										<template #search="{attributes, events}">
 											<input
@@ -123,6 +126,7 @@
 									variant="primary"
 									class="d-none d-sm-inline-block form-control"
 									:title="$t('rule.addaction')"
+									:disabled="viewOnly"
 									@click="addAction(index, datavalues)"
 								>
 									<font-awesome-icon 
@@ -163,6 +167,7 @@
 					<b-button 
 						type="submit"
 						variant="success"
+						:disabled="viewOnly"
 					>
 						{{ $t('generic.save') }}
 					</b-button>
@@ -179,8 +184,9 @@ export default {
 	props: {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
-		triggers: { type: [Array, Object], default: () => [] },
-		actions: { type: [Array, Object], default: () => [] }
+		triggers: { type: Array, default: null },
+		actions: { type: Array, default: null },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {
