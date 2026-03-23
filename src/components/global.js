@@ -15,6 +15,7 @@ import MassProcessingModal from '@/components/Modals/Item/MassProcessingModal.vu
 import NetdeviceModal from '@/components/Modals/Item/NetdeviceModal.vue'
 import NetworkGroupModal from '@/components/Modals/Item/NetworkGroupModal.vue'
 import NetworkModal from '@/components/Modals/Item/NetworkModal.vue'
+import NoteModal from '@/components/Modals/Item/NoteModal.vue'
 import PackageModal from '@/components/Modals/Item/PackageModal.vue'
 import PackageResultModal from '@/components/Modals/Item/PackageResultModal.vue'
 import RuleModal from '@/components/Modals/Item/RuleModal.vue'
@@ -33,6 +34,7 @@ import LineChart from '@/components/Dashboard/Chart/Line.vue'
 import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
 import LdapModal from '@/components/Modals/Item/LdapModal.vue'
 import draggable from 'vuedraggable'
+import Notes from '@/components/Notes/Notes.vue'
 
 const GlobalComponents = {
 	install(Vue) {
@@ -54,6 +56,7 @@ const GlobalComponents = {
 		Vue.component('NetdeviceModal', NetdeviceModal)
 		Vue.component('NetworkGroupModal', NetworkGroupModal)
 		Vue.component('NetworkModal', NetworkModal)
+		Vue.component('NoteModal', NoteModal)
 		Vue.component('PackageModal', PackageModal)
 		Vue.component('PackageResultModal', PackageResultModal)
 		Vue.component('RuleModal', RuleModal)
@@ -70,7 +73,8 @@ const GlobalComponents = {
 		Vue.component('LineChart', LineChart)
 		Vue.component('ActionListModal', ActionListModal)
 		Vue.component('LdapModal', LdapModal)
-		Vue.component('draggable', draggable)
+		Vue.component('Draggable', draggable)
+		Vue.component('Notes', Notes)
 	}
 }
 
