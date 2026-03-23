@@ -194,15 +194,33 @@
 								<b-col 
 									align-self="center"
 									align="center"
-									class="multisearch-btns"
+									class="d-flex justify-content-center align-items-center gap-2 multisearch-btns"
 								>
 									<b-button 
 										type="submit"
 										variant="success"
-										:disabled="!canedit"
+										:disabled="!canedit || loadingcreate"
 									>
 										{{ $t('generic.save') }}
 									</b-button>
+
+									<b-spinner
+										v-if="loadingcreate"
+										small
+										class="ms-2"
+									/>
+									<font-awesome-icon
+										v-if="createwithsuccess"
+										:icon="['fas', 'check']"
+										class="ms-2"
+										color="green"
+									/>
+									<font-awesome-icon
+										v-if="createerror"
+										:icon="['fas', 'xmark']"
+										class="ms-2"
+										color="red"
+									/>
 								</b-col>
 								<b-col align-self="end" />
 							</b-row>
@@ -225,6 +243,10 @@ export default {
 			successed: false,
 			successmsg: null,
 
+			loadingcreate: false,
+			createwithsuccess: false,
+			createerror: false,
+
 			configs: [],
 
 			canedit: false,
@@ -242,12 +264,18 @@ export default {
 	watch: {
 		successed: function() {
 			setTimeout(
-				() => this.successed = false, 5000
+				() => { this.successed = false
+					this.createwithsuccess = false
+					this.createerror = false
+				}, 5000
 			)
 		},
 		errored: function() {
 			setTimeout(
-				() => this.errored = false, 5000
+				() => { this.errored = false
+					this.createwithsuccess = false
+					this.createerror = false
+				}, 5000
 			)
 		}
 	},
@@ -291,6 +319,9 @@ export default {
 		async onSubmit(event) {
 			event.preventDefault()
 			if(!this.canedit) return
+			this.loadingcreate = true
+			this.createwithsuccess = false
+			this.createerror = false
 
 			try {
 				const activeConfig = this.configs?.[this.activetab]
@@ -317,11 +348,17 @@ export default {
 				this.successed = true
 				this.errormsg = null
 				this.errored = false
+
+				this.createwithsuccess = true
 			} catch (e) {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 				this.successmsg = null
 				this.successed = false
+
+				this.createerror = true
+			} finally {
+				this.loadingcreate = false
 			}
 		},
 	}
