@@ -75,6 +75,7 @@
 								:href="redirect_url"
 								class="auth-btn mb-3"
 								variant="inverse"
+								@click="setSSOAuth"
 							>
 								{{ $t('authentication.connect_with_sso') }}
 							</BButton>
@@ -115,12 +116,20 @@ export default {
 			this.errormsg = null
 			this.sso = !!data?.SSO
 			this.redirect_url = data?.redirect_url ?? null
+
+			const token = localStorage.getItem('token_authentication')
+			if (token) {
+				await this.getPermissions()
+			}
 		} catch (e) {
 			this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 		}
 	},
 
 	methods: {
+		setSSOAuth() {
+			localStorage.setItem('auth_method', 'sso');
+		},
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loading = true

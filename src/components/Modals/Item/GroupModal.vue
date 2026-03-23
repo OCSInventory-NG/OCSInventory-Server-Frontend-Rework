@@ -38,7 +38,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="xl"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -231,7 +230,8 @@ export default {
 					"token",
 					"logentry",
 					"proxy",
-					"filemanager"
+					"filemanager",
+					"groupprotection"
 				]
 
 				this.permissions = {}
