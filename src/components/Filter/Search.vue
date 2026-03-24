@@ -252,7 +252,7 @@
 					class="multisearch-btns"
 				>
 				<div class="mb-2">
-					<b-button 
+					<b-button
 						type="button"
 						variant="info"
 						class="multisearch-btn"
@@ -260,7 +260,7 @@
 					>
 						{{ $t('search.addgroup') }}
 					</b-button>
-					<b-button 
+					<b-button
 						type="submit"
 						variant="success"
 					>
