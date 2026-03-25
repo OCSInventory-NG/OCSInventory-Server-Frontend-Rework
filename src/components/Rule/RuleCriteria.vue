@@ -123,7 +123,7 @@
 									<v-select
 										id="operator"
 										v-model="input.operator"
-										:disabled="input.field == 'auth_profile.auth_method' 
+										:disabled="viewOnly || input.field == 'auth_profile.auth_method' 
 											|| isAuthConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
@@ -131,7 +131,6 @@
 										label="text"
 										class="mb-3 ocs-select"
 										required
-										:disabled="viewOnly"
 									/>
 								</b-form-group>
 								<b-form-checkbox
