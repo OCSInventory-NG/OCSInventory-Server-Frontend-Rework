@@ -200,7 +200,7 @@
 								</b-form-group>
 							</b-col>
 							<b-col 
-								v-show="datavalues[masterindex].length > 1"
+								v-show="datavalues[masterindex].filter(input => input.field !== 'auth_profile.auth_config').length > 1"
 								cols="1"
 							>
 								<b-form-group>
@@ -211,7 +211,8 @@
 										variant="danger"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
-										@click="removeAndCondition(masterindex, index, datavalues)"
+										@click="if (input.field === 'auth_profile.auth_method') removeAuthConfig(masterindex);
+										removeAndCondition(masterindex, index, datavalues)"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
@@ -711,6 +712,14 @@ export default {
 			return this.datavalues[masterindex].some(c => 
 				c.field === "auth_profile.auth_method"
 			)
+		},
+		removeAuthConfig(masterindex) {
+            const configIndex = this.datavalues[masterindex]
+                .findIndex(c => c.field === 'auth_profile.auth_config')
+            
+            if (configIndex !== -1) {
+                this.datavalues[masterindex].splice(configIndex, 1)
+            }
 		}
 	}
 }
