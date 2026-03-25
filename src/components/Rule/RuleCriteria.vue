@@ -106,7 +106,7 @@
 										}"
 										@update:modelValue="val => {
 											input.value = null
-											onFieldChange(input, masterindex, input.value)
+											onFieldChange(input, masterindex)
 										}"
 									/>
 									<b-form-input
@@ -157,7 +157,7 @@
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
-										@update:modelValue="val => onFieldChange(input, masterindex, val)"
+										@update:modelValue="val => onFieldChange(input, masterindex)"
 									/>
 									<v-select
 										v-else-if="input.field === 'auth_profile.auth_config'"
@@ -200,7 +200,8 @@
 								</b-form-group>
 							</b-col>
 							<b-col 
-								v-show="datavalues[masterindex].filter(input => input.field !== 'auth_profile.auth_config').length > 1"
+								v-show="datavalues[masterindex]
+									.filter(input => input.field !== 'auth_profile.auth_config').length > 1"
 								cols="1"
 							>
 								<b-form-group>
@@ -659,7 +660,7 @@ export default {
 				this.successed = false
 			}
 		},
-		onFieldChange(input, masterindex, val) {
+		onFieldChange(input, masterindex) {
 			if (input.field === "auth_profile.auth_method") {
 				input.operator = "=="
 
