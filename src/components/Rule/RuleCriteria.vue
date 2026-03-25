@@ -123,7 +123,7 @@
 										id="operator"
 										v-model="input.operator"
 										:disabled="input.field == 'auth_profile.auth_method' 
-											|| isLdapConfigRow(masterindex, input)"
+											|| isAuthConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
 										:clearable="false"
@@ -134,7 +134,7 @@
 								</b-form-group>
 								<b-form-checkbox
 									v-if="input.field !== 'auth_profile.auth_method' 
-										&& !isLdapConfigRow(masterindex, input)
+										&& !isAuthConfigRow(masterindex, input)
 										&& (input.operator == 'in'
 											|| input.operator == '=='
 											|| input.operator == '!=')"
@@ -152,8 +152,8 @@
 									<v-select
 										v-if="input.field === 'auth_profile.auth_method'"
 										v-model="input.value"
-										:options="auth_methods.filter(m => m.value.toString() === ldapMethodId)"
-										:reduce="opt => opt.value.toString()"
+										:options="authMethods"
+										:reduce="opt => opt.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
@@ -162,8 +162,13 @@
 									<v-select
 										v-else-if="input.field === 'auth_profile.auth_config'"
 										v-model="input.value"
-										:options="ldapConfigs"
-										:reduce="opt => opt.value.toString()"
+										:options="authConfigs.filter(config => {
+											const inputMethod = masterinput
+												.filter(c => c.field === 'auth_profile.auth_method' && c.value)
+												.map(c => c.value)
+											return inputMethod.includes(config.method)
+										})"
+										:reduce="opt => opt.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
@@ -180,7 +185,7 @@
 							<b-col cols="1">
 								<b-form-group>
 									<b-button 
-										v-if="!isLdapConfigRow(masterindex, input)"
+										v-if="!isAuthConfigRow(masterindex, input)"
 										:id="'addfield'+masterindex+index"
 										v-b-modal="1"
 										variant="primary"
@@ -200,7 +205,7 @@
 							>
 								<b-form-group>
 									<b-button 
-										v-if="!isLdapConfigRow(masterindex, input)"
+										v-if="!isAuthConfigRow(masterindex, input)"
 										:id="'removefield'+masterindex+index"
 										v-b-modal="1"
 										variant="danger"
@@ -295,8 +300,7 @@ export default {
 				}
 			},
 			auth_methods: [],
-			ldapMethodId: null,
-			ldapConfigs: [],
+			authConfigs: [],
 
 			operatortargets: {
 				"==": this.$t("rule.equal"),
@@ -317,8 +321,7 @@ export default {
 						operator: "==",
 						value: null,
 						case_sensitive: false,
-						metadata_field: null,
-						ldap_config: null
+						metadata_field: null
 					}
 				]
 			],
@@ -339,7 +342,7 @@ export default {
 	},
 	async mounted() {
 		await this.getAuthMethods()
-		await this.getLdapConfigs()
+		await this.getAuthConfigs()
 		await this.getLogicRow()
 	},
 	methods: {
@@ -509,19 +512,6 @@ export default {
 					}
 				})
 			})
-			this.datavalues.forEach(master => {
-				master.forEach(input => {
-					if (
-						input.field === "auth_profile.auth_method" && 
-						input.value === this.ldapMethodId
-					) {
-						const ldapCondition = master.find(cond => cond.field === "auth_profile.auth_config")
-						if (ldapCondition) {
-							input.ldap_config = ldapCondition.value?.toString() || null
-						}
-					}
-				})
-			})
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
 
 			await this.getModelField()
@@ -533,8 +523,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null,
-				ldap_config: null
+				metadata_field: null
 			})
 		},
 
@@ -551,8 +540,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null,
-				ldap_config: null
+				metadata_field: null
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -644,23 +632,7 @@ export default {
 							logicTmp.or.push(tmpAnd)
 						}
 					} else if (firstKey == null) {
-						if (
-							logics[0].field === "auth_profile.auth_method"
-							&& logics[0].value === this.ldapMethodId
-						) {
-							const firstCondition = this.pushInLogicSimple({}, 0, logics)
-							const secondCondition = {
-								"==": [
-									{ var: "auth_profile.auth_config" },
-									logics[0].ldap_config.toString()
-								]
-							}
-							logicTmp = {
-								and: [ firstCondition, secondCondition ]
-							}
-						} else {
-							logicTmp = this.pushInLogicSimple({}, 0, logics)
-						}
+						logicTmp = this.pushInLogicSimple({}, 0, logics)
 					} else {
 						Object.keys(logics).forEach((key) => {
 							logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
@@ -690,61 +662,54 @@ export default {
 			if (input.field === "auth_profile.auth_method") {
 				input.operator = "=="
 
-				if (val === this.ldapMethodId) {
+				const configRow = this.datavalues[masterindex]
+					.find(c => c.field === 'auth_profile.auth_config')
 
-					const exists = this.datavalues[masterindex]
-						.some(c => c.field === 'auth_profile.auth_config')
+				if(!configRow) {
+					this.addAndCondition(masterindex, 0, this.datavalues)
+					const lastIndex = this.datavalues[masterindex].length - 1
+					const newCondition = this.datavalues[masterindex][lastIndex]
 
-					if(!exists) {
-						this.addAndCondition(masterindex, 0, this.datavalues)
-						const lastIndex = this.datavalues[masterindex].length - 1
-						const newCondition = this.datavalues[masterindex][lastIndex]
-
-						newCondition.field = "auth_profile.auth_config"
-						newCondition.operator = "=="
-						newCondition.value = null
-					}
+					newCondition.field = "auth_profile.auth_config"
+					newCondition.operator = "=="
+					newCondition.value = null
+				} else {
+					configRow.value = null
 				}
 			}
 		},
 		async getAuthMethods() {
 			try {
 				const methods = await this.$api.generic.get("auth_method/")
-				this.auth_methods = methods.map(m => ({
+				this.authMethods = methods.map(m => ({
 					value: m.id,
 					text: m.name
 				}))
-
-				const ldap = methods.find(m => m.name === "LDAP")
-				if (ldap) {
-					this.ldapMethodId = ldap.id.toString()
-				}
 			} catch(e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
-		async getLdapConfigs() {
+		async getAuthConfigs() {
 			try {
 				const configs = await this.$api.generic.get("auth_config/")
-				this.ldapConfigs = configs
-					.filter(c => c.auth_method.toString() == this.ldapMethodId)
+				this.authConfigs = configs
 					.map(c => ({
-						value: c.id.toString(),
-						text: c.name
+						value: c.id,
+						text: c.name,
+						method: c.auth_method
 					}))
 			} catch(e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
-		isLdapConfigRow(masterindex, input) {
+		isAuthConfigRow(masterindex, input) {
 			if (input.field !== "auth_profile.auth_config") {
 				return false
 			}
 			return this.datavalues[masterindex].some(c => 
-				c.field === "auth_profile.auth_method" && 
-				c.value === this.ldapMethodId
+				c.field === "auth_profile.auth_method"
 			)
 		}
 	}
