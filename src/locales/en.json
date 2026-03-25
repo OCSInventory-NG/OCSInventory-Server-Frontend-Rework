@@ -267,6 +267,7 @@
     "add": "Add",
     "actions": "Actions",
     "all": "All",
+    "backtotop": "Back to top",
     "cancel": "Cancel",
     "change": "Edit",
     "delete": "Delete",
@@ -434,6 +435,12 @@
     "unknown_network": "Unknown networks",
     "user": "User",
     "version": "Version"
+  },
+  "note": {
+    "addnote": "Add a new note",
+    "create": "Create a new note",
+    "edit": "Edit note",
+    "text": "Note"
   },
   "permission": {
     "accountinfoconfig": "Administrative data - Configuration",
@@ -685,6 +692,7 @@
     "netdevices": "Network devices",
     "netgroup": "Network groups",
     "network": "Networks",
+    "notes": "Notes",
     "ocsreports": "OCS Inventory",
     "packages": "Packages",
     "result": "Results",

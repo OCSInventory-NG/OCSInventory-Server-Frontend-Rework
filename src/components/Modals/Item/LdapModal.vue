@@ -9,6 +9,7 @@
 					<b-button
 						:title="$t('authentication.addldap')"
 						variant="primary"
+						:disabled="viewOnly"
 						class="d-sm-inline-block btn-modal"
 						@click="loadData()"
 					>
@@ -24,6 +25,7 @@
 			<button 
 				:title="$t('authentication.editldap')"
 				class="btn btn-ghost-dark"
+				:disabled="viewOnly"
 				@click="loadData(id)"
 			>
 				<font-awesome-icon 
@@ -210,6 +212,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
+							:disabled="viewOnly"
 						>
 							{{ (!update) ? $t('generic.add') : $t('generic.save') }}
 						</b-button>
@@ -233,7 +236,8 @@ export default {
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
-		authid: { type: Number, default: 2 }
+		authid: { type: Number, default: 2 },
+		viewOnly: { type: Boolean, default: false}
 	},
 	data() {
 		return {

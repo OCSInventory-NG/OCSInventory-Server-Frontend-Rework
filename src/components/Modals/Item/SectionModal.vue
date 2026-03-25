@@ -10,6 +10,7 @@
 						:title="$t('template.addsection')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
+						:disabled="viewOnly"
 						@click="loadData()"
 					>
 						<font-awesome-icon 
@@ -21,9 +22,10 @@
 			</div>
 		</div>
 		<div v-else>
-			<button 
+			<button
 				:title="$t('template.editsection')"
 				class="btn btn-ghost-dark"
+				:disabled="viewOnly"
 				@click="loadData()"
 			>
 				<font-awesome-icon 
@@ -37,7 +39,6 @@
 			:title="(!update) ? $t('template.addsection') : $t('template.editsection')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -59,7 +60,7 @@
 				</h5>
 				<b-button 
 					size="sm" 
-					variant="outline-danger" 
+					variant="outline-danger"
 					@click="close()"
 				>
 					<font-awesome-icon 
@@ -267,7 +268,8 @@ export default {
 		template: { type: Number, required: true },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
-		routetype: { type: String, default: "assets" }
+		routetype: { type: String, default: "assets" },
+		viewOnly: { type: Boolean, default: false }
 	},
 	data() {
 		return {

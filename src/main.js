@@ -35,7 +35,7 @@ import {
 	faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
-	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag
+	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag, faArrowUp
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -81,7 +81,7 @@ loadConfig().then(async (config) => {
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
 		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles,
-		faEyeSlash, faCopy, faTag
+		faEyeSlash, faCopy, faTag, faArrowUp
 	})
 
 	// Global config
@@ -110,19 +110,26 @@ loadConfig().then(async (config) => {
 			return true
 		}
 
-		await ensureExtensionsLoaded(() =>
-			loadFrontendExtensions({
-				apiClient: api.http,
-				pluginApi,
-				config,
-			})
-		)
+		try {
+			await ensureExtensionsLoaded(() =>
+				loadFrontendExtensions({
+					apiClient: api.http,
+					pluginApi,
+					config,
+				})
+			)
 
-		// Re-resolve route after dynamic addRoute()
-		if (to.matched.length === 0) {
-			return to.fullPath
+			// Re-resolve route after dynamic addRoute()
+			if (to.matched.length === 0) {
+				return to.fullPath
+			}
+		} catch (e) {
+			console.error("Error loading extensions:", e)
+			return false
 		}
 
+
+		console.info("Extensions loaded")
 		return true
 	})
 

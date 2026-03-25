@@ -267,6 +267,7 @@
     "add": "Ajouter",
     "actions": "Actions",
     "all": "Tous",
+    "backtotop": "Retour en haut",
     "cancel": "Annuler",
     "change": "Modifier",
     "delete": "Supprimer",
@@ -434,6 +435,12 @@
     "unknown_network": "Réseaux inconnus",
     "user": "Utilisateur",
     "version": "Version"
+  },
+  "note": {
+    "addnote": "Ajouter une nouvelle note",
+    "create": "Créer une nouvelle note",
+    "edit": "Modifier la note",
+    "text": "Note"
   },
   "permission": {
     "accountinfoconfig": "Données administratives - Configuration",
@@ -685,6 +692,7 @@
     "netdevices": "Périphériques réseau",
     "netgroup": "Groupes réseaux",
     "network": "Réseaux",
+    "notes": "Notes",
     "ocsreports": "OCS Inventory",
     "packages": "Paquets",
     "result": "Résultats",

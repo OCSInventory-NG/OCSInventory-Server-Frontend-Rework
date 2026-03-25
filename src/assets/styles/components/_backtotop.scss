@@ -1,0 +1,30 @@
+// ===========================================
+//  BACK TO TOP COMPONENT
+// ===========================================
+
+#back-to-top {
+  bottom: 20px;
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 1030;
+
+  button {
+    aspect-ratio: 1 / 1;
+    background: $gray-400;
+
+    &:hover {
+      background-color: $ocs-purple;
+    }
+  }
+}
+
+
+
+
+
+@media (max-width: 767.98px) {
+  #back-to-top {
+    display: none;
+  }
+}

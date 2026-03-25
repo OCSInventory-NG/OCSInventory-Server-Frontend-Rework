@@ -65,6 +65,7 @@
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
+										:view-only="viewOnly"
 										@reloadRule="reloadRule"
 									/>
 
@@ -74,6 +75,7 @@
 										:trigger="trigger"
 										:actions="actions"
 										:triggers="triggers"
+										:view-only="viewOnly"
 										@reloadRule="reloadRule"
 									/>
 								</b-tab>
@@ -113,6 +115,11 @@ export default {
 			],
 
 			loading: true,
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('rule_change_rule')
 		}
 	},
 	watch: {

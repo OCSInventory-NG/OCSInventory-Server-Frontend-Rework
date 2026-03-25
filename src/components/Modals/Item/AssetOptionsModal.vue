@@ -7,6 +7,7 @@
 				id="asset-options"
 				:title="$t('inventory.options')"
 				class="form-control btn datatable-btn"
+				:disabled="viewOnly"
 				@click="
 					assetoptmodal = true,
 					selectedopt = null,
@@ -23,6 +24,7 @@
 			id="asset-opt" 
 			v-model="assetoptmodal"
 			:title="$t('inventory.options')"
+			:disabled="viewOnly"
 			hide-footer
 			modal-class="custom-modal"
 			
@@ -80,7 +82,8 @@
 							<v-select
 								id="selectopt"
 								v-model="selectedopt" 
-								:options="options" 
+								:options="options"
+								:disabled="viewOnly"
 								:reduce="text => text.value"
 								:clearable="false"
 								label="text"
@@ -108,6 +111,7 @@
 								v-model="template"
 								:options="rowdatatmp" 
 								:reduce="text => text.value"
+								:disabled="viewOnly"
 								:clearable="false"
 								label="text"
 								class="mb-3"
@@ -126,6 +130,7 @@
 								v-model="selectedgrp" 
 								:options="rowdatagrp" 
 								:reduce="text => text.value"
+								:disabled="viewOnly"
 								:clearable="false"
 								label="text"
 								class="mb-3"
@@ -142,6 +147,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
+							:disabled="viewOnly"
 						>
 							{{ $t('generic.save') }}
 						</b-button>
@@ -182,6 +188,11 @@ export default {
 			
 			loading: false,
 			loadingcreate: false,
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
 		}
 	},
 	watch: {

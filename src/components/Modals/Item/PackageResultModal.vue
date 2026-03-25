@@ -7,6 +7,7 @@
 				id="attr-pkg"
 				:title="$t('deployment.attrpkg')"
 				class="form-control btn datatable-btn"
+				:disabled="viewOnly"
 				@click="
 					(items.length > 0) ? loadInitial() : emptyselection = !emptyselection,
 					loadData()
@@ -94,7 +95,7 @@
 						<b-button 
 							type="submit"
 							variant="success"
-							:disabled="(selectedPkg.length == 0) ? true : false"
+							:disabled="viewOnly || selectedPkg.length == 0"
 						>
 							{{ $t('generic.add') }}
 						</b-button>
@@ -142,7 +143,12 @@ export default {
 	name: "PackageResultModal",
 	props: {
 		items: { type: [Array, Object], default: () => [] },
-		group: { type: String, default: null }
+		group: { type: String, default: null },
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
+		}
 	},
 	data() {
 		return {
@@ -150,7 +156,6 @@ export default {
 			errormsg: null,
 
 			successed: false,
-
 			emptyselection: false,
 			packageresultmodal: false,
 			rowheader: [],

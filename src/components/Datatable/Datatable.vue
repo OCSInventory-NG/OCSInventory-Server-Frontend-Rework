@@ -214,7 +214,7 @@
 				striped
 				hover
 				bordered
-				:selectable="usecheckbox"
+				:selectable="showCheckbox"
 				:select-mode="selectMode"
 				:items="rowdata"
 				:fields="visibleFields"
@@ -274,10 +274,10 @@
 
 				<!-- Network redirection -->
 				<template 
-					v-if="canaccesschild"
 					#cell(network)="row"
 				>
 					<a
+						v-if="canaccesschild"
 						href="#"
 						class="ocs-link"
 						@click.prevent="filterByNetwork(row.item.network_id)"
@@ -301,17 +301,25 @@
 
 				<!-- Assets redirection -->
 				<template 
-					v-if="canaccessdetails"
+					v-if="canaccessdetails || canedittemplate"
 					#cell(name)="row"
 				>
-					<router-link  
+					<router-link
+						v-if="canaccessdetails"
 						:to="'/inventory/'+redirectto+'/'+row.item.id"
 						class="ocs-link"
 					>
 						{{ row.item.name }}
 					</router-link>
+					<router-link
+						v-if="canedittemplate" 
+						:to="'/configurations/templates/'+row.item.id"
+						class="ocs-link"
+					>
+						{{ row.item.name }}
+					</router-link>
 				</template>
-
+				
 				<!-- Assets redirection -->
 				<template 
 					v-if="canaccessdetails || canaccesspackagedetails"
@@ -417,19 +425,6 @@
 					</span>
 				</template>
 
-				<!-- Template redirection -->
-				<template 
-					v-if="canedittemplate"
-					#cell(name)="row"
-				>
-					<router-link 
-						:to="'/configurations/templates/'+row.item.id"
-						class="ocs-link"
-					>
-						{{ row.item.name }}
-					</router-link>
-				</template>
-
 				<!-- Edit row for configuration -->
 				<template #cell(value)="row">
 					<div 
@@ -462,6 +457,9 @@
 				<template #cell(updated_at)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
+				<template #cell(created_at)="row">
+					{{ new Date(row.item.created_at).toLocaleString($i18n.locale) }}
+				</template>
 				<template #cell(last_seen)="row">
 					{{ row.item.last_update_formatted }}
 				</template>
@@ -469,7 +467,7 @@
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
 					<b-button-toolbar>
-						<b-button-group class="mx-1">
+						<b-button-group class="mx-1">	
 							<slot
 								name="cell(firstActions)"
 								:row="row"
@@ -540,7 +538,13 @@
 							<component
 								:is="editcomponent"
 								v-if="canedit"
-								v-bind="{ id: row.item.id || row.item.identifier }"
+								v-bind="{ 
+									id: row.item.id || row.item.identifier,
+									update: true,
+									object_slug: row.item.object_slug,
+									object_id: row.item.object_id,
+									contentType: row.item.content_type
+								}"
 								:update="true"
 								@reloadDatatable="reloadDatatable"
 							/>
@@ -617,7 +621,7 @@ export default {
 		canrefresh: { type: Boolean, default: true },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
-		usecheckbox: { type: Boolean, default: true },
+		usecheckbox: { type: Boolean, default: null },
 		canexport: { type: Boolean, default: true },
 		canedittemplate: { type: Boolean, default: false },
 		caneditsnmptemplate: { type: Boolean, default: false },
@@ -708,6 +712,16 @@ export default {
 		};
 	},
 	computed: {
+		showCheckbox() {
+			if (this.usecheckbox !== null) {
+				return this.usecheckbox
+			}
+			return (
+				this.candelete ||
+				this.canmassprocessing
+			)
+		},
+
 		// Initialize visible fields
 		visibleFields() {
 			var key = this.title + "_" + this.templateid
@@ -799,6 +813,19 @@ export default {
 				this.emitQueryChange()
 			}
 		},
+		showCheckbox(val) {
+			this.fields = this.fields.filter(field => field.key !== 'selected')
+
+			if (val) {
+				this.fields.unshift({
+					key: "selected",
+					label: this.$t('generic.selected'),
+					sortable: false,
+					visible: true,
+					disabled: true
+				})
+			}
+		}
 	},
 	created() {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
@@ -819,7 +846,7 @@ export default {
 			this.deleterte = "netdevices"
 		}
 
-		if(this.usecheckbox == true) {
+		if(this.showCheckbox) {
 			this.fields.push({
 				key: "selected", 
 				label: this.$t('generic.selected'), 
@@ -931,7 +958,8 @@ export default {
 			tdClass: 'sticky-col right actions-col'
 		}
 
-		if(this.canedit == true || this.candelete == true || this.canviewhistory) {
+		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction || 
+		this.canviewaction || this.canedittemplate) {
 			this.fields.push(actions)
 		}
 
@@ -950,7 +978,8 @@ export default {
 		this.json_data = this.rowdata
 
 		this.rowdata.forEach(row => {
-			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created','date','last_seen','updated_at'];
+			const dateFields = ['last_update', 'last_updated', 'timestamp',
+				'date_created','date','last_seen','updated_at','created_at'];
 			const dateValue = dateFields.find(field => row[field]);
 			if (dateValue) {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
@@ -1149,7 +1178,7 @@ export default {
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
 				const dateFields = ['last_update', 'last_updated', 'timestamp', 
-					'date_created', 'date', 'updated_at','last_seen'];
+					'date_created', 'date', 'updated_at','last_seen','created_at'];
 				const dateValue = dateFields.find(field => row[field]);
 				if (dateValue) {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);

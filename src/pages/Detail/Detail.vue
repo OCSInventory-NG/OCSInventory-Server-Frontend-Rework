@@ -117,6 +117,15 @@
 												/>
 											</fieldset><br>
 
+											<div align="center">
+												<h2>{{ $t("title.notes") }}</h2>
+											</div>
+											<Notes
+												:id="device.id"
+												:type="type"
+												:slug="slug"
+											/><br>
+
 											<ExtensionSlot
 												name="inventory.asset.detail.afterAccountInfo"
 												:context="{ assetId: device?.id }"
@@ -196,6 +205,14 @@
 										:slug="slug"
 									/>
 								</fieldset><br>
+								<div align="center">
+									<h2>{{ $t("title.notes") }}</h2>
+								</div>
+								<Notes
+									:id="device.id"
+									:type="type"
+									:slug="slug"
+								/><br>
 							</div>
 						</div>
 					</div>
