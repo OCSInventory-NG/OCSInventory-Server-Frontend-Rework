@@ -110,19 +110,26 @@ loadConfig().then(async (config) => {
 			return true
 		}
 
-		await ensureExtensionsLoaded(() =>
-			loadFrontendExtensions({
-				apiClient: api.http,
-				pluginApi,
-				config,
-			})
-		)
+		try {
+			await ensureExtensionsLoaded(() =>
+				loadFrontendExtensions({
+					apiClient: api.http,
+					pluginApi,
+					config,
+				})
+			)
 
-		// Re-resolve route after dynamic addRoute()
-		if (to.matched.length === 0) {
-			return to.fullPath
+			// Re-resolve route after dynamic addRoute()
+			if (to.matched.length === 0) {
+				return to.fullPath
+			}
+		} catch (e) {
+			console.error("Error loading extensions:", e)
+			return false
 		}
 
+
+		console.info("Extensions loaded")
 		return true
 	})
 
