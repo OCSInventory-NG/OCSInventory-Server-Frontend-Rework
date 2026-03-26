@@ -199,8 +199,8 @@ export default {
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error)
-					? e.response.data.error
+				this.errormsg = (e.response?.data?.error || e.response?.data?.email)
+					? e.response.data.error || e.response.data.email
 					: e.message
 				this.errored = true
 				this.successmsg = null
