@@ -77,7 +77,6 @@
 											<b-form-input
 												id="email"
 												v-model="rowdata.email"
-												required
 											>
 												{{ rowdata.email }}
 											</b-form-input>
@@ -94,7 +93,6 @@
 											<b-form-input
 												id="first_name"
 												v-model="rowdata.first_name"
-												required
 											>
 												{{ rowdata.first_name }}
 											</b-form-input>
@@ -109,7 +107,6 @@
 											<b-form-input
 												id="last_name"
 												v-model="rowdata.last_name"
-												required
 											>
 												{{ rowdata.last_name }}
 											</b-form-input>
