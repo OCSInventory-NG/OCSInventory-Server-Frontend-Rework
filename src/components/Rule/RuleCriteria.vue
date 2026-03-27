@@ -94,17 +94,17 @@
 									<v-select
 										id="field"
 										v-model="input.field"
-										:options="fields"
+										:options="fields.filter(option => {
+											if (option.value !== 'auth_profile.auth_config') return true
+											return index > 0 && masterinput.some(
+												item => item.field === 'auth_profile.auth_method')
+										})"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
-										:disabled="viewOnly"
-										:selectable="option => {
-											if (option.value !== 'auth_profile.auth_config') return true
-											return index > 0
-										}"
+										:disabled="viewOnly || isAuthConfigRow(masterindex, input)"
 										@update:modelValue="val => {
 											input.value = null
 											onFieldChange(input, masterindex)
@@ -173,6 +173,9 @@
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
+										:disabled="!masterinput.some(
+												item => item.field === 'auth_profile.auth_method'&& item.value === 2
+										)"
 									/>
 									<b-form-input
 										v-else
@@ -667,11 +670,14 @@ export default {
 			}
 		},
 		onFieldChange(input, masterindex) {
-			if (input.field === "auth_profile.auth_method") {
+			if (input.field === "auth_profile.auth_method" && input.value !== 1) {
 				input.operator = "=="
 
 				const configRow = this.datavalues[masterindex]
 					.find(c => c.field === 'auth_profile.auth_config')
+
+				const methodConfig = this.authConfigs.find(c => c.method === input.value)
+        		const defaultConfig = methodConfig ? methodConfig.value : null
 
 				if(!configRow) {
 					this.addAndCondition(masterindex, 0, this.datavalues)
@@ -680,10 +686,12 @@ export default {
 
 					newCondition.field = "auth_profile.auth_config"
 					newCondition.operator = "=="
-					newCondition.value = null
+					newCondition.value = defaultConfig
 				} else {
-					configRow.value = null
+					configRow.value = defaultConfig
 				}
+			} else {
+				this.removeAuthConfig(masterindex)
 			}
 		},
 		async getAuthMethods() {
