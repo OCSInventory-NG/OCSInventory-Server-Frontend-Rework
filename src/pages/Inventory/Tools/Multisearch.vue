@@ -50,6 +50,7 @@
 								:candelete="candelete"
 								:usecheckbox="candelete"
 								:isbusy="isbusy"
+								is-sticky
 								title="asset/bases"
 								translationkey="inventory."
 								@reloadDatatable="reloadDatatable"

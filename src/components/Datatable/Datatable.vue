@@ -204,13 +204,16 @@
 		</div>
 
 		<!-- Datatable -->
-		<div class="overflow-auto">
+		<div
+			class="overflow-auto"
+			:class="{ 'sticky-table': isSticky }"
+		>
 			<b-table
 				id="data-list"  
 				ref="selectableTable"
 				v-model:sort-by="sortByLocal"
 				v-model:sort-desc="sortDescLocal"
-				responsive
+				:responsive="!isSticky"
 				striped
 				hover
 				bordered
@@ -663,6 +666,8 @@ export default {
 		isbusy: { type: Boolean, default: false },
 		// Multisearch
 		redirectToSearch: { type: Boolean, default: false },
+		// Table format
+		isSticky: { type: Boolean, default: false },
 	},
 	data() {
 		return {

@@ -89,9 +89,19 @@ tbody, td, tfoot, th, thead, tr {
   overflow-x: auto;
 }
 
+.sticky-table {
+  max-height: 46vh;
+}
+
 .datatable-custom table {
   border-collapse: separate;
   border-spacing: 0;
+}
+
+.datatable-custom thead, th {
+  position: sticky;
+  top: 0;
+  z-index: 6;
 }
 
 .datatable-custom th.sticky-col {
@@ -115,7 +125,7 @@ tbody, td, tfoot, th, thead, tr {
 }
 
 .datatable-custom thead th.sticky-col {
-  z-index: 6;
+  z-index: 7;
 }
 
 .datatable-custom .actions-col {

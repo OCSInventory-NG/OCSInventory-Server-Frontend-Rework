@@ -37,6 +37,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="NetworkGroupModal"
 								title="netgroups"
 								translationkey="network."

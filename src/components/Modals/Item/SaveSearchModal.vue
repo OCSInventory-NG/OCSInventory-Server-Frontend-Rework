@@ -89,6 +89,7 @@
 				:rowheader="rowsavesearchheader"
 				:canrefresh="false"
 				:isbusy="isbusy"
+				is-sticky
 				title="usesavesearch"
 				translationkey="search."
 				@useSaveSearch="useSaveSearch"

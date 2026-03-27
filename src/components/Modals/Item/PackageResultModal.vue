@@ -81,6 +81,7 @@
 						:rowheader="rowheader"
 						:isbusy="isbusy"
 						:canrefresh="false"
+						is-sticky
 						title="deployment"
 						translationkey="deployment."
 						@attributePackage="attributePackage"

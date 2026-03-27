@@ -36,6 +36,7 @@
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="ExtensionModal"
 								@change-query="handleQueryChange"
 								@export="handleExport"

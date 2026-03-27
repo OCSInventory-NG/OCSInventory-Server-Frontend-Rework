@@ -132,6 +132,7 @@
 											:assets="rowdata"
 											:hiddenfields="hiddenfields"
 											:isbusy="isbusy"
+											is-sticky
 											title="asset"
 											translationkey="inventory."
 											@reloadDatatable="reloadDatatable()"

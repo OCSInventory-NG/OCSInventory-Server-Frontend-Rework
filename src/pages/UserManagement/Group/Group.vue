@@ -42,6 +42,7 @@
 								:candelete="candelete"
 								:duplicateitem="duplicateitem"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="GroupModal"
 								title="groups"
 								titlevalue="group"

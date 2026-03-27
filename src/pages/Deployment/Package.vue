@@ -38,6 +38,7 @@
 								:canedit="canedit"
 								:canviewaction="canviewaction"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="PackageModal"
 								title="deployment/packages"
 								translationkey="deployment."

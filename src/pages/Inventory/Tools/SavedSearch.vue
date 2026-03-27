@@ -33,6 +33,7 @@
 								:candelete="candelete"
 								:hiddenfields="hiddenfields"
 								:isbusy="isbusy"
+								is-sticky
 								title="search/save"
 								translationkey="search."
 								editcomponent="SaveSearchModal"

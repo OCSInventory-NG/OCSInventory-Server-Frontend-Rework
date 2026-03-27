@@ -102,6 +102,7 @@
 												:candelete="can.community.delete"
 												:hiddenfields="hiddenfields"
 												:isbusy="isbusy.community"
+												is-sticky
 												editcomponent="SnmpModal"
 												title="snmp/config"
 												translationkey="network."
@@ -143,6 +144,7 @@
 												:canexport="false"
 												:importtemplate="true"
 												:isbusy="isbusy.template"
+												is-sticky
 												title="templates"
 												translationkey="template."
 												@reloadDatatable="reloadDatatableTemp"
@@ -187,6 +189,7 @@
 												:usecheckbox="false"
 												:hiddenfields="hiddenscannerfields"
 												:isbusy="isbusy.scanner"
+												is-sticky
 												editcomponent="SnmpScannerModal"
 												title="snmp/scanner"
 												translationkey="network."

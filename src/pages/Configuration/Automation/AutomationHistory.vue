@@ -31,6 +31,7 @@
 								:rowheader="rowheader"
 								:usecheckbox="false"
 								:isbusy="isbusy"
+								is-sticky
 								sortby="date"
 								sortdesc="desc"
 								title="automation/history"
