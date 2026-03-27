@@ -804,13 +804,13 @@ export default {
 		sortByLocal() {
 			if (this.serverSide) {
 				this.currentPage = 1
-				this.emitQueryChange()
+				this.emitQueryChangeDebounced();
 			}
 		},
 		sortDescLocal() {
 			if (this.serverSide) {
 				this.currentPage = 1
-				this.emitQueryChange()
+				this.emitQueryChangeDebounced();
 			}
 		},
 		showCheckbox(val) {
@@ -1041,7 +1041,7 @@ export default {
 			}
 
 			const ordering = this.getOrdering()
-			if (ordering) query.ordering = ordering
+			query.ordering = ordering
 
 			this.$emit('change-query', query)
 		},
