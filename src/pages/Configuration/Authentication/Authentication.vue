@@ -71,7 +71,7 @@
 															v-model="authmethod.enabled"
 															class="form-check-input"
 															type="checkbox"
-															:disabled="!canedit"
+															:disabled="!canedit || isSSOActive(authmethod)"
 															@change="enableAuthentication(
 																authmethod.id, authmethod.name, authmethod.enabled
 															)"
@@ -226,6 +226,19 @@ export default {
 				this.successed = false
 			}
 		},
+		isSSOActive(authmethod) {
+			const ssoMethods = ["OIDC", "CAS"]
+
+			if (!ssoMethods.includes(authmethod.name)) {
+				return false
+			}
+
+			return this.authmethods.some(
+				m => m.name !== authmethod.name &&
+				ssoMethods.includes(m.name) &&
+				m.enabled
+			)
+		}
 	}
 }
 </script>
