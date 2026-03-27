@@ -104,6 +104,7 @@
 				<b-row>
 					<Matrix
 						:id="id"
+						:key="matrixKey"
 						v-model="row.permissions"
 						:rowtab="permissions"
 						:rowlabel="permissionslabel"
@@ -160,6 +161,7 @@ export default {
 				permissions: []
 			},
 			groupmodal: false,
+			matrixKey: 0,
 			permissions: [],
 			permissionslabel: [],
 			
@@ -194,6 +196,8 @@ export default {
 
 		loadData(id) {
 			this.groupmodal = true
+
+			this.matrixKey += 1
 
 			this.row = this.row || {}
 			this.row.name = null
