@@ -34,6 +34,10 @@ jobs:
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
+      # Force npm ci to use packaged eslint instead of mega linter one 
+      - name: Install deps
+        run: npm ci
+
       # MegaLinter
       - name: MegaLinter
         id: ml
