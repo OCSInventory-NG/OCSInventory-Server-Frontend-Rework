@@ -67,6 +67,8 @@ REPOSITORY_KINGFISHER_ARGUMENTS:
   - "docs"
   - "--exclude"
   - "gitleaks-default.toml"
+JAVASCRIPT_ES_CONFIG_FILE: ./eslint.config.mjs 
+JAVASCRIPT_ES_COMMAND_REMOVE_ARGUMENTS: ["--no-eslintrc"] 
 REPORTERS_MARKDOWN_SUMMARY_TYPE: sections
 SHOW_ELAPSED_TIME: true
 FLAVOR_SUGGESTIONS: false
@@ -74,11 +76,3 @@ EMAIL_REPORTER: false
 FILEIO_REPORTER: false
 JSON_REPORTER: true
 GITHUB_STATUS_REPORTER: false
-PLUGINS:
-  - https://raw.githubusercontent.com/oxsecurity/megalinter/main/.automation/test/mega-linter-plugin-test/test.megalinter-descriptor.yml
-PRE_COMMANDS:
-  - command: echo "This is MegaLinter PRE_COMMAND on own MegaLinter ! :)"
-    cwd: "root"
-POST_COMMANDS:
-  - command: echo "This is MegaLinter POST_COMMAND on own MegaLinter ! :)"
-    cwd: "workspace"
