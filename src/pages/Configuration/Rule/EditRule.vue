@@ -66,7 +66,7 @@
 										:trigger="trigger"
 										:logic="logic"
 										:view-only="viewOnly"
-										@reloadRule="reloadRule"
+										@reload-rule="reloadRule"
 									/>
 
 									<RuleAction
@@ -76,7 +76,7 @@
 										:actions="actions"
 										:triggers="triggers"
 										:view-only="viewOnly"
-										@reloadRule="reloadRule"
+										@reload-rule="reloadRule"
 									/>
 								</b-tab>
 							</b-tabs>

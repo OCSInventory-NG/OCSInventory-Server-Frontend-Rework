@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('deployment.addaction') : $t('deployment.editaction')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

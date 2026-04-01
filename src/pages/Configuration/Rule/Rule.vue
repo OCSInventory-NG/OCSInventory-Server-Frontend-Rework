@@ -27,7 +27,7 @@
 						<div v-else>
 							<RuleModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -41,7 +41,7 @@
 								editcomponent="RuleModal"
 								title="automation/rule"
 								translationkey="rule."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

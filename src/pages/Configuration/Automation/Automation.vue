@@ -27,7 +27,7 @@
 						<div v-else>
 							<AutomationModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -41,7 +41,7 @@
 								editcomponent="AutomationModal"
 								title="automation/scheduler"
 								translationkey="scheduler."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>
