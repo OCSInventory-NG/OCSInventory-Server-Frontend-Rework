@@ -205,8 +205,10 @@
 
 		<!-- Datatable -->
 		<div
-			class="overflow-auto"
+			ref="tableWrapper"
+			class="datatable-table-wrapper"
 			:class="{ 'sticky-table': isSticky }"
+			@scroll="syncStickyHeaderScroll"
 		>
 			<b-table
 				id="data-list"  
@@ -583,6 +585,14 @@
 			</b-table>
 		</div>
 
+		<div
+			v-if="isSticky"
+			ref="stickyHeaderPortal"
+			class="datatable-sticky-header"
+			:class="{ 'is-active': stickyHeaderActive }"
+			aria-hidden="true"
+		/>
+
 		<!-- Pagination -->
 		<b-row class="pagination-align">
 			<b-col>
@@ -713,7 +723,9 @@ export default {
 				'CHECKBOX'
 			],
 			// Reload parameter
-			isReloading: false
+			isReloading: false,
+			stickyHeaderActive: false,
+			stickyHeaderRaf: null,
 		};
 	},
 	computed: {
@@ -755,6 +767,7 @@ export default {
 			if (!this.serverSide && Array.isArray(this.rowdata)) {
 				this.totalRows = this.rowdata.length
 			}
+			this.refreshStickyHeader()
 		},
 		isChecked: function () {
 			if(this.isChecked) {
@@ -792,6 +805,7 @@ export default {
 			if (this.serverSide) {
 				this.emitQueryChange()
 			}
+			this.refreshStickyHeader()
 		},
 		perPage() {
 			this.updateRowPage()
@@ -830,6 +844,9 @@ export default {
 					disabled: true
 				})
 			}
+		},
+		visibleFields() {
+			this.refreshStickyHeader()
 		}
 	},
 	created() {
@@ -990,8 +1007,173 @@ export default {
 				row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 			}
 		});
+
+		this.setupStickyHeader()
+	},
+	beforeUnmount() {
+		this.teardownStickyHeader()
 	},
 	methods: {
+		setupStickyHeader() {
+			if (!this.isSticky) {
+				return
+			}
+
+			window.addEventListener('scroll', this.handleStickyHeader, { passive: true })
+			window.addEventListener('resize', this.handleStickyHeader, { passive: true })
+			this.$nextTick(() => {
+				this.handleStickyHeader()
+			})
+		},
+		teardownStickyHeader() {
+			window.removeEventListener('scroll', this.handleStickyHeader)
+			window.removeEventListener('resize', this.handleStickyHeader)
+			if (this.stickyHeaderRaf) {
+				cancelAnimationFrame(this.stickyHeaderRaf)
+				this.stickyHeaderRaf = null
+			}
+		},
+		refreshStickyHeader() {
+			if (!this.isSticky) {
+				return
+			}
+			this.$nextTick(() => {
+				this.handleStickyHeader()
+			})
+		},
+		getTableElement() {
+			const tableRef = this.$refs.selectableTable
+			if (!tableRef) {
+				return null
+			}
+
+			const root = tableRef.$el || tableRef
+			if (root?.tagName === 'TABLE') {
+				return root
+			}
+			return root?.querySelector?.('table') || null
+		},
+		getStickyTopOffset() {
+			const header = document.querySelector('header.navbar')
+			if (!header) {
+				return 0
+			}
+
+			const style = window.getComputedStyle(header)
+			const isFixedLike = ['fixed', 'sticky'].includes(style.position)
+			if (!isFixedLike) {
+				return 0
+			}
+
+			const rect = header.getBoundingClientRect()
+			return rect.bottom > 0 ? rect.bottom : 0
+		},
+		handleStickyHeader() {
+			if (!this.isSticky) {
+				return
+			}
+
+			if (this.stickyHeaderRaf) {
+				cancelAnimationFrame(this.stickyHeaderRaf)
+			}
+
+			this.stickyHeaderRaf = requestAnimationFrame(() => {
+				this.stickyHeaderRaf = null
+
+				const table = this.getTableElement()
+				const thead = table?.querySelector('thead')
+				const wrapper = this.$refs.tableWrapper
+				const portal = this.$refs.stickyHeaderPortal
+
+				if (!table || !thead || !wrapper || !portal) {
+					this.stickyHeaderActive = false
+					return
+				}
+
+				const tableRect = table.getBoundingClientRect()
+				const wrapperRect = wrapper.getBoundingClientRect()
+				const headerRect = thead.getBoundingClientRect()
+				const topOffset = this.getStickyTopOffset()
+				const headerHeight = headerRect.height || 0
+				const shouldStick =
+					tableRect.top <= topOffset &&
+					tableRect.bottom > (topOffset + headerHeight)
+
+				this.stickyHeaderActive = shouldStick
+
+				if (!shouldStick) {
+					portal.innerHTML = ''
+					return
+				}
+
+				this.renderStickyHeader({
+					table,
+					thead,
+					wrapperRect,
+					topOffset,
+					headerHeight,
+				})
+			})
+		},
+		renderStickyHeader({ table, thead, wrapperRect, topOffset, headerHeight }) {
+			const portal = this.$refs.stickyHeaderPortal
+			const wrapper = this.$refs.tableWrapper
+			if (!portal || !wrapper) {
+				return
+			}
+
+			let cloneTable = portal.querySelector('table')
+			if (!cloneTable) {
+				cloneTable = document.createElement('table')
+				cloneTable.className = table.className
+				cloneTable.setAttribute('aria-hidden', 'true')
+				portal.innerHTML = ''
+				portal.appendChild(cloneTable)
+			}
+
+			const cloneHead = thead.cloneNode(true)
+			cloneTable.innerHTML = ''
+			cloneTable.appendChild(cloneHead)
+
+			const sourceHeaders = Array.from(thead.querySelectorAll('th'))
+			const cloneHeaders = Array.from(cloneHead.querySelectorAll('th'))
+
+			sourceHeaders.forEach((header, index) => {
+				const width = header.getBoundingClientRect().width
+				if (!cloneHeaders[index]) {
+					return
+				}
+				cloneHeaders[index].style.width = `${width}px`
+				cloneHeaders[index].style.minWidth = `${width}px`
+				cloneHeaders[index].style.maxWidth = `${width}px`
+			})
+
+			cloneTable.style.width = `${table.getBoundingClientRect().width}px`
+			portal.style.top = `${topOffset}px`
+			portal.style.left = `${wrapperRect.left}px`
+			portal.style.width = `${wrapperRect.width}px`
+			portal.style.height = `${headerHeight}px`
+
+			this.syncStickyHeaderScroll()
+		},
+		syncStickyHeaderScroll() {
+			if (!this.isSticky || !this.stickyHeaderActive) {
+				return
+			}
+
+			const portal = this.$refs.stickyHeaderPortal
+			const wrapper = this.$refs.tableWrapper
+			const cloneTable = portal?.querySelector('table')
+
+			if (!portal || !wrapper || !cloneTable) {
+				return
+			}
+
+			const wrapperRect = wrapper.getBoundingClientRect()
+			portal.style.left = `${wrapperRect.left}px`
+			portal.style.width = `${wrapperRect.width}px`
+			cloneTable.style.transform = `translateX(${-wrapper.scrollLeft}px)`
+		},
 		// Trigger pagination to update the number of buttons/pages due to filtering
 		onFiltered(filteredItems) {
 			if (this.serverSide) {
@@ -1179,6 +1361,7 @@ export default {
 		updateRowPage() {
 			localStorage.removeItem("perPage")
 			localStorage.setItem("perPage", this.perPage)
+			this.refreshStickyHeader()
 		},
 		updateDateFormat() {
 			this.rowdata.forEach(row => {
