@@ -28,7 +28,7 @@
 					is-sticky
 					title="deployment/results"
 					translationkey="deployment."
-					@reloadDatatable="reloadDatatable"
+					@reload-datatable="reloadDatatable"
 				/>
 			</div>
 		</section>

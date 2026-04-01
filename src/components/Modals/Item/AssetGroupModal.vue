@@ -300,6 +300,11 @@ export default {
 			loadingcreate: false,
 		}
 	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem('permissions')?.split(',').includes("asset_group_change_assetgroup")
+		}
+	},
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
@@ -320,11 +325,6 @@ export default {
 					this.$emit("reloadDatatable")
 				}
 			}, 500)
-		}
-	},
-	computed: {
-		viewOnly() {
-			return !localStorage.getItem('permissions')?.split(',').includes("asset_group_change_assetgroup")
 		}
 	},
 	methods: {

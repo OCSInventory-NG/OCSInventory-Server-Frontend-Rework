@@ -37,7 +37,7 @@
 											:id="id"
 											:update="true"
 											:view-only="viewOnly"
-											@reloadDatatable="reloadTemplate"
+											@reload-datatable="reloadTemplate"
 										/>
 									</div>
 								</b-col>
@@ -46,7 +46,7 @@
 										:template="parseInt(id)"
 										:routetype="routetype"
 										:view-only="viewOnly"
-										@reloadTemplate="reloadTemplate"
+										@reload-template="reloadTemplate"
 									/>
 								</b-col>
 							</b-row>
@@ -84,7 +84,7 @@
 											:section="section"
 											:routetype="routetype"
 											:view-only="viewOnly"
-											@reloadTemplate="reloadTemplate"
+											@reload-template="reloadTemplate"
 										/>
 									</b-tab>
 								</b-tabs>

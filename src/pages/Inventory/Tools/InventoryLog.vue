@@ -42,7 +42,7 @@
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllInventorylogs"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

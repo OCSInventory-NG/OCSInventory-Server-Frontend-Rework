@@ -45,7 +45,7 @@
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllAssets"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 

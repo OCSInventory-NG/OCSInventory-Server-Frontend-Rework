@@ -19,7 +19,7 @@
 
 						<div>
 							<Search
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 
@@ -53,7 +53,7 @@
 								is-sticky
 								title="asset/bases"
 								translationkey="inventory."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<AssetGroupModal 

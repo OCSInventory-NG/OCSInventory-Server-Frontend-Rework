@@ -35,7 +35,7 @@
 											<PackageResultModal
 												:items="rowdata"
 												:group="$route.params.id"
-												@reloadDeployment="reloadDeployment"
+												@reload-deployment="reloadDeployment"
 											/>
 										</b-button-group>
 									</div>
@@ -135,7 +135,7 @@
 											is-sticky
 											title="asset"
 											translationkey="inventory."
-											@reloadDatatable="reloadDatatable()"
+											@reload-datatable="reloadDatatable()"
 										/>
 									</b-tab>
 									<b-tab
@@ -144,7 +144,7 @@
 										<ResultDetail
 											:group="$route.params.id"
 											:reload="reload"
-											@endReloadDeployment="endReloadDeployment"
+											@end-reload-deployment="endReloadDeployment"
 										/>
 									</b-tab>
 									<b-tab

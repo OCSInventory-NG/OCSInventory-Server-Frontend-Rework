@@ -27,7 +27,7 @@
 						<div v-else>
 							<TemplateModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -45,7 +45,7 @@
 								title="templates"
 								titlevalue="template"
 								translationkey="template."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

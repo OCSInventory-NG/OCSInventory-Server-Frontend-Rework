@@ -92,7 +92,7 @@
 				is-sticky
 				title="usesavesearch"
 				translationkey="search."
-				@useSaveSearch="useSaveSearch"
+				@use-save-search="useSaveSearch"
 			/>
 		</b-modal>
 		<b-modal 

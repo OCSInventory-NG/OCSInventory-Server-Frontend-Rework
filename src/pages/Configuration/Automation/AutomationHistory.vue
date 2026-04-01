@@ -36,7 +36,7 @@
 								sortdesc="desc"
 								title="automation/history"
 								translationkey="scheduler."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

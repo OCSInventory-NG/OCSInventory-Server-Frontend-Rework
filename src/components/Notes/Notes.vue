@@ -44,7 +44,7 @@
 					editcomponent="NoteModal"
 					title="notes"
 					translationkey="note."
-					@reloadDatatable="reloadDatatable"
+					@reload-datatable="reloadDatatable"
 				/>
 
 				<NoteModal
@@ -53,7 +53,7 @@
 					:object-slug="slug"
 					:object-id="id"
 					:content-type="Number(type)"
-					@reloadDatatable="reloadDatatable"
+					@reload-datatable="reloadDatatable"
 				/>
 			</div>
 		</section>

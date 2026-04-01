@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('software.addsoftwaremapping') : $t('software.editsoftwaremapping')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

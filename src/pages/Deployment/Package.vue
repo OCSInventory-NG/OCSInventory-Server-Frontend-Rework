@@ -27,7 +27,7 @@
 						<div v-else>
 							<PackageModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -42,7 +42,7 @@
 								editcomponent="PackageModal"
 								title="deployment/packages"
 								translationkey="deployment."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

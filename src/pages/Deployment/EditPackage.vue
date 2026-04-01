@@ -41,7 +41,7 @@
 							<ActionListModal
 								v-if="canadd"
 								:package="id"
-								@reloadPackage="reloadPackage"
+								@reload-package="reloadPackage"
 							/>
 
 							<Draggable 
@@ -50,7 +50,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								is-sticky
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

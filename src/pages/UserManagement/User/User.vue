@@ -28,7 +28,7 @@
 							<UserModal
 								v-if="canadd"
 								:groupsprop="groups"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -42,7 +42,7 @@
 								editcomponent="UserModal"
 								title="users"
 								translationkey="user."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

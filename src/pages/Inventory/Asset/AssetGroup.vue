@@ -38,7 +38,7 @@
 								title="assetgroups"
 								translationkey="assetgroup."
 								editcomponent="AssetGroupModal"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

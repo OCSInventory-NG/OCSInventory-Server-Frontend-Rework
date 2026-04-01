@@ -88,7 +88,7 @@
 
 												<SnmpModal
 													v-if="can.community.add"
-													@reloadDatatable="reloadDatatableComm"
+													@reload-datatable="reloadDatatableComm"
 												/>
 											</div>
 										</div>
@@ -106,7 +106,7 @@
 												editcomponent="SnmpModal"
 												title="snmp/config"
 												translationkey="network."
-												@reloadDatatable="reloadDatatableComm"
+												@reload-datatable="reloadDatatableComm"
 											/>
 										</div>
 									</div>
@@ -129,7 +129,7 @@
 
 												<SnmpTemplateModal
 													v-if="can.template.add"
-													@reloadDatatable="reloadDatatableTemp"
+													@reload-datatable="reloadDatatableTemp"
 												/>
 											</div>
 										</div>
@@ -147,7 +147,7 @@
 												is-sticky
 												title="templates"
 												translationkey="template."
-												@reloadDatatable="reloadDatatableTemp"
+												@reload-datatable="reloadDatatableTemp"
 											/>
 										</div>
 									</div>
@@ -173,7 +173,7 @@
 
 												<SnmpScannerModal
 													v-if="can.scanner.add"
-													@reloadDatatable="reloadDatatableScan"
+													@reload-datatable="reloadDatatableScan"
 												/>
 											</div>
 										</div>
@@ -193,8 +193,8 @@
 												editcomponent="SnmpScannerModal"
 												title="snmp/scanner"
 												translationkey="network."
-												@reloadDatatable="reloadDatatableScan"
-												@assetsSearch="assetsSearch"
+												@reload-datatable="reloadDatatableScan"
+												@assets-search="assetsSearch"
 											/>
 										</div>
 									</div>

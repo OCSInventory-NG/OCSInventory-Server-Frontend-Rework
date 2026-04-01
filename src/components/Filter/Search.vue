@@ -3,7 +3,7 @@
 		<SaveSearchModal 
 			v-if="cansave && !disableforgroup"
 			:rowsearch="datavalues"
-			@useSaveSearch="useSaveSearch"
+			@use-save-search="useSaveSearch"
 		/>
 		<b-form
 			@submit="onSubmit"

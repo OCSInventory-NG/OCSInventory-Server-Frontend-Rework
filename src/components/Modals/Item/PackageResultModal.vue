@@ -25,7 +25,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="xl"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -84,7 +83,7 @@
 						is-sticky
 						title="deployment"
 						translationkey="deployment."
-						@attributePackage="attributePackage"
+						@attribute-package="attributePackage"
 					/>
 				</div>
 				<b-row>
@@ -112,7 +111,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="lg"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -146,11 +144,6 @@ export default {
 		items: { type: [Array, Object], default: () => [] },
 		group: { type: String, default: null },
 	},
-	computed: {
-		viewOnly() {
-			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
-		}
-	},
 	data() {
 		return {
 			errored: false,
@@ -166,6 +159,11 @@ export default {
 			isbusy: true,
 			loading: true,
 			loadingcreate: false,
+		}
+	},
+	computed: {
+		viewOnly() {
+			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
 		}
 	},
 	watch: {

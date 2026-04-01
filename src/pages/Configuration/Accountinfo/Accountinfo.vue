@@ -27,7 +27,7 @@
 						<div v-else>
 							<AccountinfoModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -45,7 +45,7 @@
 								adddvalueroute="accountinfo/value"
 								reconciliationname="accountinfo_config"
 								translationkey="accountinfo."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

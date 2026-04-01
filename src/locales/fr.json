@@ -716,7 +716,6 @@
     "first_name": "Prénom",
     "groups": "Groupes",
     "id": "ID",
-    "is_staff": "Super admin",
     "is_superuser": "Utilisateur privilégié",
     "last_name": "Nom",
     "name": "Nom",

@@ -27,7 +27,7 @@
 						<div v-else>
 							<SoftwareMappingModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -41,7 +41,7 @@
 								editcomponent="SoftwareMappingModal"
 								title="software_mapping"
 								translationkey="software."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

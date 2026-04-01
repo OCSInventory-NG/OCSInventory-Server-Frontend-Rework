@@ -16,7 +16,6 @@
 			:title="$t('network.editnetdevice')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
