@@ -102,7 +102,7 @@
 												customclass="datatable-btn mr-1"
 												parameter="dashboard/layout"
 												:disabled="edit"
-												@reloadDashboard="reloadDashboard"
+												@reload-dashboard="reloadDashboard"
 											/>
 										</b-col>
 									</b-row>
@@ -267,7 +267,7 @@
 									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
-									@removeItem="removeItem"
+									@remove-item="removeItem"
 								/>
 								<PieChart
 									v-if="chartsVisible && item.type == 'DonutChart'"
@@ -275,7 +275,7 @@
 									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
-									@removeItem="removeItem"
+									@remove-item="removeItem"
 								/>
 								<LineChart
 									v-if="chartsVisible && item.type == 'LineChart'"
@@ -283,7 +283,7 @@
 									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
-									@removeItem="removeItem"
+									@remove-item="removeItem"
 								/>
 								<BarChart
 									v-if="chartsVisible && item.type == 'BarChart'"
@@ -291,7 +291,7 @@
 									:chart-name="item.name"
 									:edit="edit"
 									:i="item.i"
-									@removeItem="removeItem"
+									@remove-item="removeItem"
 								/>
 							</GridItem>
 						</GridLayout>

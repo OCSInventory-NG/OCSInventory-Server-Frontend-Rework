@@ -83,7 +83,7 @@
 									</div>
 									<!-- LDAP -->
 									<div v-if="authmenu.value == 'LDAP'">
-										<Ldap :viewOnly="viewOnly" />
+										<Ldap :view-only="viewOnly" />
 									</div>
 									<!-- OIDC -->
 									<div v-if="authmenu.value == 'OIDC'">
@@ -130,9 +130,9 @@ export default {
 		}
 	},
 	computed: {
-	viewOnly() {
-		const perms = localStorage.getItem("permissions")?.split(",") || []
-		return !perms.includes("auth_method_change_authmethod")
+		viewOnly() {
+			const perms = localStorage.getItem("permissions")?.split(",") || []
+			return !perms.includes("auth_method_change_authmethod")
 		}
 	},
 	watch: {

@@ -57,14 +57,14 @@
 											:rowsectiondata="rowsection"
 											:template="rowsection.template"
 											:view-only="viewOnly"
-											@reloadTemplate="reloadTemplate"
-											@reloadSection="reloadSection"
+											@reload-template="reloadTemplate"
+											@reload-section="reloadSection"
 										/>
 										<delete-item-modal 
 											:id="rowsection.id"
 											:name="rowsection.name"
 											parameter="sections"
-											@reloadTemplate="reloadTemplate"
+											@reload-template="reloadTemplate"
 										/>
 									</b-button-group>
 								</b-button-toolbar>
@@ -83,7 +83,7 @@
 						:section="section.id"
 						:routetype="routetype"
 						:view-only="viewOnly"
-						@reloadDatatable="reloadDatatable"
+						@reload-datatable="reloadDatatable"
 					/>
 				</b-col>
 			</b-row>
@@ -109,7 +109,7 @@
 						apiroute="fields"
 						translationkey="template."
 						editcomponent="FieldModal"
-						@reloadDatatable="reloadDatatable"
+						@reload-datatable="reloadDatatable"
 					/>
 					<div v-else>
 						<Alert

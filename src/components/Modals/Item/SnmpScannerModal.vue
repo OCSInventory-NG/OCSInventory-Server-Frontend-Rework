@@ -36,7 +36,6 @@
 			:title="(!update) ? $t('network.addsnmpscanner') : $t('network.editsnmpscanner')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

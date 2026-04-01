@@ -61,8 +61,8 @@
 					</div>
 					<LdapModal 
 						:authid="authid"
-						:viewOnly="viewOnly"
-						@reloadDatatable="reloadDatatable"
+						:view-only="viewOnly"
+						@reload-datatable="reloadDatatable"
 					/>
 				</div>
 			</div>
@@ -77,7 +77,7 @@
 					editcomponent="LdapModal"
 					translationkey=""
 					apiroute="auth_config"
-					@reloadDatatable="reloadDatatable"
+					@reload-datatable="reloadDatatable"
 				/>
 			</div>
 		</div>
@@ -89,7 +89,7 @@ export default {
 	name: "Ldap",
 
 	props: {
-	viewOnly: { type: Boolean, default: false }
+		viewOnly: { type: Boolean, default: false }
 	},
 
 	data() {

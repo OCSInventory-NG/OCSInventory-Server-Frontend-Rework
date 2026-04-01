@@ -27,7 +27,7 @@
 						<div v-else>
 							<NetworkGroupModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -40,7 +40,7 @@
 								editcomponent="NetworkGroupModal"
 								title="netgroups"
 								translationkey="network."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

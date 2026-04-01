@@ -50,7 +50,7 @@
 										:isbusy="isbusy"
 										editcomponent="NetworkModal"
 										translationkey="network."
-										@reloadDatatable="reloadDatatable"
+										@reload-datatable="reloadDatatable"
 									/>
 								</b-tab>
 							</b-tabs>

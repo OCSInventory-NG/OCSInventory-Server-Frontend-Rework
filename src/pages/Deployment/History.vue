@@ -33,7 +33,7 @@
 								:isbusy="isbusy"
 								title="history"
 								translationkey="deployment."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

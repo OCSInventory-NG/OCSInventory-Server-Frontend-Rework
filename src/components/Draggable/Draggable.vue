@@ -66,14 +66,14 @@
 										v-bind="{ id: element.id }"
 										:update="true"
 										:view-only="viewOnly"
-										@reloadDatatable="reloadDatatable"
+										@reload-datatable="reloadDatatable"
 									/>
 									<DeleteItemModal 
 										v-if="candelete"
 										:id="element.id"
 										:name="element.name"
 										:parameter="apiroute"
-										@reloadDatatable="reloadDatatable"
+										@reload-datatable="reloadDatatable"
 									/>
 								</b-button-group>
 							</b-button-toolbar>
