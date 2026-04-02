@@ -42,8 +42,8 @@
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllSoftwares"
-								@reloadDatatable="reloadDatatable"
-								@assetsSearch="assetsSearch"
+								@reload-datatable="reloadDatatable"
+								@assets-search="assetsSearch"
 							/>
 						</div>
 					</div>

@@ -19,7 +19,7 @@
 
 						<div>
 							<Search
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 
@@ -52,7 +52,7 @@
 								:isbusy="isbusy"
 								title="asset/bases"
 								translationkey="inventory."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<AssetGroupModal 

@@ -43,7 +43,7 @@
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllNetdevices"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 								@filter-by-network="onFilterByNetwork"
 							/>
 						</div>

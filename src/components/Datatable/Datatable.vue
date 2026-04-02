@@ -63,7 +63,7 @@
 					class="col-1 ocs-col-datatable"
 				>
 					<ImportTemplateModal
-						@reloadDatatable="reloadDatatable"
+						@reload-datatable="reloadDatatable"
 					/>
 				</div>
 
@@ -85,7 +85,7 @@
 					<DuplicateModal
 						:route="title"
 						:title="titlevalue"
-						@reloadDatatable="reloadDatatable"
+						@reload-datatable="reloadDatatable"
 					/>
 				</div>
 
@@ -110,7 +110,7 @@
 						<MassProcessingModal
 							:items="(multisearch && selected.length == 0) ? rowdata : selected"
 							:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
-							@reloadDatatable="reloadDatatable"
+							@reload-datatable="reloadDatatable"
 						/>
 					</b-button-group>
 				</div>
@@ -532,7 +532,7 @@
 								:titlevalue="titlevalue"
 								:reconciliationname="reconciliationname"
 								:translationkey="translationkey"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 							<!-- Edit button -->
 							<component
@@ -546,7 +546,7 @@
 									contentType: row.item.content_type
 								}"
 								:update="true"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 							<router-link
 								v-if="viewautomationhistory"
@@ -572,7 +572,7 @@
 								:removefromgroup="removefromgroup"
 								:assetgroupid="assetgroupid"
 								:assets="assets"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</b-button-group>
 					</b-button-toolbar>
@@ -602,7 +602,7 @@
 					:removefromgroup="removefromgroup"
 					:assetgroupid="assetgroupid"
 					:assets="assets"
-					@reloadDatatable="reloadDatatable"
+					@reload-datatable="reloadDatatable"
 				/>
 			</b-col>
 		</b-row>
@@ -804,13 +804,13 @@ export default {
 		sortByLocal() {
 			if (this.serverSide) {
 				this.currentPage = 1
-				this.emitQueryChange()
+				this.emitQueryChangeDebounced();
 			}
 		},
 		sortDescLocal() {
 			if (this.serverSide) {
 				this.currentPage = 1
-				this.emitQueryChange()
+				this.emitQueryChangeDebounced();
 			}
 		},
 		showCheckbox(val) {
@@ -1041,7 +1041,7 @@ export default {
 			}
 
 			const ordering = this.getOrdering()
-			if (ordering) query.ordering = ordering
+			query.ordering = ordering
 
 			this.$emit('change-query', query)
 		},

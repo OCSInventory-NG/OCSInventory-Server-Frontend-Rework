@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('network.addsnmpcommunity') : $t('network.editsnmpcommunity')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
