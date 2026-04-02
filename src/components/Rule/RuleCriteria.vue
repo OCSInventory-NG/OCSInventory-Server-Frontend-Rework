@@ -104,7 +104,7 @@
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
 										:disabled="viewOnly || isAuthConfigRow(masterindex, input)"
-										@update:modelValue="() => onFieldChange(input, masterindex)"
+										@update:model-value="() => onFieldChange(input, masterindex)"
 									/>
 									<b-form-input
 										v-if="input.field && input.field.includes('metadata')"
@@ -155,7 +155,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:disabled="viewOnly"
-										@update:modelValue="val => onAuthMethodChange(input, masterindex, val)"
+										@update:model-value="val => onAuthMethodChange(input, masterindex, val)"
 									/>
 									<v-select
 										v-else-if="input.field === 'auth_profile.auth_config'"
