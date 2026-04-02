@@ -49,6 +49,7 @@
 								:rowheader="rowheader"
 								:canedit="canedit"
 								:candelete="candelete"
+								is-sticky
 								@reload-datatable="reloadDatatable"
 							/>
 						</div>

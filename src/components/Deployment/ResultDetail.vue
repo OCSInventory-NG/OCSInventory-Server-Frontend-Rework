@@ -25,6 +25,7 @@
 					:deletemultiple="(group) ? true : false"
 					:deleteids="rows"
 					:isbusy="isbusy"
+					is-sticky
 					title="deployment/results"
 					translationkey="deployment."
 					@reload-datatable="reloadDatatable"

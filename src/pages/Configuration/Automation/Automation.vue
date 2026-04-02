@@ -38,6 +38,7 @@
 								:canedit="canedit"
 								:viewautomationhistory="true"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="AutomationModal"
 								title="automation/scheduler"
 								translationkey="scheduler."

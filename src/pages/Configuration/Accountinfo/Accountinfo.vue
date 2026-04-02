@@ -38,6 +38,7 @@
 								:candelete="candelete"
 								:canaddvalue="canaddvalue"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="AccountinfoModal"
 								title="accountinfo/config"
 								titlevalue="accountinfo_param"

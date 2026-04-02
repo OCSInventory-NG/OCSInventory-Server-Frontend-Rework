@@ -38,6 +38,7 @@
 								:canedit="canedit"
 								:canviewruleaction="canviewaction"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="RuleModal"
 								title="automation/rule"
 								translationkey="rule."

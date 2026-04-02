@@ -31,6 +31,7 @@
 								:rowheader="rowheader"
 								:canviewhistory="canviewhistory"
 								:isbusy="isbusy"
+								is-sticky
 								title="history"
 								translationkey="deployment."
 								@reload-datatable="reloadDatatable"

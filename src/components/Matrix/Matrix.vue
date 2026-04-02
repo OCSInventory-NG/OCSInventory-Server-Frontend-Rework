@@ -1,6 +1,9 @@
 <template>
-	<div id="matrix">
-		<table class="table w-full table-fix-head">
+	<div
+		id="matrix"
+		class="table-fix-head"
+	>
+		<table class="table w-full">
 			<thead>
 				<tr align="center">
 					<th>{{ $t("generic.type") }}</th>
@@ -59,18 +62,6 @@
 					</td>
 				</tr>
 			</tbody>
-
-			<thead>
-				<tr align="center">
-					<th>{{ $t("generic.type") }}</th>
-					<th 
-						v-for="action in headertab"
-						:key="action"
-					>
-						{{ $t('generic.'+action) }}
-					</th>
-				</tr>
-			</thead>
 		</table>
 	</div>
 </template>

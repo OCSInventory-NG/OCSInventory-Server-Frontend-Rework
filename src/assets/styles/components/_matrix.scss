@@ -3,11 +3,12 @@
 // ===========================================
 
 .table-fix-head {
+  max-height: 46vh;
   overflow: auto;
 
   thead th {
     position: sticky;
-    top: -25px;
+    top: 0;
     z-index: 1;
   }
 }

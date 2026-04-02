@@ -38,6 +38,7 @@
 								:canedit="canedit"
 								:candelete="candelete"
 								:isbusy="isbusy"
+								is-sticky
 								editcomponent="UserModal"
 								title="users"
 								translationkey="user."

@@ -81,6 +81,7 @@
 											:canaccesspackagedetails="true"
 											:isbusy="isbusy"
 											:canrefresh="false"
+											is-sticky
 											title="history-all"
 											translationkey="deployment."
 										/>
@@ -94,6 +95,7 @@
 											:canaccesspackagedetails="true"
 											:isbusy="isbusy"
 											:canrefresh="false"
+											is-sticky
 											title="history-waiting"
 											translationkey="deployment."
 										/>
@@ -107,6 +109,7 @@
 											:canaccesspackagedetails="true"
 											:isbusy="isbusy"
 											:canrefresh="false"
+											is-sticky
 											title="history-notified"
 											translationkey="deployment."
 										/>
@@ -120,6 +123,7 @@
 											:canaccesspackagedetails="true"
 											:isbusy="isbusy"
 											:canrefresh="false"
+											is-sticky
 											title="history-success"
 											translationkey="deployment."
 										/>
@@ -133,6 +137,7 @@
 											:canaccesspackagedetails="true"
 											:isbusy="isbusy"
 											:canrefresh="false"
+											is-sticky
 											title="history-error"
 											translationkey="deployment."
 										/>

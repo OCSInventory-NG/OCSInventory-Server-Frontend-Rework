@@ -2,6 +2,7 @@
 	<div 
 		id="draggable-component"
 		class="table-responsive datatable-custom"
+		:class="{ 'sticky-table': isSticky }"
 	>
 		<table class="table table-vcenter table-striped table-hover border">
 			<thead>
@@ -105,7 +106,9 @@ export default {
 		candelete: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false },
 		field: { type: String, default: 'priority' },
-		viewOnly: { type: Boolean, default: false }
+		viewOnly: { type: Boolean, default: false },
+		// Table format
+		isSticky: { type: Boolean, default: false },
 	},
 	data() {
 		return {

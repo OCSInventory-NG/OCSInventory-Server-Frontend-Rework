@@ -34,6 +34,7 @@
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
 								:isbusy="isbusy"
+								is-sticky
 								title="assetgroups"
 								translationkey="assetgroup."
 								editcomponent="AssetGroupModal"

@@ -85,8 +85,38 @@ tbody, td, tfoot, th, thead, tr {
   font-weight: bold;
 }
 
-.datatable-custom .overflow-auto {
+.datatable-custom .datatable-table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
+}
+
+.sticky-table {
+  max-height: none;
+  overflow: visible;
+}
+
+.datatable-sticky-header {
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  z-index: 20;
+}
+
+.datatable-sticky-header.is-active {
+  display: block;
+}
+
+.datatable-sticky-header table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+}
+
+.datatable-sticky-header th {
+  background: #f0f0f0;
+  border-color: #f2f3f4;
+  box-shadow: inset 0 0 0 9999px #f0f0f0;
 }
 
 .datatable-custom table {
@@ -115,7 +145,7 @@ tbody, td, tfoot, th, thead, tr {
 }
 
 .datatable-custom thead th.sticky-col {
-  z-index: 6;
+  z-index: 7;
 }
 
 .datatable-custom .actions-col {

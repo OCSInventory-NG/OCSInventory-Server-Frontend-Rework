@@ -40,6 +40,7 @@
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
+								is-sticky
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllNetdevices"

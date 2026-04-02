@@ -41,6 +41,7 @@
 								:exporttemplate="exporttemplate"
 								:duplicateitem="duplicateitem"
 								:isbusy="isbusy"
+								is-sticky
 								title="templates"
 								titlevalue="template"
 								translationkey="template."

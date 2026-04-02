@@ -39,6 +39,7 @@
 								:server-total-rows="total"
 								:isbusy="isbusy"
 								:redirect-to-search="true"
+								is-sticky
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllSoftwares"

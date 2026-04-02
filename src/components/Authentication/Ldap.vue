@@ -74,6 +74,7 @@
 					:canedit="canedit && !viewOnly"
 					:candelete="candelete"
 					:canaddmapping="canaddmapping"
+					is-sticky
 					editcomponent="LdapModal"
 					translationkey=""
 					apiroute="auth_config"
