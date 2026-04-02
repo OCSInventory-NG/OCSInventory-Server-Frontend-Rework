@@ -80,6 +80,7 @@ export default {
 
 			rowdata: [],
 			rowheader: [],
+			baseRowheader: [],
 			rowsearch: [],
 			assetids: [],
 			noresult: null,
@@ -141,6 +142,7 @@ export default {
 						this.rowheader.unshift(label)
 					}
 				}
+				this.baseRowheader = [...this.rowheader]
 
 				this.errored = false
 				this.errormsg = null
@@ -156,9 +158,13 @@ export default {
 		async reloadDatatable(search) {
 			this.isbusy = true
 			this.loading = true
-			this.rowsearch = search ?? JSON.parse(localStorage.getItem("multisearch"))
+			this.rowsearch = search ?? {
+				search_data: JSON.parse(localStorage.getItem("multisearch")),
+				ungroup: false
+			}
 
 			try {
+				this.rowheader = [...this.baseRowheader]
 				const data = await this.$api.generic.post(
 					"search/",
 					this.rowsearch,

@@ -788,7 +788,10 @@ export default {
 			})
 
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
-			this.$emit("reloadDatatable", this.datavalues)
+			this.$emit("reloadDatatable", {
+				search_data: this.datavalues,
+				ungroup: this.ungroup
+			})
 		},
 	}
 }
