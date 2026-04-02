@@ -218,7 +218,7 @@ export default {
 			routetargets: {
 				"inventory_received": {
 					"accountinfo.accountinfoconfig": {
-						route: "accountinfo/config?datatarget=ASSET",
+						route: "accountinfo/config/?datatarget=ASSET",
 						key: "accountinfo"
 					},
 					"inventory_base.inventorybase": {
@@ -234,7 +234,7 @@ export default {
 				},
 				"netdevice_received": {
 					"accountinfo.accountinfoconfig": {
-						route: "accountinfo/config?datatarget=IPDISCOVER",
+						route: "accountinfo/config/?datatarget=IPDISCOVER",
 						key: "accountinfo"
 					}
 				}
@@ -509,7 +509,7 @@ export default {
 				this.loadingselect = true
 				try {
 					const data = await this.$api.generic.get(
-						"accountinfo/value",
+						"accountinfo/value/",
 						{ accountinfo_config: input.field }
 					)
 
