@@ -251,28 +251,28 @@
 					align="center"
 					class="multisearch-btns"
 				>
-				<div class="mb-2">
-					<b-button
-						type="button"
-						variant="info"
-						class="multisearch-btn"
-						@click="addGroup(datavalues)"
+					<div class="mb-2">
+						<b-button
+							type="button"
+							variant="info"
+							class="multisearch-btn"
+							@click="addGroup(datavalues)"
+						>
+							{{ $t('search.addgroup') }}
+						</b-button>
+						<b-button
+							type="submit"
+							variant="success"
+						>
+							{{ $t('generic.search') }}
+						</b-button>
+					</div>
+					<b-form-checkbox
+						v-model="ungroup"
+						inline
 					>
-						{{ $t('search.addgroup') }}
-					</b-button>
-					<b-button
-						type="submit"
-						variant="success"
-					>
-						{{ $t('generic.search') }}
-					</b-button>
-				</div>
-				<b-form-checkbox
-					v-model="ungroup"
-					inline
-				>
-					{{ $t('search.ungroup') }}
-				</b-form-checkbox>
+						{{ $t('search.ungroup') }}
+					</b-form-checkbox>
 				</b-col>
 				<b-col align-self="end" />
 			</b-row>
