@@ -208,8 +208,12 @@
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
 										:disabled="viewOnly"
-										@click="if (input.field === 'auth_profile.auth_method') removeAuthConfig(masterindex, input);
-										removeAndCondition(masterindex, index, datavalues)"
+										@click="
+											if (input.field === 'auth_profile.auth_method') {
+												removeAuthConfig(masterindex, input);
+											}
+											removeAndCondition(masterindex, index, datavalues)
+										"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
