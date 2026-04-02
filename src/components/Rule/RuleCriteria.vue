@@ -93,14 +93,24 @@
 								<b-form-group>
 									<v-select
 										id="field"
-										v-model="input.field" 
-										:options="fields" 
+										v-model="input.field"
+										:options="fields.filter(option => {
+											if (option.value !== 'auth_profile.auth_config') return true
+											return input.field === 'auth_profile.auth_config'
+										})"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
-										:disabled="viewOnly"
+										:disabled="viewOnly || isAuthConfigRow(masterindex, input)"
+										@update:model-value="() => onFieldChange(input, masterindex)"
+									/>
+									<b-form-input
+										v-if="input.field && input.field.includes('metadata')"
+										v-model="input.metadata_field"
+										placeholder="Metadata field"
+										class="mb-3"
 									/>
 								</b-form-group>
 							</b-col>
@@ -108,20 +118,23 @@
 								<b-form-group>
 									<v-select
 										id="operator"
-										v-model="input.operator" 
+										v-model="input.operator"
+										:disabled="viewOnly || input.field == 'auth_profile.auth_method' 
+											|| isAuthConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
 										required
-										:disabled="viewOnly"
 									/>
 								</b-form-group>
 								<b-form-checkbox
-									v-if="input.operator == 'in'
-										|| input.operator == '=='
-										|| input.operator == '!='"
+									v-if="input.field !== 'auth_profile.auth_method' 
+										&& !isAuthConfigRow(masterindex, input)
+										&& (input.operator == 'in'
+											|| input.operator == '=='
+											|| input.operator == '!=')"
 									id="case_sensitive"
 									v-model="input.case_sensitive"
 									name="enabled"
@@ -133,7 +146,29 @@
 							</b-col>
 							<b-col cols="3">
 								<b-form-group>
+									<v-select
+										v-if="input.field === 'auth_profile.auth_method'"
+										v-model="input.value"
+										:options="authMethods"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="viewOnly"
+										@update:model-value="val => onAuthMethodChange(input, masterindex, val)"
+									/>
+									<v-select
+										v-else-if="input.field === 'auth_profile.auth_config'"
+										v-model="input.value"
+										:options="getAuthConfigOptions(masterinput, input)"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="viewOnly || isAuthConfigValueDisabled(masterinput, input)"
+									/>
 									<b-form-input
+										v-else
 										id="value"
 										v-model="input.value"
 										class="mb-3"
@@ -144,6 +179,7 @@
 							<b-col cols="1">
 								<b-form-group>
 									<b-button 
+										v-if="!isAuthConfigRow(masterindex, input)"
 										:id="'addfield'+masterindex+index"
 										v-b-modal="1"
 										variant="primary"
@@ -159,18 +195,25 @@
 								</b-form-group>
 							</b-col>
 							<b-col 
-								v-show="datavalues[masterindex].length > 1"
+								v-show="datavalues[masterindex]
+									.filter(input => input.field !== 'auth_profile.auth_config').length > 1"
 								cols="1"
 							>
 								<b-form-group>
 									<b-button 
+										v-if="!isAuthConfigRow(masterindex, input)"
 										:id="'removefield'+masterindex+index"
 										v-b-modal="1"
 										variant="danger"
 										class="d-none d-sm-inline-block form-control"
 										:title="$t('rule.removeandcondition')"
 										:disabled="viewOnly"
-										@click="removeAndCondition(masterindex, index, datavalues)"
+										@click="
+											if (input.field === 'auth_profile.auth_method') {
+												removeAuthConfig(masterindex, input);
+											}
+											removeAndCondition(masterindex, index, datavalues)
+										"
 									>
 										<font-awesome-icon 
 											:icon="['fas', 'trash-can']"
@@ -213,6 +256,7 @@
 </template>
 
 <script>
+
 export default {
 	name: "RuleCriteria",
 	props: {
@@ -260,6 +304,9 @@ export default {
 					key: "network."
 				}
 			},
+			authMethods: [],
+			authConfigs: [],
+
 			operatortargets: {
 				"==": this.$t("rule.equal"),
 				"!=": this.$t("rule.notequal"),
@@ -278,12 +325,14 @@ export default {
 						field: "id",
 						operator: "==",
 						value: null,
-						case_sensitive: false
+						case_sensitive: false,
+						metadata_field: null
 					}
 				]
 			],
 			links: [ "and", "or" ],
 			disabledvalue: ["!!", "!"],
+			authLinkCounter: 0,
 
 			loading: true,
 			loadingfield: true,
@@ -298,6 +347,8 @@ export default {
 		}
 	},
 	async mounted() {
+		await this.getAuthMethods()
+		await this.getAuthConfigs()
 		await this.getLogicRow()
 	},
 	methods: {
@@ -324,6 +375,23 @@ export default {
 						})
 					}
 				})
+				const triggers = await this.$api.generic.get("automation/triggers/")
+				const triggerObj = triggers.find(t => t.trigger === this.trigger)
+
+				if (triggerObj?.context_fields) {
+					Object.keys(triggerObj.context_fields).forEach(parent => {
+						Object.keys(triggerObj.context_fields[parent]).forEach(child => {
+							const fullPath = `${parent}.${child}`
+
+							if (!this.fields.find(f => f.value === fullPath)) {
+								this.fields.push({
+									value: fullPath,
+									text: this.$t(`trigger_fields.${fullPath}`, fullPath)
+								})
+							}
+						})
+					})	
+				}
 
 				this.errormsg = null
 				this.errored = false
@@ -346,10 +414,18 @@ export default {
 			Object.keys(this.logic || {}).forEach((key) => {
 				if (!this.links.includes(key)) {
 					if (key !== "case_sensitive") {
+						let fullVar = this.logic[key][0].var ?? this.logic[key][1].var
+						let metadata_field = null
+
+						if (fullVar && fullVar.includes(".metadata.")) {
+							metadata_field = fullVar.split(".metadata.")[1]
+							fullVar = fullVar.split(".metadata.")[0] + ".metadata"
+						}
 						this.datavalues = [
 							[
 								{
-									field: this.logic[key][0].var ?? this.logic[key][1].var,
+									field: fullVar,
+									metadata_field,
 									operator: key,
 									value: (this.logic[key][1] && this.logic[key][1].var)
 										? this.logic[key][0]
@@ -384,14 +460,15 @@ export default {
 					})
 				} else if (key === "or") {
 					Object.keys(this.logic[key]).forEach((or) => {
-						this.datavalues[masterindex] = []
+						const currentIndex = masterindex
+						this.datavalues[currentIndex] = []
 
 						Object.keys(this.logic[key][or]).forEach((key2) => {
 							if (key2 === "and") {
 								Object.keys(this.logic[key][or][key2]).forEach((and) => {
 									Object.keys(this.logic[key][or][key2][and]).forEach((operator) => {
 										if (operator !== "case_sensitive") {
-											this.datavalues[masterindex].push({
+											this.datavalues[currentIndex].push({
 												field: this.logic[key][or][key2][and][operator][0].var
 													?? this.logic[key][or][key2][and][operator][1].var,
 												operator: operator,
@@ -403,8 +480,8 @@ export default {
 														: null),
 											})
 										} else {
-											this.datavalues[masterindex][
-												this.datavalues[masterindex].length - 1
+											this.datavalues[currentIndex][
+												this.datavalues[currentIndex].length - 1
 											].case_sensitive =
 												this.logic[key][or][key2][and][operator]
 										}
@@ -412,7 +489,7 @@ export default {
 								})
 							} else {
 								if (key2 !== "case_sensitive") {
-									this.datavalues[masterindex].push({
+									this.datavalues[currentIndex].push({
 										field: this.logic[key][or][key2][0].var
 											?? this.logic[key][or][key2][1].var,
 										operator: key2,
@@ -422,20 +499,29 @@ export default {
 												? this.logic[key][or][key2][1]
 												: null),
 									})
-									masterindex++
 								} else {
-									this.datavalues[masterindex - 1][
-										this.datavalues[masterindex - 1].length - 1
+									this.datavalues[currentIndex][
+										this.datavalues[currentIndex].length - 1
 									].case_sensitive =
 										this.logic[key][or][key2]
 								}
 							}
 						})
+
+						masterindex++
 					})
 				}
 			})
-
+			this.datavalues.forEach(masterInput => {
+				masterInput.forEach(input => {
+					if (input.field.includes(".metadata.") && input.metadata_field == null) {
+						input.metadata_field = input.field.split(".metadata.")[1]
+						input.field = input.field.split(".metadata.")[0] + ".metadata"
+					}
+				})
+			})
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
+			this.normalizeAuthConditions()
 
 			await this.getModelField()
 		},
@@ -446,6 +532,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
+				metadata_field: null
 			})
 		},
 
@@ -462,6 +549,7 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
+				metadata_field: null
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -472,19 +560,23 @@ export default {
 		},
 
 		pushInLogicComplexe(object, key, logics) {
+			let fieldVar = logics[key].field
+			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
+			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
 				object.push({
-					[logics[key].operator]: [{ var: logics[key].field }],
+					[logics[key].operator]: [{ var: fieldVar }],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			} else if (logics[key].operator === "in") {
 				object.push({
-					[logics[key].operator]: [logics[key].value, { var: logics[key].field }],
+					[logics[key].operator]: [logics[key].value, { var: fieldVar }],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			} else {
 				object.push({
-					[logics[key].operator]: [{ var: logics[key].field }, logics[key].value],
+					[logics[key].operator]: [{ var: fieldVar }, logics[key].value],
 					case_sensitive: logics[key].case_sensitive,
 				})
 			}
@@ -493,14 +585,18 @@ export default {
 		},
 
 		pushInLogicSimple(object, key, logics) {
+			let fieldVar = logics[key].field
+			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
+			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
-				object[logics[key].operator] = [{ var: logics[key].field }]
+				object[logics[key].operator] = [{ var: fieldVar }]
 				object.case_sensitive = logics[key].case_sensitive
 			} else if (logics[key].operator === "in") {
-				object[logics[key].operator] = [logics[key].value, { var: logics[key].field }]
+				object[logics[key].operator] = [logics[key].value, { var: fieldVar }]
 				object.case_sensitive = logics[key].case_sensitive
 			} else {
-				object[logics[key].operator] = [{ var: logics[key].field }, logics[key].value]
+				object[logics[key].operator] = [{ var: fieldVar }, logics[key].value]
 				object.case_sensitive = logics[key].case_sensitive
 			}
 
@@ -545,7 +641,7 @@ export default {
 							logicTmp.or.push(tmpAnd)
 						}
 					} else if (firstKey == null) {
-						logicTmp = this.pushInLogicSimple(logicTmp, 0, logics)
+						logicTmp = this.pushInLogicSimple({}, 0, logics)
 					} else {
 						Object.keys(logics).forEach((key) => {
 							logicTmp.or = this.pushInLogicComplexe(logicTmp.or, key, logics)
@@ -571,6 +667,268 @@ export default {
 				this.successed = false
 			}
 		},
+		getAuthMethodId(name, fallback = null) {
+			const normalized = String(name || "").toUpperCase()
+			const match = this.authMethods.find(method => method.name === normalized)
+			return match ? match.value : fallback
+		},
+		normalizeComparableId(value) {
+			const numericValue = Number(value)
+			return Number.isNaN(numericValue) ? value : numericValue
+		},
+		idsEqual(left, right) {
+			return this.normalizeComparableId(left) === this.normalizeComparableId(right)
+		},
+		createAuthLinkId() {
+			this.authLinkCounter += 1
+			return `auth-link-${this.authLinkCounter}`
+		},
+		ensureAuthLinkId(input) {
+			if (!input.auth_link_id) {
+				input.auth_link_id = this.createAuthLinkId()
+			}
+			return input.auth_link_id
+		},
+		getAuthMethodByLink(masterinput, authLinkId) {
+			if (!authLinkId) {
+				return null
+			}
+			return masterinput.find(condition =>
+				condition.field === "auth_profile.auth_method" && condition.auth_link_id === authLinkId
+			) || null
+		},
+		getSelectedAuthMethod(masterinput) {
+			const methodCondition = masterinput.find(
+				condition => condition.field === "auth_profile.auth_method"
+			)
+			return methodCondition ? methodCondition.value : null
+		},
+		getConfigsByMethod(methodId) {
+			return this.authConfigs.filter(config => this.idsEqual(config.method, methodId))
+		},
+		shouldHaveAuthConfig(methodId) {
+			const ldapId = this.getAuthMethodId("LDAP", 2)
+			const oidcId = this.getAuthMethodId("OIDC", 3)
+			const casId = this.getAuthMethodId("CAS", 4)
+
+			return [ldapId, oidcId, casId].some(id => this.idsEqual(id, methodId))
+		},
+		onFieldChange(input, masterindex) {
+			if (input.field === "auth_profile.auth_method") {
+				const localId = this.getAuthMethodId("LOCAL", 1)
+				input.operator = "=="
+				input.value = localId
+				this.ensureAuthLinkId(input)
+				this.onAuthMethodChange(input, masterindex, localId)
+				return
+			}
+
+			input.value = null
+			this.normalizeAuthConditionsForRow(masterindex)
+		},
+		onAuthMethodChange(input, masterindex, value) {
+			input.operator = "=="
+			input.value = value
+			this.ensureAuthLinkId(input)
+			this.syncAuthConfigCondition(masterindex, input)
+		},
+		syncAuthConfigCondition(masterindex, authMethodInput) {
+			const row = this.datavalues[masterindex]
+			if (!authMethodInput || authMethodInput.field !== "auth_profile.auth_method") {
+				return
+			}
+
+			const authLinkId = this.ensureAuthLinkId(authMethodInput)
+			const methodId = authMethodInput.value
+			const ldapId = this.getAuthMethodId("LDAP", 2)
+
+			if (!this.shouldHaveAuthConfig(methodId)) {
+				this.removeAuthConfig(masterindex, authMethodInput)
+				return
+			}
+
+			let configRow = row.find(condition =>
+				condition.field === "auth_profile.auth_config" && condition.auth_link_id === authLinkId
+			)
+
+			if (!configRow) {
+				configRow = {
+					field: "auth_profile.auth_config",
+					operator: "==",
+					value: null,
+					case_sensitive: false,
+					metadata_field: null,
+					auth_link_id: authLinkId
+				}
+				const methodIndex = row.indexOf(authMethodInput)
+				row.splice(methodIndex + 1, 0, configRow)
+			} else {
+				const methodIndex = row.indexOf(authMethodInput)
+				const configIndex = row.indexOf(configRow)
+				if (methodIndex !== -1 && configIndex !== -1 && configIndex !== methodIndex + 1) {
+					row.splice(configIndex, 1)
+					row.splice(methodIndex + 1, 0, configRow)
+				}
+			}
+
+			const methodConfigs = this.getConfigsByMethod(methodId)
+			const defaultConfig = methodConfigs.length > 0 ? methodConfigs[0].value : null
+
+			configRow.field = "auth_profile.auth_config"
+			configRow.operator = "=="
+			configRow.case_sensitive = false
+			configRow.metadata_field = null
+			configRow.auth_link_id = authLinkId
+
+			if (this.idsEqual(methodId, ldapId)) {
+				const isCurrentValueAllowed = methodConfigs.some(
+					config => this.idsEqual(config.value, configRow.value)
+				)
+				if (!isCurrentValueAllowed) {
+					configRow.value = defaultConfig
+				}
+			} else {
+				configRow.value = defaultConfig
+			}
+		},
+		async getAuthMethods() {
+			try {
+				const methods = await this.$api.generic.get("auth_method/")
+				this.authMethods = methods.map(m => ({
+					value: m.id,
+					text: m.name,
+					name: String(m.name || "").toUpperCase()
+				}))
+			} catch(e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
+		async getAuthConfigs() {
+			try {
+				const configs = await this.$api.generic.get("auth_config/")
+				this.authConfigs = configs
+					.map(c => ({
+						value: c.id,
+						text: c.name,
+						method: c.auth_method
+					}))
+			} catch(e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
+		getAuthConfigOptions(masterinput, input) {
+			const linkedMethod = this.getAuthMethodByLink(masterinput, input.auth_link_id)
+			const methodId = linkedMethod ? linkedMethod.value : this.getSelectedAuthMethod(masterinput)
+			return this.getConfigsByMethod(methodId)
+		},
+		isAuthConfigValueDisabled(masterinput, input) {
+			const linkedMethod = this.getAuthMethodByLink(masterinput, input.auth_link_id)
+			const methodId = linkedMethod ? linkedMethod.value : this.getSelectedAuthMethod(masterinput)
+			const ldapId = this.getAuthMethodId("LDAP", 2)
+			return !this.idsEqual(methodId, ldapId)
+		},
+		isAuthConfigRow(masterindex, input) {
+			if (input.field !== "auth_profile.auth_config") {
+				return false
+			}
+			return this.datavalues[masterindex].some(c => 
+				c.field === "auth_profile.auth_method"
+			)
+		},
+		removeAuthConfig(masterindex, authMethodInput = null) {
+			const row = this.datavalues[masterindex]
+			if (!row) {
+				return
+			}
+
+			if (authMethodInput?.auth_link_id) {
+				const configIndex = row.findIndex(condition =>
+					condition.field === "auth_profile.auth_config"
+					&& condition.auth_link_id === authMethodInput.auth_link_id
+				)
+				if (configIndex !== -1) {
+					row.splice(configIndex, 1)
+				}
+				return
+			}
+
+			const configIndex = row.findIndex(c => c.field === "auth_profile.auth_config")
+			if (configIndex !== -1) {
+				row.splice(configIndex, 1)
+			}
+		},
+		normalizeAuthConditionsForRow(masterindex) {
+			const row = this.datavalues[masterindex]
+			if (!row) {
+				return
+			}
+
+			const authMethodConditions = row.filter(condition => condition.field === "auth_profile.auth_method")
+			const configConditions = row.filter(condition => condition.field === "auth_profile.auth_config")
+
+			// Rebuild auth/config links after reload (link id is UI-only, not persisted).
+			authMethodConditions.forEach(authMethodCondition => {
+				this.ensureAuthLinkId(authMethodCondition)
+			})
+			const linkedMethodIds = new Set(
+				configConditions
+					.filter(condition => !!condition.auth_link_id)
+					.map(condition => condition.auth_link_id)
+			)
+			row.forEach((condition, index) => {
+				if (condition.field !== "auth_profile.auth_config" || condition.auth_link_id) {
+					return
+				}
+
+				for (let scanIndex = index - 1; scanIndex >= 0; scanIndex -= 1) {
+					const candidate = row[scanIndex]
+					if (candidate.field !== "auth_profile.auth_method") {
+						continue
+					}
+
+					const candidateLinkId = this.ensureAuthLinkId(candidate)
+					if (!this.shouldHaveAuthConfig(candidate.value) || linkedMethodIds.has(candidateLinkId)) {
+						continue
+					}
+
+					condition.auth_link_id = candidateLinkId
+					linkedMethodIds.add(candidateLinkId)
+					break
+				}
+			})
+
+			const activeLinkedMethodIds = new Set()
+
+			authMethodConditions.forEach(authMethodCondition => {
+				const localId = this.getAuthMethodId("LOCAL", 1)
+				authMethodCondition.operator = "=="
+				if (authMethodCondition.value == null) {
+					authMethodCondition.value = localId
+				}
+
+				const linkId = this.ensureAuthLinkId(authMethodCondition)
+				activeLinkedMethodIds.add(linkId)
+				this.syncAuthConfigCondition(masterindex, authMethodCondition)
+			})
+
+			for (let index = row.length - 1; index >= 0; index -= 1) {
+				const condition = row[index]
+				if (condition.field !== "auth_profile.auth_config") {
+					continue
+				}
+
+				if (!condition.auth_link_id || !activeLinkedMethodIds.has(condition.auth_link_id)) {
+					row.splice(index, 1)
+				}
+			}
+		},
+		normalizeAuthConditions() {
+			this.datavalues.forEach((_row, masterindex) => {
+				this.normalizeAuthConditionsForRow(masterindex)
+			})
+		}
 	}
 }
 </script>

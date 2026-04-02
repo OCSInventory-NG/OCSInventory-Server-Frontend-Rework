@@ -289,6 +289,7 @@
     "loading_data": "Chargement des données...",
     "login": "Connexion",
     "logout": "Déconnexion",
+    "name": "Nom",
     "no": "Non",
     "none": "Aucun",
     "no_data": "Aucune donnée disponible",
@@ -724,5 +725,12 @@
     "user_informations": "Informations de l'utilisateur",
     "user_permissions": "Permissions",
     "username": "Identifiant"
+  },
+  "trigger_fields": {
+    "auth_profile": {
+      "auth_config": "Configuration d'authentification",
+      "auth_method": "Méthode d'authentification",
+      "metadata": "Métadonnées d'authentification"
+    }
   }
 }
