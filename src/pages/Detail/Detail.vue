@@ -53,12 +53,12 @@
 											<PackageResultModal
 												v-if="device.osname != 'SNMP'"
 												:items="deployment"
-												@reloadDeployment="reloadDeployment"
+												@reload-deployment="reloadDeployment"
 											/>&nbsp;
 
 											<AssetOptionsModal
 												:item="deployment"
-												@reloadInventory="reloadInventory"
+												@reload-inventory="reloadInventory"
 											/>&nbsp;&nbsp;
 
 											<router-link 
@@ -139,7 +139,7 @@
 											<ResultDetail
 												:id="$route.params.id"
 												:reload="reload"
-												@endReloadDeployment="endReloadDeployment"
+												@end-reload-deployment="endReloadDeployment"
 											/>
 										</div>
 										<div

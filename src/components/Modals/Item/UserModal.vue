@@ -283,7 +283,7 @@ export default {
 	},
 	methods: {
 		_apiError(e) {
-			return e?.response?.data?.error || e?.message || String(e)
+			return e?.response?.data?.error || e?.response?.data?.email || e?.message || String(e)
 		},
 
 		loadData(id) {

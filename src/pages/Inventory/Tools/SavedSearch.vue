@@ -36,7 +36,7 @@
 								title="search/save"
 								translationkey="search."
 								editcomponent="SaveSearchModal"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							>
 								<template #cell(firstActions)="row">
 									<button

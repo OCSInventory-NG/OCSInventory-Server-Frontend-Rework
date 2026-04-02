@@ -27,7 +27,7 @@
 			:title="section.name"
 			:templateid="section.template"
 			:isbusy="isbusy"
-			@reloadDatatable="reloadDatatable"
+			@reload-datatable="reloadDatatable"
 		/>
 	</div>
 </template>
