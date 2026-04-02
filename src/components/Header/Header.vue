@@ -30,7 +30,7 @@
 			<div class="navbar-nav flex-row order-md-last">
 				<SaveSearchModal
 					:navbar="true"
-					@useSaveSearch="useSaveSearch"
+					@use-save-search="useSaveSearch"
 				/>
 
 				<Localeswitcher />

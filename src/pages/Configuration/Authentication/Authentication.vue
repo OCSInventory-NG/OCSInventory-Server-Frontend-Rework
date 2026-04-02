@@ -71,7 +71,7 @@
 															v-model="authmethod.enabled"
 															class="form-check-input"
 															type="checkbox"
-															:disabled="!canedit"
+															:disabled="!canedit || isSSOActive(authmethod)"
 															@change="enableAuthentication(
 																authmethod.id, authmethod.name, authmethod.enabled
 															)"
@@ -83,7 +83,7 @@
 									</div>
 									<!-- LDAP -->
 									<div v-if="authmenu.value == 'LDAP'">
-										<Ldap :viewOnly="viewOnly" />
+										<Ldap :view-only="viewOnly" />
 									</div>
 									<!-- OIDC -->
 									<div v-if="authmenu.value == 'OIDC'">
@@ -130,9 +130,9 @@ export default {
 		}
 	},
 	computed: {
-	viewOnly() {
-		const perms = localStorage.getItem("permissions")?.split(",") || []
-		return !perms.includes("auth_method_change_authmethod")
+		viewOnly() {
+			const perms = localStorage.getItem("permissions")?.split(",") || []
+			return !perms.includes("auth_method_change_authmethod")
 		}
 	},
 	watch: {
@@ -226,6 +226,19 @@ export default {
 				this.successed = false
 			}
 		},
+		isSSOActive(authmethod) {
+			const ssoMethods = ["OIDC", "CAS"]
+
+			if (!ssoMethods.includes(authmethod.name)) {
+				return false
+			}
+
+			return this.authmethods.some(
+				m => m.name !== authmethod.name &&
+				ssoMethods.includes(m.name) &&
+				m.enabled
+			)
+		}
 	}
 }
 </script>

@@ -40,7 +40,7 @@
 								@change-query="handleQueryChange"
 								@export="handleExport"
 								@export-all="exportAllExtensions"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

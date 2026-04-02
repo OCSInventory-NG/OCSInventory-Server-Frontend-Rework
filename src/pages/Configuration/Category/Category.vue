@@ -27,7 +27,7 @@
 						<div v-else>
 							<CategoryModal
 								v-if="canadd"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -40,7 +40,7 @@
 								editcomponent="CategoryModal"
 								title="categories"
 								translationkey="template."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>

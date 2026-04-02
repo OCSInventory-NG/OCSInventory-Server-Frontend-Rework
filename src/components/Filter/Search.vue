@@ -3,7 +3,7 @@
 		<SaveSearchModal 
 			v-if="cansave && !disableforgroup"
 			:rowsearch="datavalues"
-			@useSaveSearch="useSaveSearch"
+			@use-save-search="useSaveSearch"
 		/>
 		<b-form
 			@submit="onSubmit"
@@ -251,7 +251,8 @@
 					align="center"
 					class="multisearch-btns"
 				>
-					<b-button 
+				<div class="mb-2">
+					<b-button
 						type="button"
 						variant="info"
 						class="multisearch-btn"
@@ -259,12 +260,19 @@
 					>
 						{{ $t('search.addgroup') }}
 					</b-button>
-					<b-button 
+					<b-button
 						type="submit"
 						variant="success"
 					>
 						{{ $t('generic.search') }}
 					</b-button>
+				</div>
+				<b-form-checkbox
+					v-model="ungroup"
+					inline
+				>
+					{{ $t('search.ungroup') }}
+				</b-form-checkbox>
 				</b-col>
 				<b-col align-self="end" />
 			</b-row>
@@ -282,6 +290,7 @@ export default {
 	data() {
 		return {
 			errored: false,
+			ungroup: false,
 
 			errormsg: null,
 			successmsg: null,
@@ -510,7 +519,10 @@ export default {
 		onSubmit(event) {
 			event.preventDefault()
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
-			this.$emit("reloadDatatable", this.datavalues)
+			this.$emit("reloadDatatable", {
+				search_data: this.datavalues,
+				ungroup: this.ungroup
+			})
 		},
 
 		async getFields(route, masterindex, index, section = false, loadingdata = false) {

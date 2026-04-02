@@ -37,7 +37,6 @@
 			:title="(!update) ? $t('accountinfo.addaccountinfo') : $t('accountinfo.editaccountinfo')"
 			hide-footer
 			modal-class="custom-modal"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

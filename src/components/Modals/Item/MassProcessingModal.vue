@@ -22,7 +22,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="xl"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
@@ -45,7 +44,7 @@
 				:slug="(type == 'ASSET') ? 'inventory_base.inventorybase' : 'netdevice.netdevice'"
 				:items="items"
 				:type="type"
-				@reloadDatatable="reloadDatatable"
+				@reload-datatable="reloadDatatable"
 			/>
 		</b-modal>
 		<b-modal 
@@ -54,7 +53,6 @@
 			hide-footer
 			modal-class="custom-modal"
 			size="lg"
-			
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">

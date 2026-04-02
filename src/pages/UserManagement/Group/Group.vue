@@ -31,7 +31,7 @@
 								v-if="canadd"
 								:permissionsprop="permissions"
 								:permissionslabelprop="permissionslabel"
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 
 							<Datatable
@@ -46,7 +46,7 @@
 								title="groups"
 								titlevalue="group"
 								translationkey="group."
-								@reloadDatatable="reloadDatatable"
+								@reload-datatable="reloadDatatable"
 							/>
 						</div>
 					</div>
