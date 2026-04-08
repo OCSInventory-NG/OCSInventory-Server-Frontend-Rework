@@ -49,10 +49,13 @@
 								:multisearch="true"
 								:candelete="candelete"
 								:usecheckbox="candelete"
+								:server-side="true"
+								:server-total-rows="total"
 								:isbusy="isbusy"
 								is-sticky
 								title="asset/bases"
 								translationkey="inventory."
+								@change-query="handleQueryChange"
 								@reload-datatable="reloadDatatable"
 							/>
 
@@ -83,6 +86,7 @@ export default {
 			baseRowheader: [],
 			rowsearch: [],
 			assetids: [],
+			total: 0,
 			noresult: null,
 			translation_col_keys: {
 				"results": "deployment",
@@ -101,6 +105,13 @@ export default {
 
 			isbusy: true,
 			loading: true,
+			searchContextKey: null,
+			query: {
+				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
+				offset: 0,
+				ordering: null,
+				search: null,
+			},
 		}
 	},
 	async mounted() {
@@ -125,6 +136,71 @@ export default {
 		}
 	},
 	methods: {
+		getDefaultSearch() {
+			return {
+				search_data: JSON.parse(localStorage.getItem("multisearch")),
+				ungroup: false,
+			}
+		},
+
+		getSearchContextKey(search) {
+			if (!search) {
+				return null
+			}
+
+			return JSON.stringify({
+				search_data: search.search_data || [],
+				ungroup: !!search.ungroup,
+			})
+		},
+
+		normalizeSearchResponse(data) {
+			const results = Array.isArray(data) ? data : (data?.results || [])
+			const total = typeof data?.count === "number" ? data.count : results.length
+
+			return { results, total }
+		},
+
+		buildRows(results, { collectHeaders = false, collectAssetIds = false } = {}) {
+			const rowheader = collectHeaders ? [...this.baseRowheader] : [...this.rowheader]
+			const assetids = []
+			const rowdata = []
+
+			for (const element of results || []) {
+				const row = { ...element }
+
+				const flatMatches = this.flattenMatches(element.matched)
+
+				for (const [key, value] of Object.entries(flatMatches)) {
+					const normalizedKey = this.normalizeHeaderKey(key)
+					if (collectHeaders && !rowheader.includes(normalizedKey)) {
+						rowheader.push(normalizedKey)
+					}
+					row[normalizedKey] = value
+				}
+
+				delete row.matched
+
+				if (row.accountinfo && typeof row.accountinfo === "object") {
+					for (const [accountinfo, value] of Object.entries(row.accountinfo)) {
+						const col = "Account info : " + accountinfo
+						if (collectHeaders && !rowheader.includes(col)) {
+							rowheader.push(col)
+						}
+						row[col] = value
+					}
+				}
+
+				rowdata.push(row)
+
+				if (collectAssetIds) {
+					assetids.push(element.id)
+				}
+			}
+
+			return { rowdata, rowheader, assetids }
+		},
+
 		async loadInitial() {
 			this.loading = true
 			this.isbusy = true
@@ -155,53 +231,55 @@ export default {
 			}
 		},
 
+		async refreshSearchContext() {
+			const data = await this.$api.generic.post(
+				"search/",
+				this.rowsearch,
+				{ accountinfo: true }
+			)
+			const { results } = this.normalizeSearchResponse(data)
+			const { rowheader, assetids } = this.buildRows(results, {
+				collectHeaders: true,
+				collectAssetIds: true,
+			})
+
+			this.rowheader = rowheader
+			this.assetids = assetids
+		},
+
+		async getSearchResults(query = this.query) {
+			const data = await this.$api.generic.post(
+				"search/",
+				this.rowsearch,
+				{ ...query, accountinfo: true }
+			)
+			const { results, total } = this.normalizeSearchResponse(data)
+			const { rowdata } = this.buildRows(results)
+
+			this.rowdata = rowdata
+			this.total = total
+			this.noresult = this.rowdata.length === 0 ? this.$t("search.no_result") : null
+		},
+
 		async reloadDatatable(search) {
 			this.isbusy = true
 			this.loading = true
-			this.rowsearch = search ?? {
-				search_data: JSON.parse(localStorage.getItem("multisearch")),
-				ungroup: false
-			}
+			this.rowsearch = search ?? this.rowsearch ?? this.getDefaultSearch()
+			const nextSearchContextKey = this.getSearchContextKey(this.rowsearch)
+			const shouldRefreshSearchContext = this.searchContextKey !== nextSearchContextKey
 
 			try {
-				this.rowheader = [...this.baseRowheader]
-				const data = await this.$api.generic.post(
-					"search/",
-					this.rowsearch,
-					{ accountinfo: true } // customParams -> query params
-				)
-
-				this.rowdata = []
-				this.assetids = []
-				this.noresult = null
-
-				for (const element of data || []) {
-					const row = { ...element }
-
-					const flatMatches = this.flattenMatches(element.matched)
-
-					for (const [key, value] of Object.entries(flatMatches)) {
-						this.ensureHeaderKey(key)
-						row[key] = value
+				if (shouldRefreshSearchContext) {
+					this.query = {
+						...this.query,
+						offset: 0,
+						search: null,
 					}
 
-					delete row.matched
-
-					if (row.accountinfo && typeof row.accountinfo === "object") {
-						for (const [accountinfo, value] of Object.entries(row.accountinfo)) {
-							const col = "Account info : " + accountinfo
-							if (!this.rowheader.includes(col)) this.rowheader.push(col)
-							row[col] = value
-						}
-					}
-
-					this.rowdata.push(row)
-					this.assetids.push(element.id)
+					await this.refreshSearchContext()
+					this.searchContextKey = nextSearchContextKey
 				}
-
-				if (this.rowdata.length === 0) {
-					this.noresult = this.$t("search.no_result")
-				}
+				await this.getSearchResults(this.query)
 
 				this.successmsg = "success"
 				this.successed = true
@@ -215,6 +293,29 @@ export default {
 			} finally {
 				this.isbusy = false
 				this.loading = false
+			}
+		},
+
+		async handleQueryChange(newQuery) {
+			if (this.isbusy || !this.rowsearch?.search_data) {
+				return
+			}
+
+			this.isbusy = true
+
+			try {
+				this.query = {
+					...this.query,
+					...newQuery,
+				}
+				await this.getSearchResults(this.query)
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
+				this.errored = true
+			} finally {
+				this.isbusy = false
 			}
 		},
 
