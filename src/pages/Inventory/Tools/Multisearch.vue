@@ -56,6 +56,8 @@
 								title="asset/bases"
 								translationkey="inventory."
 								@change-query="handleQueryChange"
+								@export="handleExport"
+								@export-all="exportAllMultisearch"
 								@reload-datatable="reloadDatatable"
 							/>
 
@@ -316,6 +318,77 @@ export default {
 				this.errored = true
 			} finally {
 				this.isbusy = false
+			}
+		},
+
+		handleExport({ scope, rows }) {
+			const csv = this.buildCsvFromRows(rows)
+			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+			const url = URL.createObjectURL(blob)
+			const link = document.createElement("a")
+			link.href = url
+			link.setAttribute("download", `multisearch_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
+		},
+
+		buildCsvFromRows(rows) {
+			if (!rows || !rows.length) return ""
+			const headers = Object.keys(rows[0])
+			const csvRows = [headers.join(";")]
+
+			rows.forEach((row) => {
+				const values = headers.map((h) => {
+					const v = row[h] != null ? String(row[h]) : ""
+					return `"${v.replace(/"/g, '""')}"`
+				})
+				csvRows.push(values.join(";"))
+			})
+
+			return csvRows.join("\n")
+		},
+
+		async exportAllMultisearch({ filter, ordering }) {
+			if (!this.rowsearch?.search_data) {
+				return
+			}
+
+			try {
+				const allResults = []
+				const limit = 500
+				let offset = 0
+				let total = null
+
+				do {
+					const data = await this.$api.generic.post(
+						"search/",
+						this.rowsearch,
+						{
+							accountinfo: true,
+							limit,
+							offset,
+							search: filter || null,
+							ordering: ordering || null,
+						}
+					)
+					const { results, total: count } = this.normalizeSearchResponse(data)
+					total = count
+					allResults.push(...results)
+					offset += results.length
+
+					if (!results.length) {
+						break
+					}
+				} while (total === null || offset < total)
+
+				const { rowdata } = this.buildRows(allResults)
+
+				this.handleExport({ scope: "all", rows: rowdata })
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
+				this.errored = true
 			}
 		},
 
