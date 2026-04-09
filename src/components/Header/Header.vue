@@ -54,6 +54,14 @@
 						<p>{{ $t('title.myaccount') }}</p>
 					</b-dropdown-item-button>
 					<b-dropdown-divider />
+					<b-dropdown-item-button @click="serverInfo">
+						<font-awesome-icon 
+							:icon="['fas', 'info-circle']"
+							class="mr-3"
+						/>
+						<p>{{ $t('title.serverinfo') }}</p>
+					</b-dropdown-item-button>
+					<b-dropdown-divider />
 					<b-dropdown-item-button @click="logout">
 						<font-awesome-icon 
 							:icon="['fas', 'power-off']"
@@ -101,6 +109,9 @@ export default {
 		},
 		account() {
 			this.$router.push('/myaccount');
+		},
+		serverInfo() {
+			this.$router.push('/serverinfo');
 		},
 		showMenu() {
 			this.showmobilemenu = !this.showmobilemenu;

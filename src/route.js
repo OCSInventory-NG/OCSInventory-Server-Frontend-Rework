@@ -24,6 +24,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/serverinfo',
+		name: 'ServerInfo',
+		component: () => import('@/pages/ServerInfo/ServerInfo.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/dashboard',
 		name: 'Dashboard',
 		component: () => import('@/pages/Dashboard/Dashboard.vue'),
