@@ -24,6 +24,7 @@ import SoftwareMappingModal from '@/components/Modals/Item/SoftwareMappingModal.
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
+import UserGroupAssignmentsModal from '@/components/Modals/Item/UserGroupAssignmentsModal.vue'
 import Draggable from '@/components/Draggable/Draggable.vue'
 import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
@@ -65,6 +66,7 @@ const GlobalComponents = {
 		Vue.component('SnmpModal', SnmpModal)
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)
+		Vue.component('UserGroupAssignmentsModal', UserGroupAssignmentsModal)
 		Vue.component('ExtensionModal', ExtensionModal)
 		Vue.component('ExtensionSlot', ExtensionSlot)
 		Vue.component('BarChart', BarChart)

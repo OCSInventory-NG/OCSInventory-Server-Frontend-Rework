@@ -149,24 +149,30 @@
 				<b-row>
 					<b-col>
 						<h4>{{ $t('title.groups') }}</h4>
+						<Alert
+							v-if="update"
+							:message="$t('message.group_assignments_disclaimer')"
+							variant="info"
+						/>
 					</b-col>
 				</b-row>
 				<b-row>
 					<b-col
 						v-for="group in groups"
 						:key="group.id"
-						cols="4"
+						cols="6"
 						class="mb-2"
 					>
 						<b-form-checkbox
 							:id="group.code"
-							v-model="row.groups"
+							v-model="selectedGroups"
 							:name="group.code"
 							:value="group.id"
+							:disabled="isGroupLocked(group.id)"
 							unchecked
 							inline
 						>
-							{{ group.name }}
+							{{ formatGroupLabel(group) }}
 						</b-form-checkbox>
 					</b-col>
 				</b-row>
@@ -251,6 +257,9 @@ export default {
 			},
 			usermodal: false,
 			groups: [],
+			selectedGroups: [],
+			lockedGroups: [],
+			groupSourcesById: {},
 			
 			loading: true,
 			loadingcreate: false,
@@ -271,6 +280,9 @@ export default {
 					groups: [],
 					user_permissions: []
 				}
+				this.selectedGroups = []
+				this.lockedGroups = []
+				this.groupSourcesById = {}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
@@ -286,6 +298,12 @@ export default {
 			return e?.response?.data?.error || e?.response?.data?.email || e?.message || String(e)
 		},
 
+		getOrderedSources(sources) {
+			const sourceOrder = ["manual", "ldap", "rule"]
+			return Array.from(new Set(sources || []))
+				.sort((a, b) => sourceOrder.indexOf(a) - sourceOrder.indexOf(b))
+		},
+
 		loadData(id) {
 			this.usermodal = true
 			this.row = {
@@ -298,6 +316,9 @@ export default {
 				groups: [],
 				user_permissions: [],
 			}
+			this.selectedGroups = []
+			this.lockedGroups = []
+			this.groupSourcesById = {}
 
 			this.errormsg = null
 			this.errored = false
@@ -315,6 +336,7 @@ export default {
 			try {
 				const data = await this.$api.generic.get(`users/${id}/`)
 				this.row = data
+				this.initializeGroupAssignments(data)
 
 				this.errormsg = null
 				this.errored = false
@@ -325,6 +347,71 @@ export default {
 				this.errored = true
 				this.loading = false
 			}
+		},
+
+		initializeGroupAssignments(userData) {
+			const groupAssignments = Array.isArray(userData?.group_assignments) ? userData.group_assignments : []
+			const lockedGroups = []
+			const groupSourcesById = {}
+			const manualGroups = []
+
+			for (const assignment of groupAssignments) {
+				if (!assignment?.group_id) {
+					continue
+				}
+
+				if (!groupSourcesById[assignment.group_id]) {
+					groupSourcesById[assignment.group_id] = []
+				}
+
+				if (assignment.source && !groupSourcesById[assignment.group_id].includes(assignment.source)) {
+					groupSourcesById[assignment.group_id].push(assignment.source)
+				}
+
+				if (assignment.source === "manual" && !manualGroups.includes(assignment.group_id)) {
+					manualGroups.push(assignment.group_id)
+				}
+
+				if (["ldap", "rule"].includes(assignment.source) && !lockedGroups.includes(assignment.group_id)) {
+					lockedGroups.push(assignment.group_id)
+				}
+			}
+
+			Object.keys(groupSourcesById).forEach((groupId) => {
+				groupSourcesById[groupId] = this.getOrderedSources(groupSourcesById[groupId])
+			})
+
+			this.groupSourcesById = groupSourcesById
+			this.lockedGroups = lockedGroups
+
+			const projectedGroups = Array.isArray(userData?.groups) ? userData.groups : []
+			this.selectedGroups = groupAssignments.length > 0
+				? Array.from(new Set([...manualGroups, ...lockedGroups]))
+				: projectedGroups
+		},
+
+		isGroupLocked(groupId) {
+			return this.update && this.lockedGroups.includes(groupId)
+		},
+
+		getGroupSourceLabel(source) {
+			const labels = {
+				manual: "M",
+				ldap: "L",
+				rule: "R",
+			}
+
+			return labels[source] || source
+		},
+
+		formatGroupLabel(group) {
+			const sources = this.groupSourcesById[group.id] || []
+			if (!sources.length) {
+				return group.name
+			}
+
+			const suffix = sources.map((source) => this.getGroupSourceLabel(source)).join(",")
+			return `${group.name} [${suffix}]`
 		},
 
 		async getGroups() {
@@ -360,9 +447,17 @@ export default {
 					if (!this.row[key]) this.row[key] = ""
 				})
 				if (!this.update) {
-					await this.$api.generic.post("users/", this.row)
+					const payload = {
+						...this.row,
+						groups: this.selectedGroups
+					}
+
+					await this.$api.generic.post("users/", payload)
 				} else {
-					const payload = { ...this.row }
+					const payload = {
+						...this.row,
+						groups: this.selectedGroups.filter((groupId) => !this.lockedGroups.includes(groupId))
+					}
 
 					if (payload.password === "") {
 						delete payload.password
