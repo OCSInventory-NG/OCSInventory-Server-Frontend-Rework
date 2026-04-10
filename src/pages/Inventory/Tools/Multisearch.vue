@@ -86,7 +86,7 @@ export default {
 			rowdata: [],
 			rowheader: [],
 			baseRowheader: [],
-			rowsearch: [],
+			rowsearch: null,
 			assetids: [],
 			total: 0,
 			noresult: null,
@@ -146,7 +146,7 @@ export default {
 		},
 
 		getSearchContextKey(search) {
-			if (!search) {
+			if (!search?.search_data) {
 				return null
 			}
 
@@ -266,7 +266,7 @@ export default {
 		async reloadDatatable(search) {
 			this.isbusy = true
 			this.loading = true
-			this.rowsearch = search ?? this.rowsearch ?? this.getDefaultSearch()
+			this.rowsearch = search ?? (this.rowsearch?.search_data ? this.rowsearch : this.getDefaultSearch())
 			const nextSearchContextKey = this.getSearchContextKey(this.rowsearch)
 			const shouldRefreshSearchContext = this.searchContextKey !== nextSearchContextKey
 
