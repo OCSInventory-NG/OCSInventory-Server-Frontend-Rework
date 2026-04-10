@@ -167,6 +167,16 @@
 										class="mb-3 ocs-select"
 										:disabled="viewOnly || isAuthConfigValueDisabled(masterinput, input)"
 									/>
+									<v-select
+										v-else-if="isUserGroupField(input)"
+										v-model="input.value"
+										:options="groups"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="viewOnly || disabledvalue.includes(input.operator)"
+									/>
 									<b-form-input
 										v-else
 										id="value"
@@ -306,6 +316,7 @@ export default {
 			},
 			authMethods: [],
 			authConfigs: [],
+			groups: [],
 
 			operatortargets: {
 				"==": this.$t("rule.equal"),
@@ -349,6 +360,7 @@ export default {
 	async mounted() {
 		await this.getAuthMethods()
 		await this.getAuthConfigs()
+		await this.getGroups()
 		await this.getLogicRow()
 	},
 	methods: {
@@ -368,7 +380,7 @@ export default {
 				this.fields = []
 
 				Object.keys(data.actions.POST).forEach((field) => {
-					if (!["inventory_sections", "matched"].includes(field)) {
+					if (!["inventory_sections", "matched", "group_assignments"].includes(field)) {
 						this.fields.push({
 							value: field,
 							text: this.$t(key + field),
@@ -522,6 +534,7 @@ export default {
 			})
 			this.datavalues = JSON.parse(JSON.stringify(this.datavalues))
 			this.normalizeAuthConditions()
+			this.normalizeGroupConditions()
 
 			await this.getModelField()
 		},
@@ -724,6 +737,9 @@ export default {
 			}
 
 			input.value = null
+			if (this.isUserGroupField(input)) {
+				input.operator = "=="
+			}
 			this.normalizeAuthConditionsForRow(masterindex)
 		},
 		onAuthMethodChange(input, masterindex, value) {
@@ -817,6 +833,34 @@ export default {
 				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
+		},
+		async getGroups() {
+			try {
+				const data = await this.$api.generic.get("groups/")
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+
+				this.groups = rows.map(group => ({
+					value: group.id,
+					text: group.name
+				}))
+			} catch(e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
+		isUserGroupField(input) {
+			return this.trigger === "user_login" && input.field === "groups"
+		},
+		normalizeGroupConditions() {
+			this.datavalues.forEach(masterinput => {
+				masterinput.forEach(input => {
+					if (!this.isUserGroupField(input) || input.value == null) {
+						return
+					}
+
+					input.value = this.normalizeComparableId(input.value)
+				})
+			})
 		},
 		getAuthConfigOptions(masterinput, input) {
 			const linkedMethod = this.getAuthMethodByLink(masterinput, input.auth_link_id)
