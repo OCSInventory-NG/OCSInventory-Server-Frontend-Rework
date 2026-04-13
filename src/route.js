@@ -155,6 +155,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/configurations/serverinfo',
+		name: 'ServerInfo',
+		component: () => import('@/pages/Configuration/ServerInfo/ServerInfo.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/inventory/assets',
 		name: 'Assets',
 		component: () => import('@/pages/Inventory/Asset/Asset.vue'),

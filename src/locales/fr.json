@@ -589,6 +589,14 @@
     "usesavedsearch": "Utiliser une recherche sauvegardée",
     "visibility": "Visibilité"
   },
+  "serverinfo": {
+    "backend_title": "Serveur",
+    "copied": "Copié",
+    "copy": "Copier",
+    "copy_all": "Copier tout",
+    "frontend_title": "Interface",
+    "unknown_browser": "Inconnu"
+  },
   "software": {
     "addsoftwaremapping": "Ajouter un mapping logiciel",
     "editsoftwaremapping": "Modifier un mapping logiciel",
@@ -700,6 +708,7 @@
     "result": "Résultats",
     "rules": "Règles",
     "savedsearch": "Recherches sauvegardées",
+    "serverinfo": "Informations du serveur",
     "software_dictionary": "Logiciels",
     "software_mapping": "Mapping logiciels",
     "snmp": "SNMP",

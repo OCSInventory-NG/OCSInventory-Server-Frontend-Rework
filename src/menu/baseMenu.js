@@ -171,6 +171,12 @@ export const baseMenu = [
 				column: "general",
 			},
 			{
+				headerKey: "title.serverinfo",
+				link: "/configurations/serverinfo",
+				route: "ServerInfo",
+				column: "general",
+			},
+			{
 				headerKey: "title.templates",
 				link: "/configurations/templates",
 				route: "Template",
