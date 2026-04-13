@@ -24,14 +24,6 @@ const routes = [
 		}
 	},
 	{
-		path: '/serverinfo',
-		name: 'ServerInfo',
-		component: () => import('@/pages/ServerInfo/ServerInfo.vue'),
-		meta: {
-			layout: AppLayout
-		}
-	},
-	{
 		path: '/dashboard',
 		name: 'Dashboard',
 		component: () => import('@/pages/Dashboard/Dashboard.vue'),
@@ -158,6 +150,14 @@ const routes = [
 		name: 'EditRule',
 		component: () => import('@/pages/Configuration/Rule/EditRule.vue'),
 		props: true,
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/serverinfo',
+		name: 'ServerInfo',
+		component: () => import('@/pages/Configuration/ServerInfo/ServerInfo.vue'),
 		meta: {
 			layout: AppLayout
 		}
