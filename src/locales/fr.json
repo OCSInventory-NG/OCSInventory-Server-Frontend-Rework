@@ -374,6 +374,7 @@
     "deletevalid": "Êtes-vous sûr(e) ?",
     "dont_have_right_to_see": "Vous n'avez pas l'autorisation de voir cette page",
     "error_no_permissions": "Vous ne disposez pas des permissions requises, veuillez contacter votre administrateur",
+    "group_assignments_disclaimer": "Types d'assignation des groupes : M = manuelle, L = LDAP, R = règle. Les groupes assignés via LDAP ou règle sont en lecture seule.",
     "hide_details": "Masquer le détail",
     "info": "Information",
     "no_field": "Aucun champ disponible. Cliquez sur \"Ajouter un nouveau champ\" pour en créer un.",
@@ -725,6 +726,13 @@
     "edituser": "Modifier un utilisateur",
     "email": "Email",
     "first_name": "Prénom",
+    "group_assignment_group": "Groupe",
+    "group_assignment_manual": "Manuelle",
+    "group_assignment_method": "Méthode d'assignation",
+    "group_assignment_model": "Modèle d'assignation",
+    "group_assignment_rule": "Règle",
+    "group_assignment_source": "Source",
+    "group_assignments_title": "Assignations des groupes",
     "groups": "Groupes",
     "id": "ID",
     "is_superuser": "Utilisateur privilégié",
@@ -733,7 +741,8 @@
     "password": "Mot de passe",
     "user_informations": "Informations de l'utilisateur",
     "user_permissions": "Permissions",
-    "username": "Identifiant"
+    "username": "Identifiant",
+    "view_group_assignments": "Voir les assignations des groupes"
   },
   "trigger_fields": {
     "auth_profile": {

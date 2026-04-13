@@ -374,9 +374,10 @@
     "deletevalid": "Are you sure?",
     "dont_have_right_to_see": "You do not have permission to view this page",
     "error_no_permissions": "You do not have the required permissions, please contact your administrator",
-    "no_field": "No fields available. Click \"Add new field\" to create one.",
+    "group_assignments_disclaimer": "Group assignment types: M = manual, L = LDAP, R = rule. Groups assigned via LDAP or rule are read-only.",
     "hide_details": "Hide detail",
     "info": "Information",
+    "no_field": "No fields available. Click \"Add new field\" to create one.",
     "no_inventory": "No inventory data available",
     "no_section": "No sections available. Click \"Add new section\" to create one.",
     "no_selection": "No machine has been selected",
@@ -725,6 +726,13 @@
     "edituser": "Edit user",
     "email": "Email",
     "first_name": "First name",
+    "group_assignment_group": "Group",
+    "group_assignment_manual": "Manual",
+    "group_assignment_method": "Assignment method",
+    "group_assignment_model": "Assignment model",
+    "group_assignment_rule": "Rule",
+    "group_assignment_source": "Source",
+    "group_assignments_title": "Group assignments",
     "groups": "Groups",
     "id": "ID",
     "is_superuser": "Privileged user",
@@ -733,7 +741,8 @@
     "password": "Password",
     "user_informations": "User information",
     "user_permissions": "Permissions",
-    "username": "Username"
+    "username": "Username",
+    "view_group_assignments": "View group assignments"
   },
   "trigger_fields": {
     "auth_profile": {

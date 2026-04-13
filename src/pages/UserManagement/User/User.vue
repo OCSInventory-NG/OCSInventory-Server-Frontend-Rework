@@ -43,7 +43,14 @@
 								title="users"
 								translationkey="user."
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(firstActions)="row">
+									<UserGroupAssignmentsModal
+										:id="row.row.item.id"
+										:username="row.row.item.username"
+									/>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>
@@ -99,6 +106,58 @@ export default {
 		await this.loadInitial()
 	},
 	methods: {
+		getOrderedSources(sources) {
+			const sourceOrder = ["manual", "ldap", "rule"]
+			return Array.from(new Set(sources || []))
+				.sort((a, b) => sourceOrder.indexOf(a) - sourceOrder.indexOf(b))
+		},
+
+		getGroupSourceLabel(source) {
+			const sourceLabels = {
+				manual: "M",
+				ldap: "L",
+				rule: "R",
+			}
+
+			return sourceLabels[source] || ""
+		},
+
+		formatGroupAssignments(groupAssignments) {
+			const groupedAssignments = {}
+
+			for (const assignment of groupAssignments || []) {
+				const groupId = assignment?.group_id
+				const groupName = assignment?.group_name
+
+				if (!groupId || !groupName) {
+					continue
+				}
+
+				if (!groupedAssignments[groupId]) {
+					groupedAssignments[groupId] = {
+						groupName,
+						sources: [],
+					}
+				}
+
+				if (assignment?.source && !groupedAssignments[groupId].sources.includes(assignment.source)) {
+					groupedAssignments[groupId].sources.push(assignment.source)
+				}
+			}
+
+			return Object.values(groupedAssignments)
+				.map(({ groupName, sources }) => {
+					const sourceLabel = this.getOrderedSources(sources)
+						.map((source) => this.getGroupSourceLabel(source))
+						.filter(Boolean)
+						.join(",")
+
+					return sourceLabel ? `${groupName} [${sourceLabel}]` : groupName
+				})
+				.filter(Boolean)
+				.join("\n")
+		},
+
 		async loadInitial() {
 			this.loading = true
 			this.isbusy = true
@@ -106,7 +165,7 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("users/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["user_permissions", "password"].includes(f)
+					(f) => !["user_permissions", "password", "group_assignments"].includes(f)
 				)
 
 				// Get groups
@@ -166,6 +225,14 @@ export default {
 
 		permissionsGroupsTreatment() {
 			for (const row of this.rowdata || []) {
+				const groupAssignments = Array.isArray(row?.group_assignments) ? row.group_assignments : []
+				const formattedAssignments = this.formatGroupAssignments(groupAssignments)
+
+				if (formattedAssignments) {
+					row.groups = formattedAssignments
+					continue
+				}
+
 				const ids = Array.isArray(row?.groups) ? row.groups : []
 				row.groups = ids
 					.map((id) => this.groupsLabel[id])
