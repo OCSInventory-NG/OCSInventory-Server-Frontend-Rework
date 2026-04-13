@@ -588,6 +588,14 @@
     "usesavedsearch": "Use saved search",
     "visibility": "Visibility"
   },
+  "serverinfo": {
+    "backend_title": "Server",
+    "copied": "Copied",
+    "copy": "Copy",
+    "copy_all": "Copy all",
+    "frontend_title": "Interface",
+    "unknown_browser": "Unknown"
+  },
   "software": {
     "addsoftwaremapping": "Add software mapping",
     "editsoftwaremapping": "Edit software mapping",
@@ -699,6 +707,7 @@
     "result": "Results",
     "rules": "Rules",
     "savedsearch": "Saved searches",
+    "serverinfo": "Server information",
     "software_dictionary": "Softwares",
     "software_mapping": "Software mapping",
     "snmp": "SNMP",

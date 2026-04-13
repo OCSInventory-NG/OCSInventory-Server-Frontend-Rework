@@ -1,0 +1,36 @@
+// ===========================================
+//  SERVER INFO PAGE
+// ===========================================
+
+.serverinfo-block {
+	border: 1px solid var(--tblr-border-color, #dce1e7);
+	border-radius: 8px;
+	background: var(--tblr-bg-surface, #fff);
+	overflow: hidden;
+}
+
+.serverinfo-block-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.75rem 1rem;
+	background: var(--tblr-bg-surface-secondary, #f6f8fb);
+	border-bottom: 1px solid var(--tblr-border-color, #dce1e7);
+}
+
+.serverinfo-block-title {
+	font-weight: 600;
+}
+
+.serverinfo-code-block {
+	margin: 0;
+	padding: 1rem;
+	background: #111827;
+	color: #e5eef9;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
