@@ -397,6 +397,8 @@ export default {
 
 			for (const [type, matches] of Object.entries(matched || {})) {
 				for (const match of matches || []) {
+					const sectionName = type === "inventory_sections" ? this.normalizeHeaderKey(match?.section) : null
+
 					for (const [key, value] of Object.entries(match || {})) {
 						let col = null
 
@@ -406,7 +408,8 @@ export default {
 							const label = this.$t(this.translation_col_keys[type] + "." + key)
 							col = `${title}: ${label}`
 						} else if (type === "inventory_sections") {
-							col = `${title}: ${key}`
+							if (key === "section" || !sectionName) continue
+							col = `${sectionName}: ${key}`
 						}
 
 						if (!col) continue
