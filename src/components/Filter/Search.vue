@@ -268,10 +268,10 @@
 						</b-button>
 					</div>
 					<b-form-checkbox
-						v-model="ungroup"
+						v-model="grouped"
 						inline
 					>
-						{{ $t('search.ungroup') }}
+						{{ $t('search.grouped') }}
 					</b-form-checkbox>
 				</b-col>
 				<b-col align-self="end" />
@@ -290,7 +290,7 @@ export default {
 	data() {
 		return {
 			errored: false,
-			ungroup: false,
+			grouped: true,
 
 			errormsg: null,
 			successmsg: null,
@@ -380,6 +380,18 @@ export default {
 	},
 
 	methods: {
+		normalizeGroupingState(search = {}) {
+			if (typeof search.grouped === "boolean") {
+				return search.grouped
+			}
+
+			if (typeof search.ungroup === "boolean") {
+				return !search.ungroup
+			}
+
+			return true
+		},
+
 		async loadFieldsAndUpdateTranslations() {
 			const promises = []
 			
@@ -521,7 +533,8 @@ export default {
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
 			this.$emit("reloadDatatable", {
 				search_data: this.datavalues,
-				ungroup: this.ungroup
+				grouped: this.grouped,
+				ungroup: !this.grouped
 			})
 		},
 
@@ -767,6 +780,7 @@ export default {
 
 		useSaveSearch(search) {
 			this.datavalues = JSON.parse(JSON.stringify(search))
+			this.grouped = this.normalizeGroupingState(search)
 
 			Object.keys(this.datavalues).forEach((masterindex) => {
 				Object.keys(this.datavalues[masterindex]).forEach((index) => {
@@ -790,7 +804,8 @@ export default {
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
 			this.$emit("reloadDatatable", {
 				search_data: this.datavalues,
-				ungroup: this.ungroup
+				grouped: this.grouped,
+				ungroup: !this.grouped
 			})
 		},
 	}

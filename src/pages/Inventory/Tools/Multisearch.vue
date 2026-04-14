@@ -138,10 +138,25 @@ export default {
 		}
 	},
 	methods: {
+		normalizeGroupedState(search = {}) {
+			if (typeof search.grouped === "boolean") {
+				return search.grouped
+			}
+
+			if (typeof search.ungroup === "boolean") {
+				return !search.ungroup
+			}
+
+			return true
+		},
+
 		getDefaultSearch() {
+			const grouped = this.normalizeGroupedState()
+
 			return {
 				search_data: JSON.parse(localStorage.getItem("multisearch")),
-				ungroup: false,
+				grouped,
+				ungroup: !grouped,
 			}
 		},
 
@@ -150,9 +165,12 @@ export default {
 				return null
 			}
 
+			const grouped = this.normalizeGroupedState(search)
+
 			return JSON.stringify({
 				search_data: search.search_data || [],
-				ungroup: !!search.ungroup,
+				grouped,
+				ungroup: !grouped,
 			})
 		},
 
