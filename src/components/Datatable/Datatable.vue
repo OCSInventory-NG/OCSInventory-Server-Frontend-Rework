@@ -252,6 +252,23 @@
 					</div>
 				</template>
 
+				<template #cell()="row">
+					<template v-if="getCellLink(row)">
+						<span>{{ getCellLink(row).prefix }}</span>
+						<a
+							:href="getCellLink(row).href"
+							class="ocs-link"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{{ getCellLink(row).label }}
+						</a>
+					</template>
+					<template v-else>
+						{{ row.value }}
+					</template>
+				</template>
+
 				<!-- Selected row -->
 				<template #head(selected)="">
 					<b-form-group>
@@ -1297,7 +1314,7 @@ export default {
 				return
 			}
 
-			const headers = Object.keys(rows[0])
+			const headers = Object.keys(rows[0]).filter((key) => !key.startsWith("__"))
 			const csvRows = []
 
 			csvRows.push(headers.join(';'))
@@ -1372,6 +1389,19 @@ export default {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 				}
 			});
+		},
+		getCellLink(row) {
+			const fieldKey = row?.field?.key
+			if (!fieldKey) {
+				return null
+			}
+
+			const link = row?.item?.__cellLinks?.[fieldKey]
+			if (!link?.href) {
+				return null
+			}
+
+			return link
 		},
 		filterByNetwork(networkId) {
 			this.$emit('filter-by-network', networkId);

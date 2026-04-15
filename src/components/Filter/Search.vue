@@ -285,7 +285,8 @@ export default {
 	name: 'Search',
 	props: {
 		searchgroup: { type: [Array, Object], default: () => [] },
-		disableforgroup: { type: Boolean, default: false }
+		disableforgroup: { type: Boolean, default: false },
+		initialGrouped: { type: Boolean, default: null },
 	},
 	data() {
 		return {
@@ -374,7 +375,10 @@ export default {
 			]
 
 		if (this.searchgroup.length) {
-			this.datavalues = this.searchgroup
+			this.datavalues = JSON.parse(JSON.stringify(this.searchgroup))
+		}
+		if (typeof this.initialGrouped === "boolean") {
+			this.grouped = this.initialGrouped
 		}
 		this.loadFieldsAndUpdateTranslations()
 	},

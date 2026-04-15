@@ -19,6 +19,8 @@
 
 						<div>
 							<Search
+								:searchgroup="initialSearch.search_data"
+								:initial-grouped="initialSearch.grouped"
 								@reload-datatable="reloadDatatable"
 							/>
 						</div>
@@ -108,6 +110,7 @@ export default {
 			isbusy: true,
 			loading: true,
 			searchContextKey: null,
+			initialSearch: this.buildInitialSearchFromRoute(),
 			query: {
 				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
 				offset: 0,
@@ -132,12 +135,94 @@ export default {
 		// Data init
 		await this.loadInitial()
 
-		if(localStorage.getItem("useSavedSearch")) {
+		if (this.$route?.query?.searchKey) {
+			this.reloadDatatable(this.initialSearch)
+		} else if(localStorage.getItem("useSavedSearch")) {
 			this.reloadDatatable()
 			localStorage.removeItem("useSavedSearch")
 		}
 	},
 	methods: {
+		buildInitialSearchFromRoute() {
+			const searchKey = this.$route?.query?.searchKey
+
+			if (searchKey) {
+				try {
+					const rawSearch = localStorage.getItem(searchKey)
+					if (!rawSearch) {
+						throw new Error("Missing multisearch local storage payload")
+					}
+					const search = JSON.parse(rawSearch)
+					localStorage.removeItem(searchKey)
+					const grouped = this.normalizeGroupedState(search)
+
+					return {
+						search_data: search.search_data || [],
+						grouped,
+						ungroup: !grouped,
+					}
+				} catch (e) {
+					console.error("Invalid multisearch local storage payload:", e)
+				}
+			}
+
+			const grouped = this.normalizeGroupedState()
+
+			return {
+				search_data: JSON.parse(localStorage.getItem("multisearch")),
+				grouped,
+				ungroup: !grouped,
+			}
+		},
+
+		buildUuidFilter(uuid, link = "AND") {
+			return {
+				object: "InventoryBase",
+				route: "asset/bases",
+				field: "uuid",
+				fieldtype: "string",
+				operator: "iexact",
+				value: uuid,
+				link,
+			}
+		},
+
+		buildLinkedSearch(uuid) {
+			const baseSearchData = this.rowsearch?.search_data
+				|| this.initialSearch?.search_data
+				|| JSON.parse(localStorage.getItem("multisearch"))
+				|| []
+			const searchData = JSON.parse(JSON.stringify(baseSearchData))
+
+			if (!Array.isArray(searchData) || !searchData.length) {
+				return {
+					search_data: [[this.buildUuidFilter(uuid, "")]],
+					grouped: false,
+					ungroup: true,
+				}
+			}
+
+			searchData.forEach((group) => {
+				if (!Array.isArray(group)) {
+					return
+				}
+
+				group.push(this.buildUuidFilter(uuid, group.length > 0 ? "AND" : ""))
+			})
+
+			return {
+				search_data: searchData,
+				grouped: false,
+				ungroup: true,
+			}
+		},
+
+		storeLinkedSearch(search) {
+			const searchKey = `multisearch-link:${Date.now()}:${Math.random().toString(36).slice(2, 10)}`
+			localStorage.setItem(searchKey, JSON.stringify(search))
+			return searchKey
+		},
+
 		normalizeGroupedState(search = {}) {
 			if (typeof search.grouped === "boolean") {
 				return search.grouped
@@ -151,13 +236,7 @@ export default {
 		},
 
 		getDefaultSearch() {
-			const grouped = this.normalizeGroupedState()
-
-			return {
-				search_data: JSON.parse(localStorage.getItem("multisearch")),
-				grouped,
-				ungroup: !grouped,
-			}
+			return this.initialSearch
 		},
 
 		getSearchContextKey(search) {
@@ -189,7 +268,7 @@ export default {
 			for (const element of results || []) {
 				const row = { ...element }
 
-				const flatMatches = this.flattenMatches(element.matched)
+				const { values: flatMatches, links: matchLinks } = this.flattenMatches(element.matched, element.uuid)
 
 				for (const [key, value] of Object.entries(flatMatches)) {
 					const normalizedKey = this.normalizeHeaderKey(key)
@@ -197,6 +276,10 @@ export default {
 						rowheader.push(normalizedKey)
 					}
 					row[normalizedKey] = value
+				}
+
+				if (Object.keys(matchLinks).length > 0) {
+					row.__cellLinks = matchLinks
 				}
 
 				delete row.matched
@@ -354,7 +437,7 @@ export default {
 
 		buildCsvFromRows(rows) {
 			if (!rows || !rows.length) return ""
-			const headers = Object.keys(rows[0])
+			const headers = Object.keys(rows[0]).filter((key) => !key.startsWith("__"))
 			const csvRows = [headers.join(";")]
 
 			rows.forEach((row) => {
@@ -410,8 +493,27 @@ export default {
 			}
 		},
 
-		flattenMatches(matched) {
+		buildMatchedResultsLink(uuid) {
+			if (!uuid) {
+				return null
+			}
+
+			const search = this.buildLinkedSearch(uuid)
+			const searchKey = this.storeLinkedSearch(search)
+
+			const route = this.$router.resolve({
+				name: "Multisearch",
+				query: {
+					searchKey,
+				},
+			})
+
+			return route.href
+		},
+
+		flattenMatches(matched, uuid) {
 			const flat = {}
+			const links = {}
 
 			for (const [type, matches] of Object.entries(matched || {})) {
 				for (const match of matches || []) {
@@ -441,10 +543,27 @@ export default {
 			}
 
 			for (const k in flat) {
-				flat[k] = flat[k].join(", ")
+				const values = flat[k]
+				const [firstValue] = values
+				const remainingCount = values.length - 1
+
+				flat[k] = remainingCount > 0
+					? `${firstValue}, +${remainingCount} ${this.$t("search.other_results", remainingCount)}`
+					: firstValue
+
+				if (remainingCount > 0) {
+					links[k] = {
+						prefix: `${firstValue}, `,
+						label: `+${remainingCount} ${this.$t("search.other_results", remainingCount)}`,
+						href: this.buildMatchedResultsLink(uuid),
+					}
+				}
 			}
 
-			return flat
+			return {
+				values: flat,
+				links,
+			}
 		},
 
 		ensureHeaderKey(key) {

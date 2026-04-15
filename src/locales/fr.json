@@ -575,6 +575,7 @@
     "lte": "est inférieur ou égal à",
     "name": "Nom",
     "no_result": "La recherche n'a retourné aucun résultat",
+    "other_results": "autre résultat | autres résultats",
     "or": "OU",
     "public": "Public",
     "private_group": "Mes groupes",
