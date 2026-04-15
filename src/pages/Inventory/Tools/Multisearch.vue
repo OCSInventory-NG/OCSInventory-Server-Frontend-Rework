@@ -91,8 +91,9 @@ export default {
 			rowsearch: null,
 			assetids: [],
 			total: 0,
-			searchContextTotal: null,
 			noresult: null,
+			matchLabelCache: {},
+			matchTitleCache: {},
 			translation_col_keys: {
 				"results": "deployment",
 				"logs": "inventory",
@@ -110,7 +111,6 @@ export default {
 
 			isbusy: true,
 			loading: true,
-			searchContextKey: null,
 			initialSearch: this.buildInitialSearchFromRoute(),
 			query: {
 				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
@@ -240,33 +240,11 @@ export default {
 			return this.initialSearch
 		},
 
-		getSearchContextKey(search) {
-			if (!search?.search_data) {
-				return null
-			}
-
-			const grouped = this.normalizeGroupedState(search)
-
-			return JSON.stringify({
-				search_data: search.search_data || [],
-				grouped,
-				ungroup: !grouped,
-			})
-		},
-
 		normalizeSearchResponse(data) {
 			const results = Array.isArray(data) ? data : (data?.results || [])
 			const total = typeof data?.count === "number" ? data.count : results.length
 
 			return { results, total }
-		},
-
-		getEffectiveTotal(total, resultsLength = 0, search = this.rowsearch) {
-			if (!this.normalizeGroupedState(search) && typeof this.searchContextTotal === "number") {
-				return this.searchContextTotal
-			}
-
-			return typeof total === "number" ? total : resultsLength
 		},
 
 		buildRows(results, { collectHeaders = false, collectAssetIds = false } = {}) {
@@ -343,23 +321,6 @@ export default {
 			}
 		},
 
-		async refreshSearchContext() {
-			const data = await this.$api.generic.post(
-				"search/",
-				this.rowsearch,
-				{ accountinfo: true }
-			)
-			const { results } = this.normalizeSearchResponse(data)
-			const { rowheader, assetids } = this.buildRows(results, {
-				collectHeaders: true,
-				collectAssetIds: true,
-			})
-
-			this.rowheader = rowheader
-			this.assetids = assetids
-			this.searchContextTotal = results.length
-		},
-
 		async getSearchResults(query = this.query) {
 			const data = await this.$api.generic.post(
 				"search/",
@@ -367,10 +328,15 @@ export default {
 				{ ...query, accountinfo: true }
 			)
 			const { results, total } = this.normalizeSearchResponse(data)
-			const { rowdata } = this.buildRows(results)
+			const { rowdata, rowheader, assetids } = this.buildRows(results, {
+				collectHeaders: true,
+				collectAssetIds: true,
+			})
 
 			this.rowdata = rowdata
-			this.total = this.getEffectiveTotal(total, results.length)
+			this.rowheader = rowheader
+			this.assetids = assetids
+			this.total = total
 			this.noresult = this.rowdata.length === 0 ? this.$t("search.no_result") : null
 		},
 
@@ -378,20 +344,12 @@ export default {
 			this.isbusy = true
 			this.loading = true
 			this.rowsearch = search ?? (this.rowsearch?.search_data ? this.rowsearch : this.getDefaultSearch())
-			const nextSearchContextKey = this.getSearchContextKey(this.rowsearch)
-			const shouldRefreshSearchContext = this.searchContextKey !== nextSearchContextKey
 
 			try {
-				if (shouldRefreshSearchContext) {
-					this.searchContextTotal = null
-					this.query = {
-						...this.query,
-						offset: 0,
-						search: null,
-					}
-
-					await this.refreshSearchContext()
-					this.searchContextKey = nextSearchContextKey
+				this.query = {
+					...this.query,
+					offset: 0,
+					search: null,
 				}
 				await this.getSearchResults(this.query)
 
@@ -525,18 +483,19 @@ export default {
 		flattenMatches(matched, uuid) {
 			const flat = {}
 			const links = {}
+			const matchedResultsHref = uuid ? this.buildMatchedResultsLink(uuid) : null
 
 			for (const [type, matches] of Object.entries(matched || {})) {
+				const title = this.getMatchTitle(type)
+
 				for (const match of matches || []) {
 					const sectionName = type === "inventory_sections" ? this.normalizeHeaderKey(match?.section) : null
 
 					for (const [key, value] of Object.entries(match || {})) {
 						let col = null
 
-						const title = this.$t("title." + this.translation_title_keys[type])
-
 						if (this.$te(this.translation_col_keys[type] + "." + key)) {
-							const label = this.$t(this.translation_col_keys[type] + "." + key)
+							const label = this.getMatchLabel(type, key)
 							col = `${title}: ${label}`
 						} else if (type === "inventory_sections") {
 							if (key === "section" || !sectionName) continue
@@ -546,27 +505,34 @@ export default {
 						if (!col) continue
 
 						col = this.normalizeHeaderKey(col)
+						if (value === null || value === undefined) continue
 
-						if (!flat[col]) flat[col] = []
-						if (value !== null && value !== undefined) flat[col].push(String(value))
+						if (!flat[col]) {
+							flat[col] = {
+								firstValue: String(value),
+								count: 1,
+							}
+							continue
+						}
+
+						flat[col].count += 1
 					}
 				}
 			}
 
 			for (const k in flat) {
-				const values = flat[k]
-				const [firstValue] = values
-				const remainingCount = values.length - 1
+				const { firstValue, count } = flat[k]
+				const remainingCount = count - 1
 
 				flat[k] = remainingCount > 0
 					? `${firstValue}, +${remainingCount} ${this.$t("search.other_results", remainingCount)}`
 					: firstValue
 
-				if (remainingCount > 0) {
+				if (remainingCount > 0 && matchedResultsHref) {
 					links[k] = {
 						prefix: `${firstValue}, `,
 						label: `+${remainingCount} ${this.$t("search.other_results", remainingCount)}`,
-						href: this.buildMatchedResultsLink(uuid),
+						href: matchedResultsHref,
 					}
 				}
 			}
@@ -575,6 +541,24 @@ export default {
 				values: flat,
 				links,
 			}
+		},
+
+		getMatchTitle(type) {
+			if (!this.matchTitleCache[type]) {
+				this.matchTitleCache[type] = this.$t("title." + this.translation_title_keys[type])
+			}
+
+			return this.matchTitleCache[type]
+		},
+
+		getMatchLabel(type, key) {
+			const cacheKey = `${type}:${key}`
+
+			if (!this.matchLabelCache[cacheKey]) {
+				this.matchLabelCache[cacheKey] = this.$t(this.translation_col_keys[type] + "." + key)
+			}
+
+			return this.matchLabelCache[cacheKey]
 		},
 
 		ensureHeaderKey(key) {
