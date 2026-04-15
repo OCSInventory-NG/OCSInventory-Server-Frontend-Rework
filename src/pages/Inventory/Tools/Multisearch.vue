@@ -91,6 +91,7 @@ export default {
 			rowsearch: null,
 			assetids: [],
 			total: 0,
+			searchContextTotal: null,
 			noresult: null,
 			translation_col_keys: {
 				"results": "deployment",
@@ -260,6 +261,14 @@ export default {
 			return { results, total }
 		},
 
+		getEffectiveTotal(total, resultsLength = 0, search = this.rowsearch) {
+			if (!this.normalizeGroupedState(search) && typeof this.searchContextTotal === "number") {
+				return this.searchContextTotal
+			}
+
+			return typeof total === "number" ? total : resultsLength
+		},
+
 		buildRows(results, { collectHeaders = false, collectAssetIds = false } = {}) {
 			const rowheader = collectHeaders ? [...this.baseRowheader] : [...this.rowheader]
 			const assetids = []
@@ -348,6 +357,7 @@ export default {
 
 			this.rowheader = rowheader
 			this.assetids = assetids
+			this.searchContextTotal = results.length
 		},
 
 		async getSearchResults(query = this.query) {
@@ -360,7 +370,7 @@ export default {
 			const { rowdata } = this.buildRows(results)
 
 			this.rowdata = rowdata
-			this.total = total
+			this.total = this.getEffectiveTotal(total, results.length)
 			this.noresult = this.rowdata.length === 0 ? this.$t("search.no_result") : null
 		},
 
@@ -373,6 +383,7 @@ export default {
 
 			try {
 				if (shouldRefreshSearchContext) {
+					this.searchContextTotal = null
 					this.query = {
 						...this.query,
 						offset: 0,
