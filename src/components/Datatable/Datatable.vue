@@ -677,6 +677,7 @@ export default {
 		deleteids: { type: [Array, Object], default: () => [] },
 		candeletemultiple: { type: Boolean, default: true },
 		canmassprocessing: { type: Boolean, default: false },
+		hascustomactions: { type: Boolean, default: false },
 		// Sort datatable parameters
 		sortby: { type: String, default: null },
 		sortdesc: { type: String, default: null },
@@ -778,6 +779,17 @@ export default {
 		selectionLength() {
 			return Array.isArray(this.selected) ? this.selected.length : 0
 		},
+		shouldShowActions() {
+			return (
+				this.canedit ||
+				this.candelete ||
+				this.canviewhistory ||
+				this.canviewruleaction ||
+				this.canviewaction ||
+				this.canedittemplate ||
+				this.hascustomactions
+			)
+		},
 	},
 	watch: {
 		rowdata: function () {
@@ -861,6 +873,9 @@ export default {
 					disabled: true
 				})
 			}
+		},
+		shouldShowActions() {
+			this.syncActionsField()
 		},
 		visibleFields() {
 			this.refreshStickyHeader()
@@ -987,20 +1002,7 @@ export default {
 			})
 		}
 
-		var actions = {
-			key: "actions", 
-			label: this.$t('generic.actions'), 
-			sortable: false ,
-			visible: true,
-			disabled: true,
-			thClass: 'sticky-col right actions-col',
-			tdClass: 'sticky-col right actions-col'
-		}
-
-		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction || 
-		this.canviewaction || this.canedittemplate) {
-			this.fields.push(actions)
-		}
+		this.syncActionsField()
 
 		if(localStorage.getItem("perPage") != null && localStorage.getItem("perPage") != "") {
 			this.perPage = localStorage.getItem("perPage")
@@ -1031,6 +1033,23 @@ export default {
 		this.teardownStickyHeader()
 	},
 	methods: {
+		syncActionsField() {
+			this.fields = this.fields.filter(field => field.key !== 'actions')
+
+			if (!this.shouldShowActions) {
+				return
+			}
+
+			this.fields.push({
+				key: "actions",
+				label: this.$t('generic.actions'),
+				sortable: false,
+				visible: true,
+				disabled: true,
+				thClass: 'sticky-col right actions-col',
+				tdClass: 'sticky-col right actions-col'
+			})
+		},
 		setupStickyHeader() {
 			if (!this.isSticky) {
 				return

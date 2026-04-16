@@ -586,8 +586,10 @@
     "searchname": "Name",
     "selectsavedsearch": "Select search to update",
     "ungroup": "Ungrouped search",
+    "ungrouped_warning": "Ungrouping results on a large search may cause slowdowns.",
     "update": "Update an existing search",
     "user": "User",
+    "view_more_results": "View more results",
     "usesavedsearch": "Use saved search",
     "visibility": "Visibility"
   },

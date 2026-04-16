@@ -586,8 +586,10 @@
     "searchname": "Nom",
     "selectsavedsearch": "Sélectionner la recherche à mettre à jour",
     "ungroup": "Recherche dégroupée",
+    "ungrouped_warning": "Dégrouper les résultats sur une recherche conséquente peut entraîner des lenteurs.",
     "update": "Mettre à jour une recherche existante",
     "user": "Utilisateur",
+    "view_more_results": "Voir plus de résultats",
     "usesavedsearch": "Utiliser une recherche sauvegardée",
     "visibility": "Visibilité"
   },
