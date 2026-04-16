@@ -91,18 +91,6 @@
 <script>
 export default {
 	name: "Multisearch",
-	computed: {
-		isCurrentSearchGrouped() {
-			const currentSearch = this.rowsearch ?? this.initialSearch
-			return this.normalizeGroupedState(currentSearch)
-		},
-		canDeleteInCurrentMode() {
-			return this.candelete && this.isCurrentSearchGrouped
-		},
-		hasVisibleCustomActions() {
-			return this.rowdata.some((row) => Boolean(row?.__matchedResultsHref))
-		},
-	},
 	data() {
 		return {
 			errored: false,
@@ -137,6 +125,18 @@ export default {
 			loading: true,
 			initialSearch: this.buildInitialSearchFromRoute(),
 		}
+	},
+	computed: {
+		isCurrentSearchGrouped() {
+			const currentSearch = this.rowsearch ?? this.initialSearch
+			return this.normalizeGroupedState(currentSearch)
+		},
+		canDeleteInCurrentMode() {
+			return this.candelete && this.isCurrentSearchGrouped
+		},
+		hasVisibleCustomActions() {
+			return this.rowdata.some((row) => Boolean(row?.__matchedResultsHref))
+		},
 	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem("permissions")
