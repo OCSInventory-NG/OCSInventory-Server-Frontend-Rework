@@ -48,20 +48,33 @@
 								:rowheader="rowheader"
 								:canaccessdetails="true"
 								:candeploy="true"
+								:hascustomactions="hasVisibleCustomActions"
 								:multisearch="true"
-								:candelete="candelete"
-								:usecheckbox="candelete"
-								:server-side="true"
-								:server-total-rows="total"
+								:candelete="canDeleteInCurrentMode"
+								:usecheckbox="canDeleteInCurrentMode"
 								:isbusy="isbusy"
 								is-sticky
 								title="asset/bases"
 								translationkey="inventory."
-								@change-query="handleQueryChange"
-								@export="handleExport"
-								@export-all="exportAllMultisearch"
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(firstActions)="{ row }">
+									<div>
+										<a
+											v-if="row.item.__matchedResultsHref"
+											:href="row.item.__matchedResultsHref"
+											:title="$t('search.view_more_results')"
+											class="btn btn-ghost-dark"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<font-awesome-icon
+												:icon="['fas', 'magnifying-glass-plus']"
+											/>
+										</a>
+									</div>
+								</template>
+							</Datatable>
 
 							<AssetGroupModal 
 								:assetrow="assetids"
@@ -78,6 +91,18 @@
 <script>
 export default {
 	name: "Multisearch",
+	computed: {
+		isCurrentSearchGrouped() {
+			const currentSearch = this.rowsearch ?? this.initialSearch
+			return this.normalizeGroupedState(currentSearch)
+		},
+		canDeleteInCurrentMode() {
+			return this.candelete && this.isCurrentSearchGrouped
+		},
+		hasVisibleCustomActions() {
+			return this.rowdata.some((row) => Boolean(row?.__matchedResultsHref))
+		},
+	},
 	data() {
 		return {
 			errored: false,
@@ -90,7 +115,6 @@ export default {
 			baseRowheader: [],
 			rowsearch: null,
 			assetids: [],
-			total: 0,
 			noresult: null,
 			matchLabelCache: {},
 			matchTitleCache: {},
@@ -112,12 +136,6 @@ export default {
 			isbusy: true,
 			loading: true,
 			initialSearch: this.buildInitialSearchFromRoute(),
-			query: {
-				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
-				offset: 0,
-				ordering: null,
-				search: null,
-			},
 		}
 	},
 	async mounted() {
@@ -136,7 +154,7 @@ export default {
 		// Data init
 		await this.loadInitial()
 
-		if (this.$route?.query?.searchKey) {
+		if (this.$route?.query?.uuid) {
 			this.reloadDatatable(this.initialSearch)
 		} else if(localStorage.getItem("useSavedSearch")) {
 			this.reloadDatatable()
@@ -145,34 +163,27 @@ export default {
 	},
 	methods: {
 		buildInitialSearchFromRoute() {
-			const searchKey = this.$route?.query?.searchKey
-
-			if (searchKey) {
-				try {
-					const rawSearch = localStorage.getItem(searchKey)
-					if (!rawSearch) {
-						throw new Error("Missing multisearch local storage payload")
-					}
-					const search = JSON.parse(rawSearch)
-					localStorage.removeItem(searchKey)
-					const grouped = this.normalizeGroupedState(search)
-
-					return {
-						search_data: search.search_data || [],
-						grouped,
-						ungroup: !grouped,
-					}
-				} catch (e) {
-					console.error("Invalid multisearch local storage payload:", e)
-				}
-			}
-
-			const grouped = this.normalizeGroupedState()
+			const storedSearch = this.getStoredMultisearch()
+			const uuid = this.$route?.query?.uuid
+			const grouped = uuid ? false : this.normalizeGroupedState(storedSearch)
+			const searchData = uuid
+				? this.appendUuidToSearch(storedSearch, uuid)
+				: storedSearch
 
 			return {
-				search_data: JSON.parse(localStorage.getItem("multisearch")),
+				search_data: searchData,
 				grouped,
 				ungroup: !grouped,
+			}
+		},
+
+		getStoredMultisearch() {
+			try {
+				const storedSearch = JSON.parse(localStorage.getItem("multisearch"))
+				return Array.isArray(storedSearch) ? storedSearch : []
+			} catch (e) {
+				console.error("Invalid multisearch local storage payload:", e)
+				return []
 			}
 		},
 
@@ -188,22 +199,26 @@ export default {
 			}
 		},
 
-		buildLinkedSearch(uuid) {
-			const baseSearchData = this.rowsearch?.search_data
-				|| this.initialSearch?.search_data
-				|| JSON.parse(localStorage.getItem("multisearch"))
-				|| []
-			const searchData = JSON.parse(JSON.stringify(baseSearchData))
+		appendUuidToSearch(searchData, uuid) {
+			const clonedSearchData = JSON.parse(JSON.stringify(searchData || []))
 
-			if (!Array.isArray(searchData) || !searchData.length) {
-				return {
-					search_data: [[this.buildUuidFilter(uuid, "")]],
-					grouped: false,
-					ungroup: true,
-				}
+			if (!Array.isArray(clonedSearchData) || !clonedSearchData.length) {
+				return [[this.buildUuidFilter(uuid, "")]]
 			}
 
-			searchData.forEach((group) => {
+			const hasUuidFilter = clonedSearchData.some((group) => (
+				Array.isArray(group) && group.some((filter) => (
+					filter?.field === "uuid" &&
+					filter?.value === uuid &&
+					filter?.route === "asset/bases"
+				))
+			))
+
+			if (hasUuidFilter) {
+				return clonedSearchData
+			}
+
+			clonedSearchData.forEach((group) => {
 				if (!Array.isArray(group)) {
 					return
 				}
@@ -211,17 +226,7 @@ export default {
 				group.push(this.buildUuidFilter(uuid, group.length > 0 ? "AND" : ""))
 			})
 
-			return {
-				search_data: searchData,
-				grouped: false,
-				ungroup: true,
-			}
-		},
-
-		storeLinkedSearch(search) {
-			const searchKey = `multisearch-link:${Date.now()}:${Math.random().toString(36).slice(2, 10)}`
-			localStorage.setItem(searchKey, JSON.stringify(search))
-			return searchKey
+			return clonedSearchData
 		},
 
 		normalizeGroupedState(search = {}) {
@@ -240,13 +245,6 @@ export default {
 			return this.initialSearch
 		},
 
-		normalizeSearchResponse(data) {
-			const results = Array.isArray(data) ? data : (data?.results || [])
-			const total = typeof data?.count === "number" ? data.count : results.length
-
-			return { results, total }
-		},
-
 		buildRows(results, { collectHeaders = false, collectAssetIds = false } = {}) {
 			const rowheader = collectHeaders ? [...this.baseRowheader] : [...this.rowheader]
 			const assetids = []
@@ -255,7 +253,10 @@ export default {
 			for (const element of results || []) {
 				const row = { ...element }
 
-				const { values: flatMatches, links: matchLinks } = this.flattenMatches(element.matched, element.uuid)
+				const flatMatches = this.flattenMatches(element.matched)
+				const matchedResultsHref = this.hasRemainingMatchedResults(element.matched) && element.uuid
+					? this.buildMatchedResultsLink(element.uuid)
+					: null
 
 				for (const [key, value] of Object.entries(flatMatches)) {
 					const normalizedKey = this.normalizeHeaderKey(key)
@@ -265,8 +266,8 @@ export default {
 					row[normalizedKey] = value
 				}
 
-				if (Object.keys(matchLinks).length > 0) {
-					row.__cellLinks = matchLinks
+				if (matchedResultsHref) {
+					row.__matchedResultsHref = matchedResultsHref
 				}
 
 				delete row.matched
@@ -321,13 +322,13 @@ export default {
 			}
 		},
 
-		async getSearchResults(query = this.query) {
+		async getSearchResults() {
 			const data = await this.$api.generic.post(
 				"search/",
 				this.rowsearch,
-				{ ...query, accountinfo: true }
+				{ accountinfo: true }
 			)
-			const { results, total } = this.normalizeSearchResponse(data)
+			const results = Array.isArray(data) ? data : (data?.results || [])
 			const { rowdata, rowheader, assetids } = this.buildRows(results, {
 				collectHeaders: true,
 				collectAssetIds: true,
@@ -336,7 +337,6 @@ export default {
 			this.rowdata = rowdata
 			this.rowheader = rowheader
 			this.assetids = assetids
-			this.total = total
 			this.noresult = this.rowdata.length === 0 ? this.$t("search.no_result") : null
 		},
 
@@ -346,12 +346,7 @@ export default {
 			this.rowsearch = search ?? (this.rowsearch?.search_data ? this.rowsearch : this.getDefaultSearch())
 
 			try {
-				this.query = {
-					...this.query,
-					offset: 0,
-					search: null,
-				}
-				await this.getSearchResults(this.query)
+				await this.getSearchResults()
 
 				this.successmsg = "success"
 				this.successed = true
@@ -368,124 +363,40 @@ export default {
 			}
 		},
 
-		async handleQueryChange(newQuery) {
-			if (this.isbusy || !this.rowsearch?.search_data) {
-				return
-			}
-
-			this.isbusy = true
-
-			try {
-				this.query = {
-					...this.query,
-					...newQuery,
-				}
-				await this.getSearchResults(this.query)
-				this.errormsg = null
-				this.errored = false
-			} catch (e) {
-				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
-				this.errored = true
-			} finally {
-				this.isbusy = false
-			}
-		},
-
-		handleExport({ scope, rows }) {
-			const csv = this.buildCsvFromRows(rows)
-			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-			const url = URL.createObjectURL(blob)
-			const link = document.createElement("a")
-			link.href = url
-			link.setAttribute("download", `multisearch_${scope}.csv`)
-			document.body.appendChild(link)
-			link.click()
-			link.remove()
-			URL.revokeObjectURL(url)
-		},
-
-		buildCsvFromRows(rows) {
-			if (!rows || !rows.length) return ""
-			const headers = Object.keys(rows[0]).filter((key) => !key.startsWith("__"))
-			const csvRows = [headers.join(";")]
-
-			rows.forEach((row) => {
-				const values = headers.map((h) => {
-					const v = row[h] != null ? String(row[h]) : ""
-					return `"${v.replace(/"/g, '""')}"`
-				})
-				csvRows.push(values.join(";"))
-			})
-
-			return csvRows.join("\n")
-		},
-
-		async exportAllMultisearch({ filter, ordering }) {
-			if (!this.rowsearch?.search_data) {
-				return
-			}
-
-			try {
-				const allResults = []
-				const limit = 500
-				let offset = 0
-				let total = null
-
-				do {
-					const data = await this.$api.generic.post(
-						"search/",
-						this.rowsearch,
-						{
-							accountinfo: true,
-							limit,
-							offset,
-							search: filter || null,
-							ordering: ordering || null,
-						}
-					)
-					const { results, total: count } = this.normalizeSearchResponse(data)
-					total = count
-					allResults.push(...results)
-					offset += results.length
-
-					if (!results.length) {
-						break
-					}
-				} while (total === null || offset < total)
-
-				const { rowdata } = this.buildRows(allResults)
-
-				this.handleExport({ scope: "all", rows: rowdata })
-			} catch (e) {
-				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
-				this.errored = true
-			}
-		},
-
 		buildMatchedResultsLink(uuid) {
 			if (!uuid) {
 				return null
 			}
 
-			const search = this.buildLinkedSearch(uuid)
-			const searchKey = this.storeLinkedSearch(search)
-
 			const route = this.$router.resolve({
 				name: "Multisearch",
 				query: {
-					searchKey,
+					uuid,
 				},
 			})
 
 			return route.href
 		},
 
-		flattenMatches(matched, uuid) {
+		hasRemainingMatchedResults(matched) {
+			return Object.entries(matched || {}).some(([key, value]) => (
+				key.endsWith("_remaining_count") &&
+				Number(value) > 0
+			))
+		},
+
+		flattenMatches(matched) {
 			const flat = {}
-			const links = {}
-			const matchedResultsHref = uuid ? this.buildMatchedResultsLink(uuid) : null
 
 			for (const [type, matches] of Object.entries(matched || {})) {
+				if (type.endsWith("_remaining_count")) {
+					continue
+				}
+
+				if (!Array.isArray(matches)) {
+					continue
+				}
+
 				const title = this.getMatchTitle(type)
 
 				for (const match of matches || []) {
@@ -508,39 +419,14 @@ export default {
 						if (value === null || value === undefined) continue
 
 						if (!flat[col]) {
-							flat[col] = {
-								firstValue: String(value),
-								count: 1,
-							}
+							flat[col] = String(value)
 							continue
 						}
-
-						flat[col].count += 1
 					}
 				}
 			}
 
-			for (const k in flat) {
-				const { firstValue, count } = flat[k]
-				const remainingCount = count - 1
-
-				flat[k] = remainingCount > 0
-					? `${firstValue}, +${remainingCount} ${this.$t("search.other_results", remainingCount)}`
-					: firstValue
-
-				if (remainingCount > 0 && matchedResultsHref) {
-					links[k] = {
-						prefix: `${firstValue}, `,
-						label: `+${remainingCount} ${this.$t("search.other_results", remainingCount)}`,
-						href: matchedResultsHref,
-					}
-				}
-			}
-
-			return {
-				values: flat,
-				links,
-			}
+			return flat
 		},
 
 		getMatchTitle(type) {
