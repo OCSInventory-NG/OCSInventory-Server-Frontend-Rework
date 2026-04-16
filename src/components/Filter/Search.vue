@@ -273,6 +273,13 @@
 					>
 						{{ $t('search.grouped') }}
 					</b-form-checkbox>
+					<Alert
+						v-if="!grouped"
+						:message="$t('search.ungrouped_warning')"
+						:cols="false"
+						variant="warning"
+						class="mt-3 text-start"
+					/>
 				</b-col>
 				<b-col align-self="end" />
 			</b-row>
