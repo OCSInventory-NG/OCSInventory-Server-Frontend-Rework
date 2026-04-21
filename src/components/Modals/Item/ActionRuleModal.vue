@@ -244,7 +244,7 @@ export default {
 			}, 500)
 		},
 		'row.field': {
-			handler(newValue, oldValue) {
+			handler(newValue) {
 				this.handleFieldChange(newValue);
 			},
 		}
