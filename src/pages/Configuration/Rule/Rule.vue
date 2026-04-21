@@ -126,8 +126,9 @@ export default {
 				this.rowheader = Object.keys(header.actions.POST).filter(
 					(f) => !this.excludefields.includes(f)
 				)
-
+				//Get triggers
 				await this.getTriggers()
+				// Get rules
 				await this.getRules()
 
 				this.errored = false
