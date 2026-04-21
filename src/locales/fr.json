@@ -485,16 +485,19 @@
     "user": "Utilisateurs"
   },
   "rule": {
+    "action": "Action",
     "actions": "Actions",
     "addaction": "Ajouter une action",
     "addandcondition": "Ajouter une condition ET",
     "addorcondition": "Ajouter une condition OU",
     "addrule": "Ajouter une règle",
     "boolean": "est vrai",
+    "break_on_match": "Arrêter à la première correspondance",
     "case_sensitive": "Sensible à la casse",
     "contains": "contient",
     "data": "Valeur",
     "description": "Nom/Description",
+    "editaction": "Modifier l'action",
     "editrule": "Modifier la règle",
     "enabled": "Activé",
     "equal": "est égal à",
@@ -515,6 +518,7 @@
     "removeandcondition": "Supprimer la condition ET",
     "removeorcondition": "Supprimer la condition OU",
     "set": "ASSIGNER",
+    "template": "Template",
     "trigger": "Déclencheur",
     "user_login": "Connexion utilisateur"
   },

@@ -61,6 +61,17 @@
 										:id="element.id"
 									/>
 									<!-- Edit button -->
+									<button 
+										v-if="canviewruleaction"
+										:title="$t('rule.managerule')"
+										class="btn btn-ghost-orange ocs-auto"
+										@click="goToEditRule(element.id)"
+									>
+										<font-awesome-icon 
+											:icon="['fas', 'gear']"
+											size="1x"
+										/>
+									</button>
 									<component 
 										:is="editcomponent"
 										v-if="canedit"
@@ -104,6 +115,7 @@ export default {
 		editcomponent: { type: String, default: "ActionListModal" },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		canviewruleaction: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false },
 		field: { type: String, default: 'priority' },
 		viewOnly: { type: Boolean, default: false },
@@ -140,7 +152,7 @@ export default {
 
 				const payload = { ...this.rowdatas[idx] }
 				if (payload.file) delete payload.file
-
+				if (payload.trigger) delete payload.trigger
 				await this.$api.generic.patch(
 					`${this.apiroute}/${payload.id}/`,
 					payload
@@ -169,6 +181,9 @@ export default {
 					}
 				}
 			}
+		},
+		goToEditRule(id) {
+			this.$router.push('/configurations/rules/'+id);
 		},
 	}
 }

@@ -125,6 +125,23 @@
 					</b-col>
 				</b-row>
 				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('rule.break_on_match')" 
+							label-for="break_on_match"
+						>
+							<div class="form-check form-switch">
+								<input
+									id="break_on_match"
+									v-model="row.break_on_match"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</div>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
@@ -168,8 +185,10 @@ export default {
 
 			row: {
 				description: null,
-				trigger: 'inventory_received',
+				trigger: "inventory_received",
+				priority: null,
 				enabled: false,
+				break_on_match: false,
 				logic: {},
 				actions: []
 			},
@@ -191,8 +210,10 @@ export default {
 				this.createwithsuccess = false
 				this.row = {
 					description: null,
-					trigger: 'inventory_received',
+					trigger: "inventory_received",
+					priority: null,
 					enabled: false,
+					break_on_match: false,
 					logic: {},
 					actions: []
 				}
@@ -216,10 +237,10 @@ export default {
 				description: null,
 				trigger: "inventory_received",
 				enabled: false,
+				break_on_match: false,
 				logic: {},
-				actions: [],
+				actions: []
 			}
-
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
@@ -247,32 +268,30 @@ export default {
 		},
 
 		async onSubmit(event) {
-			event.preventDefault()
-			this.loadingcreate = true
+			event.preventDefault();
+			this.loadingcreate = true;
 
-			this.createwithsuccess = false
-			this.createerror = false
-			this.createerrormsg = null
+			this.createwithsuccess = false;
+			this.createerror = false;
+			this.createerrormsg = null;
 
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("automation/rule/", this.row)
+					await this.$api.generic.post("automation/rule/", this.row);
 				} else {
-					const { logic: _logic, actions: _actions, ...payload } = this.row
-
+					const { logic: _logic, actions: _actions, ...payload } = this.row;
 					await this.$api.generic.patch(
 						`automation/rule/${this.row.id}/`,
 						payload
-					)
+					);
 				}
-
-				this.createwithsuccess = true
+				this.createwithsuccess = true;
 			} catch (e) {
-				this.createerrormsg = this._apiError(e)
-				this.createerror = true
-				this.createwithsuccess = false
+				this.createerrormsg = this._apiError(e);
+				this.createerror = true;
+				this.createwithsuccess = false;
 			} finally {
-				this.loadingcreate = false
+				this.loadingcreate = false;
 			}
 		},
 	}

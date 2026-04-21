@@ -485,16 +485,19 @@
     "user": "Users"
   },
   "rule": {
+    "action": "Action",
     "actions": "Actions",
     "addaction": "Add an action",
     "addandcondition": "Add AND condition",
     "addorcondition": "Add OR condition",
     "addrule": "Add a rule",
     "boolean": "is true",
+    "break_on_match": "Break on first match",
     "case_sensitive": "Case sensitive",
     "contains": "contains",
     "data": "Value",
     "description": "Name/Description",
+    "editaction": "Edit action",
     "editrule": "Edit rule",
     "enabled": "Enabled",
     "equal": "is equal to",
@@ -515,6 +518,7 @@
     "removeandcondition": "Remove AND condition",
     "removeorcondition": "Remove OR condition",
     "set": "SET",
+    "template": "Template",
     "trigger": "Trigger",
     "user_login": "User login"
   },

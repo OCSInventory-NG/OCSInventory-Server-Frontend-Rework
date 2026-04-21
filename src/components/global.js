@@ -33,6 +33,7 @@ import Counter from '@/components/Dashboard/Counter/Counter.vue'
 import PieChart from '@/components/Dashboard/Chart/Pie.vue'
 import LineChart from '@/components/Dashboard/Chart/Line.vue'
 import ActionListModal from '@/components/Modals/Item/ActionListModal.vue'
+import ActionRuleModal from '@/components/Modals/Item/ActionRuleModal.vue'
 import LdapModal from '@/components/Modals/Item/LdapModal.vue'
 import draggable from 'vuedraggable'
 import Notes from '@/components/Notes/Notes.vue'
@@ -74,6 +75,7 @@ const GlobalComponents = {
 		Vue.component('PieChart', PieChart)
 		Vue.component('LineChart', LineChart)
 		Vue.component('ActionListModal', ActionListModal)
+		Vue.component('ActionRuleModal', ActionRuleModal)
 		Vue.component('LdapModal', LdapModal)
 		Vue.component('Draggable', draggable)
 		Vue.component('Notes', Notes)
