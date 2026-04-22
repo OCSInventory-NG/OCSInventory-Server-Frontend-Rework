@@ -730,6 +730,7 @@
     "group_assignment_manual": "Manual",
     "group_assignment_method": "Assignment method",
     "group_assignment_model": "Assignment model",
+    "group_assignment_removed": "(removed)",
     "group_assignment_rule": "Rule",
     "group_assignment_source": "Source",
     "group_assignments_title": "Group assignments",

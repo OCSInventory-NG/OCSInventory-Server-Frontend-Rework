@@ -69,6 +69,8 @@
 							v-if="row.item.source_type === 'rule' && row.item.source_object_id && row.item.source_found"
 							:to="{ name: 'EditRule', params: { id: String(row.item.source_object_id) } }"
 							class="ocs-link text-decoration-none"
+							rel="noopener noreferrer"
+							target="_blank"
 						>
 							{{ row.item.source_name }}
 						</router-link>
@@ -177,18 +179,21 @@ export default {
 			const ldapMap = Object.fromEntries(ldapEntries)
 
 			return (groupAssignments || []).map((assignment) => ({
+				source_found: assignment?.source === "rule"
+					? ruleMap?.[assignment.source_object_id] != null
+					: true,
 				group_name: assignment?.group_name || "N/A",
 				source: this.getSourceLabel(assignment?.source),
 				source_name: assignment?.source === "rule"
-					? (ruleMap?.[assignment.source_object_id] || `#${assignment?.source_object_id}`)
+					? (
+						ruleMap?.[assignment.source_object_id]
+						|| `#${assignment?.source_object_id} ${this.$t("user.group_assignment_removed")}`
+					)
 					: assignment?.source === "ldap"
 						? (ldapMap?.[assignment.source_object_id] || "N/A")
 						: "N/A",
 				source_type: assignment?.source || null,
 				source_object_id: assignment?.source_object_id || null,
-				source_found: assignment?.source === "rule"
-					? !!ruleMap?.[assignment.source_object_id]
-					: true,
 			}))
 		}
 	}
