@@ -734,6 +734,7 @@
     "group_assignment_manual": "Manuelle",
     "group_assignment_method": "Méthode d'assignation",
     "group_assignment_model": "Modèle d'assignation",
+    "group_assignment_removed": "(supprimée)",
     "group_assignment_rule": "Règle",
     "group_assignment_source": "Source",
     "group_assignments_title": "Assignations des groupes",

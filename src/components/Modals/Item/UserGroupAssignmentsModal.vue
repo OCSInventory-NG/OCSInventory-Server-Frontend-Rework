@@ -63,6 +63,21 @@
 					<template #empty="">
 						{{ $t('generic.no_data') }}
 					</template>
+
+					<template #cell(source_name)="row">
+						<router-link
+							v-if="row.item.source_type === 'rule' && row.item.source_object_id && row.item.source_found"
+							:to="{ name: 'EditRule', params: { id: String(row.item.source_object_id) } }"
+							class="ocs-link text-decoration-none"
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							{{ row.item.source_name }}
+						</router-link>
+						<span v-else>
+							{{ row.item.source_name }}
+						</span>
+					</template>
 				</b-table>
 			</div>
 		</b-modal>
@@ -146,15 +161,15 @@ export default {
 					try {
 						const rule = await this.$api.generic.get(`automation/rule/${ruleId}/`)
 						return [ruleId, rule?.description || `#${ruleId}`]
-					} catch (e) {
-						return [ruleId, `#${ruleId}`]
+					} catch {
+						return [ruleId, null]
 					}
 				})),
 				Promise.all(ldapIds.map(async (ldapId) => {
 					try {
 						const authConfig = await this.$api.generic.get(`auth_config/${ldapId}/`)
 						return [ldapId, authConfig?.name || `#${ldapId}`]
-					} catch (e) {
+					} catch {
 						return [ldapId, `#${ldapId}`]
 					}
 				}))
@@ -164,22 +179,22 @@ export default {
 			const ldapMap = Object.fromEntries(ldapEntries)
 
 			return (groupAssignments || []).map((assignment) => ({
+				source_found: assignment?.source === "rule"
+					? ruleMap?.[assignment.source_object_id] != null
+					: true,
 				group_name: assignment?.group_name || "N/A",
 				source: this.getSourceLabel(assignment?.source),
-				source_name: this.getSourceName(assignment, ruleMap, ldapMap),
+				source_name: assignment?.source === "rule"
+					? (
+						ruleMap?.[assignment.source_object_id]
+						|| `#${assignment?.source_object_id} ${this.$t("user.group_assignment_removed")}`
+					)
+					: assignment?.source === "ldap"
+						? (ldapMap?.[assignment.source_object_id] || "N/A")
+						: "N/A",
+				source_type: assignment?.source || null,
+				source_object_id: assignment?.source_object_id || null,
 			}))
-		},
-
-		getSourceName(assignment, ruleMap, ldapMap) {
-			if (assignment?.source === "rule") {
-				return ruleMap?.[assignment.source_object_id] || "N/A"
-			}
-
-			if (assignment?.source === "ldap") {
-				return ldapMap?.[assignment.source_object_id] || "N/A"
-			}
-
-			return "N/A"
 		}
 	}
 }
