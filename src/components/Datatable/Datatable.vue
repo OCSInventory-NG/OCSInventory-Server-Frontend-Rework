@@ -472,7 +472,7 @@
 				<!-- Actions buttons -->
 				<template #cell(actions)="row">
 					<b-button-toolbar>
-						<b-button-group class="mx-1">	
+						<div class="d-flex flex-row flex-nowrap align-items-center gap-1 mx-1">	
 							<slot
 								name="cell(firstActions)"
 								:row="row"
@@ -500,7 +500,7 @@
 							<button 
 								v-if="canviewaction"
 								:title="$t('deployment.manageaction')"
-								class="btn btn-ghost-orange ocs-auto"
+								class="btn btn-ghost-orange"
 								@click="goToEditPackage(row.item.id)"
 							>
 								<font-awesome-icon 
@@ -511,7 +511,7 @@
 							<button 
 								v-if="canviewruleaction"
 								:title="$t('rule.managerule')"
-								class="btn btn-ghost-orange ocs-auto"
+								class="btn btn-ghost-orange"
 								@click="goToEditRule(row.item.id)"
 							>
 								<font-awesome-icon 
@@ -579,7 +579,7 @@
 								:assets="assets"
 								@reload-datatable="reloadDatatable"
 							/>
-						</b-button-group>
+						</div>
 					</b-button-toolbar>
 				</template>
 			</b-table>
