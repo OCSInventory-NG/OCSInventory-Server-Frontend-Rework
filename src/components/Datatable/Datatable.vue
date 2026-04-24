@@ -252,6 +252,23 @@
 					</div>
 				</template>
 
+				<template #cell()="row">
+					<template v-if="getCellLink(row)">
+						<span>{{ getCellLink(row).prefix }}</span>
+						<a
+							:href="getCellLink(row).href"
+							class="ocs-link"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{{ getCellLink(row).label }}
+						</a>
+					</template>
+					<template v-else>
+						{{ row.value }}
+					</template>
+				</template>
+
 				<!-- Selected row -->
 				<template #head(selected)="">
 					<b-form-group>
@@ -660,6 +677,7 @@ export default {
 		deleteids: { type: [Array, Object], default: () => [] },
 		candeletemultiple: { type: Boolean, default: true },
 		canmassprocessing: { type: Boolean, default: false },
+		hascustomactions: { type: Boolean, default: false },
 		// Sort datatable parameters
 		sortby: { type: String, default: null },
 		sortdesc: { type: String, default: null },
@@ -761,6 +779,17 @@ export default {
 		selectionLength() {
 			return Array.isArray(this.selected) ? this.selected.length : 0
 		},
+		shouldShowActions() {
+			return (
+				this.canedit ||
+				this.candelete ||
+				this.canviewhistory ||
+				this.canviewruleaction ||
+				this.canviewaction ||
+				this.canedittemplate ||
+				this.hascustomactions
+			)
+		},
 	},
 	watch: {
 		rowdata: function () {
@@ -844,6 +873,9 @@ export default {
 					disabled: true
 				})
 			}
+		},
+		shouldShowActions() {
+			this.syncActionsField()
 		},
 		visibleFields() {
 			this.refreshStickyHeader()
@@ -970,20 +1002,7 @@ export default {
 			})
 		}
 
-		var actions = {
-			key: "actions", 
-			label: this.$t('generic.actions'), 
-			sortable: false ,
-			visible: true,
-			disabled: true,
-			thClass: 'sticky-col right actions-col',
-			tdClass: 'sticky-col right actions-col'
-		}
-
-		if(this.canedit == true || this.candelete == true || this.canviewhistory || this.canviewruleaction || 
-		this.canviewaction || this.canedittemplate) {
-			this.fields.push(actions)
-		}
+		this.syncActionsField()
 
 		if(localStorage.getItem("perPage") != null && localStorage.getItem("perPage") != "") {
 			this.perPage = localStorage.getItem("perPage")
@@ -1014,6 +1033,23 @@ export default {
 		this.teardownStickyHeader()
 	},
 	methods: {
+		syncActionsField() {
+			this.fields = this.fields.filter(field => field.key !== 'actions')
+
+			if (!this.shouldShowActions) {
+				return
+			}
+
+			this.fields.push({
+				key: "actions",
+				label: this.$t('generic.actions'),
+				sortable: false,
+				visible: true,
+				disabled: true,
+				thClass: 'sticky-col right actions-col',
+				tdClass: 'sticky-col right actions-col'
+			})
+		},
 		setupStickyHeader() {
 			if (!this.isSticky) {
 				return
@@ -1297,7 +1333,7 @@ export default {
 				return
 			}
 
-			const headers = Object.keys(rows[0])
+			const headers = Object.keys(rows[0]).filter((key) => !key.startsWith("__"))
 			const csvRows = []
 
 			csvRows.push(headers.join(';'))
@@ -1372,6 +1408,19 @@ export default {
 					row.last_update_formatted = new Date(row[dateValue]).toLocaleString(this.$i18n.locale);
 				}
 			});
+		},
+		getCellLink(row) {
+			const fieldKey = row?.field?.key
+			if (!fieldKey) {
+				return null
+			}
+
+			const link = row?.item?.__cellLinks?.[fieldKey]
+			if (!link?.href) {
+				return null
+			}
+
+			return link
 		},
 		filterByNetwork(networkId) {
 			this.$emit('filter-by-network', networkId);
