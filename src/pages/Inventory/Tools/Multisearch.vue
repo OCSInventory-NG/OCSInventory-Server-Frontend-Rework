@@ -19,6 +19,8 @@
 
 						<div>
 							<Search
+								:searchgroup="initialSearch.search_data"
+								:initial-grouped="initialSearch.grouped"
 								@reload-datatable="reloadDatatable"
 							/>
 						</div>
@@ -46,20 +48,33 @@
 								:rowheader="rowheader"
 								:canaccessdetails="true"
 								:candeploy="true"
+								:hascustomactions="hasVisibleCustomActions"
 								:multisearch="true"
-								:candelete="candelete"
-								:usecheckbox="candelete"
-								:server-side="true"
-								:server-total-rows="total"
+								:candelete="canDeleteInCurrentMode"
+								:usecheckbox="canDeleteInCurrentMode"
 								:isbusy="isbusy"
 								is-sticky
 								title="asset/bases"
 								translationkey="inventory."
-								@change-query="handleQueryChange"
-								@export="handleExport"
-								@export-all="exportAllMultisearch"
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(firstActions)="{ row }">
+									<div>
+										<a
+											v-if="row.item.__matchedResultsHref"
+											:href="row.item.__matchedResultsHref"
+											:title="$t('search.view_more_results')"
+											class="btn btn-ghost-dark"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<font-awesome-icon
+												:icon="['fas', 'magnifying-glass-plus']"
+											/>
+										</a>
+									</div>
+								</template>
+							</Datatable>
 
 							<AssetGroupModal 
 								:assetrow="assetids"
@@ -88,8 +103,9 @@ export default {
 			baseRowheader: [],
 			rowsearch: null,
 			assetids: [],
-			total: 0,
 			noresult: null,
+			matchLabelCache: {},
+			matchTitleCache: {},
 			translation_col_keys: {
 				"results": "deployment",
 				"logs": "inventory",
@@ -107,14 +123,20 @@ export default {
 
 			isbusy: true,
 			loading: true,
-			searchContextKey: null,
-			query: {
-				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
-				offset: 0,
-				ordering: null,
-				search: null,
-			},
+			initialSearch: this.buildInitialSearchFromRoute(),
 		}
+	},
+	computed: {
+		isCurrentSearchGrouped() {
+			const currentSearch = this.rowsearch ?? this.initialSearch
+			return this.normalizeGroupedState(currentSearch)
+		},
+		canDeleteInCurrentMode() {
+			return this.candelete && this.isCurrentSearchGrouped
+		},
+		hasVisibleCustomActions() {
+			return this.rowdata.some((row) => Boolean(row?.__matchedResultsHref))
+		},
 	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem("permissions")
@@ -132,35 +154,95 @@ export default {
 		// Data init
 		await this.loadInitial()
 
-		if(localStorage.getItem("useSavedSearch")) {
+		if (this.$route?.query?.uuid) {
+			this.reloadDatatable(this.initialSearch)
+		} else if(localStorage.getItem("useSavedSearch")) {
 			this.reloadDatatable()
 			localStorage.removeItem("useSavedSearch")
 		}
 	},
 	methods: {
-		getDefaultSearch() {
+		buildInitialSearchFromRoute() {
+			const storedSearch = this.getStoredMultisearch()
+			const uuid = this.$route?.query?.uuid
+			const grouped = uuid ? false : this.normalizeGroupedState(storedSearch)
+			const searchData = uuid
+				? this.appendUuidToSearch(storedSearch, uuid)
+				: storedSearch
+
 			return {
-				search_data: JSON.parse(localStorage.getItem("multisearch")),
-				ungroup: false,
+				search_data: searchData,
+				grouped,
+				ungroup: !grouped,
 			}
 		},
 
-		getSearchContextKey(search) {
-			if (!search?.search_data) {
-				return null
+		getStoredMultisearch() {
+			try {
+				const storedSearch = JSON.parse(localStorage.getItem("multisearch"))
+				return Array.isArray(storedSearch) ? storedSearch : []
+			} catch (e) {
+				console.error("Invalid multisearch local storage payload:", e)
+				return []
+			}
+		},
+
+		buildUuidFilter(uuid, link = "AND") {
+			return {
+				object: "InventoryBase",
+				route: "asset/bases",
+				field: "uuid",
+				fieldtype: "string",
+				operator: "iexact",
+				value: uuid,
+				link,
+			}
+		},
+
+		appendUuidToSearch(searchData, uuid) {
+			const clonedSearchData = JSON.parse(JSON.stringify(searchData || []))
+
+			if (!Array.isArray(clonedSearchData) || !clonedSearchData.length) {
+				return [[this.buildUuidFilter(uuid, "")]]
 			}
 
-			return JSON.stringify({
-				search_data: search.search_data || [],
-				ungroup: !!search.ungroup,
+			const hasUuidFilter = clonedSearchData.some((group) => (
+				Array.isArray(group) && group.some((filter) => (
+					filter?.field === "uuid" &&
+					filter?.value === uuid &&
+					filter?.route === "asset/bases"
+				))
+			))
+
+			if (hasUuidFilter) {
+				return clonedSearchData
+			}
+
+			clonedSearchData.forEach((group) => {
+				if (!Array.isArray(group)) {
+					return
+				}
+
+				group.push(this.buildUuidFilter(uuid, group.length > 0 ? "AND" : ""))
 			})
+
+			return clonedSearchData
 		},
 
-		normalizeSearchResponse(data) {
-			const results = Array.isArray(data) ? data : (data?.results || [])
-			const total = typeof data?.count === "number" ? data.count : results.length
+		normalizeGroupedState(search = {}) {
+			if (typeof search.grouped === "boolean") {
+				return search.grouped
+			}
 
-			return { results, total }
+			if (typeof search.ungroup === "boolean") {
+				return !search.ungroup
+			}
+
+			return true
+		},
+
+		getDefaultSearch() {
+			return this.initialSearch
 		},
 
 		buildRows(results, { collectHeaders = false, collectAssetIds = false } = {}) {
@@ -172,6 +254,9 @@ export default {
 				const row = { ...element }
 
 				const flatMatches = this.flattenMatches(element.matched)
+				const matchedResultsHref = this.hasRemainingMatchedResults(element.matched) && element.uuid
+					? this.buildMatchedResultsLink(element.uuid)
+					: null
 
 				for (const [key, value] of Object.entries(flatMatches)) {
 					const normalizedKey = this.normalizeHeaderKey(key)
@@ -179,6 +264,10 @@ export default {
 						rowheader.push(normalizedKey)
 					}
 					row[normalizedKey] = value
+				}
+
+				if (matchedResultsHref) {
+					row.__matchedResultsHref = matchedResultsHref
 				}
 
 				delete row.matched
@@ -233,33 +322,21 @@ export default {
 			}
 		},
 
-		async refreshSearchContext() {
+		async getSearchResults() {
 			const data = await this.$api.generic.post(
 				"search/",
 				this.rowsearch,
 				{ accountinfo: true }
 			)
-			const { results } = this.normalizeSearchResponse(data)
-			const { rowheader, assetids } = this.buildRows(results, {
+			const results = Array.isArray(data) ? data : (data?.results || [])
+			const { rowdata, rowheader, assetids } = this.buildRows(results, {
 				collectHeaders: true,
 				collectAssetIds: true,
 			})
 
+			this.rowdata = rowdata
 			this.rowheader = rowheader
 			this.assetids = assetids
-		},
-
-		async getSearchResults(query = this.query) {
-			const data = await this.$api.generic.post(
-				"search/",
-				this.rowsearch,
-				{ ...query, accountinfo: true }
-			)
-			const { results, total } = this.normalizeSearchResponse(data)
-			const { rowdata } = this.buildRows(results)
-
-			this.rowdata = rowdata
-			this.total = total
 			this.noresult = this.rowdata.length === 0 ? this.$t("search.no_result") : null
 		},
 
@@ -267,21 +344,9 @@ export default {
 			this.isbusy = true
 			this.loading = true
 			this.rowsearch = search ?? (this.rowsearch?.search_data ? this.rowsearch : this.getDefaultSearch())
-			const nextSearchContextKey = this.getSearchContextKey(this.rowsearch)
-			const shouldRefreshSearchContext = this.searchContextKey !== nextSearchContextKey
 
 			try {
-				if (shouldRefreshSearchContext) {
-					this.query = {
-						...this.query,
-						offset: 0,
-						search: null,
-					}
-
-					await this.refreshSearchContext()
-					this.searchContextKey = nextSearchContextKey
-				}
-				await this.getSearchResults(this.query)
+				await this.getSearchResults()
 
 				this.successmsg = "success"
 				this.successed = true
@@ -298,132 +363,88 @@ export default {
 			}
 		},
 
-		async handleQueryChange(newQuery) {
-			if (this.isbusy || !this.rowsearch?.search_data) {
-				return
+		buildMatchedResultsLink(uuid) {
+			if (!uuid) {
+				return null
 			}
 
-			this.isbusy = true
-
-			try {
-				this.query = {
-					...this.query,
-					...newQuery,
-				}
-				await this.getSearchResults(this.query)
-				this.errormsg = null
-				this.errored = false
-			} catch (e) {
-				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
-				this.errored = true
-			} finally {
-				this.isbusy = false
-			}
-		},
-
-		handleExport({ scope, rows }) {
-			const csv = this.buildCsvFromRows(rows)
-			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-			const url = URL.createObjectURL(blob)
-			const link = document.createElement("a")
-			link.href = url
-			link.setAttribute("download", `multisearch_${scope}.csv`)
-			document.body.appendChild(link)
-			link.click()
-			link.remove()
-			URL.revokeObjectURL(url)
-		},
-
-		buildCsvFromRows(rows) {
-			if (!rows || !rows.length) return ""
-			const headers = Object.keys(rows[0])
-			const csvRows = [headers.join(";")]
-
-			rows.forEach((row) => {
-				const values = headers.map((h) => {
-					const v = row[h] != null ? String(row[h]) : ""
-					return `"${v.replace(/"/g, '""')}"`
-				})
-				csvRows.push(values.join(";"))
+			const route = this.$router.resolve({
+				name: "Multisearch",
+				query: {
+					uuid,
+				},
 			})
 
-			return csvRows.join("\n")
+			return route.href
 		},
 
-		async exportAllMultisearch({ filter, ordering }) {
-			if (!this.rowsearch?.search_data) {
-				return
-			}
-
-			try {
-				const allResults = []
-				const limit = 500
-				let offset = 0
-				let total = null
-
-				do {
-					const data = await this.$api.generic.post(
-						"search/",
-						this.rowsearch,
-						{
-							accountinfo: true,
-							limit,
-							offset,
-							search: filter || null,
-							ordering: ordering || null,
-						}
-					)
-					const { results, total: count } = this.normalizeSearchResponse(data)
-					total = count
-					allResults.push(...results)
-					offset += results.length
-
-					if (!results.length) {
-						break
-					}
-				} while (total === null || offset < total)
-
-				const { rowdata } = this.buildRows(allResults)
-
-				this.handleExport({ scope: "all", rows: rowdata })
-			} catch (e) {
-				this.errormsg = e?.response?.data?.error ?? e?.message ?? String(e)
-				this.errored = true
-			}
+		hasRemainingMatchedResults(matched) {
+			return Object.entries(matched || {}).some(([key, value]) => (
+				key.endsWith("_remaining_count") &&
+				Number(value) > 0
+			))
 		},
 
 		flattenMatches(matched) {
 			const flat = {}
 
 			for (const [type, matches] of Object.entries(matched || {})) {
+				if (type.endsWith("_remaining_count")) {
+					continue
+				}
+
+				if (!Array.isArray(matches)) {
+					continue
+				}
+
+				const title = this.getMatchTitle(type)
+
 				for (const match of matches || []) {
+					const sectionName = type === "inventory_sections" ? this.normalizeHeaderKey(match?.section) : null
+
 					for (const [key, value] of Object.entries(match || {})) {
 						let col = null
 
-						const title = this.$t("title." + this.translation_title_keys[type])
-
 						if (this.$te(this.translation_col_keys[type] + "." + key)) {
-							const label = this.$t(this.translation_col_keys[type] + "." + key)
+							const label = this.getMatchLabel(type, key)
 							col = `${title}: ${label}`
 						} else if (type === "inventory_sections") {
-							col = `${title}: ${key}`
+							if (key === "section" || !sectionName) continue
+							col = `${sectionName}: ${key}`
 						}
 
 						if (!col) continue
 
 						col = this.normalizeHeaderKey(col)
+						if (value === null || value === undefined) continue
 
-						if (!flat[col]) flat[col] = []
-						if (value !== null && value !== undefined) flat[col].push(String(value))
+						if (!flat[col]) {
+							flat[col] = String(value)
+							continue
+						}
 					}
 				}
 			}
 
-			for (const k in flat) {
-				flat[k] = flat[k].join(", ")
+			return flat
+		},
+
+		getMatchTitle(type) {
+			if (!this.matchTitleCache[type]) {
+				this.matchTitleCache[type] = this.$t("title." + this.translation_title_keys[type])
 			}
 
-			return flat
+			return this.matchTitleCache[type]
+		},
+
+		getMatchLabel(type, key) {
+			const cacheKey = `${type}:${key}`
+
+			if (!this.matchLabelCache[cacheKey]) {
+				this.matchLabelCache[cacheKey] = this.$t(this.translation_col_keys[type] + "." + key)
+			}
+
+			return this.matchLabelCache[cacheKey]
 		},
 
 		ensureHeaderKey(key) {

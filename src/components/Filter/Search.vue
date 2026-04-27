@@ -268,11 +268,18 @@
 						</b-button>
 					</div>
 					<b-form-checkbox
-						v-model="ungroup"
+						v-model="grouped"
 						inline
 					>
-						{{ $t('search.ungroup') }}
+						{{ $t('search.grouped') }}
 					</b-form-checkbox>
+					<Alert
+						v-if="!grouped"
+						:message="$t('search.ungrouped_warning')"
+						:cols="false"
+						variant="warning"
+						class="mt-3 text-start"
+					/>
 				</b-col>
 				<b-col align-self="end" />
 			</b-row>
@@ -285,12 +292,13 @@ export default {
 	name: 'Search',
 	props: {
 		searchgroup: { type: [Array, Object], default: () => [] },
-		disableforgroup: { type: Boolean, default: false }
+		disableforgroup: { type: Boolean, default: false },
+		initialGrouped: { type: Boolean, default: null },
 	},
 	data() {
 		return {
 			errored: false,
-			ungroup: false,
+			grouped: true,
 
 			errormsg: null,
 			successmsg: null,
@@ -374,12 +382,27 @@ export default {
 			]
 
 		if (this.searchgroup.length) {
-			this.datavalues = this.searchgroup
+			this.datavalues = JSON.parse(JSON.stringify(this.searchgroup))
+		}
+		if (typeof this.initialGrouped === "boolean") {
+			this.grouped = this.initialGrouped
 		}
 		this.loadFieldsAndUpdateTranslations()
 	},
 
 	methods: {
+		normalizeGroupingState(search = {}) {
+			if (typeof search.grouped === "boolean") {
+				return search.grouped
+			}
+
+			if (typeof search.ungroup === "boolean") {
+				return !search.ungroup
+			}
+
+			return true
+		},
+
 		async loadFieldsAndUpdateTranslations() {
 			const promises = []
 			
@@ -521,7 +544,8 @@ export default {
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
 			this.$emit("reloadDatatable", {
 				search_data: this.datavalues,
-				ungroup: this.ungroup
+				grouped: this.grouped,
+				ungroup: !this.grouped
 			})
 		},
 
@@ -767,6 +791,7 @@ export default {
 
 		useSaveSearch(search) {
 			this.datavalues = JSON.parse(JSON.stringify(search))
+			this.grouped = this.normalizeGroupingState(search)
 
 			Object.keys(this.datavalues).forEach((masterindex) => {
 				Object.keys(this.datavalues[masterindex]).forEach((index) => {
@@ -790,7 +815,8 @@ export default {
 			localStorage.setItem("multisearch", JSON.stringify(this.datavalues))
 			this.$emit("reloadDatatable", {
 				search_data: this.datavalues,
-				ungroup: this.ungroup
+				grouped: this.grouped,
+				ungroup: !this.grouped
 			})
 		},
 	}
