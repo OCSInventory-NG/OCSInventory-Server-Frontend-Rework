@@ -134,8 +134,8 @@
 						>
 							<v-select
 								v-if="isValueSelect"
-								:key="valueOptions.length"
 								id="value"
+								:key="valueOptions.length"
 								v-model="row.value"
 								:options="valueOptions"
 								:reduce="text => text.value"
