@@ -750,6 +750,10 @@
     "view_group_assignments": "Voir les assignations des groupes"
   },
   "trigger_fields": {
+    "template":{
+      "id": "ID du modèle",
+      "name": "Nom du modèle"
+    },
     "auth_profile": {
       "auth_config": "Configuration d'authentification",
       "auth_method": "Méthode d'authentification",
