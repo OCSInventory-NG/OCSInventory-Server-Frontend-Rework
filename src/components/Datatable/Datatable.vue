@@ -625,7 +625,9 @@
 				<!-- Delete button -->
 				<DeleteItemModal
 					v-if="candelete && !selected.some(item => item.is_protected) && candeletemultiple"
-					:ids="selectedids"
+					:ids="deletemultiple && !Array.isArray(deleteids)
+						? selected.flatMap(item => deleteids[item.id] || [item.id])
+						: selectedids"
 					:name="$t('generic.removeselection')"
 					:parameter="deleterte"
 					:multiple="true"
