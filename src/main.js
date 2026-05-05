@@ -108,7 +108,7 @@ loadConfig().then(async (config) => {
 
 		const token = localStorage.getItem("token_authentication")
 		if (!token) {
-			return true
+			return { name: "Login" }
 		}
 
 		try {

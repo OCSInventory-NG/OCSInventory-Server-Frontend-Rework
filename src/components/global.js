@@ -25,7 +25,6 @@ import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 import UserGroupAssignmentsModal from '@/components/Modals/Item/UserGroupAssignmentsModal.vue'
-import Draggable from '@/components/Draggable/Draggable.vue'
 import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
 import BarChart from '@/components/Dashboard/Chart/Bar.vue'
@@ -45,7 +44,6 @@ const GlobalComponents = {
 		Vue.component('CategoryModal', CategoryModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
-		Vue.component('Draggable', Draggable)
 		Vue.component('DuplicateModal', DuplicateModal)
 		Vue.component('ExportModal', ExportModal)
 		Vue.component('ExportTemplateModal', ExportTemplateModal)
