@@ -135,7 +135,7 @@
 										&& (input.operator == 'in'
 											|| input.operator == '=='
 											|| input.operator == '!=')"
-									id="case_sensitive"
+									:id="`case_sensitive-${masterindex}-${index}`"
 									v-model="input.case_sensitive"
 									name="enabled"
 									:value="true"
