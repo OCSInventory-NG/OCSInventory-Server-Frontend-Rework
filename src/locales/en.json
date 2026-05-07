@@ -754,6 +754,17 @@
       "auth_config": "Authentication configuration",
       "auth_method": "Authentication method",
       "metadata": "Authentication metadata"
+    },
+    "network": {
+      "group_id": "Network group ID",
+      "id": "Network ID",
+      "location": "Network location",
+      "name": "Network name",
+      "nettag": "Network TAG"
+    },
+    "template":{
+      "id": "Template ID",
+      "name": "Template name"
     }
   }
 }
