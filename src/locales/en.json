@@ -406,6 +406,7 @@
     "enablesnmp": "Enable SNMP scanning",
     "id": "ID",
     "identifier": "Identifier",
+    "identifier_format": "Identifier can only contain letters, numbers, hyphens and underscores.",
     "ip": "IP address",
     "last_scan_date": "Last scan",
     "last_seen": "Last update",

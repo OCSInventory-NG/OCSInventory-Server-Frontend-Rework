@@ -307,6 +307,12 @@ export default {
 			this.createwithsuccess = false
 
 			try {
+				if (!/^[A-Za-z0-9_-]+$/.test(this.row.identifier)) {
+					this.createerror = true
+					this.createerrormsg = this.$t("network.identifier_format")
+					return
+				}
+
 				const payload = { ...this.row }
 
 				if (!Array.isArray(payload.subnets)) {
