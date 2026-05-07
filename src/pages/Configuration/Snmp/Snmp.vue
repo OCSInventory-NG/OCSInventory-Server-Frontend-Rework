@@ -484,7 +484,7 @@ export default {
 				{
 					object: "snmpscanner",
 					route: "snmp/scanner",
-					field: "identifier",
+					field: "name",
 					fieldtype: "string",
 					operator: "iexact",
 					value: params[0],

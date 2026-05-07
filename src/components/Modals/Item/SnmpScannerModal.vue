@@ -78,12 +78,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.identifier')" 
-							label-for="identifier"
+							:label="$t('network.name')" 
+							label-for="name"
 						>
 							<b-form-input
-								id="identifier"
-								v-model="row.identifier"
+								id="name"
+								v-model="row.name"
 								required
 								:disabled="(!update) ? false : true"
 							/>
@@ -180,7 +180,7 @@ export default {
 	name: "SnmpScannerModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: String, default: null }
+		id: { type: [String, Number], default: null }
 	},
 	data() {
 		return {
@@ -192,7 +192,7 @@ export default {
 			createwithsuccess: false,
 
 			row: {
-				identifier: null,
+				name: null,
 				ip: null,
 				subnets: null,
 				notes: null,
@@ -211,7 +211,7 @@ export default {
 				this.snmpscannermodal = false
 				this.createwithsuccess = false
 				this.row = {
-					identifier: null,
+					name: null,
 					ip: null,
 					subnets: null,
 					notes: null,
@@ -232,7 +232,7 @@ export default {
 		async loadData(id) {
 			this.snmpscannermodal = true
 			this.row = {
-				identifier: null,
+				name: null,
 				ip: null,
 				subnets: null,
 				notes: null,
