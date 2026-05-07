@@ -386,6 +386,7 @@ export default {
 
 		formatDate(value, key) {
 			const dateFields = ['last_update', 'last_updated', 'timestamp', 'date_created', 'last_seen']
+			if (key === "id") return value
 			if (this.$te('inventory.' + value)) return this.$t('inventory.' + value)
 			if (dateFields.includes(key)) {
 				return new Date(value).toLocaleString(this.$i18n.locale)

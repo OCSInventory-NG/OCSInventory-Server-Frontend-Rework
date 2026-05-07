@@ -754,6 +754,17 @@
       "auth_config": "Configuration d'authentification",
       "auth_method": "Méthode d'authentification",
       "metadata": "Métadonnées d'authentification"
+    },
+    "network": {
+      "group_id": "ID du groupe réseau",
+      "id": "ID du réseau",
+      "location": "Emplacement du réseau",
+      "name": "Nom du réseau",
+      "nettag": "TAG du réseau"
+    },
+    "template":{
+      "id": "ID du modèle",
+      "name": "Nom du modèle"
     }
   }
 }
