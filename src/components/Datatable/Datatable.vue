@@ -388,7 +388,7 @@
 				>
 					<a
 						class="ocs-link"
-						@click="assetsSearch(row.item.identifier)"
+						@click="assetsSearch(row.item.name)"
 					>
 						{{ row.item.assets }}
 					</a>
