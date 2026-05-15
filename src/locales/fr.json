@@ -512,6 +512,7 @@
     "netdevice_received": "Réception de l'inventaire de l'équipement réseau",
     "not": "n'est pas vrai",
     "notequal": "n'est pas égal à",
+    "object": "Objet",
     "operator": "Opérateur",
     "regex": "Validation par expression régulière",
     "removeaction": "Supprimer l'action",

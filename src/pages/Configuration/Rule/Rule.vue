@@ -41,6 +41,7 @@
 								>
 									<Draggable
 										id="rules-datatable"
+										:key="`${trigger.trigger}-${draggableKey}`"
 										:rowdata="getRuleRows(trigger.trigger)"
 										:rowheader="rowheader"
 										:candelete="candelete"
@@ -80,6 +81,7 @@ export default {
 			triggers: [],
 			rowdata: [],
 			rowheader: [],
+			draggableKey: 0,
 
 			excludefields: ["logic", "actions"],
 
@@ -184,6 +186,7 @@ export default {
 
 		async reloadDatatable() {
 			await this.getRules()
+			this.draggableKey += 1
 		}
 	}
 }

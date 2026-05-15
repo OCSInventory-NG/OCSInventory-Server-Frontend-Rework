@@ -512,6 +512,7 @@
     "netdevice_received": "Network device inventory received",
     "not": "is not true",
     "notequal": "is not equal to",
+    "object": "Object",
     "operator": "Operator",
     "regex": "Regular expression validation",
     "removeaction": "Remove action",

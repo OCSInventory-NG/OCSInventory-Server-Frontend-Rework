@@ -79,13 +79,18 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('rule.description')" 
-							label-for="description"
+							:label="$t('rule.object')" 
+							label-for="object"
 						>
-							<b-form-input
-								id="description"
-								v-model="row.description"
-								required
+							<v-select
+								id="object"
+								v-model="row.object_slug"
+								:options="objectOptions"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3 ocs-select"
+								@option:selected="onObjectSelected"
 							/>
 						</b-form-group>
 					</b-col>
@@ -120,8 +125,11 @@
 								:options="fieldOptions"
 								:reduce="text => text.value"
 								:clearable="false"
+								:disabled="!row.object_slug"
+								:loading="loadingFieldOptions"
 								label="text"
 								class="mb-3 ocs-select"
+								@option:selected="onFieldSelected"
 							/>
 						</b-form-group>
 					</b-col>
@@ -150,7 +158,9 @@
 								v-else
 								id="value"
 								v-model="row.value"
+								:type="valueInputType"
 								class="mb-3"
+								:disabled="!row.field"
 								required
 							/>
 						</b-form-group>
@@ -187,7 +197,8 @@ export default {
 	name: "ActionRuleModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: [Number, String], default: null }
+		id: { type: [Number, String], default: null },
+		trigger: { type: String, default: null },
 	},
 	data() {
 		return {
@@ -215,16 +226,74 @@ export default {
 			fieldOptions: [],
 			valueOptions: [],
 			loadingValueOptions: false,
-			
+			loadingFieldOptions: false,
+			selectedFieldType: null,
+			actionstrigger: {},
+
+			routeopt: {
+				inventory_received: [
+					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
+					{ value: "inventory_base.inventorybase", text: this.$t("title.assets") },
+				],
+				user_login: [
+					{ value: "auth.user", text: this.$t("title.users") },
+				],
+				netdevice_received: [
+					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
+				],
+			},
+			routetargets: {
+				inventory_received: {
+					"accountinfo.accountinfoconfig": {
+						route: "accountinfo/config/?datatarget=ASSET",
+						key: "accountinfo",
+					},
+					"inventory_base.inventorybase": {
+						route: "asset/bases/",
+						key: "inventory",
+					},
+				},
+				user_login: {
+					"auth.user": {
+						route: "users/",
+						key: "user",
+					},
+				},
+				netdevice_received: {
+					"accountinfo.accountinfoconfig": {
+						route: "accountinfo/config/?datatarget=IPDISCOVER",
+						key: "accountinfo",
+					},
+				},
+			},
+			selectfield: ["select", "checkbox", "field"],
+			inputype: {
+				string: "text",
+				integer: "number",
+				datetime: "datetime-local",
+			},
+			linktype: {
+				TEXT: "string",
+				TEXTAREA: "string",
+				SELECT: "select",
+				CHECKBOX: "checkbox",
+			},
+
 			loading: true,
 			loadingcreate: false,
 		}
 	},
 	computed: {
+		objectOptions() {
+			return this.routeopt[this.trigger] || []
+		},
 		isValueSelect() {
-			const result = this.row.field === 'template';
-			return result;
-		}
+			return this.selectfield.includes(this.selectedFieldType)
+				|| this.row.field === "template"
+		},
+		valueInputType() {
+			return this.inputype[this.selectedFieldType] || "text"
+		},
 	},
 	watch: {
 		createwithsuccess: function() {
@@ -239,21 +308,23 @@ export default {
 					action: null,
 					field: null,
 					value: null,
+					object_slug: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		},
 		'row.field': {
-			handler(newValue) {
-				this.handleFieldChange(newValue);
+			handler() {
+				this.handleFieldChange()
 			},
-		}
+		},
 	},
 	mounted() {
 		if(!this.update) {
 			this.row.rule = this.id ? Number(this.id) : null
 			this.loading = false
 		}
+		this.loadActionTargets()
 		this.loadOptions()
 	},
 	methods: {
@@ -279,29 +350,160 @@ export default {
 					]
 				}
 
-				// Charger les options pour field depuis l'API
-				if (postFields.field && postFields.field.choices) {
-					this.fieldOptions = postFields.field.choices.map(choice => ({
-						value: choice.value,
-						text: choice.display_name || choice.value
-					}))
-				} else {
-					// Fallback si pas de choices
-					this.fieldOptions = [
-						{ value: 'template', text: this.$t('rule.template') }
-					]
-				}
-
 			} catch (e) {
 				console.error('Erreur lors du chargement des options depuis l\'API:', e)
 				// Fallback en cas d'erreur
 				this.actionOptions = [
 					{ value: 'set', text: this.$t('rule.set') }
 				]
-				this.fieldOptions = [
-					{ value: 'template', text: this.$t('rule.template') }
-				]
 			}
+		},
+
+		async loadActionTargets() {
+			try {
+				let triggers = this.triggers
+				if (!triggers?.length) {
+					const data = await this.$api.generic.get("automation/triggers/")
+					triggers = Array.isArray(data) ? data : (data?.results || [])
+				}
+				const triggerObj = triggers.find((t) => t.trigger === this.trigger)
+				this.actionstrigger = triggerObj?.action_targets || {}
+			} catch (e) {
+				console.error("Erreur lors du chargement des action_targets:", e)
+				this.actionstrigger = {}
+			}
+		},
+
+		normalizeObjectSlug(slug) {
+			if (!slug) return null
+			const match = this.objectOptions.find(
+				(o) => o.value.toLowerCase() === String(slug).toLowerCase()
+			)
+			return match ? match.value : slug
+		},
+
+		parseRowFromApi(data) {
+			const row = { ...data }
+			row.object_slug = this.normalizeObjectSlug(data.object_slug)
+
+			if (data.field?.startsWith("accountdata:")) {
+				const parts = data.field.split(":")
+				const regex = /\[|\]/g
+				row.field = parts[1]
+				row.value = parts.length > 2
+					? data.value
+					: String(data.value ?? "").replace(regex, "")
+				this.selectedFieldType = data.description
+			} else if (data.field === "template") {
+				this.selectedFieldType = "field"
+			} else {
+				this.selectedFieldType = data.description
+			}
+
+			return row
+		},
+
+		onObjectSelected() {
+			this.loadFieldOptions(true)
+		},
+
+		onFieldSelected(option) {
+			this.selectedFieldType = option?.fieldtype || null
+			this.row.value = null
+			this.handleFieldChange()
+		},
+
+		async loadFieldOptions(reload = false) {
+			const model = this.row.object_slug
+			if (!model) {
+				this.fieldOptions = []
+				return
+			}
+
+			const target = this.routetargets[this.trigger]?.[model]
+			if (!target) {
+				this.fieldOptions = []
+				return
+			}
+
+			if (reload) {
+				this.row.field = null
+				this.row.value = null
+				this.selectedFieldType = null
+				this.valueOptions = []
+			}
+
+			this.loadingFieldOptions = true
+			try {
+				if (model === "accountinfo.accountinfoconfig") {
+					const data = await this.$api.generic.get(target.route)
+					const list = Array.isArray(data) ? data : (data?.results ?? data ?? [])
+
+					this.fieldOptions = list
+						.map((field) => ({
+							value: field.id.toString(),
+							text: field.name,
+							fieldtype: this.linktype[field.datatype] || "string",
+						}))
+						.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+				} else {
+					const opt = await this.$api.generic.options(target.route)
+					const allowed = this.actionstrigger[model] || []
+
+					this.fieldOptions = []
+					for (const field in opt.actions.POST) {
+						if (allowed.includes(field)) {
+							const labelKey = `${target.key}.${field}`
+							this.fieldOptions.push({
+								value: field.toString(),
+								text: this.$te(labelKey) ? this.$t(labelKey) : field,
+								fieldtype: opt.actions.POST[field].type,
+							})
+						}
+					}
+					this.fieldOptions.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
+				}
+			} catch (e) {
+				console.error("Erreur lors du chargement des champs:", e)
+				this.fieldOptions = []
+			} finally {
+				this.loadingFieldOptions = false
+			}
+		},
+
+		buildActionPayload(base) {
+			const payload = { ...base }
+			const model = this.row.object_slug
+			const selected = this.fieldOptions.find((f) => f.value == this.row.field)
+			const fieldtype = selected?.fieldtype || this.selectedFieldType
+
+			if (model === "accountinfo.accountinfoconfig") {
+				payload.description = fieldtype
+				payload.object_id = this.row.field
+				payload.object_slug = model.toLowerCase()
+
+				if (fieldtype === "checkbox") {
+					payload.field = `accountdata:${this.row.field}`
+					payload.value = `[${this.row.value}]`
+				} else if (fieldtype === "select") {
+					payload.field = `accountdata:${this.row.field}:value`
+					payload.value = this.row.value
+				} else {
+					payload.field = `accountdata:${this.row.field}`
+					payload.value = this.row.value
+				}
+			} else {
+				payload.field = this.row.field
+				payload.value = this.row.value
+				if (model) {
+					payload.object_slug = model
+				}
+				if (fieldtype) {
+					payload.description = fieldtype
+				}
+			}
+
+			return payload
 		},
 
 		loadData(id) {
@@ -314,8 +516,11 @@ export default {
 				action: null,
 				field: null,
 				value: null,
+				object_slug: null,
 			}
 			this.valueOptions = []
+			this.fieldOptions = []
+			this.selectedFieldType = null
 
 			this.errormsg = null
 			this.errored = false
@@ -332,11 +537,12 @@ export default {
 		async getAction(id) {
 			try {
 				const data = await this.$api.generic.get(`automation/action/${id}/`)
-				this.row = data
+				this.row = this.parseRowFromApi(data)
 				this.errormsg = null
 				this.errored = false
-				if (this.row.field === 'template') {
-					await this.handleFieldChange(this.row.field)
+				if (this.row.object_slug) {
+					await this.loadFieldOptions(false)
+					await this.handleFieldChange()
 				}
 			} catch (e) {
 				this.errormsg = this._apiError(e)
@@ -376,24 +582,18 @@ export default {
 				const priority = this.update ? this.row.priority : await this.calculatePriority(this.id);
 
 				if (!this.update) {
-					const payload = {
+					const payload = this.buildActionPayload({
 						rule: this.id ? Number(this.id) : null,
 						priority: priority,
-						description: this.row.description,
 						action: this.row.action,
-						field: this.row.field,
-						value: this.row.value,
-					};
+					})
 
 					await this.$api.generic.post("automation/action/", payload);
 				} else {
-					const payload = {
+					const payload = this.buildActionPayload({
 						priority: priority,
-						description: this.row.description,
 						action: this.row.action,
-						field: this.row.field,
-						value: this.row.value,
-					};
+					})
 
 					await this.$api.generic.patch(`automation/action/${this.row.id}/`, payload);
 				}
@@ -409,26 +609,52 @@ export default {
 		},
 
 		async handleFieldChange() {
-			this.valueOptions = [];
-			if (this.row.field === 'template') {
-				this.loadingValueOptions = true;
+			this.valueOptions = []
+
+			if (!this.row.field) return
+
+			const selected = this.fieldOptions.find((f) => f.value == this.row.field)
+			this.selectedFieldType = selected?.fieldtype || this.selectedFieldType
+
+			if (this.selectedFieldType === "field" || this.row.field === "template") {
+				this.loadingValueOptions = true
 				try {
-					const response = await this.$api.generic.get('templates/');
-					const templates = Array.isArray(response)
-						? response 
-						: response.results ?? response;
-					
-					this.valueOptions = templates.map(template => {
-						return {
-							value: template.id,
-							text: template.name || template.id
-						};
-					});
+					const route = this.row.field === "template" ? "templates" : `${this.row.field}/`
+					const response = await this.$api.generic.get(route)
+					const items = Array.isArray(response)
+						? response
+						: response.results ?? response
+
+					this.valueOptions = (items || []).map((item) => ({
+						value: item.id.toString(),
+						text: item.name || item.id,
+					}))
 				} catch (e) {
-					console.error('Erreur lors du chargement des templates:', e);
-					this.valueOptions = [];
+					console.error("Erreur lors du chargement des valeurs:", e)
+					this.valueOptions = []
 				} finally {
-					this.loadingValueOptions = false;
+					this.loadingValueOptions = false
+				}
+			} else if (this.selectedFieldType === "select" || this.selectedFieldType === "checkbox") {
+				this.loadingValueOptions = true
+				try {
+					const response = await this.$api.generic.get(
+						"accountinfo/value/",
+						{ accountinfo_config: this.row.field }
+					)
+					const values = Array.isArray(response)
+						? response
+						: response.results ?? response
+
+					this.valueOptions = (values || []).map((item) => ({
+						value: item.id.toString(),
+						text: item.value,
+					}))
+				} catch (e) {
+					console.error("Erreur lors du chargement des valeurs accountinfo:", e)
+					this.valueOptions = []
+				} finally {
+					this.loadingValueOptions = false
 				}
 			}
 		},

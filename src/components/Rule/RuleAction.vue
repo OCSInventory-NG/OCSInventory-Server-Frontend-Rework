@@ -25,6 +25,8 @@
 						<ActionRuleModal
 							v-if="canadd"
 							:id="id"
+							:trigger="trigger"
+							:view-only="viewOnly"
 							@reload-datatable="reloadDatatable"
 						/>
 						<Draggable 
@@ -34,6 +36,7 @@
 							:candelete="candelete"
 							:apiroute="`automation/action`"
 							editcomponent="ActionRuleModal"
+							:edit-props="{ trigger }"
 							title="automation/action"
 							translationkey="automation.action."
 							is-sticky
@@ -57,7 +60,6 @@ export default {
 	props: {
 		id: { type: [Number, String], required: true },
 		trigger: { type: String, default: "inventory_received" },
-		triggers: { type: Array, default: null },
 		actions: { type: Array, default: null },
 		viewOnly: { type: Boolean, default: false }
 	},
@@ -83,60 +85,6 @@ export default {
 			fields: [],
 			fieldopt: [],
 			actionstrigger: {},
-			routeopt: {
-				"inventory_received": [
-					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
-					{ value: "inventory_base.inventorybase", text: this.$t("title.assets") }
-				],
-				"user_login": [
-					{ value: "auth.user", text: this.$t("title.users") }
-				],
-				"netdevice_received": [
-					{ value: "accountinfo.accountinfoconfig", text: this.$t("title.accountinfo") },
-				]
-			},
-			routetargets: {
-				"inventory_received": {
-					"accountinfo.accountinfoconfig": {
-						route: "accountinfo/config/?datatarget=ASSET",
-						key: "accountinfo"
-					},
-					"inventory_base.inventorybase": {
-						route: "asset/bases/",
-						key: "inventory"
-					}
-				},
-				"user_login": {
-					"auth.user": {
-						route: "users/",
-						key: "user"
-					},
-				},
-				"netdevice_received": {
-					"accountinfo.accountinfoconfig": {
-						route: "accountinfo/config/?datatarget=IPDISCOVER",
-						key: "accountinfo"
-					}
-				}
-			},
-			selectfield: ["select", "checkbox", "field"],
-			selectfieldopt: [],
-			inputype: {
-				"string": "text",
-				"integer": "number",
-				"datetime": "datetime-local"
-			},
-			defaultrouteopt: {
-				"inventory_received": "inventory_base.inventorybase",
-				"user_login": "auth.user",
-				"netdevice_received": "accountinfo.accountinfoconfig",
-			},
-			linktype: {
-				"TEXT": "string",
-				"TEXTAREA": "string",
-				"SELECT": "select",
-				"CHECKBOX": "checkbox"
-			},
 			datavalues: [],
 
 			loading: false,
