@@ -347,7 +347,7 @@ export default {
 				"datetime": "datetime-local"
 			},
 			selectfield: ["select", "checkbox", "choice"],
-			excludefield: ["id", "asset", "package"],
+			excludefield: ["id", "asset", "package", "installation_number"],
 			scope: [],
 
 			loading: true,
