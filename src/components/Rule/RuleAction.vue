@@ -79,7 +79,7 @@ export default {
 			rowpackagedata: [],
 			rowactiondata: [],
 			rowheader: [],
-			excludedFields: [],
+			excludedFields: ["content_type", "object_id", "object_slug"],
 			templates: [],
 
 			actionupdate: [],
