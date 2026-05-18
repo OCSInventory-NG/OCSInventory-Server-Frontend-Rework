@@ -228,6 +228,7 @@ export default {
 			loadingValueOptions: false,
 			loadingFieldOptions: false,
 			selectedFieldType: null,
+			resolvedTrigger: null,
 			actionstrigger: {},
 
 			routeopt: {
@@ -284,8 +285,11 @@ export default {
 		}
 	},
 	computed: {
+		activeTrigger() {
+			return this.trigger || this.resolvedTrigger
+		},
 		objectOptions() {
-			return this.routeopt[this.trigger] || []
+			return this.routeopt[this.activeTrigger] || []
 		},
 		isValueSelect() {
 			return this.selectfield.includes(this.selectedFieldType)
@@ -300,6 +304,7 @@ export default {
 			setTimeout(() => {
 				this.rulemodal = false
 				this.createwithsuccess = false
+				this.resolvedTrigger = null
 				this.row = {
 					id: null,
 					rule: this.id ? Number(this.id) : null,
@@ -337,22 +342,18 @@ export default {
 				const options = await this.$api.generic.options("automation/action/")
 				const postFields = options.actions.POST
 
-				// Charger les options pour action depuis l'API
 				if (postFields.action && postFields.action.choices) {
 					this.actionOptions = postFields.action.choices.map(choice => ({
 						value: choice.value,
 						text: choice.display_name || choice.value
 					}))
 				} else {
-					// Fallback si pas de choices
 					this.actionOptions = [
 						{ value: 'set', text: this.$t('rule.set') }
 					]
 				}
 
 			} catch (e) {
-				console.error('Erreur lors du chargement des options depuis l\'API:', e)
-				// Fallback en cas d'erreur
 				this.actionOptions = [
 					{ value: 'set', text: this.$t('rule.set') }
 				]
@@ -366,20 +367,37 @@ export default {
 					const data = await this.$api.generic.get("automation/triggers/")
 					triggers = Array.isArray(data) ? data : (data?.results || [])
 				}
-				const triggerObj = triggers.find((t) => t.trigger === this.trigger)
+				const triggerObj = triggers.find((t) => t.trigger === this.activeTrigger)
 				this.actionstrigger = triggerObj?.action_targets || {}
 			} catch (e) {
-				console.error("Erreur lors du chargement des action_targets:", e)
 				this.actionstrigger = {}
 			}
 		},
 
 		normalizeObjectSlug(slug) {
 			if (!slug) return null
-			const match = this.objectOptions.find(
+			const allOptions = Object.values(this.routeopt || {}).flat()
+			const match = allOptions.find(
 				(o) => o.value.toLowerCase() === String(slug).toLowerCase()
 			)
 			return match ? match.value : slug
+		},
+
+		inferObjectSlugFromField(field) {
+			if (!field) return null
+
+			if (field.startsWith("accountdata:")) {
+				return "accountinfo.accountinfoconfig"
+			}
+
+			const models = Object.keys(this.actionstrigger || {})
+			for (const model of models) {
+				if ((this.actionstrigger[model] || []).includes(field)) {
+					return model
+				}
+			}
+
+			return null
 		},
 
 		parseRowFromApi(data) {
@@ -389,14 +407,18 @@ export default {
 			if (data.field?.startsWith("accountdata:")) {
 				const parts = data.field.split(":")
 				const regex = /\[|\]/g
+				row.object_slug = "accountinfo.accountinfoconfig"
 				row.field = parts[1]
 				row.value = parts.length > 2
-					? data.value
+					? String(data.value ?? "")
 					: String(data.value ?? "").replace(regex, "")
 				this.selectedFieldType = data.description
 			} else if (data.field === "template") {
 				this.selectedFieldType = "field"
 			} else {
+				if (!row.object_slug) {
+					row.object_slug = this.inferObjectSlugFromField(data.field)
+				}
 				this.selectedFieldType = data.description
 			}
 
@@ -420,7 +442,7 @@ export default {
 				return
 			}
 
-			const target = this.routetargets[this.trigger]?.[model]
+			const target = this.routetargets[this.activeTrigger]?.[model]
 			if (!target) {
 				this.fieldOptions = []
 				return
@@ -464,7 +486,6 @@ export default {
 					this.fieldOptions.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
 				}
 			} catch (e) {
-				console.error("Erreur lors du chargement des champs:", e)
 				this.fieldOptions = []
 			} finally {
 				this.loadingFieldOptions = false
@@ -508,6 +529,7 @@ export default {
 
 		loadData(id) {
 			this.rulemodal = true
+			this.resolvedTrigger = null
 			this.row = {
 				id: null,
 				rule: this.id,
@@ -537,9 +559,20 @@ export default {
 		async getAction(id) {
 			try {
 				const data = await this.$api.generic.get(`automation/action/${id}/`)
-				this.row = this.parseRowFromApi(data)
 				this.errormsg = null
 				this.errored = false
+
+				if (!this.activeTrigger && data?.rule) {
+					const rule = await this.$api.generic.get(`automation/rule/${data.rule}/`)
+					this.resolvedTrigger = rule?.trigger || null
+				}
+				await this.loadActionTargets()
+
+				this.row = this.parseRowFromApi(data)
+				if (!this.row.object_slug) {
+					this.row.object_slug = this.inferObjectSlugFromField(this.row.field || data.field)
+				}
+
 				if (this.row.object_slug) {
 					await this.loadFieldOptions(false)
 					await this.handleFieldChange()
@@ -565,7 +598,6 @@ export default {
 
 				return maxPriority + 1
 			} catch (e) {
-				console.error("Erreur lors du calcul de la priority :", e)
 				return 1
 			}
 		},
@@ -619,7 +651,7 @@ export default {
 			if (this.selectedFieldType === "field" || this.row.field === "template") {
 				this.loadingValueOptions = true
 				try {
-					const route = this.row.field === "template" ? "templates" : `${this.row.field}/`
+					const route = this.row.field === "template" ? "templates/" : `${this.row.field}/`
 					const response = await this.$api.generic.get(route)
 					const items = Array.isArray(response)
 						? response
@@ -630,7 +662,6 @@ export default {
 						text: item.name || item.id,
 					}))
 				} catch (e) {
-					console.error("Erreur lors du chargement des valeurs:", e)
 					this.valueOptions = []
 				} finally {
 					this.loadingValueOptions = false
@@ -651,7 +682,6 @@ export default {
 						text: item.value,
 					}))
 				} catch (e) {
-					console.error("Erreur lors du chargement des valeurs accountinfo:", e)
 					this.valueOptions = []
 				} finally {
 					this.loadingValueOptions = false
