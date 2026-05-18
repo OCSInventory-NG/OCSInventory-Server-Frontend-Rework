@@ -691,9 +691,3 @@ export default {
 	},
 }
 </script>
-
-<style scoped>
-.ocs-select {
-	margin-bottom: 1rem;
-}
-</style>
