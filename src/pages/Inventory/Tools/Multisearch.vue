@@ -405,7 +405,7 @@ export default {
 					for (const [key, value] of Object.entries(match || {})) {
 						let col = null
 
-						if (this.$te(this.translation_col_keys[type] + "." + key)) {
+						if (this.$te(this.translation_col_keys[type] + "." + key) && key !== "installation_number") {
 							const label = this.getMatchLabel(type, key)
 							col = `${title}: ${label}`
 						} else if (type === "inventory_sections") {

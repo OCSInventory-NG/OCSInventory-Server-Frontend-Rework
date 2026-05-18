@@ -83,9 +83,6 @@ export default {
 
 		// Data init
 		await this.loadInitial()
-
-		await this.getHeader()
-		await this.getAutomationHistory()
 	},
 	methods: {
 		async loadInitial() {
