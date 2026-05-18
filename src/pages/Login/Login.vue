@@ -148,6 +148,7 @@ export default {
 				localStorage.setItem('token_authentication', data.token)
 				localStorage.setItem('authenticated', true)
 				localStorage.setItem('locale', this.$root.$i18n.locale)
+				localStorage.removeItem('auth_method')
 
 				await this.getPermissions()
 			} catch (e) {
