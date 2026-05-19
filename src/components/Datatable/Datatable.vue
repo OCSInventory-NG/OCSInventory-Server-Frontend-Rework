@@ -159,9 +159,9 @@
 							:key="field.key"
 							v-model="field.visible"
 							:active="!field.visible"
-							:disabled="field.disabled"
+							:disabled="field.disabled || field.key === 'name'"
 							class="visible-select"
-							@click="field.visible = !field.visible"
+							@click="toggleFieldVisibility(field)"
 						>
 							<b-col>
 								<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
@@ -761,9 +761,6 @@ export default {
 
 		// Initialize visible fields
 		visibleFields() {
-			var key = this.title + "_" + this.templateid
-			localStorage.removeItem(key)
-			localStorage.setItem(key, JSON.stringify(this.fields))
 			return this.fields.filter(field => field.visible)
 		},
 		pageRows() {
@@ -921,7 +918,7 @@ export default {
 					// Initialize CSV export header
 					this.json_fields[visible.key] = visible.key
 					// Initialize datatable header
-					var index = this.fields.findIndex(x => x.key==visible);
+					var index = this.fields.findIndex(x => x.key == visible.key);
 					if (index === -1) {
 						// Translate label
 						visible.label = (this.$te(this.translationkey+visible.key))
@@ -1035,6 +1032,15 @@ export default {
 		this.teardownStickyHeader()
 	},
 	methods: {
+		toggleFieldVisibility(field) {
+			if (field.key === "name") return
+
+			field.visible = !field.visible
+			localStorage.setItem(
+				this.title + "_" + this.templateid,
+				JSON.stringify(this.fields)
+			)
+		},
 		syncActionsField() {
 			this.fields = this.fields.filter(field => field.key !== 'actions')
 
