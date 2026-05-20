@@ -55,7 +55,7 @@
 							class="section-table-btn sticky-col right actions-col"
 						>
 							<b-button-toolbar>
-								<b-button-group class="mr-1">
+								<div class="d-flex flex-row flex-nowrap align-items-center gap-1 mx-1">	
 									<MappingModal 
 										v-if="canaddmapping"
 										:id="element.id"
@@ -87,7 +87,7 @@
 										:parameter="apiroute"
 										@reload-datatable="reloadDatatable"
 									/>
-								</b-button-group>
+								</div>
 							</b-button-toolbar>
 						</td>
 					</tr>
