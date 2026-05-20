@@ -114,7 +114,7 @@
 							:label="$t('rule.enabled')" 
 							label-for="enabled"
 						>
-							<div class="form-check form-switch">
+							<div class="form-check form-switch mb-4">
 								<input 
 									v-model="row.enabled"
 									class="form-check-input"
