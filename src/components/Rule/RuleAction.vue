@@ -104,14 +104,10 @@ export default {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
-		if (permissions.includes("action_view_deploymentaction")) {
-			if (permissions.includes("action_add_deploymentaction")) {
+		if (permissions.includes("rule_view_action")) {
+			if (permissions.includes("rule_change_rule")) {
 				this.canadd = true
-			}
-			if (permissions.includes("action_change_deploymentaction")) {
 				this.canedit = true
-			}
-			if (permissions.includes("action_delete_deploymentaction")) {
 				this.candelete = true
 			}
 		} else {
