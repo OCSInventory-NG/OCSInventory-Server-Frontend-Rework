@@ -213,7 +213,6 @@ export default {
 				id: null,
 				rule: null,
 				priority: 1,
-				description: null,
 				action: null,
 				field: null,
 				value: null,
@@ -309,7 +308,6 @@ export default {
 					id: null,
 					rule: this.id ? Number(this.id) : null,
 					priority: 1,
-					description: null,
 					action: null,
 					field: null,
 					value: null,
@@ -412,14 +410,12 @@ export default {
 				row.value = parts.length > 2
 					? String(data.value ?? "")
 					: String(data.value ?? "").replace(regex, "")
-				this.selectedFieldType = data.description
 			} else if (data.field === "template") {
 				this.selectedFieldType = "field"
 			} else {
 				if (!row.object_slug) {
 					row.object_slug = this.inferObjectSlugFromField(data.field)
 				}
-				this.selectedFieldType = data.description
 			}
 
 			return row
@@ -499,7 +495,6 @@ export default {
 			const fieldtype = selected?.fieldtype || this.selectedFieldType
 
 			if (model === "accountinfo.accountinfoconfig") {
-				payload.description = fieldtype
 				payload.object_id = this.row.field
 				payload.object_slug = model.toLowerCase()
 
@@ -519,9 +514,6 @@ export default {
 				if (model) {
 					payload.object_slug = model
 				}
-				if (fieldtype) {
-					payload.description = fieldtype
-				}
 			}
 
 			return payload
@@ -534,7 +526,6 @@ export default {
 				id: null,
 				rule: this.id,
 				priority: 1,
-				description: null,
 				action: null,
 				field: null,
 				value: null,

@@ -79,7 +79,7 @@ export default {
 			rowpackagedata: [],
 			rowactiondata: [],
 			rowheader: [],
-			excludedFields: ["content_type", "object_id", "object_slug"],
+			excludedFields: ["content_type", "object_id", "object_slug", "description"],
 			templates: [],
 
 			actionupdate: [],
@@ -254,8 +254,6 @@ export default {
 				return "asset/groups/"
 			if (objectSlug === "auth.user" && action.field === "groups")
 				return "groups/"
-			if (action.description === "field" && action.field)
-				return action.field + "/"
 
 			return null
 		},
@@ -337,7 +335,6 @@ export default {
 						id: action.id,
 						rule: action.rule,
 						priority: action.priority,
-						description: action.description,
 						object: this.displayValue(this.getObjectLabel(action)),
 						action: action.action,
 						field: this.displayValue(this.getFieldLabel(action), action.field),
