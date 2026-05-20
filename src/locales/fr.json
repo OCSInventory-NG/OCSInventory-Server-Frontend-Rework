@@ -11,6 +11,13 @@
     "massprocessing": "Traitement de masse",
     "name": "Nom"
   },
+  "action": {
+    "rule": "Règle",
+    "priority": "Priorité d'exécution",
+    "object": "Objet",
+    "field": "Champ",
+    "value": "Valeur"
+  },
   "assetgroup": {
     "action": "Action",
     "addingrp": "Ajouter à un groupe existant",
@@ -514,6 +521,7 @@
     "notequal": "n'est pas égal à",
     "object": "Objet",
     "operator": "Opérateur",
+    "priority": "Priorité d'exécution",
     "regex": "Validation par expression régulière",
     "removeaction": "Supprimer l'action",
     "removeandcondition": "Supprimer la condition ET",

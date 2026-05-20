@@ -11,6 +11,13 @@
     "massprocessing": "Mass processing",
     "name": "Name"
   },
+  "action": {
+    "rule": "Rule",
+    "priority": "Execution priority",
+    "object": "Object",
+    "field": "Field",
+    "value": "Value"
+  },
   "assetgroup": {
     "action": "Action",
     "addingrp": "Add to an existing group",
@@ -514,6 +521,7 @@
     "notequal": "is not equal to",
     "object": "Object",
     "operator": "Operator",
+    "priority": "Execution priority",
     "regex": "Regular expression validation",
     "removeaction": "Remove action",
     "removeandcondition": "Remove AND condition",

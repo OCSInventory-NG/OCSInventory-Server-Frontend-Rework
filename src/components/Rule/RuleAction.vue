@@ -38,7 +38,7 @@
 							editcomponent="ActionRuleModal"
 							:edit-props="{ trigger }"
 							title="automation/action"
-							translationkey="automation.action."
+							translationkey="action."
 							is-sticky
 							@reload-datatable="reloadDatatable"
 						/>
