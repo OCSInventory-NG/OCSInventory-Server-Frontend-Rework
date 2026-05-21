@@ -189,20 +189,33 @@ export default {
 		},
 
 		getValueLabel(action, value) {
-			const valueId = String(action.value ?? "").replace(/\[|\]/g, "")
+			const raw = (action.value !== undefined) ? action.value : value
 
 			if (action.field === "template") {
-				return this.fieldValues.template?.[valueId] || value
+				const vid = String(raw ?? "").replace(/\[|\]/g, "")
+				return this.fieldValues.template?.[vid] || raw
 			}
 
 			if (action.field?.startsWith("accountdata:")) {
 				const fieldId = action.field.split(":")[1]
-				return this.accountinfoValues[fieldId]?.[valueId] || value
+
+				if (Array.isArray(raw)) {
+					return raw.map((v) => this.accountinfoValues[fieldId]?.[String(v)] || String(v)).join(', ')
+				}
+
+				if (raw && typeof raw === 'object' && raw.value !== undefined) {
+					const vid = String(raw.value)
+					return this.accountinfoValues[fieldId]?.[vid] || raw.text || vid
+				}
+
+				const vid = String(raw ?? "").replace(/\[|\]/g, "")
+				return this.accountinfoValues[fieldId]?.[vid] || raw
 			}
 
-			return this.choiceValues[action.field]?.[valueId]
-				|| this.fieldValues[action.field]?.[valueId]
-				|| value
+			const vid = String(raw ?? "").replace(/\[|\]/g, "")
+			return this.choiceValues[action.field]?.[vid]
+				|| this.fieldValues[action.field]?.[vid]
+				|| raw
 		},
 
 		displayValue(label, payloadValue = undefined) {

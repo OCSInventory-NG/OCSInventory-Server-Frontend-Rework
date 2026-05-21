@@ -147,7 +147,7 @@
 								v-model="row.value"
 								:options="valueOptions"
 								:reduce="text => text.value"
-								:multiple="false"
+								:multiple="selectedFieldType === 'checkbox'"
 								:close-on-select="true"
 								:clearable="false"
 								label="text"
@@ -404,31 +404,44 @@ export default {
 
 			if (data.field?.startsWith("accountdata:")) {
 				const parts = data.field.split(":")
-				const regex = /\[|\]/g
 				row.object_slug = "accountinfo.accountinfoconfig"
 				row.field = parts[1]
-				row.value = parts.length > 2
-					? String(data.value ?? "")
-					: String(data.value ?? "").replace(regex, "")
+
+				if (Array.isArray(data.value)) {
+					this.selectedFieldType = "checkbox"
+					row.value = data.value.map((item) => String(item))
+				} else if (data.value && typeof data.value === "object" && data.value.value !== undefined) {
+					this.selectedFieldType = "select"
+					row.value = String(data.value.value)
+				} else {
+					this.selectedFieldType = "string"
+					row.value = String(data.value ?? "")
+				}
 			} else if (data.field === "template") {
 				this.selectedFieldType = "field"
 			} else {
-				if (!row.object_slug) {
+				if (!row.object_slug) { 
 					row.object_slug = this.inferObjectSlugFromField(data.field)
 				}
+				this.selectedFieldType = "string"
 			}
 
 			return row
-		},
-
-		onObjectSelected() {
-			this.loadFieldOptions(true)
 		},
 
 		onFieldSelected(option) {
 			this.selectedFieldType = option?.fieldtype || null
 			this.row.value = null
 			this.handleFieldChange()
+		},
+
+		onObjectSelected() {
+			this.row.field = null
+			this.row.value = null
+			this.selectedFieldType = null
+			this.fieldOptions = []
+			this.valueOptions = []
+			this.loadFieldOptions(true).catch(() => {})
 		},
 
 		async loadFieldOptions(reload = false) {
@@ -500,10 +513,18 @@ export default {
 
 				if (fieldtype === "checkbox") {
 					payload.field = `accountdata:${this.row.field}`
-					payload.value = `[${this.row.value}]`
+					payload.value = Array.isArray(this.row.value)
+						? this.row.value.map((item) => parseInt(item, 10)).filter((item) => !Number.isNaN(item))
+						: []
 				} else if (fieldtype === "select") {
-					payload.field = `accountdata:${this.row.field}:value`
-					payload.value = this.row.value
+					payload.field = `accountdata:${this.row.field}`
+					const normalizedId = String(this.row.value || "").replace(/\[|\]/g, "")
+					const parsedId = parseInt(normalizedId, 10)
+					const option = this.valueOptions.find((o) => o.value == normalizedId)
+					payload.value = {
+						value: Number.isNaN(parsedId) ? normalizedId : parsedId,
+						text: option?.text || "",
+					}
 				} else {
 					payload.field = `accountdata:${this.row.field}`
 					payload.value = this.row.value
