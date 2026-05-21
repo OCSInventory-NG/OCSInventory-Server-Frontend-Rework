@@ -148,8 +148,7 @@
 								:options="valueOptions"
 								:reduce="text => text.value"
 								:multiple="selectedFieldType === 'checkbox'"
-								:close-on-select="true"
-								:clearable="false"
+								:clearable="isValueClearable"
 								label="text"
 								class="mb-3 ocs-select"
 								:loading="loadingValueOptions"
@@ -293,6 +292,9 @@ export default {
 		isValueSelect() {
 			return this.selectfield.includes(this.selectedFieldType)
 				|| this.row.field === "template"
+		},
+		isValueClearable() {
+			return this.row.field === 'groups'
 		},
 		valueInputType() {
 			return this.inputype[this.selectedFieldType] || "text"
@@ -531,7 +533,17 @@ export default {
 				}
 			} else {
 				payload.field = this.row.field
-				payload.value = this.row.value
+				if (this.row.field === 'groups') {
+					if (this.selectedFieldType === 'checkbox') {
+						payload.value = Array.isArray(this.row.value)
+							? this.row.value.map((item) => parseInt(item, 10)).filter((i) => !Number.isNaN(i))
+							: []
+					} else {
+						payload.value = this.row.value || []
+					}
+				} else {
+					payload.value = this.row.value
+				}
 				if (model) {
 					payload.object_slug = model
 				}
