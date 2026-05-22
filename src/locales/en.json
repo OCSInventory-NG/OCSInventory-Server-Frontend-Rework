@@ -11,6 +11,13 @@
     "massprocessing": "Mass processing",
     "name": "Name"
   },
+  "action": {
+    "rule": "Rule",
+    "priority": "Execution priority",
+    "object": "Object",
+    "field": "Field",
+    "value": "Value"
+  },
   "assetgroup": {
     "action": "Action",
     "addingrp": "Add to an existing group",
@@ -485,16 +492,19 @@
     "user": "Users"
   },
   "rule": {
+    "action": "Action",
     "actions": "Actions",
     "addaction": "Add an action",
     "addandcondition": "Add AND condition",
     "addorcondition": "Add OR condition",
     "addrule": "Add a rule",
     "boolean": "is true",
+    "break_on_match": "Break on first match",
     "case_sensitive": "Case sensitive",
     "contains": "contains",
     "data": "Value",
     "description": "Name/Description",
+    "editaction": "Edit action",
     "editrule": "Edit rule",
     "enabled": "Enabled",
     "equal": "is equal to",
@@ -509,12 +519,15 @@
     "netdevice_received": "Network device inventory received",
     "not": "is not true",
     "notequal": "is not equal to",
+    "object": "Object",
     "operator": "Operator",
+    "priority": "Execution priority",
     "regex": "Regular expression validation",
     "removeaction": "Remove action",
     "removeandcondition": "Remove AND condition",
     "removeorcondition": "Remove OR condition",
     "set": "SET",
+    "template": "Template",
     "trigger": "Trigger",
     "user_login": "User login"
   },

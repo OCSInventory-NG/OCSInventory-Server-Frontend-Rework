@@ -30,20 +30,33 @@
 								@reload-datatable="reloadDatatable"
 							/>
 
-							<Datatable
-								id="rules-datatable"
-								:rowdata="rowdata"
-								:rowheader="rowheader"
-								:candelete="candelete"
-								:canedit="canedit"
-								:canviewruleaction="canviewaction"
-								:isbusy="isbusy"
-								is-sticky
-								editcomponent="RuleModal"
-								title="automation/rule"
-								translationkey="rule."
-								@reload-datatable="reloadDatatable"
-							/>
+							<b-tabs 
+								content-class="mt-3"
+								fill
+							>
+								<b-tab
+									v-for="trigger in triggers"
+									:key="trigger.trigger"
+									:title="$t('rule.' + trigger.trigger)"
+								>
+									<Draggable
+										id="rules-datatable"
+										:key="`${trigger.trigger}-${draggableKey}`"
+										:rowdata="getRuleRows(trigger.trigger)"
+										:rowheader="rowheader"
+										:candelete="candelete"
+										:canedit="canedit"
+										:canviewruleaction="canviewaction"
+										:isbusy="isbusy"
+										:apiroute="`automation/rule`"
+										is-sticky
+										editcomponent="RuleModal"
+										title="automation/rule"
+										translationkey="rule."
+										@reload-datatable="reloadDatatable"
+									/>
+								</b-tab>
+							</b-tabs>
 						</div>
 					</div>
 				</div>
@@ -65,8 +78,10 @@ export default {
 			canview: false,
 			canviewaction: false,
 
+			triggers: [],
 			rowdata: [],
 			rowheader: [],
+			draggableKey: 0,
 
 			excludefields: ["logic", "actions"],
 
@@ -113,7 +128,8 @@ export default {
 				this.rowheader = Object.keys(header.actions.POST).filter(
 					(f) => !this.excludefields.includes(f)
 				)
-
+				//Get triggers
+				await this.getTriggers()
 				// Get rules
 				await this.getRules()
 
@@ -128,6 +144,15 @@ export default {
 			}
 		},
 
+		async getTriggers() {
+			try {
+				const data = await this.$api.generic.get("automation/triggers/")
+				this.triggers = Array.isArray(data) ? data : (data?.results || [])
+			} catch (e) {
+				this.triggers = []
+			}
+		},
+
 		async getRules() {
 			try {
 				this.isbusy = true
@@ -138,6 +163,7 @@ export default {
 				this.rowdata = rules.map((rule) => ({
 					...rule,
 					trigger: this.$t("rule." + rule.trigger),
+					trigger_raw: rule.trigger,
 				}))
 
 				this.errormsg = null
@@ -152,8 +178,15 @@ export default {
 			}
 		},
 
+		getRuleRows(triggerName) {
+			return this.rowdata
+				.filter((row) => row.trigger_raw === triggerName)
+				.sort((a, b) => (a?.priority ?? 0) - (b?.priority ?? 0))
+		},
+
 		async reloadDatatable() {
 			await this.getRules()
+			this.draggableKey += 1
 		}
 	}
 }

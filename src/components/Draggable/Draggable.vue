@@ -55,12 +55,23 @@
 							class="section-table-btn sticky-col right actions-col"
 						>
 							<b-button-toolbar>
-								<b-button-group class="mr-1">
+								<div class="d-flex flex-row flex-nowrap align-items-center gap-1 mx-1">	
 									<MappingModal 
 										v-if="canaddmapping"
 										:id="element.id"
 									/>
 									<!-- Edit button -->
+									<button 
+										v-if="canviewruleaction"
+										:title="$t('rule.managerule')"
+										class="btn btn-ghost-orange ocs-auto"
+										@click="goToEditRule(element.id)"
+									>
+										<font-awesome-icon 
+											:icon="['fas', 'gear']"
+											size="1x"
+										/>
+									</button>
 									<component 
 										:is="editcomponent"
 										v-if="canedit"
@@ -76,7 +87,7 @@
 										:parameter="apiroute"
 										@reload-datatable="reloadDatatable"
 									/>
-								</b-button-group>
+								</div>
 							</b-button-toolbar>
 						</td>
 					</tr>
@@ -104,6 +115,7 @@ export default {
 		editcomponent: { type: String, default: "ActionListModal" },
 		canedit: { type: Boolean, default: false },
 		candelete: { type: Boolean, default: false },
+		canviewruleaction: { type: Boolean, default: false },
 		canaddmapping: { type: Boolean, default: false },
 		field: { type: String, default: 'priority' },
 		viewOnly: { type: Boolean, default: false },
@@ -140,7 +152,7 @@ export default {
 
 				const payload = { ...this.rowdatas[idx] }
 				if (payload.file) delete payload.file
-
+				if (payload.trigger) delete payload.trigger
 				await this.$api.generic.patch(
 					`${this.apiroute}/${payload.id}/`,
 					payload
@@ -169,6 +181,9 @@ export default {
 					}
 				}
 			}
+		},
+		goToEditRule(id) {
+			this.$router.push('/configurations/rules/'+id);
 		},
 	}
 }

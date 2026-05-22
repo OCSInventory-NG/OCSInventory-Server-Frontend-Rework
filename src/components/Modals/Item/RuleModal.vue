@@ -114,9 +114,26 @@
 							:label="$t('rule.enabled')" 
 							label-for="enabled"
 						>
-							<div class="form-check form-switch">
+							<div class="form-check form-switch mb-4">
 								<input 
 									v-model="row.enabled"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</div>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('rule.break_on_match')" 
+							label-for="break_on_match"
+						>
+							<div class="form-check form-switch">
+								<input
+									id="break_on_match"
+									v-model="row.break_on_match"
 									class="form-check-input"
 									type="checkbox"
 								>
@@ -169,7 +186,9 @@ export default {
 			row: {
 				description: null,
 				trigger: 'inventory_received',
+				priority: null,
 				enabled: false,
+				break_on_match: false,
 				logic: {},
 				actions: []
 			},
@@ -192,7 +211,9 @@ export default {
 				this.row = {
 					description: null,
 					trigger: 'inventory_received',
+					priority: null,
 					enabled: false,
+					break_on_match: false,
 					logic: {},
 					actions: []
 				}
@@ -216,6 +237,7 @@ export default {
 				description: null,
 				trigger: "inventory_received",
 				enabled: false,
+				break_on_match: false,
 				logic: {},
 				actions: [],
 			}
@@ -263,9 +285,8 @@ export default {
 					await this.$api.generic.patch(
 						`automation/rule/${this.row.id}/`,
 						payload
-					)
+					);
 				}
-
 				this.createwithsuccess = true
 			} catch (e) {
 				this.createerrormsg = this._apiError(e)
