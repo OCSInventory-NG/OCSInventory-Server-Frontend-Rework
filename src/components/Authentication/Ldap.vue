@@ -111,6 +111,8 @@ export default {
 			authid: 2,
 			rowheader: [
 				"id",
+				"name",
+				"description",
 				"priority",
 				"enabled",
 				"SERVER_URI",
@@ -215,6 +217,8 @@ export default {
 
 				this.rowdata = rows.map((element) => ({
 					id: element.id,
+					name: element.name,
+					description: element.description,
 					priority: element.priority,
 					enabled: element.enabled,
 					SERVER_URI: element?.config?.SERVER_URI,
