@@ -3,6 +3,7 @@
 Welcome to the new administration console frontend for OCS Inventory.
 
 ## Table of Contents
+
 - [Introduction](#introduction)
 - [Production Use](#production-use)
 - [Development Setup](#development-setup)
@@ -10,6 +11,9 @@ Welcome to the new administration console frontend for OCS Inventory.
 ## Introduction
 
 This repository hosts the frontend application rework for the OCS Inventory Server. It aims to modernize the user interface, improve user experience, and offer a more responsive design for managing IT assets, deployments, and administrative tasks.
+
+If you are a user of the 2.X version, you can find more information about what's changes between the v2 and v3 on the following link : 
+- [v2 vs v3: What’s changed](https://documentation.ocsinventory-ng.org/project-overview/v2-vs-v3-whats-changed)
 
 ## Production Use
 
