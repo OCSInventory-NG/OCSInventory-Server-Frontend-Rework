@@ -28,6 +28,17 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      # Try to fix trivy and grype no space left errors
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+
       # Git Checkout
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -44,7 +55,7 @@ jobs:
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
         # MAJOR-RELEASE-IMPACTED
-        uses: oxsecurity/megalinter@v9
+        uses: oxsecurity/megalinter@v9.4.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
