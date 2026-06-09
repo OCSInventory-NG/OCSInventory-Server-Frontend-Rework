@@ -12,7 +12,10 @@
 				v-for="(masterinput, masterindex) in datavalues"
 				:key="masterindex"
 			>
-				<b-row v-if="masterindex > 0" class="mb-2">
+				<b-row
+					v-if="masterindex > 0"
+					class="mb-2"
+				>
 					<b-col cols="1">
 						<v-select
 							:id="'link'+masterindex+'0'"
@@ -27,236 +30,236 @@
 					</b-col>
 				</b-row>
 				<div class="modal-allactions multisearch-card">
-				<div
-					v-if="!disableforgroup"
-					v-show="datavalues.length > 1"
-					align="right"
-				>
-					<b-button
-						size="sm"
-						variant="outline-danger"
-						:title="$t('search.removegroup')"
-						@click="removeGroup(masterindex, datavalues)"
+					<div
+						v-if="!disableforgroup"
+						v-show="datavalues.length > 1"
+						align="right"
 					>
-						<font-awesome-icon
-							:icon="['fas', 'xmark']"
-							size="1x"
-						/>
-					</b-button>
-				</div>
-
-				<div
-					v-for="(input, index) in masterinput"
-					:key="`valueInput-${index}`"
-					class="modal-allactions"
-				>
-					<b-row>
-						<b-col
-							v-if="index > 0"
-							cols="1"
+						<b-button
+							size="sm"
+							variant="outline-danger"
+							:title="$t('search.removegroup')"
+							@click="removeGroup(masterindex, datavalues)"
 						>
-							<b-form-group>
-								<v-select
-									:id="'link'+masterindex+index"
-									v-model="datavalues[masterindex][index].link"
-									:options="linkopt"
-									:reduce="text => text.value"
-									:clearable="false"
-									label="text"
-									class="mb-3 ocs-select"
-									:disabled="disableforgroup"
-								/>
-							</b-form-group>
-						</b-col>
-						<b-col>
-							<b-form-group>
-								<v-select
-									:id="'route'+masterindex+index"
-									v-model="input.route"
-									:options="routeopt"
-									:reduce="text => text.value"
-									:clearable="false"
-									label="text"
-									class="mb-3 ocs-select"
-									:disabled="disableforgroup"
-									@option:selected="getFields(input.route, masterindex, index)"
-								/>
-							</b-form-group>
-						</b-col>
-						<b-col v-if="input.object == 'inventory_sections'">
-							<v-select
-								:id="'template'+masterindex+index"
-								v-model="input.template"
-								:options="(loadingtemplate || templateopt[masterindex] == undefined) ?
-									[] : templateopt[masterindex][index]"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3 ocs-select"
-								:disabled="disableforgroup"
-								:loading="loadingtemplate"
-								@option:selected="getSections(input.template, masterindex, index)"
+							<font-awesome-icon
+								:icon="['fas', 'xmark']"
+								size="1x"
+							/>
+						</b-button>
+					</div>
+
+					<div
+						v-for="(input, index) in masterinput"
+						:key="`valueInput-${index}`"
+						class="modal-allactions"
+					>
+						<b-row>
+							<b-col
+								v-if="index > 0"
+								cols="1"
 							>
-								<template #search="{attributes, events}">
-									<input
-										class="vs__search"
-										:required="!input.template"
-										v-bind="attributes"
-										v-on="events"
-									>
-								</template>
-							</v-select>
-						</b-col>
-						<b-col v-if="input.object == 'inventory_sections'">
-							<v-select
-								:id="'section'+masterindex+index"
-								v-model="input.section"
-								:options="(loadingsection || sectionopt[masterindex] == undefined) ?
-									[] : sectionopt[masterindex][index]"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3 ocs-select"
-								:disabled="disableforgroup"
-								:loading="loadingsection"
-								@option:selected="getFields(input.section, masterindex, index, true)"
-							>
-								<template #search="{attributes, events}">
-									<input
-										class="vs__search"
-										:required="!input.section"
-										v-bind="attributes"
-										v-on="events"
-									>
-								</template>
-							</v-select>
-						</b-col>
-						<b-col>
-							<b-form-group>
-								<v-select
-									:id="'field'+masterindex+index"
-									v-model="input.field"
-									:options="(fieldopt[masterindex]) ?
-										fieldopt[masterindex][index] : []"
-									:reduce="text => text.value"
-									:clearable="false"
-									label="text"
-									class="mb-3 ocs-select"
-									:disabled="disableforgroup"
-									:loading="loading"
-									@option:selected="setFieldType(input, masterindex, index)"
-								>
-									<template #search="{attributes, events}">
-										<input
-											class="vs__search"
-											:required="!input.field"
-											v-bind="attributes"
-											v-on="events"
-										>
-									</template>
-								</v-select>
-							</b-form-group>
-						</b-col>
-						<b-col cols="2">
-							<b-form-group>
-								<v-select
-									:id="'operator'+masterindex+index"
-									v-model="input.operator"
-									:options="operatoropt[input.fieldtype]"
-									:reduce="text => text.value"
-									:clearable="false"
-									label="text"
-									class="mb-3 ocs-select"
-									:disabled="disableforgroup"
-								>
-									<template #search="{attributes, events}">
-										<input
-											class="vs__search"
-											:required="!input.operator"
-											v-bind="attributes"
-											v-on="events"
-										>
-									</template>
-								</v-select>
-							</b-form-group>
-						</b-col>
-						<b-col cols="3">
-							<b-form-group>
-								<b-form-input
-									v-if="!selectfield.includes(input.fieldtype)"
-									:id="'value'+masterindex+index"
-									v-model="input.value"
-									:type="inputype[input.fieldtype]"
-									class="mb-3"
-									:disabled="disableforgroup"
-								/>
-								<div v-else>
+								<b-form-group>
 									<v-select
-										:id="'value'+masterindex+index"
-										v-model="input.value"
-										:options="(input.fieldtype == 'choice') ?
-											scope : (adminopt[masterindex]) ?
-												adminopt[masterindex][index] : []"
+										:id="'link'+masterindex+index"
+										v-model="datavalues[masterindex][index].link"
+										:options="linkopt"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
 										class="mb-3 ocs-select"
-										:loading="loadingadmin"
 										:disabled="disableforgroup"
+									/>
+								</b-form-group>
+							</b-col>
+							<b-col>
+								<b-form-group>
+									<v-select
+										:id="'route'+masterindex+index"
+										v-model="input.route"
+										:options="routeopt"
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="disableforgroup"
+										@option:selected="getFields(input.route, masterindex, index)"
+									/>
+								</b-form-group>
+							</b-col>
+							<b-col v-if="input.object == 'inventory_sections'">
+								<v-select
+									:id="'template'+masterindex+index"
+									v-model="input.template"
+									:options="(loadingtemplate || templateopt[masterindex] == undefined) ?
+										[] : templateopt[masterindex][index]"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									:disabled="disableforgroup"
+									:loading="loadingtemplate"
+									@option:selected="getSections(input.template, masterindex, index)"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.template"
+											v-bind="attributes"
+											v-on="events"
+										>
+									</template>
+								</v-select>
+							</b-col>
+							<b-col v-if="input.object == 'inventory_sections'">
+								<v-select
+									:id="'section'+masterindex+index"
+									v-model="input.section"
+									:options="(loadingsection || sectionopt[masterindex] == undefined) ?
+										[] : sectionopt[masterindex][index]"
+									:reduce="text => text.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									:disabled="disableforgroup"
+									:loading="loadingsection"
+									@option:selected="getFields(input.section, masterindex, index, true)"
+								>
+									<template #search="{attributes, events}">
+										<input
+											class="vs__search"
+											:required="!input.section"
+											v-bind="attributes"
+											v-on="events"
+										>
+									</template>
+								</v-select>
+							</b-col>
+							<b-col>
+								<b-form-group>
+									<v-select
+										:id="'field'+masterindex+index"
+										v-model="input.field"
+										:options="(fieldopt[masterindex]) ?
+											fieldopt[masterindex][index] : []"
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="disableforgroup"
+										:loading="loading"
+										@option:selected="setFieldType(input, masterindex, index)"
 									>
 										<template #search="{attributes, events}">
 											<input
 												class="vs__search"
-												:required="!input.value"
+												:required="!input.field"
 												v-bind="attributes"
 												v-on="events"
 											>
 										</template>
 									</v-select>
-								</div>
-							</b-form-group>
-						</b-col>
-						<b-col
-							v-if="!disableforgroup"
-							cols="1"
-						>
-							<b-form-group>
-								<b-button
-									:id="'addfield'+masterindex+index"
-									v-b-modal="1"
-									variant="primary"
-									class="d-none d-sm-inline-block form-control"
-									:title="$t('search.addquerytogroup')"
-									@click="addField(masterindex, index, datavalues)"
-								>
-									<font-awesome-icon
-										:icon="['fas', 'plus']"
+								</b-form-group>
+							</b-col>
+							<b-col cols="2">
+								<b-form-group>
+									<v-select
+										:id="'operator'+masterindex+index"
+										v-model="input.operator"
+										:options="operatoropt[input.fieldtype]"
+										:reduce="text => text.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="disableforgroup"
+									>
+										<template #search="{attributes, events}">
+											<input
+												class="vs__search"
+												:required="!input.operator"
+												v-bind="attributes"
+												v-on="events"
+											>
+										</template>
+									</v-select>
+								</b-form-group>
+							</b-col>
+							<b-col cols="3">
+								<b-form-group>
+									<b-form-input
+										v-if="!selectfield.includes(input.fieldtype)"
+										:id="'value'+masterindex+index"
+										v-model="input.value"
+										:type="inputype[input.fieldtype]"
+										class="mb-3"
+										:disabled="disableforgroup"
 									/>
-								</b-button>
-							</b-form-group>
-						</b-col>
-						<b-col
-							v-if="!disableforgroup"
-							v-show="datavalues[masterindex].length > 1"
-							cols="1"
-						>
-							<b-form-group>
-								<b-button
-									:id="'removefield'+masterindex+index"
-									v-b-modal="1"
-									variant="danger"
-									class="d-none d-sm-inline-block form-control"
-									:title="$t('search.removequeryfromgroup')"
-									@click="removeField(masterindex, index, datavalues)"
-								>
-									<font-awesome-icon
-										:icon="['fas', 'trash-can']"
-									/>
-								</b-button>
-							</b-form-group>
-						</b-col>
-					</b-row>
-				</div>
+									<div v-else>
+										<v-select
+											:id="'value'+masterindex+index"
+											v-model="input.value"
+											:options="(input.fieldtype == 'choice') ?
+												scope : (adminopt[masterindex]) ?
+													adminopt[masterindex][index] : []"
+											:reduce="text => text.value"
+											:clearable="false"
+											label="text"
+											class="mb-3 ocs-select"
+											:loading="loadingadmin"
+											:disabled="disableforgroup"
+										>
+											<template #search="{attributes, events}">
+												<input
+													class="vs__search"
+													:required="!input.value"
+													v-bind="attributes"
+													v-on="events"
+												>
+											</template>
+										</v-select>
+									</div>
+								</b-form-group>
+							</b-col>
+							<b-col
+								v-if="!disableforgroup"
+								cols="1"
+							>
+								<b-form-group>
+									<b-button
+										:id="'addfield'+masterindex+index"
+										v-b-modal="1"
+										variant="primary"
+										class="d-none d-sm-inline-block form-control"
+										:title="$t('search.addquerytogroup')"
+										@click="addField(masterindex, index, datavalues)"
+									>
+										<font-awesome-icon
+											:icon="['fas', 'plus']"
+										/>
+									</b-button>
+								</b-form-group>
+							</b-col>
+							<b-col
+								v-if="!disableforgroup"
+								v-show="datavalues[masterindex].length > 1"
+								cols="1"
+							>
+								<b-form-group>
+									<b-button
+										:id="'removefield'+masterindex+index"
+										v-b-modal="1"
+										variant="danger"
+										class="d-none d-sm-inline-block form-control"
+										:title="$t('search.removequeryfromgroup')"
+										@click="removeField(masterindex, index, datavalues)"
+									>
+										<font-awesome-icon
+											:icon="['fas', 'trash-can']"
+										/>
+									</b-button>
+								</b-form-group>
+							</b-col>
+						</b-row>
+					</div>
 				</div>
 			</template>
 			<b-row v-if="!disableforgroup">
