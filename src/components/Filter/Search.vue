@@ -8,23 +8,37 @@
 		<b-form
 			@submit="onSubmit"
 		>
-			<div
+			<template
 				v-for="(masterinput, masterindex) in datavalues"
 				:key="masterindex"
-				class="modal-allactions multisearch-card"
 			>
+				<b-row v-if="masterindex > 0" class="mb-2">
+					<b-col cols="1">
+						<v-select
+							:id="'link'+masterindex+'0'"
+							v-model="datavalues[masterindex][0].link"
+							:options="linkopt"
+							:reduce="text => text.value"
+							:clearable="false"
+							label="text"
+							class="mb-3 ocs-select"
+							:disabled="disableforgroup"
+						/>
+					</b-col>
+				</b-row>
+				<div class="modal-allactions multisearch-card">
 				<div
 					v-if="!disableforgroup"
 					v-show="datavalues.length > 1"
 					align="right"
 				>
-					<b-button 
+					<b-button
 						size="sm"
 						variant="outline-danger"
 						:title="$t('search.removegroup')"
 						@click="removeGroup(masterindex, datavalues)"
 					>
-						<font-awesome-icon 
+						<font-awesome-icon
 							:icon="['fas', 'xmark']"
 							size="1x"
 						/>
@@ -38,7 +52,7 @@
 				>
 					<b-row>
 						<b-col
-							v-if="index > 0 || masterindex > 0"
+							v-if="index > 0"
 							cols="1"
 						>
 							<b-form-group>
@@ -243,7 +257,8 @@
 						</b-col>
 					</b-row>
 				</div>
-			</div>
+				</div>
+			</template>
 			<b-row v-if="!disableforgroup">
 				<b-col align-self="start" />
 				<b-col 
