@@ -88,6 +88,7 @@ export default {
 			copiedKey: null,
 			copyTimeout: null,
 			backendInfo: {
+				backend_version: null,
 				authentication_type: [],
 				infrastructure_type: null,
 				operating_system: null,
@@ -147,6 +148,7 @@ export default {
 				const data = await this.$api.generic.get("server-info/")
 
 				this.backendInfo = {
+					backend_version: data?.backend_version ?? null,
 					authentication_type: Array.isArray(data?.authentication_type) ? data.authentication_type : [],
 					infrastructure_type: data?.infrastructure_type ?? null,
 					operating_system: data?.operating_system ?? null,
@@ -202,6 +204,7 @@ export default {
 			const brands = navigator.userAgentData?.brands || []
 
 			return {
+				frontend_version: __APP_VERSION__,
 				browser: this.getBrowserName(userAgent, brands),
 				browser_version: this.getBrowserVersion(userAgent, this.getBrowserName(userAgent, brands)),
 			}
