@@ -121,7 +121,7 @@ loadConfig().then(async (config) => {
 			)
 
 			// Re-resolve route after dynamic addRoute()
-			if (to.matched.length === 0) {
+			if (to.matched.length === 0 || to.name === 'NotFound') {
 				return to.fullPath
 			}
 		} catch (e) {
