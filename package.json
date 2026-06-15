@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "lint": "eslint . --fix",
     "dev": "vite",
     "format": "prettier --write src/",
     "preview": "vite preview"
