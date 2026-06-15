@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import vue from "eslint-plugin-vue";
 import globals from "globals";
+import prettier from "eslint-config-prettier";
 
 export default [
 	{
@@ -19,16 +20,14 @@ export default [
 			}
 		},
 		rules: {
-			indent: ["error", "tab"],
-			"max-len": ["error", { code: 128 }],
-			"no-tabs": "off",
 			"no-unused-vars": ["error", { varsIgnorePattern: "^_" }],
-			"vue/html-indent": ["error", "tab"],
 			"vue/multi-word-component-names": "off",
 			"vue/no-reserved-component-names": "off",
 			"vue/valid-v-slot": "error",
 			"vue/no-multiple-template-root": "off",
 			"vue/no-v-model-argument": "off"
 		}
-	}
+	},
+	// Must be last: disables all ESLint formatting rules that conflict with Prettier.
+	prettier
 ];
