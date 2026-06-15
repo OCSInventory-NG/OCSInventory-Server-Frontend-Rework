@@ -9,6 +9,9 @@ import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	// Deployment base path. Defaults to '/'; set VITE_BASE_PATH (e.g. '/front/')
+	// to serve the app under a sub-path behind a reverse proxy.
+	base: process.env.VITE_BASE_PATH || '/',
 	server: {
 		host: '0.0.0.0',
 		port: 3000

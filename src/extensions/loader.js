@@ -1,3 +1,5 @@
+import { withBase } from "@/utils/basePath"
+
 function loadScript(url) {
 	return new Promise((resolve, reject) => {
 		const s = document.createElement("script")
@@ -22,7 +24,7 @@ export async function loadFrontendExtensions({ apiClient, pluginApi, config }) {
 	window.OCS_EXTENSIONS = window.OCS_EXTENSIONS || {}
   
 	for (const name of enabledNames) {
-		const entry = `/extensions/${name}/plugin.js`
+		const entry = withBase(`extensions/${name}/plugin.js`)
 		await loadScript(entry)
 	
 		const plugin = window.OCS_EXTENSIONS[name]
