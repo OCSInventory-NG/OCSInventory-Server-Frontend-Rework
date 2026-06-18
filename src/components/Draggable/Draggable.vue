@@ -152,12 +152,13 @@ export default {
 				const idx = event?.newIndex
 				if (idx == null || !this.rowdatas?.[idx]) return
 
-				const payload = { ...this.rowdatas[idx] }
-				if (payload.file) delete payload.file
-				if (payload.trigger) delete payload.trigger
-				await this.$api.generic.patch(
-					`${this.apiroute}/${payload.id}/`,
-					payload
+				await Promise.all(
+					this.rowdatas.map((item) => {
+						const payload = { ...item }
+						if (payload.file) delete payload.file
+						if (payload.trigger) delete payload.trigger
+						return this.$api.generic.patch(`${this.apiroute}/${payload.id}/`, payload)
+					})
 				)
 			} catch (e) {
 				console.log(e)
