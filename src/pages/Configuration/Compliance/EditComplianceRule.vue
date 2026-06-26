@@ -47,7 +47,10 @@
 							<b-row class="text-center">
 								<b-col>
 									<p>{{ $t('compliance.type') }} : {{ translatedLabel('compliance.type_', rule.type) }}</p>
-									<p>{{ $t('compliance.severity') }} : {{ translatedLabel('compliance.severity_', rule.severity) }}</p>
+									<p>
+										{{ $t('compliance.severity') }} :
+										{{ translatedLabel('compliance.severity_', rule.severity) }}
+									</p>
 									<p>{{ $t('compliance.enabled') }} : {{ $t("generic." + rule.enabled) }}</p>
 								</b-col>
 							</b-row>

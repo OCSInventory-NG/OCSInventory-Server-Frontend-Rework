@@ -195,7 +195,9 @@
 									<td>
 										<span
 											class="badge text-white"
-											:class="result.status === 'non_compliant' ? 'bg-danger' : (result.status === 'compliant' ? 'bg-success' : 'bg-secondary')"
+											:class="result.status === 'non_compliant'
+												? 'bg-danger'
+												: (result.status === 'compliant' ? 'bg-success' : 'bg-secondary')"
 										>
 											{{ $te('compliance.' + result.status)
 												? $t('compliance.' + result.status)
