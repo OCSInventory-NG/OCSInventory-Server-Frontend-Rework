@@ -87,7 +87,9 @@
 										:key="category.id"
 									>
 									<b-tab
-										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
+										:title="$te('category.'+category.name)
+										? $t('category.'+category.name)
+										: category.name"
 										title-item-class="ocs-menu-tab"
 										@click="scrollToTop()"
 									>
@@ -116,7 +118,13 @@
 															{{ $t('inventory.compliance') }}
 														</div>
 														<div class="datagrid-content">
-															<span :class="complianceStatus === 'compliant' ? 'badge bg-success' : complianceStatus === 'non_compliant' ? 'badge bg-danger' : 'badge bg-secondary'">
+															<span
+										:class="complianceStatus === 'compliant'
+											? 'badge bg-success'
+											: complianceStatus === 'non_compliant'
+												? 'badge bg-danger'
+												: 'badge bg-secondary'"
+									>
 																{{ $t('compliance.' + complianceStatus) }}
 															</span>
 														</div>
@@ -131,9 +139,13 @@
 														<div class="datagrid-content">
 															<span
 																v-if="eolStatus"
-																:class="eolStatus.is_eol ? 'badge bg-danger' : 'badge bg-success'"
+																:class="eolStatus.is_eol
+																	? 'badge bg-danger'
+																	: 'badge bg-success'"
 															>
-																{{ eolStatus.is_eol ? $t('compliance.eol_expired') : $t('compliance.eol_active') }}
+																{{ eolStatus.is_eol
+																	? $t('compliance.eol_expired')
+																	: $t('compliance.eol_active') }}
 															</span>
 															<span
 																v-else
@@ -199,7 +211,7 @@
 											</div>
 										</div>
 										<div v-else>
-											<Alert 
+											<Alert
 												:message="$t('message.no_inventory')"
 												:cols="true"
 												variant="info"
@@ -293,7 +305,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const { type, id } = this.$route.params || {}
+		const { type } = this.$route.params || {}
 
 		if (type === "asset") {
 			this.type = "ASSET"

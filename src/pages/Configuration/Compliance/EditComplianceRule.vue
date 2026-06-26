@@ -46,8 +46,8 @@
 							</b-row>
 							<b-row class="text-center">
 								<b-col>
-									<p>{{ $t('compliance.type') }} : {{ $te('compliance.type_' + rule.type) ? $t('compliance.type_' + rule.type) : rule.type }}</p>
-									<p>{{ $t('compliance.severity') }} : {{ $te('compliance.severity_' + rule.severity) ? $t('compliance.severity_' + rule.severity) : rule.severity }}</p>
+									<p>{{ $t('compliance.type') }} : {{ translatedLabel('compliance.type_', rule.type) }}</p>
+									<p>{{ $t('compliance.severity') }} : {{ translatedLabel('compliance.severity_', rule.severity) }}</p>
 									<p>{{ $t('compliance.enabled') }} : {{ $t("generic." + rule.enabled) }}</p>
 								</b-col>
 							</b-row>
@@ -132,6 +132,11 @@ export default {
 			} finally {
 				this.loading = false
 			}
+		},
+
+		translatedLabel(prefix, value) {
+			const key = prefix + value
+			return this.$te(key) ? this.$t(key) : value
 		},
 
 		async reloadRule() {

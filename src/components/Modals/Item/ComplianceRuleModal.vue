@@ -330,7 +330,9 @@ export default {
 				const tagConfig = configs.find(c => c.name === 'TAG' && c.datatarget === 'ASSET')
 				if (!tagConfig) return
 
-				const dataResponse = await this.$api.generic.get('accountinfo/data/', {}, { object_slug: 'inventory_base.inventorybase' })
+				const dataResponse = await this.$api.generic.get(
+					'accountinfo/data/', {}, { object_slug: 'inventory_base.inventorybase' }
+				)
 				const dataEntries = Array.isArray(dataResponse) ? dataResponse : (dataResponse?.results || [])
 
 				this.tagOptions = [...new Set(

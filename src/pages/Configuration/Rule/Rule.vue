@@ -260,7 +260,9 @@ export default {
 			if (!targets || !targets.length) return this.$t('compliance.target_all')
 			return targets.map(t => {
 				if (t.target_type === 'group') {
-					return this.groupsMap[t.target_value] || this.groupsMap[parseInt(t.target_value)] || `Groupe #${t.target_value}`
+					return this.groupsMap[t.target_value]
+						|| this.groupsMap[parseInt(t.target_value)]
+						|| `Groupe #${t.target_value}`
 				}
 				if (t.target_type === 'tag') return `TAG: ${t.target_value}`
 				return t.target_type

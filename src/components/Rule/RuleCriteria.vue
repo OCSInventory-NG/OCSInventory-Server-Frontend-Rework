@@ -123,10 +123,7 @@
 									<v-select
 										id="field"
 										v-model="input.field"
-										:options="(supportsInventoryFields && input.inventory_section && invfieldopt[masterindex]?.[index]) ? invfieldopt[masterindex][index] : fields.filter(option => {
-											if (option.value !== 'auth_profile.auth_config') return true
-											return input.field === 'auth_profile.auth_config'
-										})"
+										:options="getFieldOptions(input, masterindex, index)"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
@@ -136,9 +133,13 @@
 										@update:model-value="() => onFieldChange(input, masterindex)"
 									/>
 									<b-form-input
-										v-if="input.field && (input.field.includes('metadata') || input.field === 'softwares_versions')"
+										v-if="input.field &&
+										(input.field.includes('metadata') ||
+										input.field === 'softwares_versions')"
 										v-model="input.metadata_field"
-										:placeholder="input.field === 'softwares_versions' ? $t('compliance.software_name_placeholder') : 'Metadata field'"
+										:placeholder="input.field === 'softwares_versions'
+									? $t('compliance.software_name_placeholder')
+									: 'Metadata field'"
 										class="mb-3"
 									/>
 								</b-form-group>
@@ -598,6 +599,17 @@ export default {
 			await this.getModelField()
 		},
 
+		getFieldOptions(input, masterindex, index) {
+			if (this.supportsInventoryFields && input.inventory_section
+				&& this.invfieldopt[masterindex]?.[index]) {
+				return this.invfieldopt[masterindex][index]
+			}
+			return this.fields.filter(option => {
+				if (option.value !== 'auth_profile.auth_config') return true
+				return input.field === 'auth_profile.auth_config'
+			})
+		},
+
 		addAndCondition(masterindex, index, fieldType) {
 			fieldType[masterindex].push({
 				field: "id",
@@ -637,7 +649,9 @@ export default {
 
 		pushInLogicComplexe(object, key, logics) {
 			let fieldVar = logics[key].field
-			if (logics[key].metadata_field && (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")) {
+			const hasMetadataC = logics[key].metadata_field
+				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")
+			if (hasMetadataC) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
@@ -662,7 +676,9 @@ export default {
 
 		pushInLogicSimple(object, key, logics) {
 			let fieldVar = logics[key].field
-			if (logics[key].metadata_field && (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")) {
+			const hasMetadataS = logics[key].metadata_field
+				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")
+			if (hasMetadataS) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
@@ -1065,7 +1081,9 @@ export default {
 				this.templateopt[masterindex][index] = rows
 					.map(t => ({ value: t.id, text: t.name }))
 					.sort((a, b) => a.text > b.text ? 1 : -1)
-			} catch {}
+			} catch {
+				// ignore fetch error
+			}
 			this.loadingtemplate = false
 		},
 
@@ -1084,7 +1102,9 @@ export default {
 				this.sectionopt[masterindex][index] = rows
 					.map(s => ({ value: s.id, text: s.name }))
 					.sort((a, b) => a.text > b.text ? 1 : -1)
-			} catch {}
+			} catch {
+				// ignore fetch error
+			}
 			this.loadingsection = false
 		},
 
@@ -1100,7 +1120,9 @@ export default {
 				this.invfieldopt[masterindex][index] = rows
 					.map(f => ({ value: 'inventory.' + f.id, text: f.name }))
 					.sort((a, b) => a.text > b.text ? 1 : -1)
-			} catch {}
+			} catch {
+				// ignore fetch error
+			}
 			this.loadingfield = false
 		},
 	}
