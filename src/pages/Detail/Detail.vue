@@ -82,21 +82,25 @@
 									card
 									vertical
 								>
-									<b-tab
+									<template
 										v-for="category in categories"
 										:key="category.id"
+									>
+									<b-tab
 										:title="$te('category.'+category.name) ? $t('category.'+category.name) : category.name"
 										title-item-class="ocs-menu-tab"
 										@click="scrollToTop()"
 									>
 										<div v-if="category.id == 1">
 											<div class="datagrid">
-												<div 
+												<template
 													v-for="(value,key) in device"
 													:key="key"
-													class="datagrid-item"
 												>
-													<div v-if="!['templateid', 'matched'].includes(key)">
+													<div
+														v-if="!['templateid', 'matched'].includes(key)"
+														class="datagrid-item"
+													>
 														<div class="datagrid-title">
 															{{ $t(translationkey+key) }}
 														</div>
@@ -104,7 +108,42 @@
 															{{ formatDate(value, key) }}
 														</div>
 													</div>
-												</div>
+													<div
+														v-if="key === 'is_template_forced' && complianceStatus"
+														class="datagrid-item"
+													>
+														<div class="datagrid-title">
+															{{ $t('inventory.compliance') }}
+														</div>
+														<div class="datagrid-content">
+															<span :class="complianceStatus === 'compliant' ? 'badge bg-success' : complianceStatus === 'non_compliant' ? 'badge bg-danger' : 'badge bg-secondary'">
+																{{ $t('compliance.' + complianceStatus) }}
+															</span>
+														</div>
+													</div>
+													<div
+														v-if="key === 'is_template_forced'"
+														class="datagrid-item"
+													>
+														<div class="datagrid-title">
+															{{ $t('inventory.eol') }}
+														</div>
+														<div class="datagrid-content">
+															<span
+																v-if="eolStatus"
+																:class="eolStatus.is_eol ? 'badge bg-danger' : 'badge bg-success'"
+															>
+																{{ eolStatus.is_eol ? $t('compliance.eol_expired') : $t('compliance.eol_active') }}
+															</span>
+															<span
+																v-else
+																class="badge bg-secondary"
+															>
+																{{ $t('compliance.eol_unknown') }}
+															</span>
+														</div>
+													</div>
+												</template>
 											</div><br><br>
 											<div align="center">
 												<h2>{{ $t("title.accountinfo") }}</h2>
@@ -167,6 +206,15 @@
 											/>
 										</div>
 									</b-tab>
+									<b-tab
+										v-if="category.id === 1"
+										:title="$t('compliance.title')"
+										title-item-class="ocs-menu-tab"
+										@click="scrollToTop()"
+									>
+										<ComplianceDetail :asset-id="device.id" />
+									</b-tab>
+									</template>
 								</b-tabs>
 							</div>
 							<div v-else>
@@ -233,15 +281,15 @@ export default {
 			type: null,
 			slug: null,
 			translationkey: null,
-			id: null,
 			reload: false,
 			deployment: [],
 			device: {},
 			categories: [],
-			sections: [],
 			activetab: 0,
 
 			loading: true,
+			complianceStatus: null,
+			eolStatus: null,
 		}
 	},
 	async mounted() {
@@ -251,10 +299,11 @@ export default {
 			this.type = "ASSET"
 			this.slug = "inventory_base.inventorybase"
 			this.translationkey = "inventory."
-			if (id) this.id = id
 
 			// Get inventory base
 			await this.getInventoryBase()
+			this.getComplianceStatus()
+			this.getEolStatus()
 			// Get categories
 			await this.getCategories()
 			return
@@ -357,6 +406,35 @@ export default {
 			}
 		},
 
+		async getEolStatus() {
+			try {
+				const data = await this.$api.generic.get(
+					"compliance/eol-status/",
+					{},
+					{ asset: this.device.id }
+				)
+				const results = Array.isArray(data) ? data : (data?.results || [])
+				this.eolStatus = results[0] ?? null
+			} catch {
+				// non-blocking
+			}
+		},
+
+		async getComplianceStatus() {
+			try {
+				const data = await this.$api.generic.get(
+					"compliance/results/asset-summary/",
+					{},
+					{ asset__in: this.device.id }
+				)
+				const results = Array.isArray(data) ? data : (data?.results || [])
+				const entry = results.find(r => r.asset == this.device.id)
+				this.complianceStatus = entry?.global_status ?? 'not_applicable'
+			} catch {
+				// non-blocking
+			}
+		},
+
 		reloadDeployment() {
 			this.reload = true
 		},
@@ -369,7 +447,7 @@ export default {
 			await this.getCategories()
 
 			this.$nextTick(() => {
-				this.activeTab = currentTab
+				this.activetab = currentTab
 			})
 		},
 

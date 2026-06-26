@@ -235,6 +235,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/inventory/compliance',
+		name: 'ComplianceDashboard',
+		component: () => import('@/pages/Inventory/Tools/ComplianceDashboard.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/deployment/packages',
 		name: 'Packages',
 		component: () => import('@/pages/Deployment/Package.vue'),
@@ -300,6 +308,24 @@ const routes = [
 			layout: AppLayout
 		}
 	},
+	{
+		path: '/configurations/compliance/rules/:id',
+		name: 'EditComplianceRule',
+		component: () => import('@/pages/Configuration/Compliance/EditComplianceRule.vue'),
+		props: true,
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/compliance/windows-build-mapping',
+		name: 'WindowsBuildMapping',
+		component: () => import('@/pages/Configuration/Compliance/WindowsBuildMapping.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',

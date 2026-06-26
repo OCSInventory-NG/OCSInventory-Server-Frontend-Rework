@@ -89,12 +89,41 @@
 									</span>
 								</b-form-group>
 							</b-col>
+							<b-col v-if="supportsInventoryFields">
+								<v-select
+									v-model="input.inventory_template"
+									:options="templateopt[masterindex]?.[index] || []"
+									:loading="loadingtemplate"
+									:clearable="true"
+									:reduce="t => t.value"
+									label="text"
+									class="mb-3 ocs-select"
+									:disabled="viewOnly"
+									:placeholder="$t('compliance.select_template')"
+									@open="loadTemplatesIfNeeded(masterindex, index)"
+									@update:model-value="val => onTemplateChange(val, input, masterindex, index)"
+								/>
+							</b-col>
+							<b-col v-if="supportsInventoryFields && input.inventory_template">
+								<v-select
+									v-model="input.inventory_section"
+									:options="sectionopt[masterindex]?.[index] || []"
+									:loading="loadingsection"
+									:clearable="false"
+									:reduce="s => s.value"
+									label="text"
+									class="mb-3 ocs-select"
+									:disabled="viewOnly"
+									:placeholder="$t('compliance.select_section')"
+									@update:model-value="val => onSectionChange(val, input, masterindex, index)"
+								/>
+							</b-col>
 							<b-col>
 								<b-form-group>
 									<v-select
 										id="field"
 										v-model="input.field"
-										:options="fields.filter(option => {
+										:options="(supportsInventoryFields && input.inventory_section && invfieldopt[masterindex]?.[index]) ? invfieldopt[masterindex][index] : fields.filter(option => {
 											if (option.value !== 'auth_profile.auth_config') return true
 											return input.field === 'auth_profile.auth_config'
 										})"
@@ -107,9 +136,9 @@
 										@update:model-value="() => onFieldChange(input, masterindex)"
 									/>
 									<b-form-input
-										v-if="input.field && input.field.includes('metadata')"
+										v-if="input.field && (input.field.includes('metadata') || input.field === 'softwares_versions')"
 										v-model="input.metadata_field"
-										placeholder="Metadata field"
+										:placeholder="input.field === 'softwares_versions' ? $t('compliance.software_name_placeholder') : 'Metadata field'"
 										class="mb-3"
 									/>
 								</b-form-group>
@@ -273,7 +302,10 @@ export default {
 		id: { type: String, required: true },
 		trigger: { type: String, default: "inventory_received" },
 		logic: { type: Object, default: null },
-		viewOnly: { type: Boolean, default: false }
+		viewOnly: { type: Boolean, default: false },
+		customFields: { type: Array, default: null },
+		saveApiPath: { type: String, default: null },
+		supportsInventoryFields: { type: Boolean, default: false },
 	},
 	data() {
 		return {
@@ -337,7 +369,9 @@ export default {
 						operator: "==",
 						value: null,
 						case_sensitive: false,
-						metadata_field: null
+						metadata_field: null,
+						inventory_template: null,
+						inventory_section: null,
 					}
 				]
 			],
@@ -347,6 +381,11 @@ export default {
 
 			loading: true,
 			loadingfield: true,
+			templateopt: [],
+			sectionopt: [],
+			invfieldopt: [],
+			loadingtemplate: false,
+			loadingsection: false,
 		}
 	},
 	watch: {
@@ -370,6 +409,16 @@ export default {
 
 		async getModelField() {
 			this.loadingfield = true
+
+			if (this.customFields) {
+				this.fields = [...this.customFields]
+				this.loadingfield = false
+				this.loading = false
+				if (this.supportsInventoryFields) {
+					this.loadExistingInventoryFields()
+				}
+				return
+			}
 
 			try {
 				const route = this.triggermodel[this.trigger].route
@@ -426,25 +475,31 @@ export default {
 			Object.keys(this.logic || {}).forEach((key) => {
 				if (!this.links.includes(key)) {
 					if (key !== "case_sensitive") {
-						let fullVar = this.logic[key][0].var ?? this.logic[key][1].var
-						let metadata_field = null
+						{
+							let fullVar = this.logic[key][0]?.var ?? this.logic[key][1]?.var
+							let metadata_field = null
 
-						if (fullVar && fullVar.includes(".metadata.")) {
-							metadata_field = fullVar.split(".metadata.")[1]
-							fullVar = fullVar.split(".metadata.")[0] + ".metadata"
+							if (fullVar && fullVar.includes(".metadata.")) {
+								metadata_field = fullVar.split(".metadata.")[1]
+								fullVar = fullVar.split(".metadata.")[0] + ".metadata"
+							}
+							if (fullVar && fullVar.startsWith("softwares_versions.")) {
+								metadata_field = fullVar.split("softwares_versions.")[1]
+								fullVar = "softwares_versions"
+							}
+							this.datavalues = [
+								[
+									{
+										field: fullVar,
+										metadata_field,
+										operator: key,
+										value: (this.logic[key][1] && this.logic[key][1].var)
+											? this.logic[key][0]
+											: (this.logic[key][1] ? this.logic[key][1] : null),
+									},
+								],
+							]
 						}
-						this.datavalues = [
-							[
-								{
-									field: fullVar,
-									metadata_field,
-									operator: key,
-									value: (this.logic[key][1] && this.logic[key][1].var)
-										? this.logic[key][0]
-										: (this.logic[key][1] ? this.logic[key][1] : null),
-								},
-							],
-						]
 					} else {
 						this.datavalues[0][0].case_sensitive = this.logic[key]
 					}
@@ -455,8 +510,8 @@ export default {
 						Object.keys(this.logic[key][and]).forEach((operator) => {
 							if (operator !== "case_sensitive") {
 								this.datavalues[masterindex].push({
-									field: this.logic[key][and][operator][0].var
-										?? this.logic[key][and][operator][1].var,
+									field: this.logic[key][and][operator][0]?.var
+										?? this.logic[key][and][operator][1]?.var,
 									operator: operator,
 									value: (this.logic[key][and][operator][1] && this.logic[key][and][operator][1].var)
 										? this.logic[key][and][operator][0]
@@ -481,8 +536,8 @@ export default {
 									Object.keys(this.logic[key][or][key2][and]).forEach((operator) => {
 										if (operator !== "case_sensitive") {
 											this.datavalues[currentIndex].push({
-												field: this.logic[key][or][key2][and][operator][0].var
-													?? this.logic[key][or][key2][and][operator][1].var,
+												field: this.logic[key][or][key2][and][operator][0]?.var
+													?? this.logic[key][or][key2][and][operator][1]?.var,
 												operator: operator,
 												value: (this.logic[key][or][key2][and][operator][1]
 													&& this.logic[key][or][key2][and][operator][1].var)
@@ -502,8 +557,8 @@ export default {
 							} else {
 								if (key2 !== "case_sensitive") {
 									this.datavalues[currentIndex].push({
-										field: this.logic[key][or][key2][0].var
-											?? this.logic[key][or][key2][1].var,
+										field: this.logic[key][or][key2][0]?.var
+											?? this.logic[key][or][key2][1]?.var,
 										operator: key2,
 										value: (this.logic[key][or][key2][1] && this.logic[key][or][key2][1].var)
 											? this.logic[key][or][key2][0]
@@ -526,9 +581,13 @@ export default {
 			})
 			this.datavalues.forEach(masterInput => {
 				masterInput.forEach(input => {
-					if (input.field.includes(".metadata.") && input.metadata_field == null) {
+					if (input.field && input.field.includes(".metadata.") && input.metadata_field == null) {
 						input.metadata_field = input.field.split(".metadata.")[1]
 						input.field = input.field.split(".metadata.")[0] + ".metadata"
+					}
+					if (input.field && input.field.startsWith("softwares_versions.") && input.metadata_field == null) {
+						input.metadata_field = input.field.split("softwares_versions.")[1]
+						input.field = "softwares_versions"
 					}
 				})
 			})
@@ -545,7 +604,9 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null
+				metadata_field: null,
+				inventory_template: null,
+				inventory_section: null,
 			})
 		},
 
@@ -562,7 +623,9 @@ export default {
 				operator: "==",
 				value: null,
 				case_sensitive: false,
-				metadata_field: null
+				metadata_field: null,
+				inventory_template: null,
+				inventory_section: null,
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -574,7 +637,7 @@ export default {
 
 		pushInLogicComplexe(object, key, logics) {
 			let fieldVar = logics[key].field
-			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+			if (logics[key].metadata_field && (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
@@ -599,7 +662,7 @@ export default {
 
 		pushInLogicSimple(object, key, logics) {
 			let fieldVar = logics[key].field
-			if (logics[key].metadata_field && logics[key].field.includes("metadata")) {
+			if (logics[key].metadata_field && (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
 			if (this.disabledvalue.includes(logics[key].operator)) {
@@ -665,7 +728,7 @@ export default {
 				this.logicupdate.logic = logicTmp
 
 				await this.$api.generic.patch(
-					`automation/rule/${this.id}/`,
+					this.saveApiPath || `automation/rule/${this.id}/`,
 					this.logicupdate
 				)
 
@@ -972,7 +1035,74 @@ export default {
 			this.datavalues.forEach((_row, masterindex) => {
 				this.normalizeAuthConditionsForRow(masterindex)
 			})
-		}
+		},
+
+		loadExistingInventoryFields() {
+			const all = this.datavalues.flat()
+			for (const input of all) {
+				if (input.field?.startsWith('inventory.')) {
+					const fid = input.field.split('.')[1]
+					if (!this.fields.find(x => x.value === input.field)) {
+						this.$api.generic.get(`fields/${fid}/`)
+							.then(f => {
+								if (!this.fields.find(x => x.value === input.field)) {
+									this.fields.push({ value: input.field, text: f.name })
+								}
+							})
+							.catch(() => {})
+					}
+				}
+			}
+		},
+
+		async loadTemplatesIfNeeded(masterindex, index) {
+			if (this.templateopt[masterindex]?.[index]?.length > 0) return
+			this.loadingtemplate = true
+			if (!Array.isArray(this.templateopt[masterindex])) this.templateopt[masterindex] = []
+			try {
+				const data = await this.$api.generic.get('templates/')
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.templateopt[masterindex][index] = rows
+					.map(t => ({ value: t.id, text: t.name }))
+					.sort((a, b) => a.text > b.text ? 1 : -1)
+			} catch {}
+			this.loadingtemplate = false
+		},
+
+		async onTemplateChange(templateId, input, masterindex, index) {
+			input.inventory_section = null
+			input.field = ''
+			if (!Array.isArray(this.sectionopt[masterindex])) this.sectionopt[masterindex] = []
+			this.sectionopt[masterindex][index] = []
+			if (!Array.isArray(this.invfieldopt[masterindex])) this.invfieldopt[masterindex] = []
+			this.invfieldopt[masterindex][index] = []
+			if (!templateId) return
+			this.loadingsection = true
+			try {
+				const data = await this.$api.generic.get('sections/', {}, { template: templateId })
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.sectionopt[masterindex][index] = rows
+					.map(s => ({ value: s.id, text: s.name }))
+					.sort((a, b) => a.text > b.text ? 1 : -1)
+			} catch {}
+			this.loadingsection = false
+		},
+
+		async onSectionChange(sectionId, input, masterindex, index) {
+			input.field = ''
+			if (!Array.isArray(this.invfieldopt[masterindex])) this.invfieldopt[masterindex] = []
+			this.invfieldopt[masterindex][index] = []
+			if (!sectionId) return
+			this.loadingfield = true
+			try {
+				const data = await this.$api.generic.get('fields/', {}, { section: sectionId })
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.invfieldopt[masterindex][index] = rows
+					.map(f => ({ value: 'inventory.' + f.id, text: f.name }))
+					.sort((a, b) => a.text > b.text ? 1 : -1)
+			} catch {}
+			this.loadingfield = false
+		},
 	}
 }
 </script>

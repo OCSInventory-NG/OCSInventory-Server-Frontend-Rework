@@ -1,6 +1,6 @@
 <template lang="">
-	<div 
-		id="rules" 
+	<div
+		id="rules"
 		class="container-xl"
 	>
 		<div>
@@ -10,14 +10,14 @@
 				<div class="card">
 					<div class="card-body">
 						<div v-if="errored">
-							<Alert 
+							<Alert
 								:message="errormsg"
 								:cols="true"
 								variant="danger"
 							/>
 						</div>
 
-						<div 
+						<div
 							v-if="loading"
 							class="ocs-loader"
 						>
@@ -26,11 +26,16 @@
 
 						<div v-else>
 							<RuleModal
-								v-if="canadd"
+								v-if="canadd && activeTab < triggers.length"
 								@reload-datatable="reloadDatatable"
 							/>
+							<ComplianceRuleModal
+								v-if="canaddcompliance && activeTab >= triggers.length"
+								@reload-datatable="reloadComplianceDatatable"
+							/>
 
-							<b-tabs 
+							<b-tabs
+								v-model="activeTab"
 								content-class="mt-3"
 								fill
 							>
@@ -56,6 +61,27 @@
 										@reload-datatable="reloadDatatable"
 									/>
 								</b-tab>
+								<b-tab
+									v-if="canviewcompliance"
+									:title="$t('compliance.title')"
+								>
+									<Draggable
+										id="compliance-rules-datatable"
+										:key="`compliance-${complianceDraggableKey}`"
+										:rowdata="complianceRowdata"
+										:rowheader="complianceRowheader"
+										:candelete="candeletecompliance"
+										:canedit="caneditcompliance"
+										:canviewruleaction="canviewcomplianceaction"
+										ruleactionroute="/configurations/compliance/rules"
+										:apiroute="'compliance/rules'"
+										is-sticky
+										editcomponent="ComplianceRuleModal"
+										title="compliance/rules"
+										translationkey="compliance."
+										@reload-datatable="reloadComplianceDatatable"
+									/>
+								</b-tab>
 							</b-tabs>
 						</div>
 					</div>
@@ -78,10 +104,22 @@ export default {
 			canview: false,
 			canviewaction: false,
 
+			canviewcompliance: false,
+			canaddcompliance: false,
+			caneditcompliance: false,
+			candeletecompliance: false,
+			canviewcomplianceaction: false,
+
 			triggers: [],
 			rowdata: [],
 			rowheader: [],
 			draggableKey: 0,
+
+			complianceRowdata: [],
+			complianceRowheader: [],
+			complianceDraggableKey: 0,
+			activeTab: 0,
+			groupsMap: {},
 
 			excludefields: ["logic", "actions"],
 
@@ -93,20 +131,13 @@ export default {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
-		if (permissions.includes("rule_view_rule")) {
-			this.canview = true
-			if (permissions.includes("rule_add_rule")) {
-				this.canadd = true
-			}
-			if (permissions.includes("rule_change_rule")) {
-				this.canedit = true
-			}
-			if (permissions.includes("rule_delete_rule")) {
-				this.candelete = true
-			}
-			if (permissions.includes("rule_view_action")) {
-				this.canviewaction = true
-			}
+		this.canview = permissions.includes("rule_view_rule")
+
+		if (this.canview) {
+			this.canadd = permissions.includes("rule_add_rule")
+			this.canedit = permissions.includes("rule_change_rule")
+			this.candelete = permissions.includes("rule_delete_rule")
+			this.canviewaction = permissions.includes("rule_view_action")
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -115,22 +146,29 @@ export default {
 			return
 		}
 
-		// Data init
+		if (permissions.includes("compliance_view_compliancerule")) {
+			this.canviewcompliance = true
+			this.canaddcompliance = permissions.includes("compliance_add_compliancerule")
+			this.caneditcompliance = permissions.includes("compliance_change_compliancerule")
+			this.candeletecompliance = permissions.includes("compliance_delete_compliancerule")
+			this.canviewcomplianceaction = permissions.includes("compliance_change_compliancerule")
+		}
+
 		await this.loadInitial()
+		if (this.canviewcompliance) {
+			this.loadComplianceInitial()
+		}
 	},
 	methods: {
 		async loadInitial() {
 			this.loading = true
 			this.isbusy = true
 			try {
-				// Get header
 				const header = await this.$api.generic.options("automation/rule/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
 					(f) => !this.excludefields.includes(f)
 				)
-				//Get triggers
 				await this.getTriggers()
-				// Get rules
 				await this.getRules()
 
 				this.errored = false
@@ -187,7 +225,52 @@ export default {
 		async reloadDatatable() {
 			await this.getRules()
 			this.draggableKey += 1
-		}
+		},
+
+		async loadComplianceInitial() {
+			try {
+				const header = await this.$api.generic.options("compliance/rules/")
+				this.complianceRowheader = Object.keys(header.actions.POST).filter(
+					(f) => !["logic"].includes(f)
+				)
+				const groupsData = await this.$api.generic.get('asset/groups/')
+				const groups = Array.isArray(groupsData) ? groupsData : (groupsData?.results || [])
+				groups.forEach(g => { this.groupsMap[g.id] = g.name })
+				await this.getComplianceRules()
+				this.complianceDraggableKey += 1
+			} catch (e) {
+				// non-fatal, compliance tab will be empty
+			}
+		},
+
+		async getComplianceRules() {
+			try {
+				const data = await this.$api.generic.get("compliance/rules/", {}, { expand: "targets" })
+				const rules = Array.isArray(data) ? data : (data?.results || [])
+				this.complianceRowdata = rules.map(rule => ({
+					...rule,
+					targets: this._formatTargets(rule.targets),
+				}))
+			} catch (e) {
+				this.complianceRowdata = []
+			}
+		},
+
+		_formatTargets(targets) {
+			if (!targets || !targets.length) return this.$t('compliance.target_all')
+			return targets.map(t => {
+				if (t.target_type === 'group') {
+					return this.groupsMap[t.target_value] || this.groupsMap[parseInt(t.target_value)] || `Groupe #${t.target_value}`
+				}
+				if (t.target_type === 'tag') return `TAG: ${t.target_value}`
+				return t.target_type
+			}).join(', ')
+		},
+
+		async reloadComplianceDatatable() {
+			await this.getComplianceRules()
+			this.complianceDraggableKey += 1
+		},
 	}
 }
 </script>

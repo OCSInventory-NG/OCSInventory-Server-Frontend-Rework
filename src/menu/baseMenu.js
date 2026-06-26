@@ -70,6 +70,12 @@ export const baseMenu = [
 				column: "tools",
 			},
 			{
+				headerKey: "title.compliance",
+				link: "/inventory/compliance",
+				route: "ComplianceDashboard",
+				column: "tools",
+			},
+			{
 				headerKey: "title.software_dictionary",
 				link: "/inventory/software_dictionary",
 				route: "AllSoftware",
@@ -222,6 +228,12 @@ export const baseMenu = [
 				headerKey: "title.software_mapping",
 				link: "/configurations/software_mapping",
 				route: "SoftwareMapping",
+				column: "inventory",
+			},
+			{
+				headerKey: "title.compliance_config",
+				link: "/configurations/compliance/windows-build-mapping",
+				route: "WindowsBuildMapping",
 				column: "inventory",
 			},
 			{

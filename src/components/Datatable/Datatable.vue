@@ -571,6 +571,16 @@
 								@reload-datatable="reloadDatatable"
 							/>
 							<router-link
+								v-if="detailroute"
+								:to="detailroute + '/' + row.item.id"
+								:title="$t('generic.edit')"
+								class="btn btn-ghost-dark"
+							>
+								<font-awesome-icon
+									:icon="['far', 'file-lines']"
+								/>
+							</router-link>
+							<router-link
 								v-if="viewautomationhistory"
 								:to="'/configurations/automations/history/'+row.item.id"
 								:title="$t('scheduler.see_history')"
@@ -690,6 +700,7 @@ export default {
 		assetgroupid: { type: [String, Number], default: null },
 		assets: { type: [Array, Object], default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
+		detailroute: { type: String, default: null },
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
 		serverTotalRows: { type: Number, default: 0 },
@@ -884,7 +895,7 @@ export default {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
 			this.redirectto = "asset"
 		}
-		else if(this.title == "inventory_logs") {
+		else if(this.title == "inventory_logs" || this.title == "compliance_results" || this.title == "compliance_eol") {
 			this.redirectto = "asset"
 		} else {
 			this.redirectto = this.title
@@ -1348,7 +1359,10 @@ export default {
 
 			rows.forEach(row => {
 				const values = headers.map(h => {
-					const v = row[h] != null ? String(row[h]) : ''
+					const val = row[h]
+					const v = val != null
+						? (typeof val === 'object' ? (val.name ?? val.id ?? '') : String(val))
+						: ''
 					return `"${v.replace(/"/g, '""')}"`
 				})
 				csvRows.push(values.join(';'))
