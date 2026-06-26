@@ -86,146 +86,146 @@
 										v-for="category in categories"
 										:key="category.id"
 									>
-									<b-tab
-										:title="$te('category.'+category.name)
-										? $t('category.'+category.name)
-										: category.name"
-										title-item-class="ocs-menu-tab"
-										@click="scrollToTop()"
-									>
-										<div v-if="category.id == 1">
-											<div class="datagrid">
-												<template
-													v-for="(value,key) in device"
-													:key="key"
-												>
-													<div
-														v-if="!['templateid', 'matched'].includes(key)"
-														class="datagrid-item"
+										<b-tab
+											:title="$te('category.'+category.name)
+												? $t('category.'+category.name)
+												: category.name"
+											title-item-class="ocs-menu-tab"
+											@click="scrollToTop()"
+										>
+											<div v-if="category.id == 1">
+												<div class="datagrid">
+													<template
+														v-for="(value,key) in device"
+														:key="key"
 													>
-														<div class="datagrid-title">
-															{{ $t(translationkey+key) }}
+														<div
+															v-if="!['templateid', 'matched'].includes(key)"
+															class="datagrid-item"
+														>
+															<div class="datagrid-title">
+																{{ $t(translationkey+key) }}
+															</div>
+															<div class="datagrid-content">
+																{{ formatDate(value, key) }}
+															</div>
 														</div>
-														<div class="datagrid-content">
-															{{ formatDate(value, key) }}
+														<div
+															v-if="key === 'is_template_forced' && complianceStatus"
+															class="datagrid-item"
+														>
+															<div class="datagrid-title">
+																{{ $t('inventory.compliance') }}
+															</div>
+															<div class="datagrid-content">
+																<span
+																	:class="complianceStatus === 'compliant'
+																		? 'badge bg-success'
+																		: complianceStatus === 'non_compliant'
+																			? 'badge bg-danger'
+																			: 'badge bg-secondary'"
+																>
+																	{{ $t('compliance.' + complianceStatus) }}
+																</span>
+															</div>
 														</div>
-													</div>
-													<div
-														v-if="key === 'is_template_forced' && complianceStatus"
-														class="datagrid-item"
-													>
-														<div class="datagrid-title">
-															{{ $t('inventory.compliance') }}
+														<div
+															v-if="key === 'is_template_forced'"
+															class="datagrid-item"
+														>
+															<div class="datagrid-title">
+																{{ $t('inventory.eol') }}
+															</div>
+															<div class="datagrid-content">
+																<span
+																	v-if="eolStatus"
+																	:class="eolStatus.is_eol
+																		? 'badge bg-danger'
+																		: 'badge bg-success'"
+																>
+																	{{ eolStatus.is_eol
+																		? $t('compliance.eol_expired')
+																		: $t('compliance.eol_active') }}
+																</span>
+																<span
+																	v-else
+																	class="badge bg-secondary"
+																>
+																	{{ $t('compliance.eol_unknown') }}
+																</span>
+															</div>
 														</div>
-														<div class="datagrid-content">
-															<span
-										:class="complianceStatus === 'compliant'
-											? 'badge bg-success'
-											: complianceStatus === 'non_compliant'
-												? 'badge bg-danger'
-												: 'badge bg-secondary'"
-									>
-																{{ $t('compliance.' + complianceStatus) }}
-															</span>
-														</div>
-													</div>
-													<div
-														v-if="key === 'is_template_forced'"
-														class="datagrid-item"
-													>
-														<div class="datagrid-title">
-															{{ $t('inventory.eol') }}
-														</div>
-														<div class="datagrid-content">
-															<span
-																v-if="eolStatus"
-																:class="eolStatus.is_eol
-																	? 'badge bg-danger'
-																	: 'badge bg-success'"
-															>
-																{{ eolStatus.is_eol
-																	? $t('compliance.eol_expired')
-																	: $t('compliance.eol_active') }}
-															</span>
-															<span
-																v-else
-																class="badge bg-secondary"
-															>
-																{{ $t('compliance.eol_unknown') }}
-															</span>
-														</div>
-													</div>
-												</template>
-											</div><br><br>
-											<div align="center">
-												<h2>{{ $t("title.accountinfo") }}</h2>
-											</div>
-											<fieldset class="form-fieldset">
-												<Accountinfo
+													</template>
+												</div><br><br>
+												<div align="center">
+													<h2>{{ $t("title.accountinfo") }}</h2>
+												</div>
+												<fieldset class="form-fieldset">
+													<Accountinfo
+														:id="device.id"
+														:type="type"
+														:slug="slug"
+													/>
+												</fieldset><br>
+
+												<div align="center">
+													<h2>{{ $t("title.notes") }}</h2>
+												</div>
+												<Notes
 													:id="device.id"
 													:type="type"
 													:slug="slug"
+												/><br>
+
+												<ExtensionSlot
+													name="inventory.asset.detail.afterAccountInfo"
+													:context="{ assetId: device?.id }"
+												/><br>
+											</div>
+											<div v-if="category.id == 2 && device.osname != 'SNMP'">
+												<div align="center">
+													<h2>{{ $t("title.deployment") }}</h2>
+												</div>
+
+												<ResultDetail
+													:id="$route.params.id"
+													:reload="reload"
+													@end-reload-deployment="endReloadDeployment"
 												/>
-											</fieldset><br>
-
-											<div align="center">
-												<h2>{{ $t("title.notes") }}</h2>
 											</div>
-											<Notes
-												:id="device.id"
-												:type="type"
-												:slug="slug"
-											/><br>
-
-											<ExtensionSlot
-												name="inventory.asset.detail.afterAccountInfo"
-												:context="{ assetId: device?.id }"
-											/><br>
-										</div>
-										<div v-if="category.id == 2 && device.osname != 'SNMP'">
-											<div align="center">
-												<h2>{{ $t("title.deployment") }}</h2>
-											</div>
-
-											<ResultDetail
-												:id="$route.params.id"
-												:reload="reload"
-												@end-reload-deployment="endReloadDeployment"
-											/>
-										</div>
-										<div
-											v-if="category.inventory_sections
-												&& category.inventory_sections.some(
-													section => section.template == device.templateid
-												)"
-										>
 											<div
-												v-for="section in category.inventory_sections"
-												:key="section.id"
+												v-if="category.inventory_sections
+													&& category.inventory_sections.some(
+														section => section.template == device.templateid
+													)"
 											>
-												<Inventory
-													v-if="section.template == device.templateid"
-													:section="section"
-													:base="device.id"
+												<div
+													v-for="section in category.inventory_sections"
+													:key="section.id"
+												>
+													<Inventory
+														v-if="section.template == device.templateid"
+														:section="section"
+														:base="device.id"
+													/>
+												</div>
+											</div>
+											<div v-else>
+												<Alert
+													:message="$t('message.no_inventory')"
+													:cols="true"
+													variant="info"
 												/>
 											</div>
-										</div>
-										<div v-else>
-											<Alert
-												:message="$t('message.no_inventory')"
-												:cols="true"
-												variant="info"
-											/>
-										</div>
-									</b-tab>
-									<b-tab
-										v-if="category.id === 1"
-										:title="$t('compliance.title')"
-										title-item-class="ocs-menu-tab"
-										@click="scrollToTop()"
-									>
-										<ComplianceDetail :asset-id="device.id" />
-									</b-tab>
+										</b-tab>
+										<b-tab
+											v-if="category.id === 1"
+											:title="$t('compliance.title')"
+											title-item-class="ocs-menu-tab"
+											@click="scrollToTop()"
+										>
+											<ComplianceDetail :asset-id="device.id" />
+										</b-tab>
 									</template>
 								</b-tabs>
 							</div>

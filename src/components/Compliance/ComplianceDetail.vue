@@ -101,15 +101,25 @@
 						class="datagrid"
 					>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.eol_product') }}</div>
-							<div class="datagrid-content">{{ eolData.product || '-' }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.eol_product') }}
+							</div>
+							<div class="datagrid-content">
+								{{ eolData.product || '-' }}
+							</div>
 						</div>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.eol_cycle') }}</div>
-							<div class="datagrid-content">{{ eolData.cycle || '-' }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.eol_cycle') }}
+							</div>
+							<div class="datagrid-content">
+								{{ eolData.cycle || '-' }}
+							</div>
 						</div>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.eol_date') }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.eol_date') }}
+							</div>
 							<div class="datagrid-content">
 								<span :class="eolData.is_eol ? 'text-danger fw-bold' : ''">
 									{{ eolData.eol || '-' }}
@@ -117,15 +127,25 @@
 							</div>
 						</div>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.eol_support') }}</div>
-							<div class="datagrid-content">{{ eolData.support || '-' }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.eol_support') }}
+							</div>
+							<div class="datagrid-content">
+								{{ eolData.support || '-' }}
+							</div>
 						</div>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.eol_latest') }}</div>
-							<div class="datagrid-content">{{ eolData.latest || '-' }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.eol_latest') }}
+							</div>
+							<div class="datagrid-content">
+								{{ eolData.latest || '-' }}
+							</div>
 						</div>
 						<div class="datagrid-item">
-							<div class="datagrid-title">{{ $t('compliance.col_status') }}</div>
+							<div class="datagrid-title">
+								{{ $t('compliance.col_status') }}
+							</div>
 							<div class="datagrid-content">
 								<span :class="eolData.is_eol ? 'badge bg-danger' : 'badge bg-success'">
 									{{ eolData.is_eol ? $t('compliance.eol_expired') : $t('compliance.eol_active') }}

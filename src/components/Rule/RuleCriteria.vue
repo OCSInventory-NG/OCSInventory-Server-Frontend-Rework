@@ -134,12 +134,12 @@
 									/>
 									<b-form-input
 										v-if="input.field &&
-										(input.field.includes('metadata') ||
-										input.field === 'softwares_versions')"
+											(input.field.includes('metadata') ||
+												input.field === 'softwares_versions')"
 										v-model="input.metadata_field"
 										:placeholder="input.field === 'softwares_versions'
-									? $t('compliance.software_name_placeholder')
-									: 'Metadata field'"
+											? $t('compliance.software_name_placeholder')
+											: 'Metadata field'"
 										class="mb-3"
 									/>
 								</b-form-group>
