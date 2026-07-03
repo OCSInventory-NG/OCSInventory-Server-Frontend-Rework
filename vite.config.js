@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
+import pkg from './package.json'
 import vue from '@vitejs/plugin-vue'
 import { resolve, dirname } from 'path'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
@@ -9,6 +10,9 @@ import { BootstrapVueNextResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	define: {
+		__APP_VERSION__: JSON.stringify(pkg.version),
+	},
 	server: {
 		host: '0.0.0.0',
 		port: 3000
