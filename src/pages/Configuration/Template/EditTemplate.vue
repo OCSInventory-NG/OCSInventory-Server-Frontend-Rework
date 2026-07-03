@@ -39,6 +39,11 @@
 											:view-only="viewOnly"
 											@reload-datatable="reloadTemplate"
 										/>
+										<TemplateHistoryModal
+											:id="parseInt(id)"
+											:view-only="viewOnly"
+											@reload-template="reloadTemplate"
+										/>
 									</div>
 								</b-col>
 								<b-col cols="4">
