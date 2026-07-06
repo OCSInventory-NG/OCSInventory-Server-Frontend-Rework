@@ -31,12 +31,6 @@
 				</tr>
 			</tbody>
 		</table>
-		<Alert
-			v-else
-			:message="$t('message.no_field')"
-			:cols="true"
-			variant="info"
-		/>
 	</div>
 	<div
 		v-else
