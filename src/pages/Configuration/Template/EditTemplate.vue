@@ -39,11 +39,6 @@
 											:view-only="viewOnly"
 											@reload-datatable="reloadTemplate"
 										/>
-										<TemplateHistoryModal
-											:id="parseInt(id)"
-											:view-only="viewOnly"
-											@reload-template="reloadTemplate"
-										/>
 									</div>
 								</b-col>
 								<b-col cols="4">
@@ -69,6 +64,22 @@
 										</span>
 										{{ formatDate(template.last_update, 'last_update') }}
 									</p>
+								</b-col>
+							</b-row>
+							<b-row class="text-center mb-5">
+								<b-col>
+									<div class="d-flex justify-content-center align-items-center gap-2">
+										<TemplateHistoryModal
+											:id="parseInt(id)"
+											:view-only="viewOnly"
+											@reload-template="reloadTemplate"
+										/>
+										<TemplateCreateVersionModal
+											:id="parseInt(id)"
+											:view-only="viewOnly"
+											@reload-template="reloadTemplate"
+										/>
+									</div>
 								</b-col>
 							</b-row>
 							<div v-if="sections.length">

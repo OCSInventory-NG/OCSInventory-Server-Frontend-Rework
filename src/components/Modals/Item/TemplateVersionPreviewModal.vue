@@ -15,12 +15,13 @@
 			v-model="previewmodal"
 			:title="$t('template.preview')"
 			hide-footer
+			lazy
 			modal-class="custom-modal"
 			size="xl"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('template.preview') }}
+					{{ $t('template.preview') }} ({{ version.revision }})
 				</h5>
 				<b-button
 					size="sm"

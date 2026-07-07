@@ -17,6 +17,7 @@
 		>
 			<thead>
 				<tr>
+					<th>{{ $t('template.order') }}</th>
 					<th>{{ $t('user.name') }}</th>
 					<th>{{ $t('template.retrieval_value') }}</th>
 				</tr>
@@ -26,6 +27,7 @@
 					v-for="(field, index) in section.fields"
 					:key="index"
 				>
+					<td>{{ field.order }}</td>
 					<td>{{ field.name }}</td>
 					<td>{{ field.retrieval_value }}</td>
 				</tr>

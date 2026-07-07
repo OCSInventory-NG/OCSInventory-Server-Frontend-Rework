@@ -6,7 +6,7 @@
 			@click="loadData()"
 		>
 			<font-awesome-icon
-				:icon="['fas', 'code-compare']"
+				:icon="['fas', 'table-columns']"
 			/>
 		</button>
 
@@ -15,12 +15,13 @@
 			v-model="diffmodal"
 			:title="$t('template.diff')"
 			hide-footer
+			lazy
 			modal-class="custom-modal"
 			size="xl"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ $t('template.diff') }}
+					{{ $t('template.diff') }} ({{ version.revision }})
 				</h5>
 				<b-button
 					size="sm"
@@ -58,6 +59,29 @@
 				</b-row>
 
 				<div
+					v-for="row in templateFieldRows"
+					:key="row.key"
+					class="card mb-3"
+					:class="statusBorderClass(row.status)"
+				>
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<b>{{ row.label }}</b>
+						<span
+							class="badge"
+							:class="statusBadgeClass(row.status)"
+						>
+							{{ $t('template.diff_' + row.status) }}
+						</span>
+					</div>
+					<div class="card-body">
+						<b-row>
+							<b-col>{{ row.key === 'os' ? formatOs(row.current) : row.current }}</b-col>
+							<b-col>{{ row.key === 'os' ? formatOs(row.target) : row.target }}</b-col>
+						</b-row>
+					</div>
+				</div>
+
+				<div
 					v-for="row in sectionRows"
 					:key="row.name"
 					class="card mb-3"
@@ -85,8 +109,8 @@
 				</div>
 
 				<Alert
-					v-if="!sectionRows.length"
-					:message="$t('message.no_section')"
+					v-if="!templateFieldRows.length && !sectionRows.length"
+					:message="$t('template.diff_no_changes')"
 					:cols="true"
 					variant="info"
 				/>
@@ -115,6 +139,23 @@ export default {
 		}
 	},
 	computed: {
+		templateFieldRows() {
+			const fieldsToCompare = [
+				{ key: "name", label: this.$t("user.name") },
+				{ key: "os", label: this.$t("inventory.os") },
+			]
+
+			return fieldsToCompare
+				.map(({ key, label }) => {
+					const currentValue = this.current?.[key]
+					const targetValue = this.target?.[key]
+					const status = this.deepEqual(currentValue, targetValue) ? "unchanged" : "modified"
+
+					return { key, label, current: currentValue, target: targetValue, status }
+				})
+				.filter((row) => row.status !== "unchanged")
+		},
+
 		sectionRows() {
 			const currentMap = this.sectionMap(this.current)
 			const targetMap = this.sectionMap(this.target)
@@ -122,26 +163,32 @@ export default {
 				new Set([...Object.keys(currentMap), ...Object.keys(targetMap)])
 			).sort()
 
-			return names.map((name) => {
-				const currentSection = currentMap[name] || null
-				const targetSection = targetMap[name] || null
+			return names
+				.map((name) => {
+					const currentSection = currentMap[name] || null
+					const targetSection = targetMap[name] || null
 
-				let status = "unchanged"
-				if (!currentSection) {
-					status = "added"
-				} else if (!targetSection) {
-					status = "removed"
-				} else if (!this.deepEqual(currentSection, targetSection)) {
-					status = "modified"
-				}
+					let status = "unchanged"
+					if (!currentSection) {
+						status = "added"
+					} else if (!targetSection) {
+						status = "removed"
+					} else if (!this.deepEqual(currentSection, targetSection)) {
+						status = "modified"
+					}
 
-				return { name, current: currentSection, target: targetSection, status }
-			})
+					return { name, current: currentSection, target: targetSection, status }
+				})
+				.filter((row) => row.status !== "unchanged")
 		}
 	},
 	methods: {
 		_apiError(e) {
 			return e?.response?.data?.error || e?.message || String(e)
+		},
+
+		formatOs(value) {
+			return value ? this.$t("template." + value) : value
 		},
 
 		deepEqual(a, b) {

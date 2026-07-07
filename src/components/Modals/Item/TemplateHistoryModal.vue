@@ -61,29 +61,49 @@
 						{{ $t('generic.no_data') }}
 					</template>
 
+					<template #cell(revision)="row">
+						{{ row.item.revision }}
+					</template>
+
 					<template #cell(created_at)="row">
 						{{ formatDate(row.item.created_at) }}
 					</template>
 
+					<template #cell(label)="row">
+						<div style="max-width: 220px; word-break: break-word;">
+							{{ row.item.label }}
+						</div>
+					</template>
+
 					<template #cell(actions)="row">
-						<TemplateVersionPreviewModal
-							:template-id="id"
-							:version="row.item"
-						/>
-						<TemplateVersionDiffModal
-							:template-id="id"
-							:version="row.item"
-						/>
-						<button
-							:title="$t('template.rollback')"
-							class="btn btn-ghost-dark"
-							:disabled="viewOnly"
-							@click="confirmRollback(row.item)"
-						>
-							<font-awesome-icon
-								:icon="['fas', 'arrows-rotate']"
+						<div class="d-flex flex-nowrap justify-content-center">
+							<TemplateVersionPreviewModal
+								:template-id="id"
+								:version="row.item"
 							/>
-						</button>
+							<TemplateVersionDiffModal
+								:template-id="id"
+								:version="row.item"
+							/>
+							<button
+								:title="$t('template.rollback')"
+								class="btn btn-ghost-dark"
+								:disabled="viewOnly"
+								@click="confirmRollback(row.item)"
+							>
+								<font-awesome-icon
+									:icon="['fas', 'arrows-rotate']"
+								/>
+							</button>
+							<DeleteItemModal
+								v-if="row.item.revision !== 1"
+								:id="row.item.id"
+								:name="$t('template.history_revision') + ' ' + row.item.revision"
+								:parameter="`templates/${id}/versions`"
+								:disabled="viewOnly"
+								@reload-template="getVersions"
+							/>
+						</div>
 					</template>
 				</b-table>
 			</div>
@@ -140,7 +160,9 @@
 					color="#d63939"
 				/>
 				<p><b>{{ $t('message.deletevalid') }}</b></p>
-				<p>{{ $t('template.rollback_msg') }}</p>
+				<p v-if="selectedversion">
+					{{ $t('template.rollback_msg') }}
+				</p>
 			</div>
 			<div class="w-100 text-center">
 				<div class="row">
@@ -183,10 +205,11 @@ export default {
 			rollbackerrormsg: null,
 
 			fields: [
+				{ key: "revision", label: this.$t("template.history_revision") },
 				{ key: "created_at", label: this.$t("template.history_date") },
 				{ key: "created_by", label: this.$t("template.history_author") },
 				{ key: "label", label: this.$t("template.history_label") },
-				{ key: "actions", label: this.$t("generic.actions") },
+				{ key: "actions", label: this.$t("generic.actions"), class: "text-nowrap" },
 			]
 		}
 	},
@@ -249,8 +272,7 @@ export default {
 
 			try {
 				await this.$api.generic.post(
-					`templates/${this.id}/versions/${this.selectedversion.id}/rollback/`,
-					{ version_date: this.formatDate(this.selectedversion.created_at) }
+					`templates/${this.id}/versions/${this.selectedversion.id}/rollback/`
 				)
 
 				this.rollbacksuccess = true
