@@ -248,7 +248,10 @@
 							</tbody>
 						</table>
 					</b-tab>
-					<b-tab :title="$t('compliance.compliant') + (compliantResults.length > 0 ? ' (' + compliantResults.length + ')' : '')">
+					<b-tab
+						:title="$t('compliance.compliant')
+							+ (compliantResults.length > 0 ? ' (' + compliantResults.length + ')' : '')"
+					>
 						<div
 							v-if="compliantResults.length === 0"
 							class="text-center text-muted py-4"
@@ -286,9 +289,12 @@
 									<td>
 										<span
 											style="font-weight: bold;"
-											:style="{ color: severities.find(sv => sv.key === result.rule.severity)?.color }"
+											:style="{ color: severities.find(
+												sv => sv.key === result.rule.severity
+											)?.color }"
 										>
-											{{ severities.find(sv => sv.key === result.rule.severity)?.label || result.rule.severity }}
+											{{ severities.find(sv => sv.key === result.rule.severity)
+												?.label || result.rule.severity }}
 										</span>
 									</td>
 									<td>
