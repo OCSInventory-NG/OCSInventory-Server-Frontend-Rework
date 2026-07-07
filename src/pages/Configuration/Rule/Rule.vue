@@ -119,7 +119,6 @@ export default {
 			complianceRowheader: [],
 			complianceDraggableKey: 0,
 			activeTab: 0,
-			groupsMap: {},
 
 			excludefields: ["logic", "actions"],
 
@@ -231,11 +230,8 @@ export default {
 			try {
 				const header = await this.$api.generic.options("compliance/rules/")
 				this.complianceRowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["logic"].includes(f)
+					(f) => !["logic", "created_at", "updated_at"].includes(f)
 				)
-				const groupsData = await this.$api.generic.get('asset/groups/')
-				const groups = Array.isArray(groupsData) ? groupsData : (groupsData?.results || [])
-				groups.forEach(g => { this.groupsMap[g.id] = g.name })
 				await this.getComplianceRules()
 				this.complianceDraggableKey += 1
 			} catch (e) {
@@ -245,28 +241,12 @@ export default {
 
 		async getComplianceRules() {
 			try {
-				const data = await this.$api.generic.get("compliance/rules/", {}, { expand: "targets" })
+				const data = await this.$api.generic.get("compliance/rules/")
 				const rules = Array.isArray(data) ? data : (data?.results || [])
-				this.complianceRowdata = rules.map(rule => ({
-					...rule,
-					targets: this._formatTargets(rule.targets),
-				}))
+				this.complianceRowdata = rules.map(rule => ({ ...rule }))
 			} catch (e) {
 				this.complianceRowdata = []
 			}
-		},
-
-		_formatTargets(targets) {
-			if (!targets || !targets.length) return this.$t('compliance.target_all')
-			return targets.map(t => {
-				if (t.target_type === 'group') {
-					return this.groupsMap[t.target_value]
-						|| this.groupsMap[parseInt(t.target_value)]
-						|| `Groupe #${t.target_value}`
-				}
-				if (t.target_type === 'tag') return `TAG: ${t.target_value}`
-				return t.target_type
-			}).join(', ')
 		},
 
 		async reloadComplianceDatatable() {

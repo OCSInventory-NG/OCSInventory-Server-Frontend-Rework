@@ -37,12 +37,7 @@
 												>
 													{{ $t('compliance.severity_critical') }}
 												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.critical }}
-												</div>
-												<div class="text-muted small">
-													{{ $t('compliance.errors') }}
-												</div>
+												<div class="h3 mb-0">{{ resultsSummary.severities.critical }}</div>
 											</div>
 										</div>
 									</div>
@@ -58,12 +53,7 @@
 												>
 													{{ $t('compliance.severity_high') }}
 												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.high }}
-												</div>
-												<div class="text-muted small">
-													{{ $t('compliance.errors') }}
-												</div>
+												<div class="h3 mb-0">{{ resultsSummary.severities.high }}</div>
 											</div>
 										</div>
 									</div>
@@ -79,12 +69,7 @@
 												>
 													{{ $t('compliance.severity_medium') }}
 												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.medium }}
-												</div>
-												<div class="text-muted small">
-													{{ $t('compliance.errors') }}
-												</div>
+												<div class="h3 mb-0">{{ resultsSummary.severities.medium }}</div>
 											</div>
 										</div>
 									</div>
@@ -100,12 +85,7 @@
 												>
 													{{ $t('compliance.severity_low') }}
 												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.low }}
-												</div>
-												<div class="text-muted small">
-													{{ $t('compliance.errors') }}
-												</div>
+												<div class="h3 mb-0">{{ resultsSummary.severities.low }}</div>
 											</div>
 										</div>
 									</div>
@@ -118,9 +98,7 @@
 												<div class="subheader mb-1 text-success">
 													{{ $t('compliance.compliant') }}
 												</div>
-												<div class="h3 mb-0 text-success">
-													{{ resultsSummary.compliant }}
-												</div>
+												<div class="h3 mb-0 text-success">{{ resultsSummary.compliant }}</div>
 												<div class="text-muted small">
 													{{ $t('compliance.summary_compliance_rate') }} : {{ complianceRate }}%
 												</div>
@@ -180,9 +158,7 @@
 												<div class="subheader mb-1">
 													{{ $t('compliance.summary_monitored') }}
 												</div>
-												<div class="h3 mb-0">
-													{{ eolSummary.total }}
-												</div>
+												<div class="h3 mb-0">{{ eolSummary.total }}</div>
 											</div>
 										</div>
 									</div>
@@ -195,9 +171,7 @@
 												<div class="subheader mb-1 text-danger">
 													{{ $t('compliance.eol_expired') }}
 												</div>
-												<div class="h3 mb-0 text-danger">
-													{{ eolSummary.expired }}
-												</div>
+												<div class="h3 mb-0 text-danger">{{ eolSummary.expired }}</div>
 											</div>
 										</div>
 									</div>
@@ -210,9 +184,7 @@
 												<div class="subheader mb-1 text-success">
 													{{ $t('compliance.eol_active') }}
 												</div>
-												<div class="h3 mb-0 text-success">
-													{{ eolSummary.active }}
-												</div>
+												<div class="h3 mb-0 text-success">{{ eolSummary.active }}</div>
 											</div>
 										</div>
 									</div>
@@ -225,9 +197,7 @@
 												<div class="subheader mb-1 text-muted">
 													{{ $t('compliance.eol_unknown') }}
 												</div>
-												<div class="h3 mb-0 text-muted">
-													{{ eolSummary.unknown }}
-												</div>
+												<div class="h3 mb-0 text-muted">{{ eolSummary.unknown }}</div>
 											</div>
 										</div>
 									</div>

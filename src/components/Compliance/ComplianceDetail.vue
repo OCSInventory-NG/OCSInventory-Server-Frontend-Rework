@@ -79,8 +79,25 @@
 									<div class="h1 mb-0">
 										{{ counts[s.key] }}
 									</div>
-									<div class="text-muted small">
-										{{ $t('compliance.errors') }}
+								</div>
+							</div>
+						</b-col>
+						<b-col>
+							<div
+								class="card"
+								style="cursor: pointer;"
+								:style="activeTab === 'compliant' ? { borderColor: '#2fb344' } : {}"
+								@click="activeTab = 'compliant'"
+							>
+								<div class="card-body text-center p-2">
+									<div
+										class="subheader mb-1"
+										style="color: #2fb344"
+									>
+										{{ $t('compliance.compliant') }}
+									</div>
+									<div class="h1 mb-0">
+										{{ compliantResults.length }}
 									</div>
 								</div>
 							</div>
@@ -231,6 +248,63 @@
 							</tbody>
 						</table>
 					</b-tab>
+					<b-tab :title="$t('compliance.compliant') + (compliantResults.length > 0 ? ' (' + compliantResults.length + ')' : '')">
+						<div
+							v-if="compliantResults.length === 0"
+							class="text-center text-muted py-4"
+						>
+							<font-awesome-icon
+								:icon="['fas', 'circle-check']"
+								class="text-success me-2"
+							/>
+							{{ $t('compliance.no_issues_for_severity') }}
+						</div>
+						<table
+							v-else
+							class="table table-vcenter"
+						>
+							<thead>
+								<tr>
+									<th>{{ $t('compliance.col_rule') }}</th>
+									<th>{{ $t('compliance.col_type') }}</th>
+									<th>{{ $t('compliance.col_severity') }}</th>
+									<th>{{ $t('compliance.col_status') }}</th>
+									<th>{{ $t('compliance.col_message') }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									v-for="result in compliantResults"
+									:key="result.id"
+								>
+									<td>{{ result.rule.name }}</td>
+									<td>
+										{{ $te('compliance.type_' + result.rule.type)
+											? $t('compliance.type_' + result.rule.type)
+											: result.rule.type }}
+									</td>
+									<td>
+										<span
+											style="font-weight: bold;"
+											:style="{ color: severities.find(sv => sv.key === result.rule.severity)?.color }"
+										>
+											{{ severities.find(sv => sv.key === result.rule.severity)?.label || result.rule.severity }}
+										</span>
+									</td>
+									<td>
+										<span class="badge text-white bg-success">
+											{{ $te('compliance.' + result.status)
+												? $t('compliance.' + result.status)
+												: result.status }}
+										</span>
+									</td>
+									<td class="text-muted">
+										{{ result.rule.description || '-' }}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</b-tab>
 				</b-tabs>
 			</div>
 		</div>
@@ -285,14 +359,17 @@ export default {
 				})
 			return c
 		},
+		compliantResults() {
+			return this.results.filter(r => r.rule && r.status === 'compliant')
+		},
 		resultsBySeverity() {
 			const groups = { critical: [], high: [], medium: [], low: [] }
 			this.results
-				.filter(r => r.rule)
+				.filter(r => r.rule && r.status === 'non_compliant')
 				.forEach(r => {
 					if (groups[r.rule.severity]) groups[r.rule.severity].push(r)
 				})
-			const statusOrder = { non_compliant: 0, compliant: 1 }
+			const statusOrder = { non_compliant: 0, unknown: 1 }
 			Object.values(groups).forEach(g => g.sort((a, b) =>
 				(statusOrder[a.status] ?? 2) - (statusOrder[b.status] ?? 2)
 			))
@@ -300,10 +377,15 @@ export default {
 		},
 		activeTabIndex: {
 			get() {
+				if (this.activeTab === 'compliant') return this.severities.length
 				return this.severities.findIndex(s => s.key === this.activeTab)
 			},
 			set(idx) {
-				this.activeTab = this.severities[idx]?.key || 'critical'
+				if (idx === this.severities.length) {
+					this.activeTab = 'compliant'
+				} else {
+					this.activeTab = this.severities[idx]?.key || 'critical'
+				}
 			},
 		},
 	},

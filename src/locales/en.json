@@ -532,7 +532,13 @@
     "set": "SET",
     "template": "Template",
     "trigger": "Trigger",
-    "user_login": "User login"
+    "user_login": "User login",
+    "select_filter_type": "Filter type",
+    "filter_type_template": "Template",
+    "filter_type_group": "Asset group",
+    "filter_type_admin": "Administrative data",
+    "select_group": "Select a group",
+    "select_admin_field": "Select an administrative field"
   },
   "scheduler": {
     "active": "Active",
@@ -810,7 +816,7 @@
     "status": "Status",
     "evaluated_at": "Evaluated at",
     "is_eol": "End of life",
-    "no_issues_for_severity": "No rules in error for this level.",
+    "no_issues_for_severity": "No results.",
     "col_rule": "Rule",
     "col_type": "Category",
     "col_severity": "Severity",
@@ -834,7 +840,7 @@
     "evaluated": "Evaluation done: {count} result(s)",
     "field_softwares_names": "Installed software (list)",
     "field_softwares_versions": "Software version",
-    "select_template": "Template (optional)",
+    "select_template": "Template",
     "select_section": "Section",
     "software_name_placeholder": "Software name (e.g. curl)",
     "field_osname": "OS name",
@@ -856,9 +862,13 @@
     "eol_active": "Supported",
     "eol_expired": "End of life",
     "eol_unknown": "Unknown",
-    "targets": "Targets",
-    "target_groups": "Assets",
-    "target_tags": "TAG",
-    "target_all": "All assets"
+    "tab_windows_build": "Windows Build Mapping",
+    "tab_eol_mapping": "EOL Mapping",
+    "add_eol_mapping": "Add EOL mapping",
+    "edit_eol_mapping": "Edit EOL mapping",
+    "eol_extended_support_until": "Extended support until",
+    "eol_label": "Label (optional)",
+    "eol_product_placeholder": "e.g. ubuntu",
+    "eol_cycle_placeholder": "e.g. 22.04"
   }
 }

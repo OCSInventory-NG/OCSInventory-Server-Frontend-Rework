@@ -91,6 +91,19 @@
 							</b-col>
 							<b-col v-if="supportsInventoryFields">
 								<v-select
+									v-model="input.filter_type"
+									:options="filterTypeOptions"
+									:reduce="t => t.value"
+									:clearable="true"
+									label="text"
+									class="mb-3 ocs-select"
+									:disabled="viewOnly"
+									:placeholder="$t('rule.select_filter_type')"
+									@update:model-value="val => onFilterTypeChange(val, input, masterindex, index)"
+								/>
+							</b-col>
+							<b-col v-if="supportsInventoryFields && input.filter_type === 'template'">
+								<v-select
 									v-model="input.inventory_template"
 									:options="templateopt[masterindex]?.[index] || []"
 									:loading="loadingtemplate"
@@ -104,7 +117,7 @@
 									@update:model-value="val => onTemplateChange(val, input, masterindex, index)"
 								/>
 							</b-col>
-							<b-col v-if="supportsInventoryFields && input.inventory_template">
+							<b-col v-if="supportsInventoryFields && input.filter_type === 'template' && input.inventory_template">
 								<v-select
 									v-model="input.inventory_section"
 									:options="sectionopt[masterindex]?.[index] || []"
@@ -118,7 +131,21 @@
 									@update:model-value="val => onSectionChange(val, input, masterindex, index)"
 								/>
 							</b-col>
-							<b-col>
+							<b-col v-if="supportsInventoryFields && input.filter_type === 'admin'">
+								<v-select
+									v-model="input.admin_config"
+									:options="adminConfigOptions"
+									:reduce="opt => opt.value"
+									:clearable="false"
+									label="text"
+									class="mb-3 ocs-select"
+									:loading="loadingadminconfig"
+									:disabled="viewOnly"
+									:placeholder="$t('rule.select_admin_field')"
+									@update:model-value="val => onAdminConfigChange(val, input)"
+								/>
+							</b-col>
+							<b-col v-if="!supportsInventoryFields || !input.filter_type || (input.filter_type === 'template' && !!input.inventory_section)">
 								<b-form-group>
 									<v-select
 										id="field"
@@ -149,7 +176,7 @@
 									<v-select
 										id="operator"
 										v-model="input.operator"
-										:disabled="viewOnly || input.field == 'auth_profile.auth_method' 
+										:disabled="viewOnly || input.field == 'auth_profile.auth_method'
 											|| isAuthConfigRow(masterindex, input)"
 										:options="operators" 
 										:reduce="text => text.value"
@@ -201,6 +228,29 @@
 										v-else-if="isUserGroupField(input)"
 										v-model="input.value"
 										:options="groups"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="viewOnly || disabledvalue.includes(input.operator)"
+									/>
+									<v-select
+										v-else-if="input.filter_type === 'group'"
+										v-model="input.value"
+										:options="assetGroupOptions"
+										:loading="loadingassetgroups"
+										:reduce="opt => opt.value"
+										:clearable="false"
+										label="text"
+										class="mb-3 ocs-select"
+										:disabled="viewOnly || disabledvalue.includes(input.operator)"
+										@open="loadAssetGroups()"
+									/>
+									<v-select
+										v-else-if="input.filter_type === 'admin' && ['select', 'checkbox'].includes(input.admin_fieldtype)"
+										v-model="input.value"
+										:options="adminValueOptions[input.admin_config] || []"
+										:loading="loadingAdminValues"
 										:reduce="opt => opt.value"
 										:clearable="false"
 										label="text"
@@ -373,12 +423,27 @@ export default {
 						metadata_field: null,
 						inventory_template: null,
 						inventory_section: null,
+						filter_type: null,
+						admin_config: null,
+						admin_fieldtype: null,
 					}
 				]
 			],
 			links: [ "and", "or" ],
 			disabledvalue: ["!!", "!"],
 			authLinkCounter: 0,
+
+			filterTypeOptions: [
+				{ value: 'template', text: this.$t('rule.filter_type_template') },
+				{ value: 'group', text: this.$t('rule.filter_type_group') },
+				{ value: 'admin', text: this.$t('rule.filter_type_admin') },
+			],
+			adminConfigOptions: [],
+			loadingadminconfig: false,
+			adminValueOptions: {},
+			loadingAdminValues: false,
+			assetGroupOptions: [],
+			loadingassetgroups: false,
 
 			loading: true,
 			loadingfield: true,
@@ -401,6 +466,10 @@ export default {
 		await this.getAuthMethods()
 		await this.getAuthConfigs()
 		await this.getGroups()
+		if (this.supportsInventoryFields) {
+			this.loadAssetGroups()
+			this.loadAdminConfigsIfNeeded()
+		}
 		await this.getLogicRow()
 	},
 	methods: {
@@ -425,26 +494,30 @@ export default {
 				const route = this.triggermodel[this.trigger].route
 				const key = this.triggermodel[this.trigger].key
 
-				const data = await this.$api.generic.options(route)
+				const [data, triggers] = await Promise.all([
+					this.$api.generic.options(route),
+					this.$api.generic.get("automation/triggers/"),
+				])
+
+				const triggerObj = triggers.find(t => t.trigger === this.trigger)
+				const contextParents = new Set(Object.keys(triggerObj?.context_fields || {}))
 
 				this.fields = []
 
+				const skipFields = ["inventory_sections", "matched", "group_assignments"]
 				Object.keys(data.actions.POST).forEach((field) => {
-					if (!["inventory_sections", "matched", "group_assignments"].includes(field)) {
-						this.fields.push({
-							value: field,
-							text: this.$t(key + field),
-						})
-					}
+					if (skipFields.includes(field)) return
+					if (contextParents.has(field) || contextParents.has(field.replace(/_id$/, ''))) return
+					this.fields.push({
+						value: field,
+						text: this.$t(key + field),
+					})
 				})
-				const triggers = await this.$api.generic.get("automation/triggers/")
-				const triggerObj = triggers.find(t => t.trigger === this.trigger)
 
 				if (triggerObj?.context_fields) {
 					Object.keys(triggerObj.context_fields).forEach(parent => {
 						Object.keys(triggerObj.context_fields[parent]).forEach(child => {
 							const fullPath = `${parent}.${child}`
-
 							if (!this.fields.find(f => f.value === fullPath)) {
 								this.fields.push({
 									value: fullPath,
@@ -452,7 +525,7 @@ export default {
 								})
 							}
 						})
-					})	
+					})
 				}
 
 				this.errormsg = null
@@ -596,6 +669,33 @@ export default {
 			this.normalizeAuthConditions()
 			this.normalizeGroupConditions()
 
+			if (this.supportsInventoryFields) {
+				await this.loadAdminConfigsIfNeeded()
+			}
+
+			this.datavalues.forEach(masterInput => {
+				masterInput.forEach(input => {
+					if (input.filter_type || !input.field) return
+					if (input.field.startsWith('inventory.')) {
+						input.filter_type = 'template'
+					} else if (input.field === 'group_ids') {
+						input.filter_type = 'group'
+					} else if (input.field.startsWith('accountinfo.')) {
+						input.filter_type = 'admin'
+						const configId = parseInt(input.field.split('.')[1])
+						if (!isNaN(configId)) {
+							input.admin_config = configId
+							const config = this.adminConfigOptions.find(o => o.value === configId)
+							const linktype = { TEXT: 'string', TEXTAREA: 'string', SELECT: 'select', CHECKBOX: 'checkbox' }
+							input.admin_fieldtype = linktype[config?.datatype] || 'string'
+							if (['select', 'checkbox'].includes(input.admin_fieldtype)) {
+								this.loadAdminValues(configId)
+							}
+						}
+					}
+				})
+			})
+
 			await this.getModelField()
 		},
 
@@ -619,6 +719,9 @@ export default {
 				metadata_field: null,
 				inventory_template: null,
 				inventory_section: null,
+				filter_type: null,
+				admin_config: null,
+				admin_fieldtype: null,
 			})
 		},
 
@@ -638,6 +741,9 @@ export default {
 				metadata_field: null,
 				inventory_template: null,
 				inventory_section: null,
+				filter_type: null,
+				admin_config: null,
+				admin_fieldtype: null,
 			})
 
 			this.datavalues = JSON.parse(JSON.stringify(fieldType))
@@ -1124,6 +1230,77 @@ export default {
 				// ignore fetch error
 			}
 			this.loadingfield = false
+		},
+
+		onFilterTypeChange(type, input, masterindex, index) {
+			input.field = ''
+			input.value = null
+			input.inventory_template = null
+			input.inventory_section = null
+			input.admin_config = null
+			input.admin_fieldtype = null
+			if (!Array.isArray(this.sectionopt[masterindex])) this.sectionopt[masterindex] = []
+			this.sectionopt[masterindex][index] = []
+			if (!Array.isArray(this.invfieldopt[masterindex])) this.invfieldopt[masterindex] = []
+			this.invfieldopt[masterindex][index] = []
+			if (type === 'group') {
+				input.field = 'group_ids'
+				input.operator = 'in'
+			}
+		},
+
+		onAdminConfigChange(configId, input) {
+			input.field = configId ? `accountinfo.${configId}` : ''
+			input.value = null
+			const config = this.adminConfigOptions.find(o => o.value === configId)
+			const linktype = { TEXT: 'string', TEXTAREA: 'string', SELECT: 'select', CHECKBOX: 'checkbox' }
+			input.admin_fieldtype = linktype[config?.datatype] || 'string'
+			if (['select', 'checkbox'].includes(input.admin_fieldtype)) {
+				this.loadAdminValues(configId)
+			}
+		},
+
+		async loadAssetGroups() {
+			if (this.assetGroupOptions.length > 0) return
+			this.loadingassetgroups = true
+			try {
+				const data = await this.$api.generic.get('asset/groups/')
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.assetGroupOptions = rows
+					.map(g => ({ value: g.id, text: g.name }))
+					.sort((a, b) => a.text > b.text ? 1 : -1)
+			} catch {
+				// ignore fetch error
+			}
+			this.loadingassetgroups = false
+		},
+
+		async loadAdminConfigsIfNeeded() {
+			if (this.adminConfigOptions.length > 0) return
+			this.loadingadminconfig = true
+			try {
+				const data = await this.$api.generic.get('accountinfo/config/', {}, { datatarget: 'ASSET' })
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.adminConfigOptions = rows
+					.map(c => ({ value: c.id, text: c.name, datatype: c.datatype }))
+					.sort((a, b) => a.text > b.text ? 1 : -1)
+			} catch {
+				// ignore fetch error
+			}
+			this.loadingadminconfig = false
+		},
+
+		async loadAdminValues(configId) {
+			if (this.adminValueOptions[configId]) return
+			this.loadingAdminValues = true
+			try {
+				const data = await this.$api.generic.get('accountinfo/value/', {}, { accountinfo_config: configId })
+				const rows = Array.isArray(data) ? data : (data?.results || [])
+				this.adminValueOptions[configId] = rows.map(el => ({ value: el.value, text: el.value }))
+			} catch {
+				this.adminValueOptions[configId] = []
+			}
+			this.loadingAdminValues = false
 		},
 	}
 }

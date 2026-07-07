@@ -60,12 +60,13 @@
 									:key="rulemenu.value"
 									:title="rulemenu.text"
 								>
-									<RuleCriteria 
+									<RuleCriteria
 										v-if="rulemenu.value == 'logic'"
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
 										:view-only="viewOnly"
+										:supports-inventory-fields="trigger === 'inventory_received'"
 										@reload-rule="reloadRule"
 									/>
 

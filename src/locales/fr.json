@@ -532,7 +532,13 @@
     "set": "ASSIGNER",
     "template": "Template",
     "trigger": "Déclencheur",
-    "user_login": "Connexion utilisateur"
+    "user_login": "Connexion utilisateur",
+    "select_filter_type": "Type de filtre",
+    "filter_type_template": "Template",
+    "filter_type_group": "Groupe d'assets",
+    "filter_type_admin": "Données administratives",
+    "select_group": "Sélectionner un groupe",
+    "select_admin_field": "Sélectionner un champ administratif"
   },
   "scheduler": {
     "active": "Activé",
@@ -810,7 +816,7 @@
     "status": "Statut",
     "evaluated_at": "Évalué le",
     "is_eol": "Fin de vie",
-    "no_issues_for_severity": "Aucune règle en erreur pour ce niveau.",
+    "no_issues_for_severity": "Pas de résultats.",
     "col_rule": "Règle",
     "col_type": "Catégorie",
     "col_severity": "Criticité",
@@ -834,7 +840,7 @@
     "evaluated": "Évaluation effectuée : {count} résultat(s)",
     "field_softwares_names": "Logiciels installés (liste)",
     "field_softwares_versions": "Version d'un logiciel",
-    "select_template": "Template (optionnel)",
+    "select_template": "Template",
     "select_section": "Section",
     "software_name_placeholder": "Nom du logiciel (ex: curl)",
     "field_osname": "Nom du système d'exploitation",
@@ -856,9 +862,13 @@
     "eol_active": "Supporté",
     "eol_expired": "Fin de vie",
     "eol_unknown": "Inconnu",
-    "targets": "Cibles",
-    "target_groups": "Assets",
-    "target_tags": "TAG",
-    "target_all": "Tous les assets"
+    "tab_windows_build": "Mapping Windows Build",
+    "tab_eol_mapping": "Mapping EOL",
+    "add_eol_mapping": "Ajouter un mapping EOL",
+    "edit_eol_mapping": "Modifier le mapping EOL",
+    "eol_extended_support_until": "Support étendu jusqu'au",
+    "eol_label": "Libellé (optionnel)",
+    "eol_product_placeholder": "ex : ubuntu",
+    "eol_cycle_placeholder": "ex : 22.04"
   }
 }

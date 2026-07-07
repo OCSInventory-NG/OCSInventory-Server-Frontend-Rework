@@ -1,5 +1,5 @@
 <template>
-	<div id="compliance-rule-modal">
+	<div id="eol-mapping-modal">
 		<div
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,7 +7,7 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('compliance.addrule')"
+						:title="$t('compliance.add_eol_mapping')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						@click="loadData()"
@@ -15,14 +15,14 @@
 						<font-awesome-icon
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('compliance.addrule') }}
+						{{ $t('compliance.add_eol_mapping') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button
-				:title="$t('compliance.editrule')"
+				:title="$t('compliance.edit_eol_mapping')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -31,16 +31,17 @@
 				/>
 			</button>
 		</div>
+
 		<b-modal
-			id="compliancerulemodal"
-			v-model="rulemodal"
-			:title="(!update) ? $t('compliance.addrule') : $t('compliance.editrule')"
+			id="eolmappingmodal"
+			v-model="eolmappingmodal"
+			:title="(!update) ? $t('compliance.add_eol_mapping') : $t('compliance.edit_eol_mapping')"
 			hide-footer
 			modal-class="custom-modal"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('compliance.addrule') : $t('compliance.editrule') }}
+					{{ (!update) ? $t('compliance.add_eol_mapping') : $t('compliance.edit_eol_mapping') }}
 					<b-spinner
 						v-if="loadingcreate"
 						variant="success"
@@ -67,11 +68,13 @@
 					/>
 				</b-button>
 			</template>
+
 			<Alert
 				v-if="createerror || errored"
 				:message="(createerror) ? createerrormsg : errormsg"
 				variant="danger"
 			/>
+
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
@@ -79,12 +82,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.name')"
-							label-for="name"
+							:label="$t('compliance.eol_product')"
+							label-for="eol-product"
 						>
 							<b-form-input
-								id="name"
-								v-model="row.name"
+								id="eol-product"
+								v-model="row.product"
+								:placeholder="$t('compliance.eol_product_placeholder')"
 								required
 							/>
 						</b-form-group>
@@ -93,12 +97,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.description')"
-							label-for="description"
+							:label="$t('compliance.eol_cycle')"
+							label-for="eol-cycle"
 						>
 							<b-form-input
-								id="description"
-								v-model="row.description"
+								id="eol-cycle"
+								v-model="row.cycle"
+								:placeholder="$t('compliance.eol_cycle_placeholder')"
+								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -106,33 +112,14 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.type')"
-							label-for="type"
+							:label="$t('compliance.eol_extended_support_until')"
+							label-for="eol-extended-support-until"
 						>
-							<v-select
-								id="type"
-								v-model="row.type"
-								:options="typeOptions"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
-							/>
-						</b-form-group>
-					</b-col>
-					<b-col>
-						<b-form-group
-							:label="$t('compliance.severity')"
-							label-for="severity"
-						>
-							<v-select
-								id="severity"
-								v-model="row.severity"
-								:options="severityOptions"
-								:reduce="text => text.value"
-								:clearable="false"
-								label="text"
-								class="mb-3"
+							<b-form-input
+								id="eol-extended-support-until"
+								v-model="row.extended_support_until"
+								type="date"
+								required
 							/>
 						</b-form-group>
 					</b-col>
@@ -140,16 +127,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.enabled')"
-							label-for="enabled"
+							:label="$t('compliance.eol_label')"
+							label-for="eol-label"
 						>
-							<div class="form-check form-switch mb-4">
-								<input
-									v-model="row.enabled"
-									class="form-check-input"
-									type="checkbox"
-								>
-							</div>
+							<b-form-input
+								id="eol-label"
+								v-model="row.label"
+							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -169,6 +153,7 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
+
 			<div
 				v-if="loading"
 				class="ocs-loader"
@@ -181,10 +166,10 @@
 
 <script>
 export default {
-	name: "ComplianceRuleModal",
+	name: "EOLMappingModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
 	},
 	data() {
 		return {
@@ -196,24 +181,12 @@ export default {
 			createwithsuccess: false,
 
 			row: {
-				name: null,
-				description: null,
-				type: 'software',
-				severity: 'medium',
-				enabled: true,
-				logic: {},
+				product: null,
+				cycle: null,
+				extended_support_until: null,
+				label: null,
 			},
-			rulemodal: false,
-			typeOptions: [
-				{ value: 'software', text: this.$t('compliance.type_software') },
-				{ value: 'security', text: this.$t('compliance.type_security') },
-			],
-			severityOptions: [
-				{ value: 'critical', text: this.$t('compliance.severity_critical') },
-				{ value: 'high',     text: this.$t('compliance.severity_high') },
-				{ value: 'medium',   text: this.$t('compliance.severity_medium') },
-				{ value: 'low',      text: this.$t('compliance.severity_low') },
-			],
+			eolmappingmodal: false,
 
 			loading: true,
 			loadingcreate: false,
@@ -222,22 +195,20 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.rulemodal = false
+				this.eolmappingmodal = false
 				this.createwithsuccess = false
 				this.row = {
-					name: null,
-					description: null,
-					type: 'software',
-					severity: 'medium',
-					enabled: true,
-					logic: {},
+					product: null,
+					cycle: null,
+					extended_support_until: null,
+					label: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
-		}
+		},
 	},
 	mounted() {
-		if(!this.update) {
+		if (!this.update) {
 			this.loading = false
 		}
 	},
@@ -247,16 +218,14 @@ export default {
 		},
 
 		async loadData(id) {
-			this.rulemodal = true
-			this.loading = true
+			this.eolmappingmodal = true
 			this.row = {
-				name: null,
-				description: null,
-				type: 'software',
-				severity: 'medium',
-				enabled: true,
-				logic: {},
+				product: null,
+				cycle: null,
+				extended_support_until: null,
+				label: null,
 			}
+
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
@@ -264,23 +233,17 @@ export default {
 			this.createwithsuccess = false
 
 			if (id) {
-				await this.getRules(id)
-			} else {
-				this.loading = false
-			}
-		},
-
-		async getRules(id) {
-			try {
-				const data = await this.$api.generic.get(`compliance/rules/${id}/`)
-				this.row = data
-				this.errormsg = null
-				this.errored = false
-			} catch (e) {
-				this.errormsg = this._apiError(e)
-				this.errored = true
-			} finally {
-				this.loading = false
+				this.loading = true
+				try {
+					const data = await this.$api.generic.get(`compliance/eol-extended-support/${id}/`)
+					this.row = data
+					this.errored = false
+				} catch (e) {
+					this.errormsg = this._apiError(e)
+					this.errored = true
+				} finally {
+					this.loading = false
+				}
 			}
 		},
 
@@ -294,23 +257,23 @@ export default {
 
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("compliance/rules/", this.row)
+					await this.$api.generic.post("compliance/eol-extended-support/", this.row)
 				} else {
-					const { logic: _logic, ...payload } = this.row
 					await this.$api.generic.patch(
-						`compliance/rules/${this.row.id}/`,
-						payload
+						`compliance/eol-extended-support/${this.row.id}/`,
+						this.row,
 					)
 				}
+
 				this.createwithsuccess = true
 			} catch (e) {
-				this.createerrormsg = this._apiError(e)
-				this.createerror = true
 				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
 			} finally {
 				this.loadingcreate = false
 			}
 		},
-	}
+	},
 }
 </script>
