@@ -117,9 +117,11 @@
 									@update:model-value="val => onTemplateChange(val, input, masterindex, index)"
 								/>
 							</b-col>
-							<b-col v-if="supportsInventoryFields
-							&& input.filter_type === 'template'
-							&& input.inventory_template">
+							<b-col
+								v-if="supportsInventoryFields
+									&& input.filter_type === 'template'
+									&& input.inventory_template"
+							>
 								<v-select
 									v-model="input.inventory_section"
 									:options="sectionopt[masterindex]?.[index] || []"
@@ -147,8 +149,10 @@
 									@update:model-value="val => onAdminConfigChange(val, input)"
 								/>
 							</b-col>
-							<b-col v-if="!supportsInventoryFields || !input.filter_type
-							|| (input.filter_type === 'template' && !!input.inventory_section)">
+							<b-col
+								v-if="!supportsInventoryFields || !input.filter_type
+									|| (input.filter_type === 'template' && !!input.inventory_section)"
+							>
 								<b-form-group>
 									<v-select
 										id="field"
@@ -251,7 +255,7 @@
 									/>
 									<v-select
 										v-else-if="input.filter_type === 'admin'
-										&& ['select', 'checkbox'].includes(input.admin_fieldtype)"
+											&& ['select', 'checkbox'].includes(input.admin_fieldtype)"
 										v-model="input.value"
 										:options="adminValueOptions[input.admin_config] || []"
 										:loading="loadingAdminValues"
