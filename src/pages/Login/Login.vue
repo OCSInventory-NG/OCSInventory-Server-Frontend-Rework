@@ -124,6 +124,11 @@ export default {
 		} catch (e) {
 			this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 		}
+
+		if (new URLSearchParams(window.location.search).get("error")) {
+			this.errored = true
+			this.errormsg = this.$t("message.error_sso_failed")
+		}
 	},
 
 	methods: {
