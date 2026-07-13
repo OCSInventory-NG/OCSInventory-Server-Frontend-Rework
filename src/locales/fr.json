@@ -534,6 +534,7 @@
     "trigger": "Déclencheur",
     "user_login": "Connexion utilisateur",
     "select_filter_type": "Type de filtre",
+    "filter_type_base": "Inventaire de base",
     "filter_type_template": "Template",
     "filter_type_group": "Groupe d'assets",
     "filter_type_admin": "Données administratives",
@@ -749,7 +750,7 @@
     "usermanagement": "Gestion des utilisateurs",
     "user": "Utilisateur",
     "users": "Utilisateurs",
-    "compliance_config": "Mapping de conformité",
+    "compliance_config": "Paramètres de conformité",
     "windows_build_mapping": "Mapping Windows Build"
   },
   "user": {
@@ -828,7 +829,7 @@
     "severity_high": "Haut",
     "severity_medium": "Moyen",
     "severity_low": "Bas",
-    "addrule": "Ajouter une règle",
+    "addrule": "Ajouter une règle de conformité",
     "editrule": "Modifier la règle",
     "rules": "Règles de conformité",
     "name": "Nom",
@@ -863,11 +864,13 @@
     "eol_expired": "Fin de vie",
     "eol_unknown": "Inconnu",
     "tab_windows_build": "Mapping Windows Build",
-    "tab_eol_mapping": "Mapping EOL",
-    "add_eol_mapping": "Ajouter un mapping EOL",
-    "edit_eol_mapping": "Modifier le mapping EOL",
+    "tab_eol_mapping": "Mapping support étendu",
+    "add_eol_mapping": "Ajouter un support étendu",
+    "edit_eol_mapping": "Modifier le support étendu",
     "eol_extended_support_until": "Support étendu jusqu'au",
-    "eol_label": "Libellé (optionnel)",
+    "extended_support_until": "Support étendu jusqu'au",
+    "eol_description": "Description (optionnel)",
+    "description": "Description",
     "eol_product_placeholder": "ex : ubuntu",
     "eol_cycle_placeholder": "ex : 22.04"
   }

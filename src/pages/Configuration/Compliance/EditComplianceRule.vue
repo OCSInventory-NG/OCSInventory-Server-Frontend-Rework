@@ -61,6 +61,7 @@
 								:view-only="viewOnly"
 								:custom-fields="customFields"
 								:supports-inventory-fields="true"
+								:can-remove-condition="false"
 								:save-api-path="`compliance/rules/${id}/`"
 								@reload-rule="reloadRule"
 							/>

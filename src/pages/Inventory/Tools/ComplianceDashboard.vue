@@ -23,95 +23,43 @@
 								<!-- Cartes récapitulatives -->
 								<div
 									v-if="!resultsSummary.loading"
-									class="row g-2 mb-3 mt-3"
+									class="d-flex gap-2 mb-3 mt-3"
 								>
-									<div class="col">
-										<div
-											class="card"
-											style="border-top: 3px solid #d63939"
-										>
-											<div class="card-body text-center p-2">
-												<div
-													class="subheader mb-1"
-													style="color: #d63939"
-												>
-													{{ $t('compliance.severity_critical') }}
-												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.critical }}
-												</div>
+									<div
+										v-for="s in severityTiles"
+										:key="s.key"
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="activeFilter && activeFilter.type === 'severity' && activeFilter.value === s.key
+											? { borderColor: s.color }
+											: { borderTop: '3px solid ' + s.color }"
+										@click="setTileFilter('severity', s.key)"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div
+												class="subheader mb-1"
+												:style="{ color: s.color }"
+											>
+												{{ s.label }}
 											</div>
+											<div class="h3 mb-0">{{ resultsSummary.severities[s.key] }}</div>
 										</div>
 									</div>
-									<div class="col">
-										<div
-											class="card"
-											style="border-top: 3px solid #f76707"
-										>
-											<div class="card-body text-center p-2">
-												<div
-													class="subheader mb-1"
-													style="color: #f76707"
-												>
-													{{ $t('compliance.severity_high') }}
-												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.high }}
-												</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="activeFilter && activeFilter.type === 'status' && activeFilter.value === 'compliant'
+											? { borderColor: '#2fb344' }
+											: { borderTop: '3px solid #2fb344' }"
+										@click="setTileFilter('status', 'compliant')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div class="subheader mb-1 text-success">
+												{{ $t('compliance.compliant') }}
 											</div>
-										</div>
-									</div>
-									<div class="col">
-										<div
-											class="card"
-											style="border-top: 3px solid #f59f00"
-										>
-											<div class="card-body text-center p-2">
-												<div
-													class="subheader mb-1"
-													style="color: #f59f00"
-												>
-													{{ $t('compliance.severity_medium') }}
-												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.medium }}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col">
-										<div
-											class="card"
-											style="border-top: 3px solid #206bc4"
-										>
-											<div class="card-body text-center p-2">
-												<div
-													class="subheader mb-1"
-													style="color: #206bc4"
-												>
-													{{ $t('compliance.severity_low') }}
-												</div>
-												<div class="h3 mb-0">
-													{{ resultsSummary.severities.low }}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col">
-										<div
-											class="card"
-											style="border-top: 3px solid #2fb344"
-										>
-											<div class="card-body text-center p-2">
-												<div class="subheader mb-1 text-success">
-													{{ $t('compliance.compliant') }}
-												</div>
-												<div class="h3 mb-0 text-success">
-													{{ resultsSummary.compliant }}
-												</div>
-												<div class="text-muted small">
-													{{ $t('compliance.summary_compliance_rate') }} : {{ complianceRate }}%
-												</div>
+											<div class="h3 mb-0 text-success">{{ resultsSummary.compliant }}</div>
+											<div class="text-muted small">
+												{{ $t('compliance.summary_compliance_rate') }} : {{ complianceRate }}%
 											</div>
 										</div>
 									</div>
@@ -126,6 +74,19 @@
 
 								<div v-else>
 									<Datatable
+										v-if="activeFilter && activeFilter.type === 'status' && activeFilter.value === 'compliant'"
+										id="compliance-compliant-datatable"
+										:rowdata="compliantAssetsRowdata"
+										:rowheader="['asset']"
+										:usecheckbox="false"
+										:canaccessdetails="true"
+										title="compliance_results"
+										translationkey="compliance."
+										:server-side="false"
+										is-sticky
+									/>
+									<Datatable
+										v-else
 										id="compliance-results-datatable"
 										:rowdata="results.rowdata"
 										:rowheader="results.rowheader"
@@ -265,6 +226,7 @@ export default {
 	name: 'ComplianceDashboard',
 	data() {
 		return {
+			activeFilter: null,
 			results: {
 				errored: false,
 				errormsg: null,
@@ -294,6 +256,7 @@ export default {
 				nonCompliant: 0,
 				compliant: 0,
 				severities: { critical: 0, high: 0, medium: 0, low: 0 },
+				compliantAssets: [],
 			},
 			eolSummary: {
 				loading: true,
@@ -305,9 +268,23 @@ export default {
 		}
 	},
 	computed: {
+		severityTiles() {
+			return [
+				{ key: 'critical', label: this.$t('compliance.severity_critical'), color: '#d63939' },
+				{ key: 'high',     label: this.$t('compliance.severity_high'),     color: '#f76707' },
+				{ key: 'medium',   label: this.$t('compliance.severity_medium'),   color: '#f59f00' },
+				{ key: 'low',      label: this.$t('compliance.severity_low'),      color: '#206bc4' },
+			]
+		},
 		complianceRate() {
 			if (this.resultsSummary.total === 0) return 0
 			return Math.round((this.resultsSummary.compliant / this.resultsSummary.total) * 100)
+		},
+		compliantAssetsRowdata() {
+			return this.resultsSummary.compliantAssets.map(a => ({
+				id:    a.id,
+				asset: { id: a.id, name: a.name },
+			}))
 		},
 	},
 	async mounted() {
@@ -319,6 +296,18 @@ export default {
 		])
 	},
 	methods: {
+		// ── Tile filters ─────────────────────────────────────────────
+
+		setTileFilter(type, value) {
+			if (this.activeFilter?.type === type && this.activeFilter?.value === value) {
+				this.activeFilter = null
+			} else {
+				this.activeFilter = { type, value }
+			}
+			this.results.query = { ...this.results.query, offset: 0 }
+			this.fetchResults(this.results.query)
+		},
+
 		// ── Results tab ──────────────────────────────────────────────
 
 		async loadResults() {
@@ -338,14 +327,21 @@ export default {
 		async fetchResults(query) {
 			this.results.isbusy = true
 			try {
+				const params = {
+					limit: query.limit,
+					offset: query.offset,
+					ordering: query.ordering,
+					search: query.search,
+				}
+				if (this.activeFilter?.type === 'severity') {
+					params['rule__severity'] = this.activeFilter.value
+					params['status'] = 'non_compliant'
+				} else if (this.activeFilter?.type === 'status') {
+					params['status'] = this.activeFilter.value
+				}
 				const data = await this.$api.generic.get(
 					'compliance/results/',
-					{
-						limit: query.limit,
-						offset: query.offset,
-						ordering: query.ordering,
-						search: query.search,
-					},
+					params,
 					{ expand: 'rule' }
 				)
 				const items = data?.results || data || []
@@ -424,25 +420,27 @@ export default {
 
 		async loadResultsSummary() {
 			try {
-				const [page, assetSummary] = await Promise.all([
-					this.$api.generic.get('compliance/results/', { limit: 1 }, {}),
-					this.$api.generic.get('compliance/results/asset-summary/', {}, {}),
-				])
-				const total = typeof page?.count === 'number' ? page.count : 0
+				const assetSummary = await this.$api.generic.get('compliance/results/asset-summary/', {}, {})
+				const summaryItems = Array.isArray(assetSummary) ? assetSummary : []
+
 				const sev = { critical: 0, high: 0, medium: 0, low: 0 }
-				;(Array.isArray(assetSummary) ? assetSummary : []).forEach(s => {
+				summaryItems.forEach(s => {
 					sev.critical += s.counts?.critical || 0
 					sev.high     += s.counts?.high     || 0
 					sev.medium   += s.counts?.medium   || 0
 					sev.low      += s.counts?.low      || 0
 				})
-				const nonCompliant = sev.critical + sev.high + sev.medium + sev.low
+
+				const totalAssets     = summaryItems.length
+				const compliantItems  = summaryItems.filter(s => s.global_status === 'compliant')
+
 				this.resultsSummary = {
 					loading: false,
-					total,
-					nonCompliant,
-					compliant: total - nonCompliant,
-					severities: sev,
+					total:        totalAssets,
+					nonCompliant: totalAssets - compliantItems.length,
+					compliant:    compliantItems.length,
+					severities:   sev,
+					compliantAssets: compliantItems.map(s => ({ id: s.asset, name: s.asset_name || String(s.asset) })),
 				}
 			} catch {
 				this.resultsSummary.loading = false

@@ -37,7 +37,7 @@
 								/>
 								<font-awesome-icon
 									v-else
-									:icon="['fas', 'circle-info']"
+									:icon="['fas', 'circle-question']"
 									class="text-muted"
 									size="2x"
 								/>
@@ -57,61 +57,49 @@
 					</div>
 				</b-col>
 
-				<b-col>
-					<b-row>
-						<b-col
-							v-for="s in severities"
-							:key="s.key"
-						>
+				<b-col class="d-flex gap-2">
+					<div
+						v-for="s in severities"
+						:key="s.key"
+						class="card flex-fill"
+						style="cursor: pointer;"
+						:style="activeTab === s.key ? { borderColor: s.color } : {}"
+						@click="activeTab = s.key"
+					>
+						<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
 							<div
-								class="card"
-								style="cursor: pointer;"
-								:style="activeTab === s.key ? { borderColor: s.color } : {}"
-								@click="activeTab = s.key"
+								class="subheader mb-1"
+								:style="{ color: s.color }"
 							>
-								<div class="card-body text-center p-2">
-									<div
-										class="subheader mb-1"
-										:style="{ color: s.color }"
-									>
-										{{ s.label }}
-									</div>
-									<div class="h1 mb-0">
-										{{ counts[s.key] }}
-									</div>
-								</div>
+								{{ s.label }}
 							</div>
-						</b-col>
-						<b-col>
+							<div class="h1 mb-0">
+								{{ counts[s.key] }}
+							</div>
+						</div>
+					</div>
+					<div
+						class="card flex-fill"
+						style="cursor: pointer;"
+						:style="activeTab === 'compliant' ? { borderColor: '#2fb344' } : {}"
+						@click="activeTab = 'compliant'"
+					>
+						<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
 							<div
-								class="card"
-								style="cursor: pointer;"
-								:style="activeTab === 'compliant' ? { borderColor: '#2fb344' } : {}"
-								@click="activeTab = 'compliant'"
+								class="subheader mb-1"
+								style="color: #2fb344"
 							>
-								<div class="card-body text-center p-2">
-									<div
-										class="subheader mb-1"
-										style="color: #2fb344"
-									>
-										{{ $t('compliance.compliant') }}
-									</div>
-									<div class="h1 mb-0">
-										{{ compliantResults.length }}
-									</div>
-								</div>
+								{{ $t('compliance.compliant') }}
 							</div>
-						</b-col>
-					</b-row>
+							<div class="h1 mb-0">
+								{{ compliantResults.length }}
+							</div>
+						</div>
+					</div>
 				</b-col>
 			</b-row>
 
 			<div class="card mt-3">
-				<div class="card-header">
-					<div class="card-title">
-						{{ $t('compliance.eol_title') }}
-					</div>
-				</div>
 				<div class="card-body">
 					<div
 						v-if="eolData && eolData.product"

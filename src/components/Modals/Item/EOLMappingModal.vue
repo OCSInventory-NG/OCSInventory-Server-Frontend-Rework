@@ -127,12 +127,12 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.eol_label')"
-							label-for="eol-label"
+							:label="$t('compliance.eol_description')"
+							label-for="eol-description"
 						>
 							<b-form-input
-								id="eol-label"
-								v-model="row.label"
+								id="eol-description"
+								v-model="row.description"
 							/>
 						</b-form-group>
 					</b-col>
@@ -184,7 +184,7 @@ export default {
 				product: null,
 				cycle: null,
 				extended_support_until: null,
-				label: null,
+				description: null,
 			},
 			eolmappingmodal: false,
 
@@ -201,7 +201,7 @@ export default {
 					product: null,
 					cycle: null,
 					extended_support_until: null,
-					label: null,
+					description: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -223,7 +223,7 @@ export default {
 				product: null,
 				cycle: null,
 				extended_support_until: null,
-				label: null,
+				description: null,
 			}
 
 			this.errormsg = null

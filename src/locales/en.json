@@ -534,6 +534,7 @@
     "trigger": "Trigger",
     "user_login": "User login",
     "select_filter_type": "Filter type",
+    "filter_type_base": "Base inventory",
     "filter_type_template": "Template",
     "filter_type_group": "Asset group",
     "filter_type_admin": "Administrative data",
@@ -749,7 +750,7 @@
     "usermanagement": "User management",
     "user": "User",
     "users": "Users",
-    "compliance_config": "Compliance mapping",
+    "compliance_config": "Compliance settings",
     "windows_build_mapping": "Windows Build Mapping"
   },
   "user": {
@@ -828,7 +829,7 @@
     "severity_high": "High",
     "severity_medium": "Medium",
     "severity_low": "Low",
-    "addrule": "Add rule",
+    "addrule": "Add compliance rule",
     "editrule": "Edit rule",
     "rules": "Compliance rules",
     "name": "Name",
@@ -863,11 +864,13 @@
     "eol_expired": "End of life",
     "eol_unknown": "Unknown",
     "tab_windows_build": "Windows Build Mapping",
-    "tab_eol_mapping": "EOL Mapping",
-    "add_eol_mapping": "Add EOL mapping",
-    "edit_eol_mapping": "Edit EOL mapping",
+    "tab_eol_mapping": "Extended Support Mapping",
+    "add_eol_mapping": "Add extended support",
+    "edit_eol_mapping": "Edit extended support",
     "eol_extended_support_until": "Extended support until",
-    "eol_label": "Label (optional)",
+    "extended_support_until": "Extended support until",
+    "eol_description": "Description (optional)",
+    "description": "Description",
     "eol_product_placeholder": "e.g. ubuntu",
     "eol_cycle_placeholder": "e.g. 22.04"
   }

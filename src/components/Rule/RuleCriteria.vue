@@ -94,7 +94,7 @@
 									v-model="input.filter_type"
 									:options="filterTypeOptions"
 									:reduce="t => t.value"
-									:clearable="true"
+									:clearable="false"
 									label="text"
 									class="mb-3 ocs-select"
 									:disabled="viewOnly"
@@ -149,10 +149,9 @@
 									@update:model-value="val => onAdminConfigChange(val, input)"
 								/>
 							</b-col>
-							<b-col
-								v-if="!supportsInventoryFields || !input.filter_type
-									|| (input.filter_type === 'template' && !!input.inventory_section)"
-							>
+							<b-col v-if="!supportsInventoryFields || !input.filter_type
+							|| input.filter_type === 'base'
+							|| (input.filter_type === 'template' && !!input.inventory_section)">
 								<b-form-group>
 									<v-select
 										id="field"
@@ -184,8 +183,9 @@
 										id="operator"
 										v-model="input.operator"
 										:disabled="viewOnly || input.field == 'auth_profile.auth_method'
-											|| isAuthConfigRow(masterindex, input)"
-										:options="operators" 
+											|| isAuthConfigRow(masterindex, input)
+											|| input.filter_type === 'group'"
+										:options="getOperatorOptions(input)"
 										:reduce="text => text.value"
 										:clearable="false"
 										label="text"
@@ -292,14 +292,14 @@
 									</b-button>
 								</b-form-group>
 							</b-col>
-							<b-col 
-								v-show="datavalues[masterindex]
+							<b-col
+								v-show="canRemoveCondition && datavalues[masterindex]
 									.filter(input => input.field !== 'auth_profile.auth_config').length > 1"
 								cols="1"
 							>
 								<b-form-group>
-									<b-button 
-										v-if="!isAuthConfigRow(masterindex, input)"
+									<b-button
+										v-if="canRemoveCondition && !isAuthConfigRow(masterindex, input)"
 										:id="'removefield'+masterindex+index"
 										v-b-modal="1"
 										variant="danger"
@@ -365,6 +365,7 @@ export default {
 		customFields: { type: Array, default: null },
 		saveApiPath: { type: String, default: null },
 		supportsInventoryFields: { type: Boolean, default: false },
+		canRemoveCondition: { type: Boolean, default: true },
 	},
 	data() {
 		return {
@@ -442,6 +443,7 @@ export default {
 			authLinkCounter: 0,
 
 			filterTypeOptions: [
+				{ value: 'base', text: this.$t('rule.filter_type_base') },
 				{ value: 'template', text: this.$t('rule.filter_type_template') },
 				{ value: 'group', text: this.$t('rule.filter_type_group') },
 				{ value: 'admin', text: this.$t('rule.filter_type_admin') },
@@ -700,6 +702,8 @@ export default {
 								this.loadAdminValues(configId)
 							}
 						}
+					} else {
+						input.filter_type = 'base'
 					}
 				})
 			})
@@ -1254,7 +1258,22 @@ export default {
 			if (type === 'group') {
 				input.field = 'group_ids'
 				input.operator = 'in'
+			} else if (type === 'base') {
+				input.operator = '=='
 			}
+		},
+
+		getOperatorOptions(input) {
+			if (input.filter_type === 'admin' && input.admin_fieldtype) {
+				const allowed = {
+					select:   ['==', '!='],
+					checkbox: ['==', '!='],
+					string:   ['==', '!=', 'in'],
+				}
+				const keys = allowed[input.admin_fieldtype] || allowed.string
+				return this.operators.filter(o => keys.includes(o.value))
+			}
+			return this.operators
 		},
 
 		onAdminConfigChange(configId, input) {
@@ -1263,6 +1282,11 @@ export default {
 			const config = this.adminConfigOptions.find(o => o.value === configId)
 			const linktype = { TEXT: 'string', TEXTAREA: 'string', SELECT: 'select', CHECKBOX: 'checkbox' }
 			input.admin_fieldtype = linktype[config?.datatype] || 'string'
+			const allowed = { select: ['==', '!='], checkbox: ['==', '!='], string: ['==', '!=', 'in'] }
+			const validOps = allowed[input.admin_fieldtype] || allowed.string
+			if (!validOps.includes(input.operator)) {
+				input.operator = '=='
+			}
 			if (['select', 'checkbox'].includes(input.admin_fieldtype)) {
 				this.loadAdminValues(configId)
 			}
