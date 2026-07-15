@@ -48,7 +48,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="activeFilter && activeFilter.type === 'status' && activeFilter.value === 'compliant'
+										:style="activeFilter?.type === 'status' && activeFilter?.value === 'compliant'
 											? { borderColor: '#2fb344' }
 											: { borderTop: '3px solid #2fb344' }"
 										@click="setTileFilter('status', 'compliant')"
@@ -74,7 +74,7 @@
 
 								<div v-else>
 									<Datatable
-										v-if="activeFilter && activeFilter.type === 'status' && activeFilter.value === 'compliant'"
+										v-if="activeFilter?.type === 'status' && activeFilter?.value === 'compliant'"
 										id="compliance-compliant-datatable"
 										:rowdata="compliantAssetsRowdata"
 										:rowheader="['asset']"
