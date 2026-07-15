@@ -296,7 +296,7 @@ export default {
 		])
 	},
 	methods: {
-		// ── Tile filters ─────────────────────────────────────────────
+		// Tile filters
 
 		setTileFilter(type, value) {
 			if (this.activeFilter?.type === type && this.activeFilter?.value === value) {
@@ -308,7 +308,7 @@ export default {
 			this.fetchResults(this.results.query)
 		},
 
-		// ── Results tab ──────────────────────────────────────────────
+		// Results tab
 
 		async loadResults() {
 			this.results.loading = true
@@ -447,7 +447,7 @@ export default {
 			}
 		},
 
-		// ── EOL tab ──────────────────────────────────────────────────
+		// EOL tab
 
 		async loadEol() {
 			this.eol.loading = true
@@ -518,7 +518,7 @@ export default {
 			}
 		},
 
-		// ── Shared helpers ───────────────────────────────────────────
+		// Shared helpers
 
 		buildCsv(rows) {
 			if (!rows?.length) return ''
