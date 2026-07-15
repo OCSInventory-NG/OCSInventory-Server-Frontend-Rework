@@ -42,7 +42,9 @@
 											>
 												{{ s.label }}
 											</div>
-											<div class="h3 mb-0">{{ resultsSummary.severities[s.key] }}</div>
+											<div class="h3 mb-0">
+												{{ resultsSummary.severities[s.key] }}
+											</div>
 										</div>
 									</div>
 									<div
@@ -57,7 +59,9 @@
 											<div class="subheader mb-1 text-success">
 												{{ $t('compliance.compliant') }}
 											</div>
-											<div class="h3 mb-0 text-success">{{ resultsSummary.compliant }}</div>
+											<div class="h3 mb-0 text-success">
+												{{ resultsSummary.compliant }}
+											</div>
 											<div class="text-muted small">
 												{{ $t('compliance.summary_compliance_rate') }} : {{ complianceRate }}%
 											</div>
