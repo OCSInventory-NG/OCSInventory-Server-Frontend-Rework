@@ -51,7 +51,7 @@
 											</button>&nbsp;&nbsp;
 
 											<PackageResultModal
-												v-if="device.osname != 'SNMP'"
+												v-if="hasAgent"
 												:items="deployment"
 												@reload-deployment="reloadDeployment"
 											/>&nbsp;
@@ -61,8 +61,8 @@
 												@reload-inventory="reloadInventory"
 											/>&nbsp;&nbsp;
 
-											<router-link 
-												v-if="device.osname != 'SNMP'"
+											<router-link
+												v-if="hasAgent"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
 												:title="$t('inventory.see_logs')"
 												class="btn datatable-btn mr-1"
@@ -131,7 +131,7 @@
 												:context="{ assetId: device?.id }"
 											/><br>
 										</div>
-										<div v-if="category.id == 2 && device.osname != 'SNMP'">
+										<div v-if="category.id == 2 && hasAgent">
 											<div align="center">
 												<h2>{{ $t("title.deployment") }}</h2>
 											</div>
@@ -243,6 +243,16 @@ export default {
 
 			loading: true,
 		}
+	},
+	computed: {
+		// Un asset possède un vrai agent OCS uniquement s'il n'est pas SNMP
+		// (aucun agent) ni inventorié via l'API Proxmox ("Proxmox API x.x.x").
+		// Sans agent, ni le déploiement ni les logs d'inventaire n'ont de sens.
+		hasAgent() {
+			if (this.device?.osname === 'SNMP') return false
+			if (String(this.device?.agent ?? '').startsWith('Proxmox API')) return false
+			return true
+		},
 	},
 	async mounted() {
 		const { type, id } = this.$route.params || {}
