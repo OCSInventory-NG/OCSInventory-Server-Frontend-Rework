@@ -23,13 +23,25 @@
 					:candelete="group ? true : false"
 					:usecheckbox="group ? true : false"
 					:deletemultiple="(group) ? true : false"
+					:hascustomactions="group ? false : true"
 					:deleteids="rows"
 					:isbusy="isbusy"
 					is-sticky
 					title="deployment/results"
 					translationkey="deployment."
 					@reload-datatable="reloadDatatable"
-				/>
+				>
+					<!-- Delete button only for deployments still waiting for notification (status 1) -->
+					<template #cell(firstActions)="{ row }">
+						<DeleteItemModal
+							v-if="row.item.status === 1"
+							:id="row.item.id"
+							:name="row.item.name"
+							parameter="deployment/results"
+							@reload-datatable="reloadDatatable"
+						/>
+					</template>
+				</Datatable>
 			</div>
 		</section>
 	</div>
