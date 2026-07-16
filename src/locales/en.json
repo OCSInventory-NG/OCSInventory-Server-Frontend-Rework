@@ -778,6 +778,10 @@
     "view_group_assignments": "View group assignments"
   },
   "trigger_fields": {
+    "softwares": {
+      "names": "Installed software (list)",
+      "versions": "Software versions"
+    },
     "auth_profile": {
       "auth_config": "Authentication configuration",
       "auth_method": "Authentication method",
@@ -839,21 +843,9 @@
     "enabled": "Enabled",
     "evaluate_all": "Evaluate all rules",
     "evaluated": "Evaluation done: {count} result(s)",
-    "field_softwares_names": "Installed software (list)",
-    "field_softwares_versions": "Software version",
     "select_template": "Template",
     "select_section": "Section",
     "software_name_placeholder": "Software name (e.g. curl)",
-    "field_osname": "OS name",
-    "field_osversion": "OS version",
-    "field_name": "Asset name",
-    "field_os_eol_is_eol": "OS end of life",
-    "field_os_eol_eol": "OS EOL date",
-    "field_os_eol_product": "EOL product",
-    "field_os_eol_cycle": "EOL cycle",
-    "field_serial": "Serial number",
-    "field_domain": "Domain",
-    "field_description": "Asset description",
     "eol_title": "System end of life",
     "eol_product": "Product",
     "eol_cycle": "Cycle",

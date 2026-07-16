@@ -59,7 +59,7 @@
 								:id="id"
 								:logic="logic"
 								:view-only="viewOnly"
-								:custom-fields="customFields"
+								:context-fields-path="'compliance/rules/context-fields/'"
 								:supports-inventory-fields="true"
 								:can-remove-condition="false"
 								:save-api-path="`compliance/rules/${id}/`"
@@ -90,17 +90,6 @@ export default {
 
 			logic: {},
 			rule: {},
-
-			customFields: [
-				{ value: 'name',                text: this.$t('compliance.field_name') },
-				{ value: 'serial',              text: this.$t('compliance.field_serial') },
-				{ value: 'domain',              text: this.$t('compliance.field_domain') },
-				{ value: 'description',         text: this.$t('compliance.field_description') },
-				{ value: 'osname',              text: this.$t('compliance.field_osname') },
-				{ value: 'osversion',           text: this.$t('compliance.field_osversion') },
-				{ value: 'softwares_names',     text: this.$t('compliance.field_softwares_names') },
-				{ value: 'softwares_versions',  text: this.$t('compliance.field_softwares_versions') },
-			],
 
 			loading: true,
 		}

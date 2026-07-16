@@ -778,6 +778,10 @@
     "view_group_assignments": "Voir les assignations des groupes"
   },
   "trigger_fields": {
+    "softwares": {
+      "names": "Logiciels installés (liste)",
+      "versions": "Versions des logiciels"
+    },
     "auth_profile": {
       "auth_config": "Configuration d'authentification",
       "auth_method": "Méthode d'authentification",
@@ -839,21 +843,9 @@
     "enabled": "Activée",
     "evaluate_all": "Évaluer toutes les règles",
     "evaluated": "Évaluation effectuée : {count} résultat(s)",
-    "field_softwares_names": "Logiciels installés (liste)",
-    "field_softwares_versions": "Version d'un logiciel",
     "select_template": "Template",
     "select_section": "Section",
     "software_name_placeholder": "Nom du logiciel (ex: curl)",
-    "field_osname": "Nom du système d'exploitation",
-    "field_osversion": "Version du système",
-    "field_name": "Nom de l'asset",
-    "field_os_eol_is_eol": "OS en fin de vie",
-    "field_os_eol_eol": "Date de fin de vie OS",
-    "field_os_eol_product": "Produit EOL",
-    "field_os_eol_cycle": "Cycle EOL",
-    "field_serial": "Numéro de série",
-    "field_domain": "Domaine",
-    "field_description": "Description de l'asset",
     "eol_title": "Fin de vie du système",
     "eol_product": "Produit",
     "eol_cycle": "Cycle",

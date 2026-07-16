@@ -362,7 +362,7 @@ export default {
 		trigger: { type: String, default: "inventory_received" },
 		logic: { type: Object, default: null },
 		viewOnly: { type: Boolean, default: false },
-		customFields: { type: Array, default: null },
+		contextFieldsPath: { type: String, default: null },
 		saveApiPath: { type: String, default: null },
 		supportsInventoryFields: { type: Boolean, default: false },
 		canRemoveCondition: { type: Boolean, default: true },
@@ -490,32 +490,21 @@ export default {
 		async getModelField() {
 			this.loadingfield = true
 
-			if (this.customFields) {
-				this.fields = [...this.customFields]
-				this.loadingfield = false
-				this.loading = false
-				if (this.supportsInventoryFields) {
-					this.loadExistingInventoryFields()
-				}
-				return
-			}
-
 			try {
 				const route = this.triggermodel[this.trigger].route
 				const key = this.triggermodel[this.trigger].key
 
-				const [data, triggers] = await Promise.all([
+				const [data, contextFields] = await Promise.all([
 					this.$api.generic.options(route),
-					this.$api.generic.get("automation/triggers/"),
+					this.loadContextFields(),
 				])
 
-				const triggerObj = triggers.find(t => t.trigger === this.trigger)
-				const contextParents = new Set(Object.keys(triggerObj?.context_fields || {}))
+				const contextParents = new Set(Object.keys(contextFields || {}))
 
 				this.fields = []
 
 				const skipFields = ["inventory_sections", "matched", "group_assignments"]
-				Object.keys(data.actions.POST).forEach((field) => {
+				Object.keys(data?.actions?.POST || {}).forEach((field) => {
 					if (skipFields.includes(field)) return
 					if (contextParents.has(field) || contextParents.has(field.replace(/_id$/, ''))) return
 					this.fields.push({
@@ -524,18 +513,20 @@ export default {
 					})
 				})
 
-				if (triggerObj?.context_fields) {
-					Object.keys(triggerObj.context_fields).forEach(parent => {
-						Object.keys(triggerObj.context_fields[parent]).forEach(child => {
-							const fullPath = `${parent}.${child}`
-							if (!this.fields.find(f => f.value === fullPath)) {
-								this.fields.push({
-									value: fullPath,
-									text: this.$t(`trigger_fields.${fullPath}`, fullPath)
-								})
-							}
-						})
+				Object.keys(contextFields || {}).forEach(parent => {
+					Object.keys(contextFields[parent]).forEach(child => {
+						const fullPath = `${parent}.${child}`
+						if (!this.fields.find(f => f.value === fullPath)) {
+							this.fields.push({
+								value: fullPath,
+								text: this.$t(`trigger_fields.${fullPath}`, fullPath)
+							})
+						}
 					})
+				})
+
+				if (this.supportsInventoryFields) {
+					this.loadExistingInventoryFields()
 				}
 
 				this.errormsg = null
@@ -547,6 +538,18 @@ export default {
 				this.loadingfield = false
 				this.loading = false
 			}
+		},
+
+		async loadContextFields() {
+			// Compliance passes an explicit endpoint that returns the context
+			// schema dict directly; automation rules derive it from the trigger.
+			if (this.contextFieldsPath) {
+				return await this.$api.generic.get(this.contextFieldsPath)
+			}
+			const triggers = await this.$api.generic.get("automation/triggers/")
+			const list = Array.isArray(triggers) ? triggers : (triggers?.results || [])
+			const triggerObj = list.find(t => t.trigger === this.trigger)
+			return triggerObj?.context_fields || {}
 		},
 
 		async getLogicRow() {
