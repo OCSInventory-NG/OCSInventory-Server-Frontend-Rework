@@ -1,6 +1,7 @@
 <template>
 	<div id="template-history-modal">
 		<button
+			v-if="canView"
 			:title="$t('template.history')"
 			class="btn btn-ghost-dark"
 			@click="loadData()"
@@ -88,7 +89,7 @@
 							<button
 								:title="$t('template.rollback')"
 								class="btn btn-ghost-dark"
-								:disabled="viewOnly"
+								:disabled="!canRestore"
 								@click="confirmRollback(row.item)"
 							>
 								<font-awesome-icon
@@ -100,7 +101,7 @@
 								:id="row.item.id"
 								:name="$t('template.history_revision') + ' ' + row.item.revision"
 								:parameter="`templates/${id}/versions`"
-								:disabled="viewOnly"
+								:disabled="!canDelete"
 								@reload-template="getVersions"
 							/>
 						</div>
@@ -185,7 +186,6 @@ export default {
 	name: "TemplateHistoryModal",
 	props: {
 		id: { type: [String, Number], required: true },
-		viewOnly: { type: Boolean, default: false },
 		isProtected: { type: Boolean, default: false }
 	},
 	data() {
@@ -215,6 +215,19 @@ export default {
 				{ key: "label", label: this.$t("template.history_label") },
 				{ key: "actions", label: this.$t("generic.actions"), class: "text-nowrap" },
 			]
+		},
+
+		// "Template - Versionning" permission (templateversion model).
+		// View gates access to the history, restore maps to the "change" right,
+		// deleting a revision to the "delete" right.
+		canView() {
+			return localStorage.getItem('permissions') ?.split(',').includes('template_view_templateversion')
+		},
+		canRestore() {
+			return localStorage.getItem('permissions') ?.split(',').includes('template_change_templateversion')
+		},
+		canDelete() {
+			return localStorage.getItem('permissions') ?.split(',').includes('template_delete_templateversion')
 		}
 	},
 	watch: {

@@ -71,13 +71,11 @@
 									<div class="d-flex justify-content-center align-items-center gap-2">
 										<TemplateHistoryModal
 											:id="parseInt(id)"
-											:view-only="viewOnly"
 											:is-protected="!!template.is_protected"
 											@reload-template="reloadTemplate"
 										/>
 										<TemplateCreateVersionModal
 											:id="parseInt(id)"
-											:view-only="viewOnly"
 											@reload-template="reloadTemplate"
 										/>
 									</div>

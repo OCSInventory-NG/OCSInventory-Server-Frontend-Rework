@@ -4,6 +4,7 @@
 		class="d-inline"
 	>
 		<b-button
+			v-if="canView"
 			:title="$t('template.create_revision')"
 			class="btn-teal"
 			:disabled="viewOnly"
@@ -98,8 +99,7 @@
 export default {
 	name: "TemplateCreateVersionModal",
 	props: {
-		id: { type: [String, Number], required: true },
-		viewOnly: { type: Boolean, default: false }
+		id: { type: [String, Number], required: true }
 	},
 	data() {
 		return {
@@ -114,6 +114,14 @@ export default {
 			label: "",
 
 			loadingcreate: false,
+		}
+	},
+	computed: {
+		canView() {
+			return localStorage.getItem('permissions') ?.split(',').includes('template_view_templateversion')
+		},
+		viewOnly() {
+			return !localStorage.getItem('permissions') ?.split(',').includes('template_add_templateversion')
 		}
 	},
 	watch: {
