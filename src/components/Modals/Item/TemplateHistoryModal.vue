@@ -203,8 +203,11 @@ export default {
 			rollbacksuccess: false,
 			rollbackerror: false,
 			rollbackerrormsg: null,
-
-			fields: [
+		}
+	},
+	computed: {
+		fields() {
+			return [
 				{ key: "revision", label: this.$t("template.history_revision") },
 				{ key: "created_at", label: this.$t("template.history_date") },
 				{ key: "created_by", label: this.$t("template.history_author") },
