@@ -72,6 +72,7 @@
 										<TemplateHistoryModal
 											:id="parseInt(id)"
 											:view-only="viewOnly"
+											:is-protected="!!template.is_protected"
 											@reload-template="reloadTemplate"
 										/>
 										<TemplateCreateVersionModal

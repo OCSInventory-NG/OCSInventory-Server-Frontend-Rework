@@ -96,7 +96,7 @@
 								/>
 							</button>
 							<DeleteItemModal
-								v-if="row.item.revision !== 1"
+								v-if="!isProtected || row.item.revision !== 1"
 								:id="row.item.id"
 								:name="$t('template.history_revision') + ' ' + row.item.revision"
 								:parameter="`templates/${id}/versions`"
@@ -185,7 +185,8 @@ export default {
 	name: "TemplateHistoryModal",
 	props: {
 		id: { type: [String, Number], required: true },
-		viewOnly: { type: Boolean, default: false }
+		viewOnly: { type: Boolean, default: false },
+		isProtected: { type: Boolean, default: false }
 	},
 	data() {
 		return {
