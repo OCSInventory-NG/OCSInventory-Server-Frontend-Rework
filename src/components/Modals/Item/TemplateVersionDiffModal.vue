@@ -173,7 +173,7 @@ export default {
 						status = "added"
 					} else if (!targetSection) {
 						status = "removed"
-					} else if (!this.deepEqual(currentSection, targetSection)) {
+					} else if (!this.deepEqual(this.normalizeSection(currentSection), this.normalizeSection(targetSection))) {
 						status = "modified"
 					}
 
@@ -213,6 +213,28 @@ export default {
 				map[section.name] = section
 			}
 			return map
+		},
+
+		normalizeSection(section) {
+			if (!section) return null
+
+			const fields = (section.fields || [])
+				.map((field) => ({
+					order: field.order ?? null,
+					name: field.name ?? null,
+					retrieval_value: field.retrieval_value ?? null,
+				}))
+				.sort((a, b) =>
+					(Number(a.order) - Number(b.order)) ||
+					String(a.name ?? "").localeCompare(String(b.name ?? ""))
+				)
+
+			return {
+				retrieval_method: section.retrieval_method ?? null,
+				retrieval_output: section.retrieval_output ?? null,
+				target: section.target ?? null,
+				fields,
+			}
 		},
 
 		statusBorderClass(status) {
