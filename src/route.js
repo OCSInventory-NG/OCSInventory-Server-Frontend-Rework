@@ -309,18 +309,18 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/compliance/rules/:id',
-		name: 'EditComplianceRule',
-		component: () => import('@/pages/Configuration/Compliance/EditComplianceRule.vue'),
-		props: true,
+		path: '/configurations/compliance',
+		name: 'ComplianceSettings',
+		component: () => import('@/pages/Configuration/Compliance/ComplianceSettings.vue'),
 		meta: {
 			layout: AppLayout
 		}
 	},
 	{
-		path: '/configurations/compliance/windows-build-mapping',
-		name: 'WindowsBuildMapping',
-		component: () => import('@/pages/Configuration/Compliance/WindowsBuildMapping.vue'),
+		path: '/configurations/compliance/:id',
+		name: 'EditComplianceRule',
+		component: () => import('@/pages/Configuration/Compliance/EditComplianceRule.vue'),
+		props: true,
 		meta: {
 			layout: AppLayout
 		}

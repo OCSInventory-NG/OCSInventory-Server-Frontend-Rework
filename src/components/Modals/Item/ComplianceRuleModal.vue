@@ -204,10 +204,7 @@ export default {
 				logic: {},
 			},
 			rulemodal: false,
-			typeOptions: [
-				{ value: 'software', text: this.$t('compliance.type_software') },
-				{ value: 'security', text: this.$t('compliance.type_security') },
-			],
+			typeOptions: [],
 			severityOptions: [
 				{ value: 'critical', text: this.$t('compliance.severity_critical') },
 				{ value: 'high',     text: this.$t('compliance.severity_high') },
@@ -237,6 +234,7 @@ export default {
 		}
 	},
 	mounted() {
+		this.loadTypes()
 		if(!this.update) {
 			this.loading = false
 		}
@@ -244,6 +242,21 @@ export default {
 	methods: {
 		_apiError(e) {
 			return e?.response?.data?.error || e?.message || String(e)
+		},
+
+		async loadTypes() {
+			try {
+				const data = await this.$api.generic.get("compliance/types/")
+				const types = Array.isArray(data) ? data : (data?.results || [])
+				this.typeOptions = types.map(t => ({
+					value: t.name,
+					text: this.$te('compliance.type_' + t.name)
+						? this.$t('compliance.type_' + t.name)
+						: t.name,
+				}))
+			} catch (e) {
+				this.typeOptions = []
+			}
 		},
 
 		async loadData(id) {

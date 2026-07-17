@@ -538,6 +538,7 @@
     "filter_type_template": "Template",
     "filter_type_group": "Groupe d'assets",
     "filter_type_admin": "Données administratives",
+    "filter_type_software": "Inventaire logiciel",
     "select_group": "Sélectionner un groupe",
     "select_admin_field": "Sélectionner un champ administratif"
   },
@@ -750,8 +751,7 @@
     "usermanagement": "Gestion des utilisateurs",
     "user": "Utilisateur",
     "users": "Utilisateurs",
-    "compliance_config": "Paramètres de conformité",
-    "windows_build_mapping": "Mapping Windows Build"
+    "compliance_config": "Paramètres de conformité"
   },
   "user": {
     "adduser": "Ajouter un nouvel utilisateur",
@@ -800,11 +800,13 @@
     }
   },
   "compliance": {
-    "windows_build_mapping": "Mapping Windows Build",
     "build_number": "Numéro de build",
     "channel": "Canal (endoflife.date)",
     "add_windows_build": "Ajouter un build",
     "edit_windows_build": "Modifier le build",
+    "add_type": "Ajouter un type",
+    "edit_type": "Modifier le type",
+    "type_name": "Nom du type",
     "build_number_invalid": "Le numéro de build doit être un entier",
     "title": "Conformité",
     "global_status": "Statut global",
@@ -829,6 +831,7 @@
     "col_message": "Message",
     "type_software": "Logiciel",
     "type_security": "Sécurité",
+    "type_hardware": "Matériel",
     "severity_critical": "Critique",
     "severity_high": "Haut",
     "severity_medium": "Moyen",
@@ -857,11 +860,13 @@
     "eol_unknown": "Inconnu",
     "tab_windows_build": "Mapping Windows Build",
     "tab_eol_mapping": "Mapping support étendu",
+    "tab_rules": "Règles",
+    "tab_build_eol": "Mapping Build & EOL",
+    "tab_types": "Types",
     "add_eol_mapping": "Ajouter un support étendu",
     "edit_eol_mapping": "Modifier le support étendu",
-    "eol_extended_support_until": "Support étendu jusqu'au",
-    "extended_support_until": "Support étendu jusqu'au",
-    "eol_description": "Description (optionnel)",
+    "is_extended": "Support étendu",
+    "eol_is_extended": "Support étendu actif ?",
     "description": "Description",
     "eol_product_placeholder": "ex : ubuntu",
     "eol_cycle_placeholder": "ex : 22.04"

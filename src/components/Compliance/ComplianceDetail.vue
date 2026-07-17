@@ -136,7 +136,7 @@
 								{{ $t('compliance.eol_support') }}
 							</div>
 							<div class="datagrid-content">
-								{{ eolData.support || '-' }}
+								{{ eolData.product ? (eolData.support ? $t('generic.yes') : $t('generic.no')) : '-' }}
 							</div>
 						</div>
 						<div class="datagrid-item">

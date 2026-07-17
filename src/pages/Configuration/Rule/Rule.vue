@@ -26,12 +26,8 @@
 
 						<div v-else>
 							<RuleModal
-								v-if="canadd && activeTab < triggers.length"
+								v-if="canadd"
 								@reload-datatable="reloadDatatable"
-							/>
-							<ComplianceRuleModal
-								v-if="canaddcompliance && activeTab >= triggers.length"
-								@reload-datatable="reloadComplianceDatatable"
 							/>
 
 							<b-tabs
@@ -61,27 +57,6 @@
 										@reload-datatable="reloadDatatable"
 									/>
 								</b-tab>
-								<b-tab
-									v-if="canviewcompliance"
-									:title="$t('compliance.title')"
-								>
-									<Draggable
-										id="compliance-rules-datatable"
-										:key="`compliance-${complianceDraggableKey}`"
-										:rowdata="complianceRowdata"
-										:rowheader="complianceRowheader"
-										:candelete="candeletecompliance"
-										:canedit="caneditcompliance"
-										:canviewruleaction="canviewcomplianceaction"
-										ruleactionroute="/configurations/compliance/rules"
-										:apiroute="'compliance/rules'"
-										is-sticky
-										editcomponent="ComplianceRuleModal"
-										title="compliance/rules"
-										translationkey="compliance."
-										@reload-datatable="reloadComplianceDatatable"
-									/>
-								</b-tab>
 							</b-tabs>
 						</div>
 					</div>
@@ -104,20 +79,11 @@ export default {
 			canview: false,
 			canviewaction: false,
 
-			canviewcompliance: false,
-			canaddcompliance: false,
-			caneditcompliance: false,
-			candeletecompliance: false,
-			canviewcomplianceaction: false,
-
 			triggers: [],
 			rowdata: [],
 			rowheader: [],
 			draggableKey: 0,
 
-			complianceRowdata: [],
-			complianceRowheader: [],
-			complianceDraggableKey: 0,
 			activeTab: 0,
 
 			excludefields: ["logic", "actions"],
@@ -145,18 +111,7 @@ export default {
 			return
 		}
 
-		if (permissions.includes("compliance_view_compliancerule")) {
-			this.canviewcompliance = true
-			this.canaddcompliance = permissions.includes("compliance_add_compliancerule")
-			this.caneditcompliance = permissions.includes("compliance_change_compliancerule")
-			this.candeletecompliance = permissions.includes("compliance_delete_compliancerule")
-			this.canviewcomplianceaction = permissions.includes("compliance_change_compliancerule")
-		}
-
 		await this.loadInitial()
-		if (this.canviewcompliance) {
-			this.loadComplianceInitial()
-		}
 	},
 	methods: {
 		async loadInitial() {
@@ -224,34 +179,6 @@ export default {
 		async reloadDatatable() {
 			await this.getRules()
 			this.draggableKey += 1
-		},
-
-		async loadComplianceInitial() {
-			try {
-				const header = await this.$api.generic.options("compliance/rules/")
-				this.complianceRowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["logic", "created_at", "updated_at"].includes(f)
-				)
-				await this.getComplianceRules()
-				this.complianceDraggableKey += 1
-			} catch (e) {
-				// non-fatal, compliance tab will be empty
-			}
-		},
-
-		async getComplianceRules() {
-			try {
-				const data = await this.$api.generic.get("compliance/rules/")
-				const rules = Array.isArray(data) ? data : (data?.results || [])
-				this.complianceRowdata = rules.map(rule => ({ ...rule }))
-			} catch (e) {
-				this.complianceRowdata = []
-			}
-		},
-
-		async reloadComplianceDatatable() {
-			await this.getComplianceRules()
-			this.complianceDraggableKey += 1
 		},
 	}
 }

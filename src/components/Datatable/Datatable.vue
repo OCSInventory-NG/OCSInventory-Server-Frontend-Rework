@@ -682,6 +682,7 @@ export default {
 		translationkey: { type: String, default: '' },
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
+		ruleactionroute: { type: String, default: '/configurations/rules' },
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
@@ -1401,7 +1402,7 @@ export default {
 			this.$router.push('/deployment/history/'+id); 
 		},
 		goToEditRule(id){
-			this.$router.push('/configurations/rules/'+id); 
+			this.$router.push(this.ruleactionroute+'/'+id);
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)

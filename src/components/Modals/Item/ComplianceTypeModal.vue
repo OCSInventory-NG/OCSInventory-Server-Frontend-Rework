@@ -1,5 +1,5 @@
 <template>
-	<div id="eol-mapping-modal">
+	<div id="compliance-type-modal">
 		<div
 			v-if="!update"
 			class="page-header d-print-none"
@@ -7,7 +7,7 @@
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('compliance.add_eol_mapping')"
+						:title="$t('compliance.add_type')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						@click="loadData()"
@@ -15,14 +15,14 @@
 						<font-awesome-icon
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('compliance.add_eol_mapping') }}
+						{{ $t('compliance.add_type') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
 			<button
-				:title="$t('compliance.edit_eol_mapping')"
+				:title="$t('compliance.edit_type')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
@@ -33,15 +33,15 @@
 		</div>
 
 		<b-modal
-			id="eolmappingmodal"
-			v-model="eolmappingmodal"
-			:title="(!update) ? $t('compliance.add_eol_mapping') : $t('compliance.edit_eol_mapping')"
+			id="compliancetypemodal"
+			v-model="compliancetypemodal"
+			:title="(!update) ? $t('compliance.add_type') : $t('compliance.edit_type')"
 			hide-footer
 			modal-class="custom-modal"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('compliance.add_eol_mapping') : $t('compliance.edit_eol_mapping') }}
+					{{ (!update) ? $t('compliance.add_type') : $t('compliance.edit_type') }}
 					<b-spinner
 						v-if="loadingcreate"
 						variant="success"
@@ -82,43 +82,13 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('compliance.eol_product')"
-							label-for="eol-product"
+							:label="$t('compliance.type_name')"
+							label-for="type-name"
 						>
 							<b-form-input
-								id="eol-product"
-								v-model="row.product"
-								:placeholder="$t('compliance.eol_product_placeholder')"
+								id="type-name"
+								v-model="row.name"
 								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('compliance.eol_cycle')"
-							label-for="eol-cycle"
-						>
-							<b-form-input
-								id="eol-cycle"
-								v-model="row.cycle"
-								:placeholder="$t('compliance.eol_cycle_placeholder')"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col>
-						<b-form-group
-							:label="$t('compliance.eol_is_extended')"
-							label-for="eol-is-extended"
-						>
-							<b-form-checkbox
-								id="eol-is-extended"
-								v-model="row.is_extended"
-								switch
 							/>
 						</b-form-group>
 					</b-col>
@@ -152,7 +122,7 @@
 
 <script>
 export default {
-	name: "EOLMappingModal",
+	name: "ComplianceTypeModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null },
@@ -167,11 +137,9 @@ export default {
 			createwithsuccess: false,
 
 			row: {
-				product: null,
-				cycle: null,
-				is_extended: true,
+				name: null,
 			},
-			eolmappingmodal: false,
+			compliancetypemodal: false,
 
 			loading: true,
 			loadingcreate: false,
@@ -180,12 +148,10 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.eolmappingmodal = false
+				this.compliancetypemodal = false
 				this.createwithsuccess = false
 				this.row = {
-					product: null,
-					cycle: null,
-					is_extended: true,
+					name: null,
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
@@ -202,11 +168,9 @@ export default {
 		},
 
 		async loadData(id) {
-			this.eolmappingmodal = true
+			this.compliancetypemodal = true
 			this.row = {
-				product: null,
-				cycle: null,
-				is_extended: true,
+				name: null,
 			}
 
 			this.errormsg = null
@@ -218,7 +182,7 @@ export default {
 			if (id) {
 				this.loading = true
 				try {
-					const data = await this.$api.generic.get(`compliance/eol-extended-support/${id}/`)
+					const data = await this.$api.generic.get(`compliance/types/${id}/`)
 					this.row = data
 					this.errored = false
 				} catch (e) {
@@ -240,12 +204,9 @@ export default {
 
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("compliance/eol-extended-support/", this.row)
+					await this.$api.generic.post("compliance/types/", this.row)
 				} else {
-					await this.$api.generic.patch(
-						`compliance/eol-extended-support/${this.row.id}/`,
-						this.row,
-					)
+					await this.$api.generic.patch(`compliance/types/${this.row.id}/`, this.row)
 				}
 
 				this.createwithsuccess = true

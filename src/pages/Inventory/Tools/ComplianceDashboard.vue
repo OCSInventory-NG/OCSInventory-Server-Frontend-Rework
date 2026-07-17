@@ -474,7 +474,7 @@ export default {
 					eol_product: r.product || '-',
 					eol_cycle:   r.cycle || '-',
 					eol_date:    r.eol || '-',
-					eol_support: r.support || '-',
+					eol_support: r.product ? (r.support ? this.$t('generic.yes') : this.$t('generic.no')) : '-',
 					eol_latest:  r.latest || '-',
 					is_eol:      !r.product
 						? this.$t('compliance.eol_unknown')

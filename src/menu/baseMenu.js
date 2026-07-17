@@ -232,8 +232,8 @@ export const baseMenu = [
 			},
 			{
 				headerKey: "title.compliance_config",
-				link: "/configurations/compliance/windows-build-mapping",
-				route: "WindowsBuildMapping",
+				link: "/configurations/compliance",
+				route: "ComplianceSettings",
 				column: "inventory",
 			},
 			{

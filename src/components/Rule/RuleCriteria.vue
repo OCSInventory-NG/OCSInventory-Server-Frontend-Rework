@@ -149,9 +149,12 @@
 									@update:model-value="val => onAdminConfigChange(val, input)"
 								/>
 							</b-col>
-							<b-col v-if="!supportsInventoryFields || !input.filter_type
-							|| input.filter_type === 'base'
-							|| (input.filter_type === 'template' && !!input.inventory_section)">
+							<b-col
+								v-if="!supportsInventoryFields || !input.filter_type
+									|| input.filter_type === 'base'
+									|| input.filter_type === 'software'
+									|| (input.filter_type === 'template' && !!input.inventory_section)"
+							>
 								<b-form-group>
 									<v-select
 										id="field"
@@ -168,9 +171,9 @@
 									<b-form-input
 										v-if="input.field &&
 											(input.field.includes('metadata') ||
-												input.field === 'softwares_versions')"
+												input.field === 'softwares.versions')"
 										v-model="input.metadata_field"
-										:placeholder="input.field === 'softwares_versions'
+										:placeholder="input.field === 'softwares.versions'
 											? $t('compliance.software_name_placeholder')
 											: 'Metadata field'"
 										class="mb-3"
@@ -442,12 +445,7 @@ export default {
 			disabledvalue: ["!!", "!"],
 			authLinkCounter: 0,
 
-			filterTypeOptions: [
-				{ value: 'base', text: this.$t('rule.filter_type_base') },
-				{ value: 'template', text: this.$t('rule.filter_type_template') },
-				{ value: 'group', text: this.$t('rule.filter_type_group') },
-				{ value: 'admin', text: this.$t('rule.filter_type_admin') },
-			],
+			hasSoftware: false,
 			adminConfigOptions: [],
 			loadingadminconfig: false,
 			adminValueOptions: {},
@@ -463,6 +461,20 @@ export default {
 			loadingtemplate: false,
 			loadingsection: false,
 		}
+	},
+	computed: {
+		filterTypeOptions() {
+			const options = [
+				{ value: 'base', text: this.$t('rule.filter_type_base') },
+				{ value: 'template', text: this.$t('rule.filter_type_template') },
+				{ value: 'group', text: this.$t('rule.filter_type_group') },
+				{ value: 'admin', text: this.$t('rule.filter_type_admin') },
+			]
+			if (this.hasSoftware) {
+				options.push({ value: 'software', text: this.$t('rule.filter_type_software') })
+			}
+			return options
+		},
 	},
 	watch: {
 		successed: function() {
@@ -500,6 +512,7 @@ export default {
 				])
 
 				const contextParents = new Set(Object.keys(contextFields || {}))
+				this.hasSoftware = contextParents.has('softwares')
 
 				this.fields = []
 
@@ -570,9 +583,9 @@ export default {
 								metadata_field = fullVar.split(".metadata.")[1]
 								fullVar = fullVar.split(".metadata.")[0] + ".metadata"
 							}
-							if (fullVar && fullVar.startsWith("softwares_versions.")) {
-								metadata_field = fullVar.split("softwares_versions.")[1]
-								fullVar = "softwares_versions"
+							if (fullVar && fullVar.startsWith("softwares.versions.")) {
+								metadata_field = fullVar.split("softwares.versions.")[1]
+								fullVar = "softwares.versions"
 							}
 							this.datavalues = [
 								[
@@ -672,9 +685,9 @@ export default {
 						input.metadata_field = input.field.split(".metadata.")[1]
 						input.field = input.field.split(".metadata.")[0] + ".metadata"
 					}
-					if (input.field && input.field.startsWith("softwares_versions.") && input.metadata_field == null) {
-						input.metadata_field = input.field.split("softwares_versions.")[1]
-						input.field = "softwares_versions"
+					if (input.field && input.field.startsWith("softwares.versions.") && input.metadata_field == null) {
+						input.metadata_field = input.field.split("softwares.versions.")[1]
+						input.field = "softwares.versions"
 					}
 				})
 			})
@@ -705,6 +718,8 @@ export default {
 								this.loadAdminValues(configId)
 							}
 						}
+					} else if (input.field.startsWith('softwares.')) {
+						input.filter_type = 'software'
 					} else {
 						input.filter_type = 'base'
 					}
@@ -720,6 +735,14 @@ export default {
 				return this.invfieldopt[masterindex][index]
 			}
 			return this.fields.filter(option => {
+				const isSoftware = option.value.startsWith('softwares.')
+				if (this.hasSoftware) {
+					if (input.filter_type === 'software') {
+						if (!isSoftware) return false
+					} else if (isSoftware) {
+						return false
+					}
+				}
 				if (option.value !== 'auth_profile.auth_config') return true
 				return input.field === 'auth_profile.auth_config'
 			})
@@ -771,7 +794,7 @@ export default {
 		pushInLogicComplexe(object, key, logics) {
 			let fieldVar = logics[key].field
 			const hasMetadataC = logics[key].metadata_field
-				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")
+				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares.versions")
 			if (hasMetadataC) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
@@ -798,7 +821,7 @@ export default {
 		pushInLogicSimple(object, key, logics) {
 			let fieldVar = logics[key].field
 			const hasMetadataS = logics[key].metadata_field
-				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares_versions")
+				&& (logics[key].field.includes("metadata") || logics[key].field === "softwares.versions")
 			if (hasMetadataS) {
 				fieldVar = `${logics[key].field}.${logics[key].metadata_field}`
 			}
