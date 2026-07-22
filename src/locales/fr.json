@@ -243,6 +243,7 @@
     "name": "Nom",
     "nb": "Nombre",
     "notified": "Notifié",
+    "no_deployable_selection": "La sélection contient des actifs (SNMP ou Proxmox) non éligibles au déploiement. Veuillez les désélectionner.",
     "original_file_name": "Nom du fichier",
     "package": "Paquet",
     "path": "Chemin",

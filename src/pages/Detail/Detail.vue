@@ -245,9 +245,8 @@ export default {
 		}
 	},
 	computed: {
-		// Un asset possède un vrai agent OCS uniquement s'il n'est pas SNMP
-		// (aucun agent) ni inventorié via l'API Proxmox ("Proxmox API x.x.x").
-		// Sans agent, ni le déploiement ni les logs d'inventaire n'ont de sens.
+		// An asset only has a real OCS agent if it is not SNMP or inventoried
+		// through the Proxmox API.
 		hasAgent() {
 			if (this.device?.osname === 'SNMP') return false
 			if (String(this.device?.agent ?? '').startsWith('Proxmox API')) return false

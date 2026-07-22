@@ -243,6 +243,7 @@
     "name": "Name",
     "nb": "Count",
     "notified": "Notified",
+    "no_deployable_selection": "The selection contains assets (SNMP or Proxmox) that are not eligible for deployment. Please deselect them.",
     "original_file_name": "Filename",
     "package": "Package",
     "path": "Path",
