@@ -836,6 +836,11 @@ export default {
 		rowdata: function () {
 			if (!this.serverSide && Array.isArray(this.rowdata)) {
 				this.totalRows = this.rowdata.length
+				// Re-sync the export data when the parent replaces the dataset
+				// in place (e.g. EOL tile filtering, same instance); otherwise
+				// json_data stays on the initial set and "export all" ignores
+				// the active filter.
+				this.json_data = this.rowdata
 			}
 			this.refreshStickyHeader()
 		},

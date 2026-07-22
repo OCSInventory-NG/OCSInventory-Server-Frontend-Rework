@@ -138,7 +138,7 @@
 															</div>
 															<div class="datagrid-content">
 																<span
-																	v-if="eolStatus"
+																	v-if="eolStatus && eolStatus.product"
 																	:class="eolStatus.is_eol
 																		? 'badge bg-danger'
 																		: 'badge bg-success'"
