@@ -318,6 +318,13 @@ export default {
 			this.getEolStatus()
 			// Get categories
 			await this.getCategories()
+
+			// Open the compliance tab directly when requested via query param.
+			// The compliance tab is rendered right after the category id 1.
+			if (this.$route.query.tab === "compliance") {
+				const idx = this.categories.findIndex((c) => c.id === 1)
+				if (idx !== -1) this.activetab = idx + 1
+			}
 			return
 		}
 

@@ -309,7 +309,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/compliance',
+		path: '/configurations/compliance_settings',
 		name: 'ComplianceSettings',
 		component: () => import('@/pages/Configuration/Compliance/ComplianceSettings.vue'),
 		meta: {
@@ -317,7 +317,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/compliance/:id',
+		path: '/configurations/compliance_settings/:id',
 		name: 'EditComplianceRule',
 		component: () => import('@/pages/Configuration/Compliance/EditComplianceRule.vue'),
 		props: true,

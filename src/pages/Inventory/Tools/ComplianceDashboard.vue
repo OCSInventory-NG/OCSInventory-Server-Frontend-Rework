@@ -9,9 +9,18 @@
 			<div class="page-body">
 				<div class="card">
 					<div class="card-body">
-						<b-tabs>
-							<!-- Résultats des règles -->
-							<b-tab :title="$t('title.compliance_results')">
+						<b-tabs
+							v-model="mainTab"
+							vertical
+							pills
+							card
+							content-class="col-10 sticky-tabs"
+						>
+							<!-- By assets -->
+							<b-tab
+								:title="$t('title.compliance_by_assets')"
+								title-item-class="ocs-menu-tab"
+							>
 								<section v-if="results.errored">
 									<Alert
 										:message="results.errormsg"
@@ -63,6 +72,21 @@
 											</div>
 										</div>
 									</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="activeFilter?.type === 'status' && activeFilter?.value === 'non_compliant'
+											? { borderColor: '#d63939' }
+											: { borderTop: '3px solid #d63939' }"
+										@click="setTileFilter('status', 'non_compliant')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div class="subheader mb-1 text-danger">
+												{{ $t('compliance.non_compliant') }}
+											</div>
+											<div class="h3 mb-0 text-danger">{{ resultsSummary.nonCompliant }}</div>
+										</div>
+									</div>
 								</div>
 
 								<div
@@ -86,14 +110,40 @@
 										is-sticky
 									/>
 									<Datatable
+										v-else-if="activeFilter?.type === 'status' && activeFilter?.value === 'non_compliant'"
+										id="compliance-noncompliant-datatable"
+										:rowdata="nonCompliantAssetsRowdata"
+										:rowheader="['asset', 'rule']"
+										:clickablecells="['rule']"
+										:usecheckbox="false"
+										:canaccessdetails="true"
+										title="compliance_results"
+										translationkey="compliance."
+										:server-side="false"
+										is-sticky
+										@cell-click="onNonCompliantCellClick"
+									/>
+									<Datatable
+										v-else-if="activeFilter?.type === 'severity'"
+										id="compliance-severity-datatable"
+										:rowdata="severityAssetsRowdata"
+										:rowheader="['asset', 'rule']"
+										:clickablecells="['rule']"
+										:usecheckbox="false"
+										:canaccessdetails="true"
+										title="compliance_results"
+										translationkey="compliance."
+										:server-side="false"
+										is-sticky
+										@cell-click="onNonCompliantCellClick"
+									/>
+									<Datatable
 										v-else
 										id="compliance-results-datatable"
 										:rowdata="results.rowdata"
 										:rowheader="results.rowheader"
 										:usecheckbox="false"
 										:canaccessdetails="true"
-										sortby="evaluated_at"
-										sortdesc="desc"
 										title="compliance_results"
 										translationkey="compliance."
 										:server-side="true"
@@ -108,8 +158,90 @@
 								</div>
 							</b-tab>
 
+							<b-tab
+								:title="$t('title.compliance_by_rules')"
+								title-item-class="ocs-menu-tab"
+							>
+								<section v-if="byrules.errored">
+									<Alert
+										:message="byrules.errormsg"
+										:cols="true"
+										variant="danger"
+									/>
+								</section>
+
+								<div
+									v-if="byrules.loading"
+									class="ocs-loader"
+								>
+									<Loader />
+								</div>
+
+								<div v-else-if="byrules.selectedRule">
+									<a
+										href="#"
+										class="ocs-link d-inline-block mb-2"
+										@click.prevent="byrules.selectedRule = null"
+									>
+										← {{ $t('compliance.back_to_rules') }}
+									</a>
+									<h2 class="mb-3">{{ byrules.selectedRule.rule_name }}</h2>
+									<Datatable
+										id="compliance-byrules-assets-datatable"
+										:rowdata="byrules.assetsRowdata"
+										:rowheader="['asset']"
+										:usecheckbox="false"
+										:canaccessdetails="true"
+										:isbusy="byrules.assetsLoading"
+										title="compliance_results"
+										translationkey="compliance."
+										:server-side="false"
+										is-sticky
+									/>
+								</div>
+
+								<div v-else>
+									<div class="d-flex gap-2 mb-3 mt-3">
+										<div
+											v-for="s in severityTiles"
+											:key="s.key"
+											class="card flex-fill"
+											style="cursor: pointer;"
+											:style="byrules.filter === s.key
+												? { borderColor: s.color }
+												: { borderTop: '3px solid ' + s.color }"
+											@click="setByRulesFilter(s.key)"
+										>
+											<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+												<div
+													class="subheader mb-1"
+													:style="{ color: s.color }"
+												>
+													{{ s.label }}
+												</div>
+												<div class="h3 mb-0">{{ byRulesTileCounts[s.key] }}</div>
+											</div>
+										</div>
+									</div>
+									<Datatable
+										id="compliance-byrules-datatable"
+										:rowdata="byrulesRowdata"
+										:rowheader="['rule_name', 'severity', 'type', 'impacted']"
+										:usecheckbox="false"
+										:clickablecells="['impacted']"
+										title="compliance_results"
+										translationkey="compliance."
+										:server-side="false"
+										is-sticky
+										@cell-click="onRuleCellClick"
+									/>
+								</div>
+							</b-tab>
 							<!-- Fin de vie des systèmes -->
-							<b-tab :title="$t('title.compliance_eol')">
+							<b-tab
+								:title="$t('title.compliance_eol')"
+								title-item-class="ocs-menu-tab"
+							>
 								<section v-if="eol.errored">
 									<Alert
 										:message="eol.errormsg"
@@ -118,66 +250,95 @@
 									/>
 								</section>
 
-								<!-- Cartes récapitulatives EOL -->
+								<!-- EOL summary tiles -->
 								<div
 									v-if="!eolSummary.loading"
-									class="row g-2 mb-3 mt-3"
+									class="d-flex gap-2 mb-3 mt-3"
 								>
-									<div class="col-3">
-										<div class="card">
-											<div class="card-body text-center p-2">
-												<div class="subheader mb-1">
-													{{ $t('compliance.summary_monitored') }}
-												</div>
-												<div class="h3 mb-0">
-													{{ eolSummary.total }}
-												</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="eolFilter === null ? { borderColor: '#adb5bd' } : {}"
+										@click="setEolFilter(null)"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div class="subheader mb-1">{{ $t('compliance.summary_monitored') }}</div>
+											<div class="h3 mb-0">{{ eolSummary.total }}</div>
+											<div class="text-muted small">
+												{{ $t('compliance.eol_coverage') }} : {{ eolCoverage }}%
 											</div>
 										</div>
 									</div>
-									<div class="col-3">
-										<div
-											class="card"
-											style="border-top: 3px solid #d63939"
-										>
-											<div class="card-body text-center p-2">
-												<div class="subheader mb-1 text-danger">
-													{{ $t('compliance.eol_expired') }}
-												</div>
-												<div class="h3 mb-0 text-danger">
-													{{ eolSummary.expired }}
-												</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="eolFilter === 'supported'
+											? { borderColor: '#2fb344' }
+											: { borderTop: '3px solid #2fb344' }"
+										@click="setEolFilter('supported')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div
+												class="subheader mb-1"
+												:style="{ color: '#2fb344' }"
+											>
+												{{ $t('compliance.eol_active') }}
 											</div>
+											<div class="h3 mb-0" :style="{ color: '#2fb344' }">{{ eolSummary.supported }}</div>
 										</div>
 									</div>
-									<div class="col-3">
-										<div
-											class="card"
-											style="border-top: 3px solid #2fb344"
-										>
-											<div class="card-body text-center p-2">
-												<div class="subheader mb-1 text-success">
-													{{ $t('compliance.eol_active') }}
-												</div>
-												<div class="h3 mb-0 text-success">
-													{{ eolSummary.active }}
-												</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="eolFilter === 'extended'
+											? { borderColor: '#f59f00' }
+											: { borderTop: '3px solid #f59f00' }"
+										@click="setEolFilter('extended')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div
+												class="subheader mb-1"
+												:style="{ color: '#f59f00' }"
+											>
+												{{ $t('compliance.eol_extended') }}
 											</div>
+											<div class="h3 mb-0" :style="{ color: '#f59f00' }">{{ eolSummary.extended }}</div>
 										</div>
 									</div>
-									<div class="col-3">
-										<div
-											class="card"
-											style="border-top: 3px solid #adb5bd"
-										>
-											<div class="card-body text-center p-2">
-												<div class="subheader mb-1 text-muted">
-													{{ $t('compliance.eol_unknown') }}
-												</div>
-												<div class="h3 mb-0 text-muted">
-													{{ eolSummary.unknown }}
-												</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="eolFilter === 'expired'
+											? { borderColor: '#d63939' }
+											: { borderTop: '3px solid #d63939' }"
+										@click="setEolFilter('expired')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div
+												class="subheader mb-1"
+												:style="{ color: '#d63939' }"
+											>
+												{{ $t('compliance.eol_expired') }}
 											</div>
+											<div class="h3 mb-0" :style="{ color: '#d63939' }">{{ eolSummary.expired }}</div>
+										</div>
+									</div>
+									<div
+										class="card flex-fill"
+										style="cursor: pointer;"
+										:style="eolFilter === 'unknown'
+											? { borderColor: '#adb5bd' }
+											: { borderTop: '3px solid #adb5bd' }"
+										@click="setEolFilter('unknown')"
+									>
+										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
+											<div
+												class="subheader mb-1"
+												:style="{ color: '#adb5bd' }"
+											>
+												{{ $t('compliance.eol_unknown') }}
+											</div>
+											<div class="h3 mb-0" :style="{ color: '#adb5bd' }">{{ eolSummary.unknown }}</div>
 										</div>
 									</div>
 								</div>
@@ -219,21 +380,22 @@ const RESULTS_ORDERING_MAP = {
 	rule_type:    'rule__type',
 	severity:     'rule__severity',
 	status:       'status',
-	evaluated_at: 'evaluated_at',
 }
 
 export default {
 	name: 'ComplianceDashboard',
 	data() {
 		return {
+			mainTab: 0,
 			activeFilter: null,
+			eolFilter: null,
 			results: {
 				errored: false,
 				errormsg: null,
 				loading: true,
 				isbusy: true,
 				rowdata: [],
-				rowheader: ['asset', 'rule_name', 'rule_type', 'severity', 'status', 'evaluated_at'],
+				rowheader: ['asset', 'rule_name', 'rule_type', 'severity', 'status'],
 				total: 0,
 				query: {
 					limit: localStorage.getItem('perPage') ? Number(localStorage.getItem('perPage')) : 5,
@@ -257,13 +419,25 @@ export default {
 				compliant: 0,
 				severities: { critical: 0, high: 0, medium: 0, low: 0 },
 				compliantAssets: [],
+				nonCompliantAssets: [],
+			},
+			byrules: {
+				loading: true,
+				errored: false,
+				errormsg: null,
+				rows: [],
+				filter: null,
+				selectedRule: null,
+				assetsRowdata: [],
+				assetsLoading: false,
 			},
 			eolSummary: {
 				loading: true,
 				total: 0,
 				expired: 0,
 				unknown: 0,
-				active: 0,
+				supported: 0,
+				extended: 0,
 			},
 		}
 	},
@@ -276,6 +450,33 @@ export default {
 				{ key: 'low',      label: this.$t('compliance.severity_low'),      color: '#206bc4' },
 			]
 		},
+		eolCoverage() {
+			if (!this.eolSummary.total) return 0
+			return Math.round(((this.eolSummary.supported + this.eolSummary.extended) / this.eolSummary.total) * 100)
+		},
+		byRulesTileCounts() {
+			const counts = { critical: 0, high: 0, medium: 0, low: 0 }
+			this.byrules.rows.forEach(r => {
+				if (counts[r.severity] !== undefined) counts[r.severity] += 1
+			})
+			return counts
+		},
+		byrulesRowdata() {
+			const order = { critical: 0, high: 1, medium: 2, low: 3 }
+			return this.byrules.rows
+				.filter(r => !this.byrules.filter || r.severity === this.byrules.filter)
+				.sort((a, b) => (order[a.severity] ?? 99) - (order[b.severity] ?? 99))
+				.map(r => ({
+					id: r.rule,
+					rule: r.rule,
+					rule_name: r.rule_name,
+					severity: this.$te('compliance.severity_' + r.severity)
+						? this.$t('compliance.severity_' + r.severity)
+						: r.severity,
+					type: this.ruleTypeLabel(r.type),
+					impacted: r.impacted,
+				}))
+		},
 		complianceRate() {
 			if (this.resultsSummary.total === 0) return 0
 			return Math.round((this.resultsSummary.compliant / this.resultsSummary.total) * 100)
@@ -286,13 +487,40 @@ export default {
 				asset: { id: a.id, name: a.name },
 			}))
 		},
+		nonCompliantAssetsRowdata() {
+			return this.resultsSummary.nonCompliantAssets.map(a => ({
+				id:    a.id,
+				asset: { id: a.id, name: a.name },
+				rule:  a.ruleCount,
+			}))
+		},
+		severityAssetsRowdata() {
+			const severity = this.activeFilter?.type === 'severity' ? this.activeFilter.value : null
+			if (!severity) return []
+			return this.resultsSummary.nonCompliantAssets
+				.filter(a => (a.counts?.[severity] || 0) > 0)
+				.map(a => ({
+					id:    a.id,
+					asset: { id: a.id, name: a.name },
+					rule:  a.counts[severity],
+				}))
+		},
+	},
+	watch: {
+		// Leaving/returning to a tab clears the "By rules" drill-down so the
+		// rules list is shown again instead of the previously selected rule.
+		mainTab() {
+			this.byrules.selectedRule = null
+		},
 	},
 	async mounted() {
+		this.activeFilter = { type: 'status', value: 'non_compliant' }
 		await Promise.all([
 			this.loadResults(),
 			this.loadEol(),
 			this.loadResultsSummary(),
 			this.loadEolSummary(),
+			this.loadByRules(),
 		])
 	},
 	methods: {
@@ -375,9 +603,6 @@ export default {
 				status:       this.$te('compliance.' + r.status)
 					? this.$t('compliance.' + r.status)
 					: r.status,
-				evaluated_at: r.evaluated_at
-					? new Date(r.evaluated_at).toLocaleString(this.$i18n.locale)
-					: '-',
 			}))
 		},
 
@@ -418,29 +643,112 @@ export default {
 			}
 		},
 
+		async loadByRules() {
+			this.byrules.loading = true
+			try {
+				const data = await this.$api.generic.get('compliance/results/rule-summary/', {}, {})
+				this.byrules.rows = Array.isArray(data) ? data : (data?.results || [])
+				this.byrules.errored = false
+				this.byrules.errormsg = null
+			} catch (e) {
+				this.byrules.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.byrules.errored = true
+			} finally {
+				this.byrules.loading = false
+			}
+		},
+
+		async selectRule(rule) {
+			this.byrules.selectedRule = rule
+			this.byrules.assetsLoading = true
+			this.byrules.assetsRowdata = []
+			try {
+				const data = await this.$api.generic.get(
+					'compliance/results/',
+					{ rule: rule.rule, status: 'non_compliant', limit: 1000 },
+					{}
+				)
+				const items = data?.results || data || []
+				this.byrules.assetsRowdata = items.map(r => ({
+					id: r.asset,
+					asset: { id: r.asset, name: r.asset_name || '-' },
+				}))
+			} catch (e) {
+				this.byrules.assetsRowdata = []
+			} finally {
+				this.byrules.assetsLoading = false
+			}
+		},
+
+		setEolFilter(type) {
+			this.eolFilter = this.eolFilter === type ? null : type
+			this.fetchEol()
+		},
+
+		setByRulesFilter(severity) {
+			this.byrules.filter = this.byrules.filter === severity ? null : severity
+		},
+
+		onRuleCellClick(payload) {
+			if (payload?.field === 'impacted') {
+				this.selectRule(payload.item)
+			}
+		},
+
+		onNonCompliantCellClick(payload) {
+			if (payload?.field === 'rule' && payload.item?.asset?.id) {
+				this.$router.push({
+					path: `/inventory/asset/${payload.item.asset.id}`,
+					query: { tab: 'compliance' },
+				})
+			}
+		},
+
+		ruleTypeLabel(type) {
+			return this.$te('compliance.type_' + type)
+				? this.$t('compliance.type_' + type)
+				: type
+		},
+
 		async loadResultsSummary() {
 			try {
-				const assetSummary = await this.$api.generic.get('compliance/results/asset-summary/', {}, {})
+				const [assetSummary, fleet] = await Promise.all([
+					this.$api.generic.get('compliance/results/asset-summary/', {}, {}),
+					this.$api.generic.get('asset/bases/', { limit: 1 }, {}),
+				])
 				const summaryItems = Array.isArray(assetSummary) ? assetSummary : []
 
+				// Count impacted assets per severity (not rule occurrences), to
+				// match the "By assets" tab and the per-severity datatable.
 				const sev = { critical: 0, high: 0, medium: 0, low: 0 }
 				summaryItems.forEach(s => {
-					sev.critical += s.counts?.critical || 0
-					sev.high     += s.counts?.high     || 0
-					sev.medium   += s.counts?.medium   || 0
-					sev.low      += s.counts?.low      || 0
+					if (s.counts?.critical > 0) sev.critical += 1
+					if (s.counts?.high     > 0) sev.high     += 1
+					if (s.counts?.medium   > 0) sev.medium   += 1
+					if (s.counts?.low      > 0) sev.low      += 1
 				})
 
-				const totalAssets     = summaryItems.length
+				// fleetTotal is kept as the compliance-rate denominator (coverage
+				// over the whole fleet); the non-compliant tile counts only
+				// assets actually flagged non compliant, to match the datatable.
+				const fleetTotal      = typeof fleet?.count === 'number' ? fleet.count : summaryItems.length
 				const compliantItems  = summaryItems.filter(s => s.global_status === 'compliant')
+				const nonCompliantItems = summaryItems.filter(s => s.global_status === 'non_compliant')
 
 				this.resultsSummary = {
 					loading: false,
-					total:        totalAssets,
-					nonCompliant: totalAssets - compliantItems.length,
+					total:        fleetTotal,
+					nonCompliant: nonCompliantItems.length,
 					compliant:    compliantItems.length,
 					severities:   sev,
 					compliantAssets: compliantItems.map(s => ({ id: s.asset, name: s.asset_name || String(s.asset) })),
+					nonCompliantAssets: nonCompliantItems.map(s => ({
+						id: s.asset,
+						name: s.asset_name || String(s.asset),
+						counts: s.counts || {},
+						ruleCount: (s.counts?.critical || 0) + (s.counts?.high || 0)
+							+ (s.counts?.medium || 0) + (s.counts?.low || 0),
+					})),
 				}
 			} catch {
 				this.resultsSummary.loading = false
@@ -466,7 +774,19 @@ export default {
 		async fetchEol() {
 			this.eol.isbusy = true
 			try {
-				const data = await this.$api.generic.get('compliance/eol-status/', {}, {})
+				const filters = {}
+				if (this.eolFilter === 'expired') {
+					filters.is_eol = true
+				} else if (this.eolFilter === 'extended') {
+					filters.support = true
+				} else if (this.eolFilter === 'unknown') {
+					filters.product__isnull = true
+				} else if (this.eolFilter === 'supported') {
+					filters.is_eol = false
+					filters.support = false
+					filters.product__isnull = false
+				}
+				const data = await this.$api.generic.get('compliance/eol-status/', {}, filters)
 				const items = Array.isArray(data) ? data : (data?.results || [])
 				this.eol.rowdata = items.map(r => ({
 					id: r.id,
@@ -474,7 +794,9 @@ export default {
 					eol_product: r.product || '-',
 					eol_cycle:   r.cycle || '-',
 					eol_date:    r.eol || '-',
-					eol_support: r.product ? (r.support ? this.$t('generic.yes') : this.$t('generic.no')) : '-',
+					eol_support: r.product
+						? (r.support ? (r.support_date || this.$t('generic.yes')) : this.$t('generic.no'))
+						: '-',
 					eol_latest:  r.latest || '-',
 					is_eol:      !r.product
 						? this.$t('compliance.eol_unknown')
@@ -498,20 +820,23 @@ export default {
 
 		async loadEolSummary() {
 			try {
-				const [all, expired, unknown] = await Promise.all([
+				const [all, expired, unknown, extended] = await Promise.all([
 					this.$api.generic.get('compliance/eol-status/', { limit: 1 }, {}),
 					this.$api.generic.get('compliance/eol-status/', { limit: 1 }, { is_eol: true }),
 					this.$api.generic.get('compliance/eol-status/', { limit: 1 }, { product__isnull: true }),
+					this.$api.generic.get('compliance/eol-status/', { limit: 1 }, { support: true }),
 				])
-				const total        = typeof all?.count     === 'number' ? all.count     : 0
-				const expiredCount = typeof expired?.count === 'number' ? expired.count : 0
-				const unknownCount = typeof unknown?.count === 'number' ? unknown.count : 0
+				const statusTotal   = typeof all?.count      === 'number' ? all.count      : 0
+				const expiredCount  = typeof expired?.count  === 'number' ? expired.count  : 0
+				const unknownCount  = typeof unknown?.count  === 'number' ? unknown.count  : 0
+				const extendedCount = typeof extended?.count === 'number' ? extended.count : 0
 				this.eolSummary = {
 					loading: false,
-					total,
+					total: statusTotal,
 					expired: expiredCount,
 					unknown: unknownCount,
-					active:  total - expiredCount - unknownCount,
+					extended: extendedCount,
+					supported: statusTotal - expiredCount - unknownCount - extendedCount,
 				}
 			} catch {
 				this.eolSummary.loading = false

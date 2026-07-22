@@ -172,7 +172,8 @@ export default {
 	name: "RuleModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
+		defaultTrigger: { type: String, default: 'inventory_received' }
 	},
 	data() {
 		return {
@@ -185,7 +186,7 @@ export default {
 
 			row: {
 				description: null,
-				trigger: 'inventory_received',
+				trigger: this.defaultTrigger,
 				priority: null,
 				enabled: false,
 				break_on_match: false,
@@ -210,7 +211,7 @@ export default {
 				this.createwithsuccess = false
 				this.row = {
 					description: null,
-					trigger: 'inventory_received',
+					trigger: this.defaultTrigger,
 					priority: null,
 					enabled: false,
 					break_on_match: false,
@@ -235,7 +236,7 @@ export default {
 			this.rulemodal = true
 			this.row = {
 				description: null,
-				trigger: "inventory_received",
+				trigger: this.defaultTrigger,
 				enabled: false,
 				break_on_match: false,
 				logic: {},

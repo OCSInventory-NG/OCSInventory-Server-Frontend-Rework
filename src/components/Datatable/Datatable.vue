@@ -264,6 +264,33 @@
 							{{ getCellLink(row).label }}
 						</a>
 					</template>
+					<template v-else-if="clickablecells.includes(row.field.key)">
+						<a
+							href="#"
+							class="ocs-link"
+							@click.prevent="$emit('cell-click', { field: row.field.key, item: row.item })"
+						>
+							{{ row.value }}
+						</a>
+					</template>
+					<template v-else-if="badgecells.includes(row.field.key)">
+						<span
+							class="badge text-white"
+							:class="'bg-' + (row.item['__' + row.field.key + '_variant'] || 'secondary')"
+						>
+							{{ row.value }}
+						</span>
+					</template>
+					<template v-else-if="coloredcells.includes(row.field.key)">
+						<span
+							:style="{
+								color: row.item['__' + row.field.key + '_color'],
+								fontWeight: 'bold',
+							}"
+						>
+							{{ row.value }}
+						</span>
+					</template>
 					<template v-else>
 						{{ row.value }}
 					</template>
@@ -683,6 +710,9 @@ export default {
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
 		ruleactionroute: { type: String, default: '/configurations/rules' },
+		clickablecells: { type: Array, default: () => [] },
+		badgecells: { type: Array, default: () => [] },
+		coloredcells: { type: Array, default: () => [] },
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },

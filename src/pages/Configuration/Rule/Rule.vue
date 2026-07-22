@@ -27,18 +27,22 @@
 						<div v-else>
 							<RuleModal
 								v-if="canadd"
+								:default-trigger="currentTrigger"
 								@reload-datatable="reloadDatatable"
 							/>
 
 							<b-tabs
 								v-model="activeTab"
-								content-class="mt-3"
-								fill
+								content-class="col-10 sticky-tabs"
+								pills
+								card
+								vertical
 							>
 								<b-tab
 									v-for="trigger in triggers"
 									:key="trigger.trigger"
 									:title="$t('rule.' + trigger.trigger)"
+									title-item-class="ocs-menu-tab"
 								>
 									<Draggable
 										id="rules-datatable"
@@ -91,6 +95,11 @@ export default {
 			isbusy: true,
 			loading: true,
 		}
+	},
+	computed: {
+		currentTrigger() {
+			return this.triggers[this.activeTab]?.trigger
+		},
 	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem('permissions')

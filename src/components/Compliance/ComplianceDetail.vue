@@ -159,6 +159,12 @@
 						</div>
 					</div>
 					<div
+						v-else-if="!eolData"
+						class="text-muted"
+					>
+						{{ $t('compliance.eol_no_data') }}
+					</div>
+					<div
 						v-else
 						class="text-muted"
 					>
@@ -171,7 +177,7 @@
 				v-if="results.length > 0"
 				class="mt-4"
 			>
-				<b-tabs v-model="activeTabIndex">
+				<b-tabs v-model="activeTabIndex" fill>
 					<b-tab
 						v-for="s in severities"
 						:key="s.key"
@@ -187,54 +193,18 @@
 							/>
 							{{ $t('compliance.no_issues_for_severity') }}
 						</div>
-						<table
+						<Datatable
 							v-else
-							class="table table-vcenter"
-						>
-							<thead>
-								<tr>
-									<th>{{ $t('compliance.col_rule') }}</th>
-									<th>{{ $t('compliance.col_type') }}</th>
-									<th>{{ $t('compliance.col_severity') }}</th>
-									<th>{{ $t('compliance.col_status') }}</th>
-									<th>{{ $t('compliance.col_message') }}</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr
-									v-for="result in resultsBySeverity[s.key]"
-									:key="result.id"
-								>
-									<td>{{ result.rule.name }}</td>
-									<td>
-										{{ $te('compliance.type_' + result.rule.type)
-											? $t('compliance.type_' + result.rule.type)
-											: result.rule.type }}
-									</td>
-									<td>
-										<span
-											style="font-weight: bold;"
-											:style="{ color: s.color }"
-										>{{ s.label }}</span>
-									</td>
-									<td>
-										<span
-											class="badge text-white"
-											:class="result.status === 'non_compliant'
-												? 'bg-danger'
-												: (result.status === 'compliant' ? 'bg-success' : 'bg-secondary')"
-										>
-											{{ $te('compliance.' + result.status)
-												? $t('compliance.' + result.status)
-												: result.status }}
-										</span>
-									</td>
-									<td class="text-muted">
-										{{ result.rule.description || '-' }}
-									</td>
-								</tr>
-							</tbody>
-						</table>
+							:id="'compliance-detail-' + s.key"
+							:rowdata="toRows(resultsBySeverity[s.key])"
+							:rowheader="['rule_name', 'type', 'severity', 'status']"
+							:badgecells="['status']"
+							:coloredcells="['severity']"
+							:usecheckbox="false"
+							title="compliance_results"
+							translationkey="compliance."
+							:server-side="false"
+						/>
 					</b-tab>
 					<b-tab
 						:title="$t('compliance.compliant')
@@ -250,54 +220,18 @@
 							/>
 							{{ $t('compliance.no_issues_for_severity') }}
 						</div>
-						<table
+						<Datatable
 							v-else
-							class="table table-vcenter"
-						>
-							<thead>
-								<tr>
-									<th>{{ $t('compliance.col_rule') }}</th>
-									<th>{{ $t('compliance.col_type') }}</th>
-									<th>{{ $t('compliance.col_severity') }}</th>
-									<th>{{ $t('compliance.col_status') }}</th>
-									<th>{{ $t('compliance.col_message') }}</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr
-									v-for="result in compliantResults"
-									:key="result.id"
-								>
-									<td>{{ result.rule.name }}</td>
-									<td>
-										{{ $te('compliance.type_' + result.rule.type)
-											? $t('compliance.type_' + result.rule.type)
-											: result.rule.type }}
-									</td>
-									<td>
-										<span
-											style="font-weight: bold;"
-											:style="{ color: severities.find(
-												sv => sv.key === result.rule.severity
-											)?.color }"
-										>
-											{{ severities.find(sv => sv.key === result.rule.severity)
-												?.label || result.rule.severity }}
-										</span>
-									</td>
-									<td>
-										<span class="badge text-white bg-success">
-											{{ $te('compliance.' + result.status)
-												? $t('compliance.' + result.status)
-												: result.status }}
-										</span>
-									</td>
-									<td class="text-muted">
-										{{ result.rule.description || '-' }}
-									</td>
-								</tr>
-							</tbody>
-						</table>
+							:id="'compliance-detail-compliant'"
+							:rowdata="toRows(compliantResults)"
+							:rowheader="['rule_name', 'type', 'severity', 'status']"
+							:badgecells="['status']"
+							:coloredcells="['severity']"
+							:usecheckbox="false"
+							title="compliance_results"
+							translationkey="compliance."
+							:server-side="false"
+						/>
 					</b-tab>
 				</b-tabs>
 			</div>
@@ -387,6 +321,27 @@ export default {
 		await Promise.all([this.loadResults(), this.loadEolStatus()])
 	},
 	methods: {
+		toRows(list) {
+			return (list || []).map(r => {
+				const sev = this.severities.find(sv => sv.key === r.rule?.severity)
+				return {
+					id: r.id,
+					rule_name: r.rule?.name || '-',
+					type: this.$te('compliance.type_' + r.rule?.type)
+						? this.$t('compliance.type_' + r.rule?.type)
+						: (r.rule?.type || '-'),
+					severity: sev?.label || r.rule?.severity || '-',
+					__severity_color: sev?.color || '#6c757d',
+					status: this.$te('compliance.' + r.status)
+						? this.$t('compliance.' + r.status)
+						: r.status,
+					__status_variant: r.status === 'non_compliant'
+						? 'danger'
+						: (r.status === 'compliant' ? 'success' : 'secondary'),
+				}
+			})
+		},
+
 		async loadEolStatus() {
 			try {
 				const data = await this.$api.generic.get(

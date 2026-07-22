@@ -231,8 +231,8 @@ export const baseMenu = [
 				column: "inventory",
 			},
 			{
-				headerKey: "title.compliance_config",
-				link: "/configurations/compliance",
+				headerKey: "title.compliance_settings",
+				link: "/configurations/compliance_settings",
 				route: "ComplianceSettings",
 				column: "inventory",
 			},

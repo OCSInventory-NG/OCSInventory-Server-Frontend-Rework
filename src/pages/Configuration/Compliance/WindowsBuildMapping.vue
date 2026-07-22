@@ -1,94 +1,95 @@
 <template>
-	<div id="windows-build-mapping">
-		<b-tabs>
-			<b-tab :title="$t('compliance.tab_windows_build')">
-				<div
-					v-if="wbm.errored"
-					class="mt-3"
-				>
-					<Alert
-						:message="wbm.errormsg"
-						:cols="true"
-						variant="danger"
-					/>
-				</div>
+	<div :id="'windows-build-mapping-' + section">
+		<div v-if="section === 'wbm'">
+			<div
+				v-if="wbm.errored"
+				class="mt-3"
+			>
+				<Alert
+					:message="wbm.errormsg"
+					:cols="true"
+					variant="danger"
+				/>
+			</div>
 
-				<div
-					v-if="wbm.loading"
-					class="ocs-loader mt-3"
-				>
-					<Loader />
-				</div>
+			<div
+				v-if="wbm.loading"
+				class="ocs-loader mt-3"
+			>
+				<Loader />
+			</div>
 
-				<div v-else>
-					<WindowsBuildMappingModal
-						v-if="wbm.canadd"
-						@reload-datatable="reloadWbm"
-					/>
+			<div v-else>
+				<WindowsBuildMappingModal
+					v-if="wbm.canadd"
+					@reload-datatable="reloadWbm"
+				/>
 
-					<Datatable
-						id="windows-build-mapping-datatable"
-						:rowdata="wbm.rowdata"
-						:rowheader="wbm.rowheader"
-						:canedit="wbm.canedit"
-						:candelete="wbm.candelete"
-						:isbusy="wbm.isbusy"
-						is-sticky
-						editcomponent="WindowsBuildMappingModal"
-						title="compliance/windows-build-mapping"
-						translationkey="compliance."
-						@reload-datatable="reloadWbm"
-					/>
-				</div>
-			</b-tab>
+				<Datatable
+					id="windows-build-mapping-datatable"
+					:rowdata="wbm.rowdata"
+					:rowheader="wbm.rowheader"
+					:canedit="wbm.canedit"
+					:candelete="wbm.candelete"
+					:isbusy="wbm.isbusy"
+					is-sticky
+					editcomponent="WindowsBuildMappingModal"
+					title="compliance/windows-build-mapping"
+					translationkey="compliance."
+					@reload-datatable="reloadWbm"
+				/>
+			</div>
+		</div>
 
-			<b-tab :title="$t('compliance.tab_eol_mapping')">
-				<div
-					v-if="eol.errored"
-					class="mt-3"
-				>
-					<Alert
-						:message="eol.errormsg"
-						:cols="true"
-						variant="danger"
-					/>
-				</div>
+		<div v-else-if="section === 'eol'">
+			<div
+				v-if="eol.errored"
+				class="mt-3"
+			>
+				<Alert
+					:message="eol.errormsg"
+					:cols="true"
+					variant="danger"
+				/>
+			</div>
 
-				<div
-					v-if="eol.loading"
-					class="ocs-loader mt-3"
-				>
-					<Loader />
-				</div>
+			<div
+				v-if="eol.loading"
+				class="ocs-loader mt-3"
+			>
+				<Loader />
+			</div>
 
-				<div v-else>
-					<EOLMappingModal
-						v-if="eol.canadd"
-						@reload-datatable="reloadEol"
-					/>
+			<div v-else>
+				<EOLMappingModal
+					v-if="eol.canadd"
+					@reload-datatable="reloadEol"
+				/>
 
-					<Datatable
-						id="eol-mapping-datatable"
-						:rowdata="eol.rowdata"
-						:rowheader="eol.rowheader"
-						:canedit="eol.canedit"
-						:candelete="eol.candelete"
-						:isbusy="eol.isbusy"
-						is-sticky
-						editcomponent="EOLMappingModal"
-						title="compliance/eol-extended-support"
-						translationkey="compliance."
-						@reload-datatable="reloadEol"
-					/>
-				</div>
-			</b-tab>
-		</b-tabs>
+				<Datatable
+					id="eol-mapping-datatable"
+					:rowdata="eol.rowdata"
+					:rowheader="eol.rowheader"
+					:canedit="eol.canedit"
+					:candelete="eol.candelete"
+					:isbusy="eol.isbusy"
+					is-sticky
+					editcomponent="EOLMappingModal"
+					title="compliance/eol-extended-support"
+					translationkey="compliance."
+					@reload-datatable="reloadEol"
+				/>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 export default {
 	name: "WindowsBuildMapping",
+	props: {
+		section: { type: String, required: true },
+	},
 	data() {
 		return {
 			wbm: {
@@ -119,10 +120,11 @@ export default {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
-		await Promise.all([
-			this.loadWbm(permissions),
-			this.loadEol(permissions),
-		])
+		if (this.section === 'wbm') {
+			await this.loadWbm(permissions)
+		} else if (this.section === 'eol') {
+			await this.loadEol(permissions)
+		}
 	},
 	methods: {
 		async loadWbm(permissions) {

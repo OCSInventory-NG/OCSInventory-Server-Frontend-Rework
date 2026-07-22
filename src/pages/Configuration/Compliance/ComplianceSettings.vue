@@ -4,7 +4,7 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="compliance_config" />
+			<PageHeader page-title="compliance_settings" />
 
 			<div class="page-body">
 				<div class="card">
@@ -48,7 +48,7 @@
 										:candelete="candeletecompliance"
 										:canedit="caneditcompliance"
 										:canviewruleaction="canviewcomplianceaction"
-										ruleactionroute="/configurations/compliance"
+										ruleactionroute="/configurations/compliance_settings"
 										:isbusy="isbusy"
 										is-sticky
 										editcomponent="ComplianceRuleModal"
@@ -60,10 +60,17 @@
 							</b-tab>
 
 							<b-tab
-								:title="$t('compliance.tab_build_eol')"
+								:title="$t('compliance.tab_windows_build')"
 								title-item-class="ocs-menu-tab"
 							>
-								<WindowsBuildMapping />
+								<WindowsBuildMapping section="wbm" />
+							</b-tab>
+
+							<b-tab
+								:title="$t('compliance.tab_eol_mapping')"
+								title-item-class="ocs-menu-tab"
+							>
+								<WindowsBuildMapping section="eol" />
 							</b-tab>
 
 							<b-tab
@@ -197,7 +204,14 @@ export default {
 			try {
 				const data = await this.$api.generic.get("compliance/rules/")
 				const rules = Array.isArray(data) ? data : (data?.results || [])
-				this.complianceRowdata = rules.map(rule => ({ ...rule }))
+				// Drop fields excluded from display so they don't leak into the CSV export
+				this.complianceRowdata = rules.map(rule => {
+					const row = { ...rule }
+					delete row.logic
+					delete row.created_at
+					delete row.updated_at
+					return row
+				})
 			} catch (e) {
 				this.complianceRowdata = []
 			}

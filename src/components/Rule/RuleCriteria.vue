@@ -8,6 +8,14 @@
 			/>
 		</section>
 
+		<section v-if="validationerror">
+			<Alert
+				:message="$t('rule.fill_all_fields')"
+				:cols="true"
+				variant="warning"
+			/>
+		</section>
+
 		<section v-if="errored && errorCode == null">
 			<Alert 
 				:message="errormsg.message"
@@ -177,6 +185,7 @@
 											? $t('compliance.software_name_placeholder')
 											: 'Metadata field'"
 										class="mb-3"
+										required
 									/>
 								</b-form-group>
 							</b-col>
@@ -274,6 +283,7 @@
 										v-model="input.value"
 										class="mb-3"
 										:disabled="viewOnly || (disabledvalue.includes(input.operator)) ? true : false"
+										required
 									/>
 								</b-form-group>
 							</b-col>
@@ -378,6 +388,8 @@ export default {
 
 			successed: false,
 			successmsg: null,
+
+			validationerror: false,
 
 			logicupdate: {
 				logic: {}
@@ -839,6 +851,16 @@ export default {
 			return object
 		},
 
+		// v-select fields can't use native "required"; validate them here
+		// (value is optional only for operators that take none: !!, !).
+		rowsComplete() {
+			return this.datavalues.every(masterinput => masterinput.every(input =>
+				input.field
+				&& (!this.supportsInventoryFields || input.filter_type)
+				&& (this.disabledvalue.includes(input.operator) || (input.value != null && input.value !== ''))
+			))
+		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 
@@ -846,6 +868,12 @@ export default {
 			this.successed = false
 			this.errormsg = null
 			this.errored = false
+			this.validationerror = false
+
+			if (!this.rowsComplete()) {
+				this.validationerror = true
+				return
+			}
 
 			try {
 				let logicTmp = {}
