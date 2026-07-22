@@ -333,19 +333,16 @@ export default {
 		},
 
 		async submitPartial() {
-			// Take the selected sections from the file and drop their identifiers
-			// so the backend attaches them to the target template as new sections.
+			// Only send the sections selected from the file; the backend attaches
+			// them to the target template as new sections (id/template ignored).
 			const sections = this.selectedsections
 				.map((index) => this.filesections[index])
 				.filter(Boolean)
-				.map((section) => {
-					const { id: _id, template: _template, ...rest } = section
-					return rest
-				})
 
-			await this.$api.generic.patch(`templates/${this.selectedtemplate}/`, {
-				sections,
-			})
+			await this.$api.generic.post(
+				`templates/${this.selectedtemplate}/import-sections/`,
+				{ sections },
+			)
 		},
 	}
 }
