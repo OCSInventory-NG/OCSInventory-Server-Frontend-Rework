@@ -116,7 +116,7 @@ loadConfig().then(async (config) => {
 		}
 
 		try {
-			await ensureExtensionsLoaded(() =>
+			const justLoaded = await ensureExtensionsLoaded(() =>
 				loadFrontendExtensions({
 					apiClient: api.http,
 					pluginApi,
@@ -125,7 +125,7 @@ loadConfig().then(async (config) => {
 			)
 
 			// Re-resolve route after dynamic addRoute()
-			if (to.matched.length === 0) {
+			if (justLoaded || to.matched.length === 0 || to.name === 'NotFound') {
 				return to.fullPath
 			}
 		} catch (e) {
