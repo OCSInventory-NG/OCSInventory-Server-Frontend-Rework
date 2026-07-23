@@ -66,6 +66,21 @@
 									</p>
 								</b-col>
 							</b-row>
+							<b-row class="text-center mb-5">
+								<b-col>
+									<div class="d-flex justify-content-center align-items-center gap-2">
+										<TemplateHistoryModal
+											:id="parseInt(id)"
+											:is-protected="!!template.is_protected"
+											@reload-template="reloadTemplate"
+										/>
+										<TemplateCreateVersionModal
+											:id="parseInt(id)"
+											@reload-template="reloadTemplate"
+										/>
+									</div>
+								</b-col>
+							</b-row>
 							<div v-if="sections.length">
 								<b-tabs
 									content-class="col-10"

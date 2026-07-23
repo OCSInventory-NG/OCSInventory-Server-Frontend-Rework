@@ -36,7 +36,7 @@ import {
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
 	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle,
-	faMagnifyingGlassPlus
+	faMagnifyingGlassPlus, faClockRotateLeft, faTableColumns
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -50,8 +50,11 @@ import { createPluginApi } from "@/extensions/pluginApi"
 import { loadFrontendExtensions } from "@/extensions/loader"
 import { ensureExtensionsLoaded } from "@/extensions/runtime"
 
+/***** Base path *****/
+import { withBase } from "@/utils/basePath"
+
 async function loadConfig() {
-	const response = await fetch('/config/config.json')
+	const response = await fetch(withBase('config/config.json'))
 	if (!response.ok) {
 		throw new Error('Failed to load config')
 	}
@@ -82,7 +85,8 @@ loadConfig().then(async (config) => {
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
 		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles,
-		faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle, faMagnifyingGlassPlus
+		faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle, faMagnifyingGlassPlus, faClockRotateLeft,
+		faTableColumns
 	})
 
 	// Global config
