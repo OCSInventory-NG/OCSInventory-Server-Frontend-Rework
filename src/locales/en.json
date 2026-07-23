@@ -108,6 +108,8 @@
     "deployment_timeout": "Deployment timeout",
     "Django backend log level": "Django backend log level",
     "duplicate_reconciliation": "Duplicate reconciliation",
+    "legacy_duplicate_reconciliation": "Legacy duplicate reconciliation",
+    "Field(s) used to reconcile duplicate computers on the legacy endpoint": "Field(s) used to reconcile duplicate computers on the legacy endpoint",
     "enabled": "Deployment",
     "Enable auto retry if deployment failed": "Enable automatic retry if deployment failed",
     "Enable debug mode": "Enable debug mode",
@@ -181,6 +183,7 @@
     "Timeout of command execution in seconds": "Timeout of command execution in seconds",
     "Timeout of deployment in seconds": "Timeout of deployment in seconds",
     "Type of scan": "Type of network scan",
+    "serial": "Serial number",
     "uuid": "UUID",
     "uuid, name": "UUID, Name",
     "uuid, srcmac": "UUID, MAC address"
