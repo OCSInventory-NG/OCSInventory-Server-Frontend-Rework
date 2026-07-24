@@ -1,6 +1,7 @@
 import { createWebHistory,createRouter } from "vue-router"
 import AppLayout from "./layouts/AppLayout.vue"
 import AuthLayout from "./layouts/AuthLayout.vue"
+import { withBase } from "@/utils/basePath"
 
 const routes = [
 	{
@@ -337,7 +338,7 @@ const routes = [
 ]
 
 const router = createRouter({
-	history: createWebHistory("/ocsreports"),
+	history: createWebHistory(withBase("ocsreports")),
 	routes,
 })
   
