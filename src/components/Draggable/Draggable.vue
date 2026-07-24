@@ -146,20 +146,21 @@ export default {
 			event?.preventDefault?.()
 
 			try {
+				this.rowdatas.forEach((item, idx) => {
+					item[this.field] = idx + 1
+				})
+
 				const idx = event?.newIndex
 				if (idx == null || !this.rowdatas?.[idx]) return
 
-				this.rowdatas[idx][this.field] = idx + 1
-
-				const payload = { ...this.rowdatas[idx] }
-				if (payload.file) delete payload.file
-				if (payload.trigger) delete payload.trigger
-				await this.$api.generic.patch(
-					`${this.apiroute}/${payload.id}/`,
-					payload
+				await Promise.all(
+					this.rowdatas.map((item) => {
+						const payload = { ...item }
+						if (payload.file) delete payload.file
+						if (payload.trigger) delete payload.trigger
+						return this.$api.generic.patch(`${this.apiroute}/${payload.id}/`, payload)
+					})
 				)
-
-				this.$emit("reloadDatatable")
 			} catch (e) {
 				console.log(e)
 			}
