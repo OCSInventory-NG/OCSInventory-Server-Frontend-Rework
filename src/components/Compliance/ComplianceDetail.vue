@@ -63,7 +63,7 @@
 						:key="s.key"
 						class="card flex-fill"
 						style="cursor: pointer;"
-						:style="activeTab === s.key ? { borderColor: s.color } : {}"
+						:style="tileStyle(s.color, activeTab === s.key)"
 						@click="activeTab = s.key"
 					>
 						<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -81,7 +81,7 @@
 					<div
 						class="card flex-fill"
 						style="cursor: pointer;"
-						:style="activeTab === 'compliant' ? { borderColor: '#2fb344' } : {}"
+						:style="tileStyle('#2fb344', activeTab === 'compliant')"
 						@click="activeTab = 'compliant'"
 					>
 						<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -321,6 +321,17 @@ export default {
 		await Promise.all([this.loadResults(), this.loadEolStatus()])
 	},
 	methods: {
+		tileStyle(color, isActive) {
+			return isActive
+				? {
+					border: '1px solid ' + color,
+					borderTop: '3px solid ' + color,
+					backgroundColor: color + '14',
+					boxShadow: '0 2px 8px ' + color + '40',
+				}
+				: { borderTop: '3px solid ' + color }
+		},
+
 		toRows(list) {
 			return (list || []).map(r => {
 				const sev = this.severities.find(sv => sv.key === r.rule?.severity)
