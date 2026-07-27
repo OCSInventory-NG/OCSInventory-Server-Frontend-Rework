@@ -115,7 +115,7 @@
 									v-model="input.inventory_template"
 									:options="templateopt[masterindex]?.[index] || []"
 									:loading="loadingtemplate"
-									:clearable="true"
+									:clearable="false"
 									:reduce="t => t.value"
 									label="text"
 									class="mb-3 ocs-select"
@@ -741,7 +741,42 @@ export default {
 				})
 			})
 
+			await this.restoreTemplateConditions()
+
 			await this.getModelField()
+		},
+
+		// On reload, a template condition only stores "inventory.<fieldId>".
+		// Rebuild the template/section selections (field -> section -> template)
+		// and repopulate the cascading dropdown options so they stay editable.
+		// datavalues is a 2D array (OR groups x AND conditions) -> two loops.
+		async restoreTemplateConditions() {
+			for (const [m, row] of this.datavalues.entries()) {
+				for (const [i, input] of row.entries()) {
+					if (input.filter_type !== 'template' || !input.field?.startsWith('inventory.')) {
+						continue
+					}
+					try {
+						const field = await this.$api.generic.get(`fields/${input.field.split('.')[1]}/`)
+						const section = await this.$api.generic.get(`sections/${field.section}/`)
+						input.inventory_template = section.template
+						input.inventory_section = field.section
+						await this.loadTemplatesIfNeeded(m, i)
+						if (!Array.isArray(this.sectionopt[m])) this.sectionopt[m] = []
+						const sdata = await this.$api.generic.get('sections/', {}, { template: section.template })
+						this.sectionopt[m][i] = (Array.isArray(sdata) ? sdata : (sdata?.results || []))
+							.map(s => ({ value: s.id, text: s.name }))
+							.sort((a, b) => a.text > b.text ? 1 : -1)
+						if (!Array.isArray(this.invfieldopt[m])) this.invfieldopt[m] = []
+						const fdata = await this.$api.generic.get('fields/', {}, { section: field.section })
+						this.invfieldopt[m][i] = (Array.isArray(fdata) ? fdata : (fdata?.results || []))
+							.map(f => ({ value: 'inventory.' + f.id, text: f.name }))
+							.sort((a, b) => a.text > b.text ? 1 : -1)
+					} catch {
+						// leave the condition as-is if the lookups fail
+					}
+				}
+			}
 		},
 
 		getFieldOptions(input, masterindex, index) {
