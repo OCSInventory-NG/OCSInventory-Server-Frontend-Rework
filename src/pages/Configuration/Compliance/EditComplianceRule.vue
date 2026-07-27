@@ -61,7 +61,7 @@
 								:view-only="viewOnly"
 								:context-fields-path="'compliance/rules/context-fields/'"
 								:supports-inventory-fields="true"
-								:can-remove-condition="false"
+								:can-remove-condition="true"
 								:save-api-path="`compliance/rules/${id}/`"
 								@reload-rule="reloadRule"
 							/>

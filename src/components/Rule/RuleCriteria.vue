@@ -807,7 +807,7 @@ export default {
 				metadata_field: null,
 				inventory_template: null,
 				inventory_section: null,
-				filter_type: null,
+				filter_type: "base",
 				admin_config: null,
 				admin_fieldtype: null,
 			})
@@ -829,7 +829,7 @@ export default {
 				metadata_field: null,
 				inventory_template: null,
 				inventory_section: null,
-				filter_type: null,
+				filter_type: "base",
 				admin_config: null,
 				admin_fieldtype: null,
 			})
