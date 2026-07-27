@@ -39,9 +39,7 @@
 										:key="s.key"
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="activeFilter && activeFilter.type === 'severity' && activeFilter.value === s.key
-											? { borderColor: s.color }
-											: { borderTop: '3px solid ' + s.color }"
+										:style="tileStyle(s.color, activeFilter && activeFilter.type === 'severity' && activeFilter.value === s.key)"
 										@click="setTileFilter('severity', s.key)"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -59,9 +57,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="activeFilter?.type === 'status' && activeFilter?.value === 'compliant'
-											? { borderColor: '#2fb344' }
-											: { borderTop: '3px solid #2fb344' }"
+										:style="tileStyle('#2fb344', activeFilter?.type === 'status' && activeFilter?.value === 'compliant')"
 										@click="setTileFilter('status', 'compliant')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -79,9 +75,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="activeFilter?.type === 'status' && activeFilter?.value === 'non_compliant'
-											? { borderColor: '#d63939' }
-											: { borderTop: '3px solid #d63939' }"
+										:style="tileStyle('#d63939', activeFilter?.type === 'status' && activeFilter?.value === 'non_compliant')"
 										@click="setTileFilter('status', 'non_compliant')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -211,9 +205,7 @@
 											:key="s.key"
 											class="card flex-fill"
 											style="cursor: pointer;"
-											:style="byrules.filter === s.key
-												? { borderColor: s.color }
-												: { borderTop: '3px solid ' + s.color }"
+											:style="tileStyle(s.color, byrules.filter === s.key)"
 											@click="setByRulesFilter(s.key)"
 										>
 											<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -262,7 +254,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="eolFilter === null ? { borderColor: '#adb5bd' } : {}"
+										:style="tileStyle('#adb5bd', eolFilter === null)"
 										@click="setEolFilter(null)"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -276,9 +268,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="eolFilter === 'supported'
-											? { borderColor: '#2fb344' }
-											: { borderTop: '3px solid #2fb344' }"
+										:style="tileStyle('#2fb344', eolFilter === 'supported')"
 										@click="setEolFilter('supported')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -294,9 +284,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="eolFilter === 'extended'
-											? { borderColor: '#f59f00' }
-											: { borderTop: '3px solid #f59f00' }"
+										:style="tileStyle('#f59f00', eolFilter === 'extended')"
 										@click="setEolFilter('extended')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -312,9 +300,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="eolFilter === 'expired'
-											? { borderColor: '#d63939' }
-											: { borderTop: '3px solid #d63939' }"
+										:style="tileStyle('#d63939', eolFilter === 'expired')"
 										@click="setEolFilter('expired')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -330,9 +316,7 @@
 									<div
 										class="card flex-fill"
 										style="cursor: pointer;"
-										:style="eolFilter === 'unknown'
-											? { borderColor: '#adb5bd' }
-											: { borderTop: '3px solid #adb5bd' }"
+										:style="tileStyle('#adb5bd', eolFilter === 'unknown')"
 										@click="setEolFilter('unknown')"
 									>
 										<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
@@ -529,6 +513,19 @@ export default {
 	},
 	methods: {
 		// Tile filters
+
+		tileStyle(color, isActive) {
+			return isActive
+				? {
+					borderTop:  '3px solid ' + color,
+					borderLeft: '1px solid ' + color,
+					borderRight: '1px solid ' + color,
+					borderBottom: '1px solid ' + color,
+					backgroundColor: color + '14',
+					boxShadow: '0 2px 8px ' + color + '40',
+				}
+				: { borderTop: '3px solid ' + color }
+		},
 
 		setTileFilter(type, value) {
 			if (this.activeFilter?.type === type && this.activeFilter?.value === value) {
