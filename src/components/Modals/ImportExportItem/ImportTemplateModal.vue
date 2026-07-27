@@ -56,6 +56,48 @@
 					:message="errormsg" 
 					variant="danger"
 				/>
+				<b-tabs
+					v-model="activetab"
+					fill
+					class="mb-3"
+				>
+					<b-tab :title="$t('template.import_mode_complete')" />
+					<b-tab :title="$t('template.import_mode_partial')" />
+				</b-tabs>
+				<b-row
+					v-if="mode === 'partial'"
+					class="mb-2"
+				>
+					<b-col>
+						<b-form-group
+							:label="$t('template.import_target_template')"
+							label-for="target-template"
+						>
+							<b-spinner
+								v-if="loadingtemplates"
+								small
+								variant="success"
+							/>
+							<v-select
+								v-else
+								id="target-template"
+								v-model="selectedtemplate"
+								:options="templates"
+								:reduce="text => text.value"
+								:placeholder="$t('template.import_select_target_template')"
+								label="text"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										v-bind="attributes"
+										v-on="events"
+									>
+								</template>
+							</v-select>
+						</b-form-group>
+					</b-col>
+				</b-row>
 				<b-row>
 					<b-col>
 						<b-form-file
@@ -66,15 +108,41 @@
 						/>
 					</b-col>
 				</b-row>
+				<b-row
+					v-if="mode === 'partial' && jsonToSend"
+					class="mt-3"
+				>
+					<b-col>
+						<Alert
+							v-if="!filesections.length"
+							:message="$t('template.import_no_section_in_file')"
+							variant="warning"
+						/>
+						<b-form-group
+							v-else
+							:label="$t('template.import_select_sections')"
+						>
+							<b-form-checkbox
+								v-for="(section, index) in filesections"
+								:key="index"
+								v-model="selectedsections"
+								:value="index"
+							>
+								{{ section.name || `#${index + 1}` }}
+							</b-form-checkbox>
+						</b-form-group>
+					</b-col>
+				</b-row>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
 						align-self="center"
 						align="center"
 					>
-						<b-button 
+						<b-button
 							type="submit"
 							variant="success"
+							:disabled="!canSubmit"
 						>
 							{{ $t('generic.send') }}
 						</b-button>
@@ -99,9 +167,46 @@ export default {
 			importtemplate: false,
 			file: null,
 			jsonToSend: null,
-			
+
 			loadingimport: false,
+
+			// Import mode: 'complete' (whole template) or 'partial' (inject sections)
+			mode: 'complete',
+
+			// Partial mode
+			templates: [],
+			selectedtemplate: null,
+			loadingtemplates: false,
+			selectedsections: [],
 		}
+	},
+	computed: {
+		// Proxy between the b-tabs index and the import mode
+		activetab: {
+			get() {
+				return this.mode === 'partial' ? 1 : 0
+			},
+			set(value) {
+				this.mode = value === 1 ? 'partial' : 'complete'
+			},
+		},
+
+		// Sections found in the uploaded import file
+		filesections() {
+			const sections = this.jsonToSend?.sections
+			return Array.isArray(sections) ? sections : []
+		},
+
+		canSubmit() {
+			if (this.loadingimport) return false
+			if (!this.jsonToSend) return false
+
+			if (this.mode === 'partial') {
+				return !!this.selectedtemplate && this.selectedsections.length > 0
+			}
+
+			return true
+		},
 	},
 	watch: {
 		importwithsuccess: function() {
@@ -110,27 +215,66 @@ export default {
 				this.importwithsuccess = false
 				this.$emit('reloadDatatable')
 			}, 500)
+		},
+
+		mode: function() {
+			// Reset feedback and section selection when switching mode
+			this.errormsg = null
+			this.errored = false
+			this.importwithsuccess = false
+			this.selectedsections = []
+
+			if (this.mode === 'partial' && !this.templates.length) {
+				this.getTemplates()
+			}
 		}
 	},
 	methods: {
 		loadData() {
 			this.importtemplate = true
+			this.mode = 'complete'
 			this.file = null
 			this.jsonToSend = null
 			this.errormsg = null
 			this.errored = false
 			this.importwithsuccess = false
+			this.selectedtemplate = null
+			this.selectedsections = []
 
 			this.$refs?.fileInput?.reset?.()
+		},
+
+		async getTemplates() {
+			this.loadingtemplates = true
+			try {
+				const data = await this.$api.generic.get("templates/")
+				const templates = Array.isArray(data) ? data : (data?.results || [])
+
+				this.templates = templates
+					.filter((t) => t?.os !== "SNMP")
+					.map((t) => ({ value: t.id, text: t.name }))
+
+				this.errormsg = null
+				this.errored = false
+			} catch (e) {
+				this.errormsg = e?.response?.data?.error || e?.message || String(e)
+				this.errored = true
+			} finally {
+				this.loadingtemplates = false
+			}
 		},
 
 		processFile(event) {
 			this.errormsg = null
 			this.errored = false
 			this.importwithsuccess = false
+			this.selectedsections = []
 
 			this.file = event?.target?.files?.[0] || null
-			if (!this.file) return
+			if (!this.file) {
+				this.jsonToSend = null
+				return
+			}
 
 			if (!this.file.name.toLowerCase().endsWith(".json")) {
 				this.errormsg = "Le fichier doit être un .json"
@@ -172,7 +316,11 @@ export default {
 					throw new Error("No JSON to import (missing or invalid file).")
 				}
 
-				await this.$api.generic.post("templates/", this.jsonToSend)
+				if (this.mode === 'partial') {
+					await this.submitPartial()
+				} else {
+					await this.$api.generic.post("templates/", this.jsonToSend)
+				}
 
 				this.importwithsuccess = true
 			} catch (e) {
@@ -182,6 +330,19 @@ export default {
 			} finally {
 				this.loadingimport = false
 			}
+		},
+
+		async submitPartial() {
+			// Only send the sections selected from the file; the backend attaches
+			// them to the target template as new sections (id/template ignored).
+			const sections = this.selectedsections
+				.map((index) => this.filesections[index])
+				.filter(Boolean)
+
+			await this.$api.generic.post(
+				`templates/${this.selectedtemplate}/import-sections/`,
+				{ sections },
+			)
 		},
 	}
 }
