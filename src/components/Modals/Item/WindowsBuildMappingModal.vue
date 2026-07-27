@@ -87,7 +87,9 @@
 						>
 							<b-form-input
 								id="build"
-								v-model="row.build"
+								v-model.number="row.build"
+								type="number"
+								min="0"
 								required
 							/>
 						</b-form-group>
