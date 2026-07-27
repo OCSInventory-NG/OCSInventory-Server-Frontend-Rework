@@ -8,10 +8,7 @@
 				:title="$t('deployment.attrpkg')"
 				class="form-control btn datatable-btn"
 				:disabled="viewOnly"
-				@click="
-					(items.length > 0) ? loadInitial() : emptyselection = !emptyselection,
-					loadData()
-				"
+				@click="openPackageModal"
 			>
 				<font-awesome-icon 
 					:icon="['fas', 'boxes-packing']"
@@ -60,14 +57,14 @@
 				:message="errormsg" 
 				variant="danger"
 			/>
-			<div 
+			<div
 				v-if="loading"
 				class="ocs-loader"
 			>
 				<Loader />
 			</div>
 			<b-form
-				v-else
+				v-if="!loading"
 				@submit="onSubmit"
 			>
 				<div>
@@ -128,8 +125,8 @@
 				</b-button>
 			</template>
 			<div>
-				<Alert 
-					:message="$t('message.no_selection')" 
+				<Alert
+					:message="emptySelectionMessage"
 					variant="warning"
 				/>
 			</div>
@@ -164,7 +161,19 @@ export default {
 	computed: {
 		viewOnly() {
 			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
-		}
+		},
+		deployableItems() {
+			const list = Array.isArray(this.items) ? this.items : [this.items]
+			return list.filter((asset) => this.hasAgent(asset))
+		},
+		excludedItems() {
+			const list = Array.isArray(this.items) ? this.items : [this.items]
+			return list.filter((asset) => !this.hasAgent(asset))
+		},
+		emptySelectionMessage() {
+			if (this.excludedItems.length > 0) return this.$t('deployment.no_deployable_selection')
+			return this.$t('message.no_selection')
+		},
 	},
 	watch: {
 		successed: function() {
@@ -179,9 +188,27 @@ export default {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
 
+		// An asset only has a real OCS agent if it is not SNMP or inventoried
+		// through the Proxmox API.
+		hasAgent(asset) {
+			if (asset?.osname === 'SNMP') return false
+			if (String(asset?.agent ?? '').startsWith('Proxmox API')) return false
+			return true
+		},
+
 		loadData() {
 			this.errormsg = null
 			this.errored = false
+		},
+
+		openPackageModal() {
+			this.loadData()
+
+			if (this.excludedItems.length === 0 && this.deployableItems.length > 0) {
+				this.loadInitial()
+			} else {
+				this.emptyselection = !this.emptyselection
+			}
 		},
 
 		async loadInitial() {
@@ -245,7 +272,7 @@ export default {
 			try {
 				const row = []
 
-				for (const asset of this.items) {
+				for (const asset of this.deployableItems) {
 					for (const pkg of this.selectedPkg) {
 						row.push({
 							package: pkg.id,
