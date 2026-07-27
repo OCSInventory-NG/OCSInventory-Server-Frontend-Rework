@@ -20,16 +20,28 @@
 					id="assets-deployment-datatable"
 					:rowdata="rowdata"
 					:rowheader="rowheader"
-					:candelete="group ? true : false"
-					:usecheckbox="group ? true : false"
-					:deletemultiple="(group) ? true : false"
+					:candelete="group ? candelete : false"
+					:usecheckbox="group ? candelete : false"
+					:deletemultiple="(group) ? candelete : false"
+					:hascustomactions="group ? false : true"
 					:deleteids="rows"
 					:isbusy="isbusy"
 					is-sticky
 					title="deployment/results"
 					translationkey="deployment."
 					@reload-datatable="reloadDatatable"
-				/>
+				>
+					<!-- Delete button only for deployments still waiting for notification (status 1) -->
+					<template #cell(firstActions)="{ row }">
+						<DeleteItemModal
+							v-if="row.item.status === 1 && candelete"
+							:id="row.item.id"
+							:name="row.item.name"
+							parameter="deployment/results"
+							@reload-datatable="reloadDatatable"
+						/>
+					</template>
+				</Datatable>
 			</div>
 		</section>
 	</div>
@@ -56,7 +68,9 @@ export default {
 			rowheader: [],
 			rows: [],
 			parameter: null,
-			
+
+			candelete: false,
+
 			isbusy: true,
 			loading: true,
 		}
@@ -69,6 +83,10 @@ export default {
 		}
 	},
 	async mounted() {
+		const rawPermissions = localStorage.getItem("permissions")
+		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		this.candelete = permissions.includes("result_delete_result")
+
 		// Data init
 		await this.loadInitial()
 	},
