@@ -174,6 +174,7 @@
 										class="mb-3 ocs-select"
 										:loading="(loadingfield) ? true : false"
 										:disabled="viewOnly || isAuthConfigRow(masterindex, input)"
+										:placeholder="$t('rule.select_field')"
 										@update:model-value="() => onFieldChange(input, masterindex)"
 									/>
 									<b-form-input
@@ -263,6 +264,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:disabled="viewOnly || disabledvalue.includes(input.operator)"
+										:placeholder="$t('rule.select_group')"
 										@open="loadAssetGroups()"
 									/>
 									<v-select
@@ -276,6 +278,7 @@
 										label="text"
 										class="mb-3 ocs-select"
 										:disabled="viewOnly || disabledvalue.includes(input.operator)"
+										:placeholder="$t('rule.select_value')"
 									/>
 									<b-form-input
 										v-else

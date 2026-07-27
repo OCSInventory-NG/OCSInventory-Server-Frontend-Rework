@@ -624,6 +624,8 @@
     "filter_type_software": "Software inventory",
     "select_group": "Select a group",
     "select_admin_field": "Select an administrative field",
+    "select_field": "Select a field",
+    "select_value": "Select a value",
     "fill_all_fields": "Please fill in all required fields before saving."
   },
   "scheduler": {

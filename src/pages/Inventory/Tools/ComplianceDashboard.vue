@@ -21,14 +21,6 @@
 								:title="$t('title.compliance_by_assets')"
 								title-item-class="ocs-menu-tab"
 							>
-								<section v-if="results.errored">
-									<Alert
-										:message="results.errormsg"
-										:cols="true"
-										variant="danger"
-									/>
-								</section>
-
 								<!-- Cartes récapitulatives -->
 								<div
 									v-if="!resultsSummary.loading"
@@ -88,7 +80,7 @@
 								</div>
 
 								<div
-									v-if="results.loading"
+									v-if="resultsSummary.loading"
 									class="ocs-loader"
 								>
 									<Loader />
@@ -134,24 +126,6 @@
 										:server-side="false"
 										is-sticky
 										@cell-click="onNonCompliantCellClick"
-									/>
-									<Datatable
-										v-else
-										id="compliance-results-datatable"
-										:rowdata="results.rowdata"
-										:rowheader="results.rowheader"
-										:usecheckbox="false"
-										:canaccessdetails="true"
-										title="compliance_results"
-										translationkey="compliance."
-										:server-side="true"
-										:server-total-rows="results.total"
-										:isbusy="results.isbusy"
-										is-sticky
-										@change-query="handleResultsQueryChange"
-										@export="handleResultsExport"
-										@export-all="exportAllResults"
-										@reload-datatable="reloadResults"
 									/>
 								</div>
 							</b-tab>
@@ -362,14 +336,6 @@
 </template>
 
 <script>
-const RESULTS_ORDERING_MAP = {
-	asset:        'asset__name',
-	rule_name:    'rule__name',
-	rule_type:    'rule__type',
-	severity:     'rule__severity',
-	status:       'status',
-}
-
 export default {
 	name: 'ComplianceDashboard',
 	data() {
@@ -377,21 +343,6 @@ export default {
 			mainTab: 0,
 			activeFilter: null,
 			eolFilter: null,
-			results: {
-				errored: false,
-				errormsg: null,
-				loading: true,
-				isbusy: true,
-				rowdata: [],
-				rowheader: ['asset', 'rule_name', 'rule_type', 'severity', 'status'],
-				total: 0,
-				query: {
-					limit: localStorage.getItem('perPage') ? Number(localStorage.getItem('perPage')) : 5,
-					offset: 0,
-					ordering: '-evaluated_at',
-					search: null,
-				},
-			},
 			eol: {
 				errored: false,
 				errormsg: null,
@@ -504,7 +455,6 @@ export default {
 	async mounted() {
 		this.activeFilter = { type: 'status', value: 'non_compliant' }
 		await Promise.all([
-			this.loadResults(),
 			this.loadEol(),
 			this.loadResultsSummary(),
 			this.loadEolSummary(),
@@ -528,120 +478,10 @@ export default {
 		},
 
 		setTileFilter(type, value) {
-			if (this.activeFilter?.type === type && this.activeFilter?.value === value) {
-				this.activeFilter = null
-			} else {
-				this.activeFilter = { type, value }
-			}
-			this.results.query = { ...this.results.query, offset: 0 }
-			this.fetchResults(this.results.query)
-		},
-
-		// Results tab
-
-		async loadResults() {
-			this.results.loading = true
-			this.results.isbusy = true
-			try {
-				await this.fetchResults(this.results.query)
-			} catch (e) {
-				this.results.errormsg = e?.response?.data?.error || e?.message || String(e)
-				this.results.errored = true
-			} finally {
-				this.results.loading = false
-				this.results.isbusy = false
-			}
-		},
-
-		async fetchResults(query) {
-			this.results.isbusy = true
-			try {
-				const params = {
-					limit: query.limit,
-					offset: query.offset,
-					ordering: query.ordering,
-					search: query.search,
-				}
-				if (this.activeFilter?.type === 'severity') {
-					params['rule__severity'] = this.activeFilter.value
-					params['status'] = 'non_compliant'
-				} else if (this.activeFilter?.type === 'status') {
-					params['status'] = this.activeFilter.value
-				}
-				const data = await this.$api.generic.get(
-					'compliance/results/',
-					params,
-					{ expand: 'rule' }
-				)
-				const items = data?.results || data || []
-				this.results.total = typeof data?.count === 'number' ? data.count : items.length
-				this.results.rowdata = this.mapResultRows(items)
-				this.results.errored = false
-				this.results.errormsg = null
-			} catch (e) {
-				this.results.errormsg = e?.response?.data?.error || e?.message || String(e)
-				this.results.errored = true
-			} finally {
-				this.results.isbusy = false
-			}
-		},
-
-		mapResultRows(items) {
-			return items.map(r => ({
-				id: r.id,
-				asset:        { id: r.asset, name: r.asset_name || '-' },
-				rule_name:    r.rule?.name || '-',
-				rule_type:    r.rule
-					? (this.$te('compliance.type_' + r.rule.type)
-						? this.$t('compliance.type_' + r.rule.type)
-						: r.rule.type)
-					: '-',
-				severity:     r.rule
-					? (this.$te('compliance.severity_' + r.rule.severity)
-						? this.$t('compliance.severity_' + r.rule.severity)
-						: r.rule.severity)
-					: '-',
-				status:       this.$te('compliance.' + r.status)
-					? this.$t('compliance.' + r.status)
-					: r.status,
-			}))
-		},
-
-		async reloadResults() {
-			await this.fetchResults(this.results.query)
-		},
-
-		async handleResultsQueryChange(newQuery) {
-			if (this.results.isbusy) return
-			if (newQuery.ordering) {
-				const desc = newQuery.ordering.startsWith('-')
-				const key = newQuery.ordering.replace('-', '')
-				const mapped = RESULTS_ORDERING_MAP[key] || key
-				newQuery.ordering = desc ? '-' + mapped : mapped
-			}
-			this.results.query = { ...this.results.query, ...newQuery }
-			await this.fetchResults(this.results.query)
-		},
-
-		handleResultsExport({ scope, rows }) {
-			const flat = rows.map(r => ({ ...r, asset: r.asset?.name ?? r.asset ?? '' }))
-			this.downloadCsv(this.buildCsv(flat), `compliance_results_${scope}.csv`)
-		},
-
-
-		async exportAllResults({ filter, ordering }) {
-			try {
-				const data = await this.$api.generic.get(
-					'compliance/results/',
-					{ search: filter || null, ordering: ordering || null },
-					{ expand: 'rule' }
-				)
-				const items = data?.results || data || []
-				this.handleResultsExport({ scope: 'all', rows: this.mapResultRows(items) })
-			} catch (e) {
-				this.results.errormsg = e?.response?.data?.error || e?.message || String(e)
-				this.results.errored = true
-			}
+			// A tile is always active: clicking one just selects its filter.
+			// No toggle-off, so the default full-results table is never shown
+			// (it was confusing users when a tile was deselected).
+			this.activeFilter = { type, value }
 		},
 
 		async loadByRules() {
@@ -682,7 +522,10 @@ export default {
 		},
 
 		setEolFilter(type) {
-			this.eolFilter = this.eolFilter === type ? null : type
+			// A tile is always active (Monitored = null shows all): no toggle-off,
+			// a tile can't be deselected — consistent with the "By assets" tab.
+			if (this.eolFilter === type) return
+			this.eolFilter = type
 			this.fetchEol()
 		},
 
@@ -842,30 +685,6 @@ export default {
 			} catch {
 				this.eolSummary.loading = false
 			}
-		},
-
-		// Shared helpers
-
-		buildCsv(rows) {
-			if (!rows?.length) return ''
-			const headers = Object.keys(rows[0])
-			const lines = [headers.join(';')]
-			rows.forEach(row => {
-				lines.push(headers.map(h => `"${String(row[h] ?? '').replace(/"/g, '""')}"`).join(';'))
-			})
-			return lines.join('\n')
-		},
-
-		downloadCsv(csv, filename) {
-			const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-			const url = URL.createObjectURL(blob)
-			const link = document.createElement('a')
-			link.href = url
-			link.setAttribute('download', filename)
-			document.body.appendChild(link)
-			link.click()
-			link.remove()
-			URL.revokeObjectURL(url)
 		},
 	},
 }

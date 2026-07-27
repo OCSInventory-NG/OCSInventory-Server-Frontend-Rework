@@ -20,16 +20,12 @@ export default {
 		tree() {
 			var breadcrumb = []
 
+			// Keep the raw segments (underscore preserved) so the cumulative
+			// path matches real routes (e.g. /configurations/compliance_settings).
+			// The underscore is only turned into a space for display.
 			var items = this.$route.path
 				.split('/')
 				.slice(1)
-				.map(route => route
-					.split('_')
-					.map(word => {
-						return word
-					})
-					.join(' ')
-				)
 
 			var path = "/"
 
@@ -59,14 +55,14 @@ export default {
 
 				if(routeExists) {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						to: path,
 						append: true,
 						replace: true
 					})
 				} else {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						disabled: true
 					})
 				}

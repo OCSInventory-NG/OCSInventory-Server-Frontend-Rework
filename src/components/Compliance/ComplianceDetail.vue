@@ -177,7 +177,7 @@
 				v-if="results.length > 0"
 				class="mt-4"
 			>
-				<b-tabs v-model="activeTabIndex" fill>
+				<b-tabs v-model="activeTabIndex" fill content-class="mt-2">
 					<b-tab
 						v-for="s in severities"
 						:key="s.key"
