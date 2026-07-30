@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="inventory_logs" />
+			<PageHeader
+				page-title="inventory_logs"
+				:breadcrumb-label="assetname"
+			/>
 
 			<div class="page-body">
 				<div class="card">
@@ -62,6 +65,7 @@ export default {
 			
 			rowdata: [],
 			rowheader: [],
+			assetname: "",
 			total: 0,
 			query: {
 				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
@@ -98,6 +102,9 @@ export default {
 				const header = await this.$api.generic.options("asset/logs/")
 				this.rowheader = Object.keys(header.actions.POST)
 
+				// Get asset
+				await this.getAsset()
+
 				// Get asset logs
 				await this.getLogs(this.query)
 
@@ -109,6 +116,22 @@ export default {
 			} finally {
 				this.loading = false
 				this.isbusy = false
+			}
+		},
+
+		async getAsset() {
+			const id = this.$route?.params?.id || ""
+
+			if (!id) {
+				this.assetname = ""
+				return
+			}
+
+			try {
+				const data = await this.$api.generic.get(`asset/bases/${id}/`)
+				this.assetname = data?.name || ""
+			} catch {
+				this.assetname = ""
 			}
 		},
 
