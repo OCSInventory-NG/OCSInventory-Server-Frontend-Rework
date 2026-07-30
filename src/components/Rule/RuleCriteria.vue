@@ -553,10 +553,6 @@ export default {
 					})
 				})
 
-				if (this.supportsInventoryFields) {
-					this.loadExistingInventoryFields()
-				}
-
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
@@ -1261,24 +1257,6 @@ export default {
 			this.datavalues.forEach((_row, masterindex) => {
 				this.normalizeAuthConditionsForRow(masterindex)
 			})
-		},
-
-		loadExistingInventoryFields() {
-			const all = this.datavalues.flat()
-			for (const input of all) {
-				if (input.field?.startsWith('inventory.')) {
-					const fid = input.field.split('.')[1]
-					if (!this.fields.find(x => x.value === input.field)) {
-						this.$api.generic.get(`fields/${fid}/`)
-							.then(f => {
-								if (!this.fields.find(x => x.value === input.field)) {
-									this.fields.push({ value: input.field, text: f.name })
-								}
-							})
-							.catch(() => {})
-					}
-				}
-			}
 		},
 
 		async loadTemplatesIfNeeded(masterindex, index) {
