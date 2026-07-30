@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="actionlist" />
+			<PageHeader
+				page-title="actionlist"
+				:breadcrumb-label="rowpackagedata.name"
+			/>
 
 			<div class="page-body">
 				<div class="card">

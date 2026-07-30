@@ -3,7 +3,7 @@
 		<div class="row align-items-center">
 			<div class="col">
 				<div class="page-pretitle">
-					<Breadcrumb />
+					<Breadcrumb :current-label="objectLabel" />
 				</div>
 				<h2 
 					v-if="$te('title.'+pageTitle)"
@@ -27,7 +27,17 @@
 export default {
 	name: "PageHeader",
 	props: {
-		pageTitle: { type: String, default: "" }
+		pageTitle: { type: String, default: "" },
+		breadcrumbLabel: { type: String, default: "" }
+	},
+	computed: {
+		objectLabel() {
+			if (this.breadcrumbLabel) {
+				return this.breadcrumbLabel
+			}
+
+			return this.$te('title.' + this.pageTitle) ? "" : this.pageTitle
+		}
 	},
 }
 </script>

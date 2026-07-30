@@ -11,7 +11,8 @@
 export default {
 	name: 'BreadcrumbHistory',
 	props: {
-		exclude: {type: Array, default: () => []}
+		exclude: {type: Array, default: () => []},
+		currentLabel: {type: String, default: ''}
 	},
 	computed: {
 		excluded() {
@@ -20,9 +21,11 @@ export default {
 		tree() {
 			var breadcrumb = []
 
-			var items = this.$route.path
+			var segments = this.$route.path
 				.split('/')
 				.slice(1)
+
+			var items = segments
 				.map(route => route
 					.split('_')
 					.map(word => {
@@ -71,6 +74,17 @@ export default {
 					})
 				}
 			})
+
+			if(this.currentLabel && breadcrumb.length) {
+				var lastSegment = segments[segments.length - 1]
+				var params = Object.values(this.$route.params)
+					.flat()
+					.map(param => String(param))
+
+				if(params.includes(lastSegment)) {
+					breadcrumb[breadcrumb.length - 1].text = this.currentLabel
+				}
+			}
 
 			return breadcrumb
 		}

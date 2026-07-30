@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="history" />
+			<PageHeader
+				page-title="history"
+				:breadcrumb-label="schedulername"
+			/>
 
 			<div class="page-body">
 				<div class="card">
@@ -57,6 +60,8 @@ export default {
 			rowheader: [],
 			rowdata: [],
 
+			schedulername: "",
+
 			canview: false,
 
 			status: {
@@ -93,6 +98,9 @@ export default {
 				const header = await this.$api.generic.options("automation/history/")
 				this.rowheader = Object.keys(header.actions.POST)
 
+				// Get scheduler
+				await this.getScheduler()
+
 				// Get scheduler history
 				await this.getAutomationHistory()
 
@@ -104,6 +112,22 @@ export default {
 			} finally {
 				this.loading = false
 				this.isbusy = false
+			}
+		},
+
+		async getScheduler() {
+			const id = this.$route?.params?.id || ""
+
+			if (!id) {
+				this.schedulername = ""
+				return
+			}
+
+			try {
+				const data = await this.$api.generic.get(`automation/scheduler/${id}/`)
+				this.schedulername = data?.name || ""
+			} catch {
+				this.schedulername = ""
 			}
 		},
 
