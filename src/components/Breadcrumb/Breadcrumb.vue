@@ -82,7 +82,7 @@ export default {
 					.map(param => String(param))
 
 				if(params.includes(lastSegment)) {
-					breadcrumb[breadcrumb.length - 1].text = this.currentLabel
+					breadcrumb[breadcrumb.length - 1].text = this.currentLabel + " (" + lastSegment + ")"
 				}
 			}
 
