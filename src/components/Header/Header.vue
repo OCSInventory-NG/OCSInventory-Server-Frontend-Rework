@@ -86,8 +86,17 @@ export default {
 		}
 	},
 	methods: {
-		logout() {
+		async logout() {
 			const authMethod = localStorage.getItem('auth_method');
+
+			// revoke the token server side while it is still in localStorage,
+			// without blocking the logout if the call fails
+			try {
+				await this.$api.generic.post('api-auth/token/logout')
+			} catch (e) {
+				console.log(e.message)
+			}
+
 			localStorage.removeItem('authenticated');
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
