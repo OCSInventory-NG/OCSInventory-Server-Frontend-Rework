@@ -215,6 +215,7 @@
 				ref="selectableTable"
 				v-model:sort-by="sortByLocal"
 				v-model:sort-desc="sortDescLocal"
+				v-model:selected-items="selected"
 				:responsive="!isSticky"
 				striped
 				hover
@@ -280,18 +281,11 @@
 				</template>
 
 				<template #cell(selected)="row">
-					<!-- If row is selected -->
-					<template v-if="selected.findIndex(v => v.id === row.item.id) != -1">
-						<font-awesome-icon 
-							:icon="['far', 'square-check']"
-						/>
-					</template>
-					<!-- If row is not selected -->
-					<template v-else>
-						<font-awesome-icon 
-							:icon="['far', 'square']"
-						/>
-					</template>
+					<input
+						type="checkbox"
+						:checked="selected.findIndex(v => v.id === row.item.id) != -1"
+						@click.stop="toggleRowSelected(row)"
+					>
 				</template>
 
 				<!-- Network redirection -->
@@ -798,22 +792,18 @@ export default {
 			this.refreshStickyHeader()
 		},
 		isChecked: function () {
-			if(this.isChecked) {
+			if (this.isChecked) {
 				const perPage = this.perPage
 				const currentPage = this.currentPage
 
 				const start = (currentPage - 1) * perPage
 				const end   = Math.min(start + perPage, this.rowdata.length)
 
-				this.$refs.selectableTable.clearSelected()
-				this.selected = []
-
-				for (let index = start; index < end; index++) {
-					this.$refs.selectableTable.selectRow(index)
-				}
+				this.selected = this.rowdata.slice(start, end)
+				this.selectedids = this.selected.map(item => item.id)
 			} else {
-				this.$refs.selectableTable.clearSelected()
 				this.selected = []
+				this.selectedids = []
 			}
 			this.attributePackage()
 		},
@@ -1227,6 +1217,14 @@ export default {
 			this.json_data = filteredItems
 			this.currentPage = 1
 		},
+		toggleRowSelected(row) {
+			const index = this.selected.findIndex(v => v.id === row.item.id)
+			if (index !== -1) {
+				this.onRowUnselected(row.item)
+			} else {
+				this.onRowSelected(row.item)
+			}
+		},
 		onRowSelected(item) {
 			this.selected.push(item)
 			this.selectedids.push(item.id)
@@ -1247,8 +1245,9 @@ export default {
 		},
 		reloadDatatable() {
 			this.isReloading = true;
-			this.selectedids = []
 			this.selected = []
+			this.selectedids = []
+			this.isChecked = false
 			this.$emit('reloadDatatable')
 
 			setTimeout(() => {
