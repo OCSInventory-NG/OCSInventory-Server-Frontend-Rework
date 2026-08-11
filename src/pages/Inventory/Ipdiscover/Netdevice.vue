@@ -126,9 +126,6 @@ export default {
 					}
 				}
 
-				// Get network
-				await this.getNetwork()
-
 				// Get netdevices
 				await this.getNetdevice(this.query)
 
@@ -143,7 +140,7 @@ export default {
 			}
 		},
 
-		async getNetwork() {
+		async resolveNetworkName(results) {
 			const id = this.$route?.params?.id || ""
 
 			if (!id) {
@@ -151,6 +148,19 @@ export default {
 				return
 			}
 
+			const [first] = results || []
+
+			if (first) {
+				this.networkname = first.network?.name || ""
+				return
+			}
+
+			if (!this.networkname) {
+				await this.getNetwork(id)
+			}
+		},
+
+		async getNetwork(id) {
 			try {
 				const data = await this.$api.generic.get(`networks/${id}/`)
 				this.networkname = data?.name || ""
@@ -211,6 +221,9 @@ export default {
 				})
 
 				this.rowdata = transformed
+
+				await this.resolveNetworkName(results)
+
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {

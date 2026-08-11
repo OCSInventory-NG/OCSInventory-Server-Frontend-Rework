@@ -98,9 +98,6 @@ export default {
 				const header = await this.$api.generic.options("automation/history/")
 				this.rowheader = Object.keys(header.actions.POST)
 
-				// Get scheduler
-				await this.getScheduler()
-
 				// Get scheduler history
 				await this.getAutomationHistory()
 
@@ -115,7 +112,7 @@ export default {
 			}
 		},
 
-		async getScheduler() {
+		async resolveSchedulerName(histories) {
 			const id = this.$route?.params?.id || ""
 
 			if (!id) {
@@ -123,6 +120,19 @@ export default {
 				return
 			}
 
+			const [first] = histories || []
+
+			if (first) {
+				this.schedulername = first.scheduler?.name || ""
+				return
+			}
+
+			if (!this.schedulername) {
+				await this.getScheduler(id)
+			}
+		},
+
+		async getScheduler(id) {
 			try {
 				const data = await this.$api.generic.get(`automation/scheduler/${id}/`)
 				this.schedulername = data?.name || ""
@@ -154,6 +164,8 @@ export default {
 					scheduler: h?.scheduler?.name ?? h.scheduler,
 					status: this.status?.[h.status] ?? h.status,
 				}))
+
+				await this.resolveSchedulerName(histories)
 
 				this.errormsg = null
 				this.errored = false

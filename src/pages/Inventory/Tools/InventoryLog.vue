@@ -102,9 +102,6 @@ export default {
 				const header = await this.$api.generic.options("asset/logs/")
 				this.rowheader = Object.keys(header.actions.POST)
 
-				// Get asset
-				await this.getAsset()
-
 				// Get asset logs
 				await this.getLogs(this.query)
 
@@ -119,7 +116,7 @@ export default {
 			}
 		},
 
-		async getAsset() {
+		async resolveAssetName(results) {
 			const id = this.$route?.params?.id || ""
 
 			if (!id) {
@@ -127,6 +124,19 @@ export default {
 				return
 			}
 
+			const [first] = results || []
+
+			if (first) {
+				this.assetname = first.asset?.name || ""
+				return
+			}
+
+			if (!this.assetname) {
+				await this.getAsset(id)
+			}
+		},
+
+		async getAsset(id) {
 			try {
 				const data = await this.$api.generic.get(`asset/bases/${id}/`)
 				this.assetname = data?.name || ""
@@ -164,6 +174,9 @@ export default {
 					: (Array.isArray(results) ? results.length : 0)
 
 				this.rowdata = results
+
+				await this.resolveAssetName(results)
+
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
