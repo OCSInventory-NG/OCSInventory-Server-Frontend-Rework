@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="edittemplate" />
+			<PageHeader
+				page-title="edittemplate"
+				:breadcrumb-label="template.name"
+			/>
 
 			<div class="page-body">
 				<div class="card">
