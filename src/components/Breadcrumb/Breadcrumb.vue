@@ -11,7 +11,8 @@
 export default {
 	name: 'BreadcrumbHistory',
 	props: {
-		exclude: {type: Array, default: () => []}
+		exclude: {type: Array, default: () => []},
+		currentLabel: {type: String, default: ''}
 	},
 	computed: {
 		excluded() {
@@ -20,12 +21,11 @@ export default {
 		tree() {
 			var breadcrumb = []
 
-			// Keep the raw segments (underscore preserved) so the cumulative
-			// path matches real routes (e.g. /configurations/compliance_settings).
-			// The underscore is only turned into a space for display.
-			var items = this.$route.path
+			var segments = this.$route.path
 				.split('/')
 				.slice(1)
+
+			var items = segments
 
 			var path = "/"
 
@@ -67,6 +67,17 @@ export default {
 					})
 				}
 			})
+
+			if(this.currentLabel && breadcrumb.length) {
+				var lastSegment = segments[segments.length - 1]
+				var params = Object.values(this.$route.params)
+					.flat()
+					.map(param => String(param))
+
+				if(params.includes(lastSegment)) {
+					breadcrumb[breadcrumb.length - 1].text = this.currentLabel + " (" + lastSegment + ")"
+				}
+			}
 
 			return breadcrumb
 		}

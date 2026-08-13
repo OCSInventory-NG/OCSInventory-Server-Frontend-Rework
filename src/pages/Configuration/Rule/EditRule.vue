@@ -3,7 +3,10 @@
 		id="edit-rule"
 		class="container-xl"
 	>
-		<PageHeader page-title="rules" />
+		<PageHeader
+			page-title="rules"
+			:breadcrumb-label="rule.description"
+		/>
 
 		<div class="page-body">
 			<div class="card">
