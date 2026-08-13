@@ -26,13 +26,6 @@ export default {
 				.slice(1)
 
 			var items = segments
-				.map(route => route
-					.split('_')
-					.map(word => {
-						return word
-					})
-					.join(' ')
-				)
 
 			var path = "/"
 
@@ -62,14 +55,14 @@ export default {
 
 				if(routeExists) {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						to: path,
 						append: true,
 						replace: true
 					})
 				} else {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						disabled: true
 					})
 				}

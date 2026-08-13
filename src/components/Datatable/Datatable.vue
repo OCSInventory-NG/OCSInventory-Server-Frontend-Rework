@@ -264,6 +264,33 @@
 							{{ getCellLink(row).label }}
 						</a>
 					</template>
+					<template v-else-if="clickablecells.includes(row.field.key)">
+						<a
+							href="#"
+							class="ocs-link"
+							@click.prevent="$emit('cell-click', { field: row.field.key, item: row.item })"
+						>
+							{{ row.value }}
+						</a>
+					</template>
+					<template v-else-if="badgecells.includes(row.field.key)">
+						<span
+							class="badge text-white"
+							:class="'bg-' + (row.item['__' + row.field.key + '_variant'] || 'secondary')"
+						>
+							{{ row.value }}
+						</span>
+					</template>
+					<template v-else-if="coloredcells.includes(row.field.key)">
+						<span
+							:style="{
+								color: row.item['__' + row.field.key + '_color'],
+								fontWeight: 'bold',
+							}"
+						>
+							{{ row.value }}
+						</span>
+					</template>
 					<template v-else>
 						{{ row.value }}
 					</template>
@@ -571,6 +598,16 @@
 								@reload-datatable="reloadDatatable"
 							/>
 							<router-link
+								v-if="detailroute"
+								:to="detailroute + '/' + row.item.id"
+								:title="$t('generic.edit')"
+								class="btn btn-ghost-dark"
+							>
+								<font-awesome-icon
+									:icon="['far', 'file-lines']"
+								/>
+							</router-link>
+							<router-link
 								v-if="viewautomationhistory"
 								:to="'/configurations/automations/history/'+row.item.id"
 								:title="$t('scheduler.see_history')"
@@ -672,6 +709,10 @@ export default {
 		translationkey: { type: String, default: '' },
 		canviewhistory: { type: Boolean, default: false },
 		canviewruleaction: { type: Boolean, default: false },
+		ruleactionroute: { type: String, default: '/configurations/rules' },
+		clickablecells: { type: Array, default: () => [] },
+		badgecells: { type: Array, default: () => [] },
+		coloredcells: { type: Array, default: () => [] },
 		canshowhide: { type: Boolean, default: true },
 		candeploy: { type: Boolean, default: false },
 		multisearch: { type: Boolean, default: false },
@@ -690,6 +731,7 @@ export default {
 		assetgroupid: { type: [String, Number], default: null },
 		assets: { type: [Array, Object], default: () => [] },
 		viewautomationhistory: { type: Boolean, default: false },
+		detailroute: { type: String, default: null },
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
 		serverTotalRows: { type: Number, default: 0 },
@@ -794,6 +836,11 @@ export default {
 		rowdata: function () {
 			if (!this.serverSide && Array.isArray(this.rowdata)) {
 				this.totalRows = this.rowdata.length
+				// Re-sync the export data when the parent replaces the dataset
+				// in place (e.g. EOL tile filtering, same instance); otherwise
+				// json_data stays on the initial set and "export all" ignores
+				// the active filter.
+				this.json_data = this.rowdata
 			}
 			this.refreshStickyHeader()
 		},
@@ -884,7 +931,7 @@ export default {
 		if(this.title == "asset/bases" || this.canaccesspackagedetails) {
 			this.redirectto = "asset"
 		}
-		else if(this.title == "inventory_logs") {
+		else if(this.title == "inventory_logs" || this.title == "compliance_results" || this.title == "compliance_eol") {
 			this.redirectto = "asset"
 		} else {
 			this.redirectto = this.title
@@ -1348,7 +1395,10 @@ export default {
 
 			rows.forEach(row => {
 				const values = headers.map(h => {
-					const v = row[h] != null ? String(row[h]) : ''
+					const val = row[h]
+					const v = val != null
+						? (typeof val === 'object' ? (val.name ?? val.id ?? '') : String(val))
+						: ''
 					return `"${v.replace(/"/g, '""')}"`
 				})
 				csvRows.push(values.join(';'))
@@ -1387,7 +1437,7 @@ export default {
 			this.$router.push('/deployment/history/'+id); 
 		},
 		goToEditRule(id){
-			this.$router.push('/configurations/rules/'+id); 
+			this.$router.push(this.ruleactionroute+'/'+id);
 		},
 		useSaveSearch(id) {
 			this.$emit('useSaveSearch', id)

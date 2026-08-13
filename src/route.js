@@ -236,6 +236,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/inventory/compliance',
+		name: 'ComplianceDashboard',
+		component: () => import('@/pages/Inventory/Tools/ComplianceDashboard.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/deployment/packages',
 		name: 'Packages',
 		component: () => import('@/pages/Deployment/Package.vue'),
@@ -301,6 +309,24 @@ const routes = [
 			layout: AppLayout
 		}
 	},
+	{
+		path: '/configurations/compliance_settings',
+		name: 'ComplianceSettings',
+		component: () => import('@/pages/Configuration/Compliance/ComplianceSettings.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/compliance_settings/:id',
+		name: 'EditComplianceRule',
+		component: () => import('@/pages/Configuration/Compliance/EditComplianceRule.vue'),
+		props: true,
+		meta: {
+			layout: AppLayout
+		}
+	},
+
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
