@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="result" />
+			<PageHeader
+				page-title="result"
+				:breadcrumb-label="packagename"
+			/>
 
 			<div class="page-body">
 				<div class="card">
@@ -163,6 +166,8 @@ export default {
 			errormsg: null,
 			errored: false,
 
+			packagename: "",
+
 			rowdata: [],
 			rowheader: [],
 			rowdatawaiting: [],
@@ -215,6 +220,9 @@ export default {
 				const header = await this.$api.generic.options("deployment/results/")
 				this.rowheader = Object.keys(header.actions.POST)
 
+				// Get package
+				await this.getPackage()
+
 				// Get package results
 				await this.getPackageResult()
 
@@ -226,6 +234,15 @@ export default {
 			} finally {
 				this.loading = false
 				this.isbusy = false
+			}
+		},
+
+		async getPackage() {
+			try {
+				const data = await this.$api.generic.get(`deployment/packages/${this.id}/`)
+				this.packagename = data?.name || ""
+			} catch {
+				this.packagename = ""
 			}
 		},
 

@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="netdevice" />
+			<PageHeader
+				page-title="netdevice"
+				:breadcrumb-label="networkname"
+			/>
 
 			<div class="page-body">
 				<div class="card">
@@ -68,6 +71,7 @@ export default {
 
 			rowdata: [],
 			rowheader: [],
+			networkname: "",
 			accountinfoName: "",
 			total: 0,
 			query: {
@@ -136,6 +140,35 @@ export default {
 			}
 		},
 
+		async resolveNetworkName(results) {
+			const id = this.$route?.params?.id || ""
+
+			if (!id) {
+				this.networkname = ""
+				return
+			}
+
+			const [first] = results || []
+
+			if (first) {
+				this.networkname = first.network?.name || ""
+				return
+			}
+
+			if (!this.networkname) {
+				await this.getNetwork(id)
+			}
+		},
+
+		async getNetwork(id) {
+			try {
+				const data = await this.$api.generic.get(`networks/${id}/`)
+				this.networkname = data?.name || ""
+			} catch {
+				this.networkname = ""
+			}
+		},
+
 		async getNetdevice(query = null) {
 			this.isbusy = true
 			this.rowdata = []
@@ -188,6 +221,9 @@ export default {
 				})
 
 				this.rowdata = transformed
+
+				await this.resolveNetworkName(results)
+
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {

@@ -4,7 +4,10 @@
 		class="container-xl"
 	>
 		<div>
-			<PageHeader page-title="history" />
+			<PageHeader
+				page-title="history"
+				:breadcrumb-label="schedulername"
+			/>
 
 			<div class="page-body">
 				<div class="card">
@@ -57,6 +60,8 @@ export default {
 			rowheader: [],
 			rowdata: [],
 
+			schedulername: "",
+
 			canview: false,
 
 			status: {
@@ -107,6 +112,35 @@ export default {
 			}
 		},
 
+		async resolveSchedulerName(histories) {
+			const id = this.$route?.params?.id || ""
+
+			if (!id) {
+				this.schedulername = ""
+				return
+			}
+
+			const [first] = histories || []
+
+			if (first) {
+				this.schedulername = first.scheduler?.name || ""
+				return
+			}
+
+			if (!this.schedulername) {
+				await this.getScheduler(id)
+			}
+		},
+
+		async getScheduler(id) {
+			try {
+				const data = await this.$api.generic.get(`automation/scheduler/${id}/`)
+				this.schedulername = data?.name || ""
+			} catch {
+				this.schedulername = ""
+			}
+		},
+
 		async getAutomationHistory() {
 			this.isbusy = true
 			this.rowdata = []
@@ -130,6 +164,8 @@ export default {
 					scheduler: h?.scheduler?.name ?? h.scheduler,
 					status: this.status?.[h.status] ?? h.status,
 				}))
+
+				await this.resolveSchedulerName(histories)
 
 				this.errormsg = null
 				this.errored = false
