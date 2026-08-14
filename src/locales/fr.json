@@ -181,6 +181,8 @@
     "deployment_timeout": "Délai de déploiement",
     "Django backend log level": "Niveau de log du serveur Django",
     "duplicate_reconciliation": "Réconciliation des doublons",
+    "legacy_duplicate_reconciliation": "Réconciliation des doublons (legacy)",
+    "Field(s) used to reconcile duplicate computers on the legacy endpoint, uuid is used by default if left empty": "Champ(s) utilisé(s) pour réconcilier les ordinateurs en double sur le endpoint legacy, uuid sera utilisé par défaut si aucun champ n'est sélectionné",
     "enabled": "Déploiement",
     "Enable auto retry if deployment failed": "Activer la nouvelle tentative automatique en cas d'échec du déploiement",
     "Enable debug mode": "Activer le mode de débogage",
@@ -254,6 +256,7 @@
     "Timeout of command execution in seconds": "Délai d'expiration de l'exécution de la commande en secondes",
     "Timeout of deployment in seconds": "Délai d'expiration du déploiement en secondes",
     "Type of scan": "Type d'analyse réseau",
+    "serial": "Numéro de série",
     "uuid": "UUID",
     "uuid, name": "UUID, Nom",
     "uuid, srcmac": "UUID, Adresse MAC"
