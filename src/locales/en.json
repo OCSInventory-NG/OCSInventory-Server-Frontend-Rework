@@ -225,6 +225,8 @@
     "Max age of deployment packages to purge": "Maximum age of deployment packages to purge",
     "max_retry": "Max retry",
     "Max retry number for a package to retry": "Max retry number for a package to retry",
+    "max_template_versions": "Maximum number of template versions",
+    "Maximum number of version snapshots to keep per template": "Maximum number of template versions to keep",
     "Mode of administrative data generation": "Administrative data generation mode",
     "months": "months",
     "name": "Name",
