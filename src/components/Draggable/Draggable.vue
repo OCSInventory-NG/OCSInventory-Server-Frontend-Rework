@@ -123,6 +123,7 @@ export default {
 		// Table format
 		isSticky: { type: Boolean, default: false },
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			rowdatas: [],

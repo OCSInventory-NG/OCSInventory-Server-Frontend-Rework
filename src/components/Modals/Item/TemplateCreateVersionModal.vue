@@ -101,6 +101,7 @@ export default {
 	props: {
 		id: { type: [String, Number], required: true }
 	},
+	emits: ["reload-template"],
 	data() {
 		return {
 			createmodal: false,

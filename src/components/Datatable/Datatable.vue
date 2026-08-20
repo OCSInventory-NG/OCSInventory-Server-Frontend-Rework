@@ -735,6 +735,7 @@ export default {
 		// Table format
 		isSticky: { type: Boolean, default: false },
 	},
+	emits: ['cell-click', 'reloadDatatable', 'change-query', 'export', 'export-all', 'attributePackage', 'useSaveSearch', 'assetsSearch', 'filter-by-network'],
 	data() {
 		return {
 			// Pagination parameters

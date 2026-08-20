@@ -140,6 +140,7 @@ export default {
 		reconciliationname: { type: String, default: '' },
 		translationkey: { type: String, default: '' }
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			submitErrorMsg: null,

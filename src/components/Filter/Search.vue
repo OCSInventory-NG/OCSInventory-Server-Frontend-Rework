@@ -313,6 +313,7 @@ export default {
 		disableforgroup: { type: Boolean, default: false },
 		initialGrouped: { type: Boolean, default: null },
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errored: false,

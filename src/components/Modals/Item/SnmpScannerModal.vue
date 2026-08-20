@@ -182,6 +182,7 @@ export default {
 		update: { type: Boolean, default: false },
 		id: { type: [String, Number], default: null }
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

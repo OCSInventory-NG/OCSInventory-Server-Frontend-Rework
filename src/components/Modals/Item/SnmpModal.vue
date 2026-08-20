@@ -272,6 +272,7 @@ export default {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

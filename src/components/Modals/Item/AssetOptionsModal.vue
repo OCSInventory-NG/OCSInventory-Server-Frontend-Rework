@@ -164,6 +164,7 @@ export default {
 	props: {
 		item: { type: [Array, Object], default: () => [] }
 	},
+	emits: ["reloadInventory"],
 	data() {
 		return {
 			errored: false,

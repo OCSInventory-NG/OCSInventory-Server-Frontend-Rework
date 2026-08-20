@@ -122,6 +122,7 @@ export default {
 		route: { type: String, default: 'templates' },
 		title: { type: String, default: 'template' }
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errormsg: null,

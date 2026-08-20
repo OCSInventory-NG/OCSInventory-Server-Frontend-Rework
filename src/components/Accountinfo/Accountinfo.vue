@@ -145,6 +145,7 @@ export default {
 		massprocessing: { type: Boolean, default: false },
 		items: { type: Array, default: () => [] }
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errormsg: null,

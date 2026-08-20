@@ -117,6 +117,7 @@ export default {
 		objectId: { type: Number, default: null },
 		contentType: { type: Number, required: true },
 	},
+	emits: ["reloadDatatable"],
 
 	data() {
 		return {

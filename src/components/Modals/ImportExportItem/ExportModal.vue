@@ -107,6 +107,7 @@ export default {
 		pageLength: { type: Number, default: 0 },
 		selectionLength: { type: Number, default: 0 },
 	},
+	emits: ['confirm'],
 	data() {
 		return {
 			errormsg: null,

@@ -383,6 +383,7 @@ export default {
 		supportsInventoryFields: { type: Boolean, default: false },
 		canRemoveCondition: { type: Boolean, default: true },
 	},
+	emits: ["reloadRule"],
 	data() {
 		return {
 			errormsg: null,
