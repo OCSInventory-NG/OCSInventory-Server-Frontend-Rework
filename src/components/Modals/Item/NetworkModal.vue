@@ -142,6 +142,7 @@ export default {
 	props: {
 		id: { type: Number, default: null }
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errormsg: null,

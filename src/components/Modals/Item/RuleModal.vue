@@ -175,6 +175,7 @@ export default {
 		id: { type: Number, default: null },
 		defaultTrigger: { type: String, default: 'inventory_received' }
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

@@ -199,6 +199,7 @@ export default {
 		id: { type: [Number, String], default: null },
 		trigger: { type: String, default: null },
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

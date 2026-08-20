@@ -56,6 +56,7 @@ export default {
 		id: { type: String, default: null },
 		group: { type: String, default: null }
 	},
+	emits: ['endReloadDeployment'],
 	data() {
 		return {
 			errored: false,

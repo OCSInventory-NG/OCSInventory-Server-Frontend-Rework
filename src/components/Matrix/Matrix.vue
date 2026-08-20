@@ -75,6 +75,7 @@ export default {
 		rowpermissions: { type: [Array, Object], default: () => [] },
 		id: { type: Number, default: 0 }
 	},
+	emits: ["permissions"],
 	data() {
 		return {
 			headertab: ["add", "change", "delete", "view", "all"],

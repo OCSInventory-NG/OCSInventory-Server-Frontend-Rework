@@ -277,6 +277,7 @@ export default {
 		id: { type: Number, default: null },
 		viewOnly: { type: Boolean, default: false }
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

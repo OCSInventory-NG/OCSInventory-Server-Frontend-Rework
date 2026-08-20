@@ -169,6 +169,7 @@ export default {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
+	emits: ["reloadDatatable", "reloadPackage"],
 	data() {
 		return {
 			errormsg: null,

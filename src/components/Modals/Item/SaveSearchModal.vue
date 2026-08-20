@@ -291,6 +291,7 @@ export default {
 		rowsearch: { type: [Array, Object], default: () => [] },
 		navbar: { type: Boolean, default: false }
 	},
+	emits: ["reloadDatatable", "useSaveSearch"],
 	data() {
 		return {
 			errormsg: null,

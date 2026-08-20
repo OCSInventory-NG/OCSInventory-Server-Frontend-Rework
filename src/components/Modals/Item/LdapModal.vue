@@ -239,6 +239,7 @@ export default {
 		authid: { type: Number, default: 2 },
 		viewOnly: { type: Boolean, default: false}
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

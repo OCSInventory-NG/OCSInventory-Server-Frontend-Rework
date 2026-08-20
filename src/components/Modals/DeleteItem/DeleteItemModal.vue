@@ -120,6 +120,7 @@ export default {
 		assetgroupid: { type: [String, Number], default: null },
 		assets: { type: Array, default: () => [] }
 	},
+	emits: ['reloadDatatable', 'reloadTemplate', 'reloadDashboard'],
 	data() {
 		return {
 			deleteerror: false,

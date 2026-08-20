@@ -141,6 +141,7 @@ export default {
 		items: { type: [Array, Object], default: () => [] },
 		group: { type: String, default: null },
 	},
+	emits: ["reloadDeployment"],
 	data() {
 		return {
 			errored: false,
