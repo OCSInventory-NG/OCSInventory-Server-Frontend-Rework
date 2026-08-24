@@ -462,6 +462,7 @@
     "deletevalid": "Êtes-vous sûr(e) ?",
     "dont_have_right_to_see": "Vous n'avez pas l'autorisation de voir cette page",
     "error_no_permissions": "Vous ne disposez pas des permissions requises, veuillez contacter votre administrateur",
+    "error_sso_failed": "L'authentification a échoué, veuillez contacter votre administrateur",
     "group_assignments_disclaimer": "Types d'assignation des groupes : M = manuelle, L = LDAP, R = règle. Les groupes assignés via LDAP ou règle sont en lecture seule.",
     "hide_details": "Masquer le détail",
     "info": "Information",
