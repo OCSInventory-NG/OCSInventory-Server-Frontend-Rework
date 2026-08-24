@@ -132,6 +132,7 @@ export default {
 		routetype: { type: String, default: "assets" },
 		viewOnly: { type: Boolean, default: false }
 	},
+	emits: ['reloadTemplate'],
 	data() {
 		return {
 			errored: false,

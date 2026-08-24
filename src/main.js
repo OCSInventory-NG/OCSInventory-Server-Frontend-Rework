@@ -32,7 +32,8 @@ import GlobalComponents from '@/components/global'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import {
-	faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
+	faHome, faCircle, faCircleCheck, faCircleXmark, faCircleInfo,
+	faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
 	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle,
@@ -81,7 +82,8 @@ loadConfig().then(async (config) => {
 
 	// Icons
 	library.add({
-		faHome, faCircle, faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
+		faHome, faCircle, faCircleCheck, faCircleXmark, faCircleInfo,
+		faUsersCog, faAngleRight, faArrowsRotate, faGear, faPowerOff, faUser, faPlus,
 		faMagnifyingGlass, faDownload, faSquare, faSquareCheck, faPencil, faTrashCan,
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
 		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles,

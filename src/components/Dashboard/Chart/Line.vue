@@ -53,6 +53,7 @@ export default {
 		edit: { type: Boolean, default: false },
 		i: { type: Number, default: 0 }
 	},
+	emits: ["removeItem"],
 	data() {
 		return {
 			errored: false,

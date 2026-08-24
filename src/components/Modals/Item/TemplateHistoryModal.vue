@@ -188,6 +188,7 @@ export default {
 		id: { type: [String, Number], required: true },
 		isProtected: { type: Boolean, default: false }
 	},
+	emits: ["reload-template"],
 	data() {
 		return {
 			historymodal: false,

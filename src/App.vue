@@ -44,7 +44,10 @@ export default {
 				localStorage.getItem("permissions") === null
 
 			if (stillNotAuthenticated) {
-				this.$router.push({ path: '/login' }).catch(() => {})
+				this.$router.push({
+					path: '/login',
+					query: Object.fromEntries(new URLSearchParams(window.location.search)),
+				}).catch(() => {})
 			}
 		} catch (e) {
 			console.log(e.message)

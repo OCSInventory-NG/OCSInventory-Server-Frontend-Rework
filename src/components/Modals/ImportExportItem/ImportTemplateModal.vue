@@ -157,6 +157,7 @@
 <script>
 export default {
 	name: 'ImportTemplateModal',
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errormsg: null,

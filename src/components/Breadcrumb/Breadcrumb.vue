@@ -11,7 +11,8 @@
 export default {
 	name: 'BreadcrumbHistory',
 	props: {
-		exclude: {type: Array, default: () => []}
+		exclude: {type: Array, default: () => []},
+		currentLabel: {type: String, default: ''}
 	},
 	computed: {
 		excluded() {
@@ -20,16 +21,11 @@ export default {
 		tree() {
 			var breadcrumb = []
 
-			var items = this.$route.path
+			var segments = this.$route.path
 				.split('/')
 				.slice(1)
-				.map(route => route
-					.split('_')
-					.map(word => {
-						return word
-					})
-					.join(' ')
-				)
+
+			var items = segments
 
 			var path = "/"
 
@@ -59,18 +55,29 @@ export default {
 
 				if(routeExists) {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						to: path,
 						append: true,
 						replace: true
 					})
 				} else {
 					breadcrumb.push({
-						text: (this.$te("title." + item.replace(/ /g,"_"))) ? this.$t("title." + item.replace(/ /g,"_")) : item,
+						text: (this.$te("title." + item)) ? this.$t("title." + item) : item.replace(/_/g, " "),
 						disabled: true
 					})
 				}
 			})
+
+			if(this.currentLabel && breadcrumb.length) {
+				var lastSegment = segments[segments.length - 1]
+				var params = Object.values(this.$route.params)
+					.flat()
+					.map(param => String(param))
+
+				if(params.includes(lastSegment)) {
+					breadcrumb[breadcrumb.length - 1].text = this.currentLabel + " (" + lastSegment + ")"
+				}
+			}
 
 			return breadcrumb
 		}

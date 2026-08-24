@@ -166,16 +166,16 @@
 													/>
 												</b-input-group>
 											</div>
-											<div 
+											<div
 												v-if="parameter.type == 'select'"
 												class="ocs-config-form"
 											>
-												<b-form-select 
-													v-model="parameter.value" 
+												<b-form-select
+													v-model="parameter.value"
 													class="form-select mb-3"
 													:disabled="!canedit"
 												>
-													<b-form-select-option 
+													<b-form-select-option
 														v-for="option in parameter.options"
 														:key="option"
 														:value="option"
@@ -184,6 +184,19 @@
 															$t("configuration."+option) : option }}
 													</b-form-select-option>
 												</b-form-select>
+											</div>
+											<div
+												v-if="parameter.type == 'multiselect'"
+												class="ocs-config-form"
+											>
+												<v-select
+													v-model="parameter.value"
+													:options="parameter.options"
+													:get-option-label="(option) => $te('configuration.'+option) ?
+														$t('configuration.'+option) : option"
+													multiple
+													:disabled="!canedit"
+												/>
 											</div>
 										</b-list-group-item>
 									</b-list-group>

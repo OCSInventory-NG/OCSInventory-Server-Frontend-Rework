@@ -52,6 +52,7 @@ export default {
 		options: { type: Object, default: null },
 		series: { type: [Array, Object], default: () => [] }
 	},
+	emits: ["removeItem"],
 	data() {
 		return {
 			errored: false,

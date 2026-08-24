@@ -119,9 +119,11 @@ export default {
 		canaddmapping: { type: Boolean, default: false },
 		field: { type: String, default: 'priority' },
 		viewOnly: { type: Boolean, default: false },
+		ruleactionroute: { type: String, default: '/configurations/rules' },
 		// Table format
 		isSticky: { type: Boolean, default: false },
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			rowdatas: [],
@@ -184,7 +186,7 @@ export default {
 			}
 		},
 		goToEditRule(id) {
-			this.$router.push('/configurations/rules/'+id);
+			this.$router.push(this.ruleactionroute + '/' + id);
 		},
 	}
 }

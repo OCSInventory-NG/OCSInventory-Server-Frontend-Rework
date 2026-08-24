@@ -86,6 +86,7 @@ export default {
 		items: { type: Array, default: () => [] },
 		type: {type: String, default: "ASSET"}
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errored: false,

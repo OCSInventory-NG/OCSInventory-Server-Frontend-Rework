@@ -1,0 +1,74 @@
+# Nightly npm audit fix
+# Runs `npm audit fix` every night on the `dev` branch and pushes the
+# resulting changes automatically if the project still builds correctly.
+name: Nightly npm audit fix
+
+on:
+  schedule:
+    # Every day at 02:00 UTC
+    - cron: "0 2 * * *"
+  # Allow triggering the job manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  audit-fix:
+    name: npm audit fix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          # Use a token that is allowed to push back to the repository
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit fix
+        run: npm audit fix || true
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies again (post audit fix)
+        if: steps.git-check.outputs.changed == 'true'
+        run: npm ci
+
+      - name: Lint
+        if: steps.git-check.outputs.changed == 'true'
+        run: npm run lint
+
+      - name: Build
+        if: steps.git-check.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(deps): npm audit fix [automated]"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          branch: dev
+          file_pattern: "package.json package-lock.json"

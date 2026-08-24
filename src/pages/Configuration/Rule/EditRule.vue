@@ -3,7 +3,10 @@
 		id="edit-rule"
 		class="container-xl"
 	>
-		<PageHeader page-title="rules" />
+		<PageHeader
+			page-title="rules"
+			:breadcrumb-label="rule.description"
+		/>
 
 		<div class="page-body">
 			<div class="card">
@@ -60,12 +63,13 @@
 									:key="rulemenu.value"
 									:title="rulemenu.text"
 								>
-									<RuleCriteria 
+									<RuleCriteria
 										v-if="rulemenu.value == 'logic'"
 										:id="id"
 										:trigger="trigger"
 										:logic="logic"
 										:view-only="viewOnly"
+										:supports-inventory-fields="trigger === 'inventory_received'"
 										@reload-rule="reloadRule"
 									/>
 

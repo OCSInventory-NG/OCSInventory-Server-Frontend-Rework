@@ -62,8 +62,8 @@
 					class="card mb-3"
 				>
 					<div class="card-header">
-						<b>{{ section.name }}</b>
-						— {{ $t('template.' + section.retrieval_method) }} / {{ $t('template.' + section.retrieval_output) }}
+						<b>{{ section.name }}</b>&nbsp;-
+						{{ $t('template.' + section.retrieval_method) }} / {{ $t('template.' + section.retrieval_output) }}
 					</div>
 					<div class="card-body">
 						<p v-if="section.target">

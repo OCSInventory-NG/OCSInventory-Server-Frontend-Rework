@@ -1,6 +1,6 @@
 <template lang="">
-	<div 
-		id="rules" 
+	<div
+		id="rules"
 		class="container-xl"
 	>
 		<div>
@@ -10,14 +10,14 @@
 				<div class="card">
 					<div class="card-body">
 						<div v-if="errored">
-							<Alert 
+							<Alert
 								:message="errormsg"
 								:cols="true"
 								variant="danger"
 							/>
 						</div>
 
-						<div 
+						<div
 							v-if="loading"
 							class="ocs-loader"
 						>
@@ -27,17 +27,22 @@
 						<div v-else>
 							<RuleModal
 								v-if="canadd"
+								:default-trigger="currentTrigger"
 								@reload-datatable="reloadDatatable"
 							/>
 
-							<b-tabs 
-								content-class="mt-3"
-								fill
+							<b-tabs
+								v-model="activeTab"
+								content-class="col-10 sticky-tabs"
+								pills
+								card
+								vertical
 							>
 								<b-tab
 									v-for="trigger in triggers"
 									:key="trigger.trigger"
 									:title="$t('rule.' + trigger.trigger)"
+									title-item-class="ocs-menu-tab"
 								>
 									<Draggable
 										id="rules-datatable"
@@ -83,30 +88,30 @@ export default {
 			rowheader: [],
 			draggableKey: 0,
 
+			activeTab: 0,
+
 			excludefields: ["logic", "actions"],
 
 			isbusy: true,
 			loading: true,
 		}
 	},
+	computed: {
+		currentTrigger() {
+			return this.triggers[this.activeTab]?.trigger
+		},
+	},
 	async mounted() {
 		const rawPermissions = localStorage.getItem('permissions')
 		const permissions = rawPermissions ? rawPermissions.split(",") : []
 
-		if (permissions.includes("rule_view_rule")) {
-			this.canview = true
-			if (permissions.includes("rule_add_rule")) {
-				this.canadd = true
-			}
-			if (permissions.includes("rule_change_rule")) {
-				this.canedit = true
-			}
-			if (permissions.includes("rule_delete_rule")) {
-				this.candelete = true
-			}
-			if (permissions.includes("rule_view_action")) {
-				this.canviewaction = true
-			}
+		this.canview = permissions.includes("rule_view_rule")
+
+		if (this.canview) {
+			this.canadd = permissions.includes("rule_add_rule")
+			this.canedit = permissions.includes("rule_change_rule")
+			this.candelete = permissions.includes("rule_delete_rule")
+			this.canviewaction = permissions.includes("rule_view_action")
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
@@ -115,7 +120,6 @@ export default {
 			return
 		}
 
-		// Data init
 		await this.loadInitial()
 	},
 	methods: {
@@ -123,14 +127,11 @@ export default {
 			this.loading = true
 			this.isbusy = true
 			try {
-				// Get header
 				const header = await this.$api.generic.options("automation/rule/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
 					(f) => !this.excludefields.includes(f)
 				)
-				//Get triggers
 				await this.getTriggers()
-				// Get rules
 				await this.getRules()
 
 				this.errored = false
@@ -187,7 +188,7 @@ export default {
 		async reloadDatatable() {
 			await this.getRules()
 			this.draggableKey += 1
-		}
+		},
 	}
 }
 </script>

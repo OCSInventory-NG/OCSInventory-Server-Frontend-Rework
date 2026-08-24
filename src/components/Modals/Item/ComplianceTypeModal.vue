@@ -1,77 +1,80 @@
 <template>
-	<div id="snmp-template-modal">
-		<div 
+	<div id="compliance-type-modal">
+		<div
 			v-if="!update"
 			class="page-header d-print-none"
 		>
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('network.addsnmptemplate')"
+						:title="$t('compliance.add_type')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						@click="loadData()"
 					>
-						<font-awesome-icon 
+						<font-awesome-icon
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('network.addsnmptemplate') }}
+						{{ $t('compliance.add_type') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
-			<button 
-				:title="$t('network.editsnmptemplate')"
+			<button
+				:title="$t('compliance.edit_type')"
 				class="btn btn-ghost-dark"
-				@click="loadData()"
+				@click="loadData(id)"
 			>
-				<font-awesome-icon 
+				<font-awesome-icon
 					:icon="['fas', 'pencil']"
 				/>
 			</button>
 		</div>
-		<b-modal 
-			id="snmptemplatemodal" 
-			v-model="snmptemplatemodal"
-			:title="(!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate')"
+
+		<b-modal
+			id="compliancetypemodal"
+			v-model="compliancetypemodal"
+			:title="(!update) ? $t('compliance.add_type') : $t('compliance.edit_type')"
 			hide-footer
 			modal-class="custom-modal"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('network.addsnmptemplate') : $t('network.editsnmptemplate') }}
-					<b-spinner 
+					{{ (!update) ? $t('compliance.add_type') : $t('compliance.edit_type') }}
+					<b-spinner
 						v-if="loadingcreate"
 						variant="success"
 					/>
-					<font-awesome-icon 
+					<font-awesome-icon
 						v-if="createwithsuccess"
 						:icon="['fas', 'check']"
 						color="green"
 					/>
-					<font-awesome-icon 
+					<font-awesome-icon
 						v-if="createerror"
 						:icon="['fas', 'xmark']"
 						color="red"
 					/>
 				</h5>
-				<b-button 
-					size="sm" 
-					variant="outline-danger" 
+				<b-button
+					size="sm"
+					variant="outline-danger"
 					@click="close()"
 				>
-					<font-awesome-icon 
+					<font-awesome-icon
 						:icon="['fas', 'xmark']"
 						size="1x"
 					/>
 				</b-button>
 			</template>
-			<Alert 
+
+			<Alert
 				v-if="createerror || errored"
-				:message="(createerror) ? createerrormsg : errormsg" 
+				:message="(createerror) ? createerrormsg : errormsg"
 				variant="danger"
 			/>
+
 			<b-form
 				v-if="!loading"
 				@submit="onSubmit"
@@ -79,11 +82,11 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('network.name')" 
-							label-for="templatename"
+							:label="$t('compliance.type_name')"
+							label-for="type-name"
 						>
 							<b-form-input
-								id="templatename"
+								id="type-name"
 								v-model="row.name"
 								required
 							/>
@@ -92,11 +95,11 @@
 				</b-row>
 				<b-row>
 					<b-col align-self="start" />
-					<b-col 
+					<b-col
 						align-self="center"
 						align="center"
 					>
-						<b-button 
+						<b-button
 							type="submit"
 							variant="success"
 						>
@@ -106,7 +109,8 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
-			<div 
+
+			<div
 				v-if="loading"
 				class="ocs-loader"
 			>
@@ -118,10 +122,10 @@
 
 <script>
 export default {
-	name: "SnmpTemplateModal",
+	name: "ComplianceTypeModal",
 	props: {
 		update: { type: Boolean, default: false },
-		id: { type: Number, default: null }
+		id: { type: Number, default: null },
 	},
 	emits: ["reloadDatatable"],
 	data() {
@@ -135,11 +139,9 @@ export default {
 
 			row: {
 				name: null,
-				os: 'SNMP',
-				sections: []
 			},
-			snmptemplatemodal: false,
-			
+			compliancetypemodal: false,
+
 			loading: true,
 			loadingcreate: false,
 		}
@@ -147,19 +149,17 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.snmptemplatemodal = false
+				this.compliancetypemodal = false
 				this.createwithsuccess = false
 				this.row = {
 					name: null,
-					os: 'SNMP',
-					sections: []
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
-		}
+		},
 	},
 	mounted() {
-		if(!this.update) {
+		if (!this.update) {
 			this.loading = false
 		}
 	},
@@ -168,12 +168,10 @@ export default {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
 
-		loadData() {
-			this.snmptemplatemodal = true
+		async loadData(id) {
+			this.compliancetypemodal = true
 			this.row = {
 				name: null,
-				os: "SNMP",
-				sections: [],
 			}
 
 			this.errormsg = null
@@ -182,8 +180,18 @@ export default {
 			this.createerrormsg = null
 			this.createwithsuccess = false
 
-			if (this.update) {
+			if (id) {
 				this.loading = true
+				try {
+					const data = await this.$api.generic.get(`compliance/types/${id}/`)
+					this.row = data
+					this.errored = false
+				} catch (e) {
+					this.errormsg = this._apiError(e)
+					this.errored = true
+				} finally {
+					this.loading = false
+				}
 			}
 		},
 
@@ -197,20 +205,20 @@ export default {
 
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("templates/", this.row)
+					await this.$api.generic.post("compliance/types/", this.row)
+				} else {
+					await this.$api.generic.patch(`compliance/types/${this.row.id}/`, this.row)
 				}
 
 				this.createwithsuccess = true
-				this.createerror = false
-				this.createerrormsg = null
 			} catch (e) {
-				this.createerrormsg = this._apiError(e)
-				this.createerror = true
 				this.createwithsuccess = false
+				this.createerror = true
+				this.createerrormsg = this._apiError(e)
 			} finally {
 				this.loadingcreate = false
 			}
 		},
-	}
+	},
 }
 </script>

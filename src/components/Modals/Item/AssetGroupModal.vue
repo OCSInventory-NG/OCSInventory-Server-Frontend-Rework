@@ -255,6 +255,7 @@ export default {
 		datatable: { type: Boolean, default: false },
 		cssclass: { type: String, default: null }
 	},
+	emits: ["reloadDatatable"],
 	data() {
 		return {
 			errormsg: null,

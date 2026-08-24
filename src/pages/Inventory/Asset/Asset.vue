@@ -128,6 +128,10 @@ export default {
 					}
 				}
 
+				// Add compliance and EOL columns at the end
+				this.rowheader.push('compliance')
+				this.rowheader.push('eol')
+
 				// Get assets
 				await this.getAssets(this.query)
 
@@ -171,6 +175,55 @@ export default {
 						item[label] = item.accountinfo[k]
 					})
 				})
+
+				// Add compliance and EOL status
+				const assetIds = results.map(a => a.id).join(',')
+
+				try {
+					const summaries = await this.$api.generic.get(
+						'compliance/results/asset-summary/',
+						{},
+						{ asset__in: assetIds }
+					)
+					const statusMap = {}
+					summaries.forEach(s => { statusMap[s.asset] = s.global_status })
+					results.forEach(asset => {
+						const s = statusMap[asset.id]
+						const labels = {
+							non_compliant: this.$t('compliance.non_compliant'),
+							compliant: this.$t('compliance.compliant'),
+						}
+						asset.compliance = labels[s] || this.$t('compliance.not_applicable')
+					})
+				} catch {
+					results.forEach(asset => {
+						asset.compliance = this.$t('compliance.not_applicable')
+					})
+				}
+
+				try {
+					const eolSummaries = await this.$api.generic.get(
+						'compliance/eol-status/eol-summary/',
+						{},
+						{ asset__in: assetIds }
+					)
+					const eolMap = {}
+					eolSummaries.forEach(e => { eolMap[e.asset] = e })
+					results.forEach(asset => {
+						const e = eolMap[asset.id]
+						if (!e || !e.product) {
+							asset.eol = this.$t('compliance.eol_unknown')
+						} else {
+							asset.eol = e.is_eol
+								? this.$t('compliance.eol_expired')
+								: this.$t('compliance.eol_active')
+						}
+					})
+				} catch {
+					results.forEach(asset => {
+						asset.eol = this.$t('compliance.eol_unknown')
+					})
+				}
 
 				this.rowdata = results
 			} catch (e) {

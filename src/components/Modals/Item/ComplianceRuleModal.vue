@@ -1,75 +1,75 @@
 <template>
-	<div id="network-group-modal">
-		<div 
+	<div id="compliance-rule-modal">
+		<div
 			v-if="!update"
 			class="page-header d-print-none"
 		>
 			<div class="row">
 				<div class="col-auto ms-auto">
 					<b-button
-						:title="$t('network.addnetgroup')"
+						:title="$t('compliance.addrule')"
 						variant="primary"
 						class="d-sm-inline-block btn-modal"
 						@click="loadData()"
 					>
-						<font-awesome-icon 
+						<font-awesome-icon
 							:icon="['fas', 'plus']"
 						/>
-						{{ $t('network.addnetgroup') }}
+						{{ $t('compliance.addrule') }}
 					</b-button>
 				</div>
 			</div>
 		</div>
 		<div v-else>
-			<button 
-				:title="$t('network.editnetgroup')"
+			<button
+				:title="$t('compliance.editrule')"
 				class="btn btn-ghost-dark"
 				@click="loadData(id)"
 			>
-				<font-awesome-icon 
+				<font-awesome-icon
 					:icon="['fas', 'pencil']"
 				/>
 			</button>
 		</div>
-		<b-modal 
-			id="netgroupmodal" 
-			v-model="netgroupmodal"
-			:title="(!update) ? $t('network.addnetgroup') : $t('network.editnetgroup')"
+		<b-modal
+			id="compliancerulemodal"
+			v-model="rulemodal"
+			:title="(!update) ? $t('compliance.addrule') : $t('compliance.editrule')"
 			hide-footer
 			modal-class="custom-modal"
 		>
 			<template #header="{ close }">
 				<h5 class="modal-title">
-					{{ (!update) ? $t('network.addnetgroup') : $t('network.editnetgroup') }}
-					<b-spinner 
+					{{ (!update) ? $t('compliance.addrule') : $t('compliance.editrule') }}
+					<b-spinner
 						v-if="loadingcreate"
 						variant="success"
 					/>
-					<font-awesome-icon 
+					<font-awesome-icon
 						v-if="createwithsuccess"
 						:icon="['fas', 'check']"
 						color="green"
 					/>
-					<font-awesome-icon 
+					<font-awesome-icon
 						v-if="createerror"
 						:icon="['fas', 'xmark']"
 						color="red"
 					/>
 				</h5>
-				<b-button 
-					size="sm" 
-					variant="outline-danger" 
+				<b-button
+					size="sm"
+					variant="outline-danger"
 					@click="close()"
 				>
-					<font-awesome-icon 
+					<font-awesome-icon
 						:icon="['fas', 'xmark']"
 						size="1x"
 					/>
 				</b-button>
 			</template>
-			<Alert 
+			<Alert
 				v-if="createerror || errored"
-				:message="(createerror) ? createerrormsg : errormsg" 
+				:message="(createerror) ? createerrormsg : errormsg"
 				variant="danger"
 			/>
 			<b-form
@@ -79,7 +79,7 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('user.name')" 
+							:label="$t('compliance.name')"
 							label-for="name"
 						>
 							<b-form-input
@@ -93,42 +93,73 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('generic.description')" 
+							:label="$t('compliance.description')"
 							label-for="description"
 						>
 							<b-form-input
 								id="description"
 								v-model="row.description"
-								required
-							/>
-						</b-form-group>
-					</b-col>
-				</b-row>
-				<b-row v-if="update">
-					<b-col>
-						<b-form-group
-							:label="$t('title.network')" 
-							label-for="network"
-						>
-							<v-select
-								id="network"
-								v-model="netid"
-								:options="networks"
-								:reduce="text => text.value"
-								label="text"
-								class="mb-3"
-								multiple
 							/>
 						</b-form-group>
 					</b-col>
 				</b-row>
 				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('compliance.type')"
+							label-for="type"
+						>
+							<v-select
+								id="type"
+								v-model="row.type"
+								:options="typeOptions"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+							/>
+						</b-form-group>
+					</b-col>
+					<b-col>
+						<b-form-group
+							:label="$t('compliance.severity')"
+							label-for="severity"
+						>
+							<v-select
+								id="severity"
+								v-model="row.severity"
+								:options="severityOptions"
+								:reduce="text => text.value"
+								:clearable="false"
+								label="text"
+								class="mb-3"
+							/>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('compliance.enabled')"
+							label-for="enabled"
+						>
+							<div class="form-check form-switch mb-4">
+								<input
+									v-model="row.enabled"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</div>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
 					<b-col align-self="start" />
-					<b-col 
+					<b-col
 						align-self="center"
 						align="center"
 					>
-						<b-button 
+						<b-button
 							type="submit"
 							variant="success"
 						>
@@ -138,7 +169,7 @@
 					<b-col align-self="end" />
 				</b-row>
 			</b-form>
-			<div 
+			<div
 				v-if="loading"
 				class="ocs-loader"
 			>
@@ -150,7 +181,7 @@
 
 <script>
 export default {
-	name: "NetworkGroupModal",
+	name: "ComplianceRuleModal",
 	props: {
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
@@ -167,13 +198,21 @@ export default {
 
 			row: {
 				name: null,
-				description: null
+				description: null,
+				type: 'software',
+				severity: 'medium',
+				enabled: true,
+				logic: {},
 			},
-			netgroupmodal: false,
-			networks: [],
-			netid: [],
-			oldnetid: [],
-			
+			rulemodal: false,
+			typeOptions: [],
+			severityOptions: [
+				{ value: 'critical', text: this.$t('compliance.severity_critical') },
+				{ value: 'high',     text: this.$t('compliance.severity_high') },
+				{ value: 'medium',   text: this.$t('compliance.severity_medium') },
+				{ value: 'low',      text: this.$t('compliance.severity_low') },
+			],
+
 			loading: true,
 			loadingcreate: false,
 		}
@@ -181,17 +220,22 @@ export default {
 	watch: {
 		createwithsuccess: function() {
 			setTimeout(() => {
-				this.netgroupmodal = false
+				this.rulemodal = false
 				this.createwithsuccess = false
 				this.row = {
 					name: null,
-					description: null
+					description: null,
+					type: 'software',
+					severity: 'medium',
+					enabled: true,
+					logic: {},
 				}
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
 	},
 	mounted() {
+		this.loadTypes()
 		if(!this.update) {
 			this.loading = false
 		}
@@ -201,13 +245,32 @@ export default {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
 
+		async loadTypes() {
+			try {
+				const data = await this.$api.generic.get("compliance/types/")
+				const types = Array.isArray(data) ? data : (data?.results || [])
+				this.typeOptions = types.map(t => ({
+					value: t.name,
+					text: this.$te('compliance.type_' + t.name)
+						? this.$t('compliance.type_' + t.name)
+						: t.name,
+				}))
+			} catch (e) {
+				this.typeOptions = []
+			}
+		},
+
 		async loadData(id) {
-			this.netgroupmodal = true
+			this.rulemodal = true
+			this.loading = true
 			this.row = {
 				name: null,
 				description: null,
+				type: 'software',
+				severity: 'medium',
+				enabled: true,
+				logic: {},
 			}
-
 			this.errormsg = null
 			this.errored = false
 			this.createerror = false
@@ -215,86 +278,24 @@ export default {
 			this.createwithsuccess = false
 
 			if (id) {
-				this.loading = true
-				try {
-					await this.getNetgroup(id)
-					await this.getNetworks()
-				} catch (e) {
-					this.errormsg = this._apiError(e)
-					this.errored = true
-					this.loading = false
-				}
-			}
-		},
-
-		async getNetgroup(id) {
-			try {
-				const data = await this.$api.generic.get(`netgroups/${id}/`)
-				this.row = data
-
-				this.netid = Array.isArray(this.row.networks) ? [...this.row.networks] : []
-				this.oldnetid = Array.isArray(this.row.networks) ? [...this.row.networks] : []
-
-				this.errormsg = null
-				this.errored = false
-			} catch (e) {
-				this.errormsg = this._apiError(e)
-				this.errored = true
-				throw e
-			}
-		},
-
-		async getNetworks() {
-			try {
-				const data = await this.$api.generic.get("networks/")
-
-				this.networks = (data || []).map((network) => ({
-					value: network.id,
-					text: network.netid,
-				}))
-
-				this.errormsg = null
-				this.errored = false
-			} catch (e) {
-				this.errormsg = this._apiError(e)
-				this.errored = true
-				throw e
-			} finally {
+				await this.getRules(id)
+			} else {
 				this.loading = false
 			}
 		},
 
-		async patchNetwork(networkId, payload) {
+		async getRules(id) {
 			try {
-				await this.$api.generic.patch(`networks/${networkId}/`, payload)
+				const data = await this.$api.generic.get(`compliance/rules/${id}/`)
+				this.row = data
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
 				this.errormsg = this._apiError(e)
 				this.errored = true
-				throw e
+			} finally {
+				this.loading = false
 			}
-		},
-
-		async updateNetworks(groupId) {
-			const oldIds = Array.isArray(this.oldnetid) ? this.oldnetid : []
-			const newIds = Array.isArray(this.netid) ? this.netid : []
-
-			const toRemove = oldIds.filter((nid) => !newIds.includes(nid))
-			const toAdd = newIds.filter((nid) => !oldIds.includes(nid))
-
-			const tasks = [
-				...toRemove.map((nid) => this.patchNetwork(nid, { group: null })),
-				...toAdd.map((nid) => this.patchNetwork(nid, { group: groupId })),
-			]
-
-			if (!tasks.length) {
-				return
-			}
-
-			await Promise.all(tasks)
-
-			this.oldnetid = [...newIds]
 		},
 
 		async onSubmit(event) {
@@ -307,17 +308,19 @@ export default {
 
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("netgroups/", this.row)
+					await this.$api.generic.post("compliance/rules/", this.row)
 				} else {
-					await this.$api.generic.patch(`netgroups/${this.row.id}/`, this.row)
-					await this.updateNetworks(this.row.id)
+					const { logic: _logic, ...payload } = this.row
+					await this.$api.generic.patch(
+						`compliance/rules/${this.row.id}/`,
+						payload
+					)
 				}
-
 				this.createwithsuccess = true
 			} catch (e) {
-				this.createwithsuccess = false
-				this.createerror = true
 				this.createerrormsg = this._apiError(e)
+				this.createerror = true
+				this.createwithsuccess = false
 			} finally {
 				this.loadingcreate = false
 			}

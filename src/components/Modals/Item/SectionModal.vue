@@ -271,6 +271,7 @@ export default {
 		routetype: { type: String, default: "assets" },
 		viewOnly: { type: Boolean, default: false }
 	},
+	emits: ["reloadTemplate", "reloadSection"],
 	data() {
 		return {
 			errormsg: null,

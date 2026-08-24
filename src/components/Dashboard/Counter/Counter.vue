@@ -64,6 +64,7 @@ export default {
 		firstcount: { type: [Number, String], default: null },
 		secondcount: { type: [Number, String], default: null }
 	},
+	emits: ["removeItem"],
 	data() {
 		return {
 			errored: false,

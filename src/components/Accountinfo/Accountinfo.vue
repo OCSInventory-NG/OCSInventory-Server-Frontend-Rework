@@ -145,6 +145,7 @@ export default {
 		massprocessing: { type: Boolean, default: false },
 		items: { type: Array, default: () => [] }
 	},
+	emits: ['reloadDatatable'],
 	data() {
 		return {
 			errormsg: null,
@@ -275,12 +276,13 @@ export default {
 				)
 
 				const rows = Array.isArray(data) ? data : (data?.results || [])
-				return rows[0]
+				return rows[0] || null
 			} catch (e) {
 				this.massprocerrormsg.push({
 					itemid,
 					message: (e.response?.data?.error) ? e.response.data.error : e.message,
 				})
+				return undefined
 			}
 		},
 
@@ -309,40 +311,29 @@ export default {
 				this.massprocsuccessed = false
 
 				for (const item of this.items) {
-					const patch = !!item.accountinfo
-
 					json.object_id = item.id
 					json.accountdata = this.buildAccountdataPayload({ onlyUpdated: true })
 
-					if (patch) {
-						const accountdata_item = await this.get(item.id)
-						if (!accountdata_item) continue
+					const accountdata_item = await this.get(item.id)
+					if (accountdata_item === undefined) continue
 
-						for (const key of Object.keys(json.accountdata)) {
-							if (accountdata_item.accountdata[key] !== json.accountdata[key]) {
+					try {
+						if (accountdata_item) {
+							for (const key of Object.keys(json.accountdata)) {
 								accountdata_item.accountdata[key] = json.accountdata[key]
 							}
-						}
 
-						json.accountdata = accountdata_item.accountdata
+							json.accountdata = accountdata_item.accountdata
 
-						try {
 							await this.onPatch(accountdata_item.id, json)
-						} catch (e) {
-							this.massprocerrormsg.push({
-								itemid: item.id,
-								message: (e.response?.data?.error) ? e.response.data.error : e.message,
-							})
-						}
-					} else {
-						try {
+						} else {
 							await this.onPost(json)
-						} catch (e) {
-							this.massprocerrormsg.push({
-								itemid: item.id,
-								message: (e.response?.data?.error) ? e.response.data.error : e.message,
-							})
 						}
+					} catch (e) {
+						this.massprocerrormsg.push({
+							itemid: item.id,
+							message: (e.response?.data?.error) ? e.response.data.error : e.message,
+						})
 					}
 				}
 
