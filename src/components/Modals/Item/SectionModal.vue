@@ -95,12 +95,32 @@
 				<b-row>
 					<b-col>
 						<b-form-group
-							:label="$t('template.category')" 
+							:label="$t('template.is_active')"
+							label-for="is_active"
+							label-cols="auto"
+							content-cols="auto"
+							class="d-flex align-items-center"
+						>
+							<div class="form-check form-switch mb-0">
+								<input
+									id="is_active"
+									v-model="row.is_active"
+									class="form-check-input"
+									type="checkbox"
+								>
+							</div>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col>
+						<b-form-group
+							:label="$t('template.category')"
 							label-for="category"
 						>
 							<v-select
 								id="category"
-								v-model="selectedcategory" 
+								v-model="selectedcategory"
 								:options="categories" 
 								:reduce="text => text.value"
 								:clearable="false"
@@ -289,6 +309,7 @@ export default {
 				target: null,
 				fields: [],
 				template: null,
+				is_active: true,
 				options: {}
 			},
 			snmprow: {
@@ -299,6 +320,7 @@ export default {
 				target: "SNMP",
 				fields: [],
 				template: null,
+				is_active: true,
 				options: {}
 			},
 			routetypemut: "assets",
@@ -355,6 +377,7 @@ export default {
 					retrieval_output: null,
 					target: null,
 					fields: [],
+					is_active: true,
 					options: {}
 				}
 				this.selectedcategory = null
@@ -399,6 +422,7 @@ export default {
 					target: null,
 					template: this.template,
 					fields: [],
+					is_active: true,
 					options: {},
 				}
 			} else {
@@ -410,6 +434,7 @@ export default {
 					target: "SNMP",
 					template: this.template,
 					fields: [],
+					is_active: true,
 					options: {}
 				}
 			}
