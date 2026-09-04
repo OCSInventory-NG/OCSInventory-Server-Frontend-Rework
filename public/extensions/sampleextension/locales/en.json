@@ -1,0 +1,10 @@
+{
+    "sampleextension": {
+        "title": "Sample Extension",
+        "comments_title": "Comments",
+        "add_comment": "Add comment",
+        "asset": "Asset",
+        "message": "Message",
+        "created_at": "Created at"
+    }
+}
