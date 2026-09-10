@@ -45,12 +45,19 @@
 									</div>
 								</b-col>
 								<b-col cols="4">
-									<SectionModal
-										:template="parseInt(id)"
-										:routetype="routetype"
-										:view-only="viewOnly"
-										@reload-template="reloadTemplate"
-									/>
+									<div class="d-flex justify-content-end align-items-stretch gap-2 section-header-actions">
+										<SectionsActivationModal
+											:template="parseInt(id)"
+											:view-only="viewOnly"
+											@reload-template="reloadTemplate"
+										/>
+										<SectionModal
+											:template="parseInt(id)"
+											:routetype="routetype"
+											:view-only="viewOnly"
+											@reload-template="reloadTemplate"
+										/>
+									</div>
 								</b-col>
 							</b-row>
 							<b-row class="text-center">
@@ -94,10 +101,22 @@
 									<b-tab
 										v-for="section in sections"
 										:key="section.id"
-										:title="section.name"
 										title-item-class="ocs-menu-tab"
 										lazy
 									>
+										<template #title>
+											<font-awesome-icon
+												v-if="section.is_active"
+												:icon="['fas', 'circle-check']"
+												class="text-success me-1"
+											/>
+											<font-awesome-icon
+												v-else
+												:icon="['fas', 'circle-xmark']"
+												class="text-danger me-1"
+											/>
+											{{ section.name }}
+										</template>
 										<SectionCollapse
 											:section="section"
 											:routetype="routetype"
