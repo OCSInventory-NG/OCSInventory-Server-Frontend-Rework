@@ -18,3 +18,37 @@
 .is-dynamic {
   margin-bottom: 15px;
 }
+
+// CPE match modal (security / CVE integration)
+
+.cpe-match-software-card {
+  padding: 1rem 1.25rem;
+  border-radius: $border-radius;
+  background-color: $gray-200;
+}
+
+.cpe-match-software-name {
+  font-size: $font-size-larger;
+  font-weight: $font-weight-semi-bold;
+}
+
+.cpe-match-software-publisher {
+  color: $gray-600;
+  font-size: $font-size-mini;
+}
+
+.cpe-match-cpe-input {
+  font-family: monospace;
+}
+
+.cpe-match-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.cpe-match-actions-review {
+  display: flex;
+  gap: .5rem;
+}

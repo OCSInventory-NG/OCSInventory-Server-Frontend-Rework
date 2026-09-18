@@ -2,6 +2,7 @@ import AccountinfoModal from '@/components/Modals/Item/AccountinfoModal.vue'
 import AssetGroupModal from '@/components/Modals/Item/AssetGroupModal.vue'
 import AutomationModal from '@/components/Modals/Item/AutomationModal.vue'
 import CategoryModal from '@/components/Modals/Item/CategoryModal.vue'
+import CpeMatchModal from '@/components/Modals/Item/CpeMatchModal.vue'
 import DeleteItemModal from '@/components/Modals/DeleteItem/DeleteItemModal.vue'
 import DoAllActionsItemModal from '@/components/Modals/DoAllActionsItem/DoAllActionsItemModal.vue'
 import DuplicateModal from '@/components/Modals/ImportExportItem/DuplicateModal.vue'
@@ -48,6 +49,7 @@ const GlobalComponents = {
 		Vue.component('AssetGroupModal', AssetGroupModal)
 		Vue.component('AutomationModal', AutomationModal)
 		Vue.component('CategoryModal', CategoryModal)
+		Vue.component('CpeMatchModal', CpeMatchModal)
 		Vue.component('DeleteItemModal', DeleteItemModal)
 		Vue.component('DoAllActionsItemModal', DoAllActionsItemModal)
 		Vue.component('DuplicateModal', DuplicateModal)
