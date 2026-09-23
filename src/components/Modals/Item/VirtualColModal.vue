@@ -104,7 +104,7 @@
 					</b-row>
 
 					<b-row v-if="row.visibility == 'private_group'">
-						<b-col>
+						<b-col md="7">
 							<b-form-group
 								class="mb-2"
 								:label="$t('search.groups')"
@@ -119,6 +119,22 @@
 									class="ocs-select"
 									multiple
 								/>
+							</b-form-group>
+						</b-col>
+						<b-col md="5">
+							<b-form-group
+								class="mb-2"
+								:label="$t('search.allow_group_modification')"
+								label-for="virtualcol-allow-group"
+							>
+								<label class="form-check form-switch">
+									<input
+										id="virtualcol-allow-group"
+										v-model="row.allow_group_modification"
+										class="form-check-input"
+										type="checkbox"
+									>
+								</label>
 							</b-form-group>
 						</b-col>
 					</b-row>
@@ -251,6 +267,7 @@
 						<template #cell(firstActions)="{ row: line }">
 							<div>
 								<button
+									v-if="canEdit(line.item)"
 									type="button"
 									:title="$t('virtualcol.edit')"
 									class="btn btn-ghost-dark"
@@ -259,6 +276,7 @@
 									<font-awesome-icon :icon="['fas', 'pencil']" />
 								</button>
 								<button
+									v-if="line.item.user === currentuserid"
 									type="button"
 									:title="$t('generic.delete')"
 									class="btn btn-ghost-danger"
@@ -307,10 +325,13 @@ export default {
 				name: null,
 				visibility: "public",
 				groups: [],
+				allow_group_modification: false,
 			},
 
 			templates: [],
 			groups: [],
+			currentuserid: null,
+			currentusergroups: [],
 			mappingrows: [{ template: null, section: null, field: null }],
 			existingcols: [],
 			existingcolsheader: ["name", "templates", "visibility"],
@@ -354,6 +375,16 @@ export default {
 	},
 
 	methods: {
+		// the author always may, a group member only when allowed to
+		canEdit(col) {
+			if (col.user === this.currentuserid) {
+				return true
+			}
+			return col.rawvisibility === "private_group"
+				&& col.allow_group_modification
+				&& (col.groups || []).some((id) => this.currentusergroups.includes(id))
+		},
+
 		visibilityLabel(value) {
 			const option = this.visibilityopt.find((item) => item.value === value)
 			return option ? option.text : value
@@ -364,7 +395,12 @@ export default {
 		},
 
 		resetForm() {
-			this.row = { name: null, visibility: "public", groups: [] }
+			this.row = {
+				name: null,
+				visibility: "public",
+				groups: [],
+				allow_group_modification: false,
+			}
 			this.mappingrows = [this.emptyRow()]
 			this.editingid = null
 		},
@@ -376,11 +412,11 @@ export default {
 		// the mapping only stores the field, the section is found back from it
 		editColumn(col) {
 			this.editingid = col.id
-			const raw = this.visibilityopt.find((item) => item.text === col.visibility)
 			this.row = {
 				name: col.name,
-				visibility: raw ? raw.value : "public",
+				visibility: col.rawvisibility || "public",
 				groups: col.groups || [],
+				allow_group_modification: col.allow_group_modification || false,
 			}
 
 			const rows = []
@@ -432,7 +468,7 @@ export default {
 			this.createerrormsg = null
 			this.createwithsuccess = false
 
-			await Promise.all([this.getTemplates(), this.getExistingCols(), this.getGroups()])
+			await Promise.all([this.getTemplates(), this.getExistingCols(), this.getAccount()])
 			this.loading = false
 		},
 
@@ -447,9 +483,11 @@ export default {
 			}
 		},
 
-		async getGroups() {
+		async getAccount() {
 			try {
 				const account = await this.$api.generic.get("myaccount/")
+				this.currentuserid = account.id
+				this.currentusergroups = account.groups || []
 				const results = await Promise.all(
 					(account.groups || []).map((id) => this.$api.generic.get(`groups/${id}/`))
 				)
@@ -458,6 +496,8 @@ export default {
 					.sort((a, b) => a.text.localeCompare(b.text))
 			} catch (e) {
 				this.groups = []
+				this.currentuserid = null
+				this.currentusergroups = []
 			}
 		},
 
@@ -469,6 +509,7 @@ export default {
 				this.existingcols = data.map((col) => ({
 					...col,
 					templates: Object.keys(col.mapping || {}).length,
+					rawvisibility: col.visibility,
 					// the table shows the label, editColumn reads it back
 					visibility: this.visibilityLabel(col.visibility),
 				}))
@@ -520,6 +561,9 @@ export default {
 				target: this.target,
 				visibility: this.row.visibility,
 				groups: this.row.visibility === "private_group" ? this.row.groups : [],
+				allow_group_modification:
+					this.row.visibility === "private_group"
+					&& this.row.allow_group_modification,
 				mapping: mapping,
 			}
 
