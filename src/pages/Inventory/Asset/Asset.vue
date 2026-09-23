@@ -30,6 +30,7 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
+								virtualcoltarget="asset"
 								:canaccessdetails="true"
 								:candelete="candelete"
 								:candeploy="true"
@@ -74,7 +75,11 @@ export default {
 
 			rowdata: [],
 			rowheader: [],
+			baserowheader: [],
 			total: 0,
+
+			// virtual columns defined by an administrator for this table
+			virtualcols: [],
 
 			candelete: false,
 			hiddenfields: ["id", "uuid", "template", "agent", "is_template_forced"],
@@ -89,6 +94,12 @@ export default {
 			loading: true,
 			isbusy: true,
 		}
+	},
+
+	computed: {
+		virtualcolnames() {
+			return this.virtualcols.map((col) => col.name)
+		},
 	},
 
 	async mounted() {
@@ -132,6 +143,10 @@ export default {
 				this.rowheader.push('compliance')
 				this.rowheader.push('eol')
 
+				// Get virtual columns
+				this.baserowheader = [...this.rowheader]
+				await this.loadVirtualCols()
+
 				// Get assets
 				await this.getAssets(this.query)
 
@@ -146,11 +161,29 @@ export default {
 			}
 		},
 
+		async loadVirtualCols() {
+			try {
+				this.virtualcols = await this.$api.generic.get(
+					"virtual_cols/", {}, { target: "asset" }
+				)
+			} catch (e) {
+				this.virtualcols = []
+			}
+
+			// header comes from the definition, a column with no value stays
+			this.rowheader = [...this.virtualcolnames, ...this.baserowheader]
+		},
+
 		async getAssets(query) {
 			this.isbusy = true
 			try {
+				const extraparams = { accountinfo: true }
+				if (this.virtualcols.length) {
+					extraparams.virtual_cols = this.virtualcols.map((col) => col.id).join(",")
+				}
+
 				const [assetsData, templates] = await Promise.all([
-					this.$api.generic.get("asset/bases/", query, { accountinfo: true }),
+					this.$api.generic.get("asset/bases/", query, extraparams),
 					this.$api.generic.get("templates/"),
 				])
 
@@ -173,6 +206,14 @@ export default {
 					Object.keys(item.accountinfo).forEach((k) => {
 						const label = "Account info : " + k
 						item[label] = item.accountinfo[k]
+					})
+				})
+
+				// Flatten virtual columns
+				results.forEach((item) => {
+					if (!item.virtual_cols) return
+					Object.keys(item.virtual_cols).forEach((column) => {
+						item[column] = item.virtual_cols[column]
 					})
 				})
 
@@ -235,6 +276,8 @@ export default {
 		},
 
 		async reloadDatatable() {
+			// a column may have just been created or removed
+			await this.loadVirtualCols()
 			await this.getAssets(this.query)
 		},
 
