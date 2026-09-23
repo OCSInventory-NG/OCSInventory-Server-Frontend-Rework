@@ -16,15 +16,25 @@
   border-bottom-left-radius: 0;
 }
 
+// vue-select is 40px high by default, .form-control is not : line the selects
+// up on the inputs they sit next to
+.virtualcol-form .vs__dropdown-toggle {
+  height: calc(1.5em + 0.75rem + 2px);
+}
+
+.virtualcol-form .ocs-select {
+  margin-top: 0;
+}
+
 // no display utility here, its !important would beat the flex centring
 .vcol-row-btn {
   align-items: center;
   display: inline-flex;
-  height: 40px;
+  height: calc(1.5em + 0.75rem + 2px);
   justify-content: center;
-  margin-top: 7px;
+  margin-top: 0;
   padding: 0;
-  width: 40px;
+  width: calc(1.5em + 0.75rem + 2px);
 }
 
 .virtualcol-form .vs__search::placeholder {
