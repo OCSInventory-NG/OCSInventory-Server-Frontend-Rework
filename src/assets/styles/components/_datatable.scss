@@ -44,6 +44,23 @@ tbody, td, tfoot, th, thead, tr {
   max-width: 100px;
 }
 
+// vue-select renders its own toggle, the height set above never reaches it
+#per-page-select .vs__dropdown-toggle {
+  height: 36px;
+  padding-bottom: 0;
+}
+
+#per-page-select .vs__selected-options {
+  padding: 0 2px;
+}
+
+#per-page-select .vs__search,
+#per-page-select .vs__search:focus,
+#per-page-select .vs__selected {
+  margin: 0;
+  padding: 0 2px;
+}
+
 .btn-group, .btn-group-vertical {
   box-shadow: none;
 }

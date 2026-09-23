@@ -144,15 +144,17 @@
 				</div>
 
 				<!-- Show/Hide columns -->
-				<div 
-					v-if="canshowhide"
-					class="col" 
+				<div
+					v-if="canshowhide || canaddvirtualcol"
+					class="col"
 					align="right"
 				>
+					<b-button-group>
 					<b-dropdown
+						v-if="canshowhide"
 						:text="$t('generic.show_hide')"
 						variant="bg-light"
-						class="datatable-btn"
+						:class="['datatable-btn', { 'has-secondary-action': canaddvirtualcol }]"
 					>
 						<b-dropdown-item
 							v-for="field in fields" 
@@ -177,11 +179,26 @@
 							</b-col>
 						</b-dropdown-item>
 					</b-dropdown>
+
+						<VirtualColModal
+							v-if="canaddvirtualcol"
+							:target="virtualcoltarget"
+							@reload-datatable="reloadDatatable"
+						/>
+					</b-button-group>
+				</div>
+
+				<!-- Total row number, inline when compact -->
+				<div
+					v-if="compactheader"
+					class="col d-flex align-items-center justify-content-center"
+				>
+					<p class="mb-0">{{ totalRows }} {{ $t('generic.result') }}</p>
 				</div>
 
 				<!-- Number per page-->
 				<div 
-					:class="(canshowhide) ? 'col-1' : 'col-2'" 
+					:class="compactheader ? 'col' : ((canshowhide) ? 'col-1' : 'col-2')" 
 					align="right"
 				>
 					<v-select
@@ -199,7 +216,10 @@
 		</div>
 
 		<!-- Total row number -->
-		<div align="center">
+		<div
+			v-if="!compactheader"
+			align="center"
+		>
 			<p>{{ totalRows }} {{ $t('generic.result') }}</p>
 		</div>
 
@@ -720,6 +740,12 @@ export default {
 		sortdesc: { type: String, default: null },
 		templateid: { type: Number, default: 0 },
 		hiddenfields: { type: [Array, Object], default: () => [] },
+		// columns the server cannot order on
+		nonsortablefields: { type: [Array, Object], default: () => [] },
+		// fold the result count into the header line, for tables in a modal
+		compactheader: { type: Boolean, default: false },
+		// table listed here, when it accepts virtual columns
+		virtualcoltarget: { type: String, default: null },
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
@@ -826,6 +852,15 @@ export default {
 				this.hascustomactions
 			)
 		},
+
+		// permissions are stored as "<app label>_<codename>" at login
+		canaddvirtualcol() {
+			if (!this.virtualcoltarget) {
+				return false
+			}
+			const stored = localStorage.getItem("permissions")
+			return (stored ? stored.split(",") : []).includes("virtualcolumn_add_virtualcol")
+		},
 	},
 	watch: {
 		rowdata: function () {
@@ -916,6 +951,12 @@ export default {
 		},
 		visibleFields() {
 			this.refreshStickyHeader()
+		},
+		// rebuild in place, recreating the component would close the modal
+		// hosted in the header
+		rowheader() {
+			this.buildFields()
+			this.syncActionsField()
 		}
 	},
 	created() {
@@ -947,97 +988,7 @@ export default {
 			})
 		}
 
-		var key = this.title + "_" + this.templateid
-
-		if(localStorage.getItem(key) != null && localStorage.getItem(key) != "") {
-			JSON.parse(localStorage.getItem(key)).forEach( visible => {
-				if(visible.key != "selected" && visible.key != "actions") {
-					var arrayVisible = visible
-					// Initialize CSV export header
-					this.json_fields[visible.key] = visible.key
-					// Initialize datatable header
-					var index = this.fields.findIndex(x => x.key == visible.key);
-					if (index === -1) {
-						// Translate label
-						visible.label = (this.$te(this.translationkey+visible.key))
-							? this.$t(this.translationkey+visible.key)
-							: visible.key;
-						this.fields.push(arrayVisible);
-					}
-				}
-			})
-
-			// Remove old fields
-			this.fields = this.fields.filter(field =>
-				field.key === 'selected' ||
-				field.key === 'actions' ||
-				this.rowheader.includes(field.key)
-			)
-
-			// Add new fields
-			this.rowheader.forEach(data => {
-				if (!this.fields.some(field => field.key === data)) {
-					var visible = true
-					if (this.hiddenfields && this.hiddenfields.includes(data)) {
-						visible = false
-					}
-					var array = {
-						key: data,
-						label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
-						sortable: true,
-						visible: visible,
-						disabled: false
-					}
-					this.json_fields[data] = data
-					this.fields.push(array)
-				}
-			})
-
-			// Order fields
-			const orderedFields = []
-			const orderedJsonFields = {}
-
-			const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
-			orderedFields.push(...specialFields)
-
-			this.rowheader.forEach(key => {
-				const field = this.fields.find(f => f.key === key)
-				if (field) {
-					orderedFields.push(field)
-					orderedJsonFields[key] = this.json_fields[key]
-				}
-			})
-
-			this.fields = orderedFields
-			this.json_fields = orderedJsonFields
-
-			// Update local storage key
-			localStorage.removeItem(key)
-			localStorage.setItem(key, JSON.stringify(this.fields))
-		} else {
-			Object.values(this.rowheader).forEach( data => {
-				var visible = true
-
-				if (this.hiddenfields && this.hiddenfields.includes(data)) {
-					visible = false
-				}
-
-				var array = {
-					key: data,
-					label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
-					sortable: true,
-					visible: visible,
-					disabled: false
-				}
-				
-				// Initialize CSV export header
-				this.json_fields[data] = data
-				
-				// Initialize datatable header
-				var index = this.fields.findIndex(x => x.key==data);
-				index === -1 ? this.fields.push(array) : null
-			})
-		}
+		this.buildFields()
 
 		this.syncActionsField()
 
@@ -1070,6 +1021,113 @@ export default {
 		this.teardownStickyHeader()
 	},
 	methods: {
+		// Build the columns from rowheader, keeping the user's show/hide choices
+		buildFields() {
+			var key = this.title + "_" + this.templateid
+
+			if(localStorage.getItem(key) != null && localStorage.getItem(key) != "") {
+				JSON.parse(localStorage.getItem(key)).forEach( visible => {
+					if(visible.key != "selected" && visible.key != "actions") {
+						var arrayVisible = visible
+						// Initialize CSV export header
+						this.json_fields[visible.key] = visible.key
+						// Initialize datatable header
+						var index = this.fields.findIndex(x => x.key == visible.key);
+						if (index === -1) {
+							// Translate label
+							visible.label = (this.$te(this.translationkey+visible.key))
+								? this.$t(this.translationkey+visible.key)
+								: visible.key;
+							this.fields.push(arrayVisible);
+						}
+					}
+				})
+
+				// Remove old fields
+				this.fields = this.fields.filter(field =>
+					field.key === 'selected' ||
+					field.key === 'actions' ||
+					this.rowheader.includes(field.key)
+				)
+
+				// Add new fields
+				this.rowheader.forEach(data => {
+					if (!this.fields.some(field => field.key === data)) {
+						var visible = true
+						if (this.hiddenfields && this.hiddenfields.includes(data)) {
+							visible = false
+						}
+						var array = {
+							key: data,
+							label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+							sortable: !(this.nonsortablefields && this.nonsortablefields.includes(data)),
+							visible: visible,
+							disabled: false
+						}
+						this.json_fields[data] = data
+						this.fields.push(array)
+					}
+				})
+
+				// Order fields
+				const orderedFields = []
+				const orderedJsonFields = {}
+
+				const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
+				orderedFields.push(...specialFields)
+
+				this.rowheader.forEach(key => {
+					const field = this.fields.find(f => f.key === key)
+					if (field) {
+						orderedFields.push(field)
+						orderedJsonFields[key] = this.json_fields[key]
+					}
+				})
+
+				this.fields = orderedFields
+				this.json_fields = orderedJsonFields
+
+				// Update local storage key
+				localStorage.removeItem(key)
+				localStorage.setItem(key, JSON.stringify(this.fields))
+			} else {
+				Object.values(this.rowheader).forEach( data => {
+					var visible = true
+
+					if (this.hiddenfields && this.hiddenfields.includes(data)) {
+						visible = false
+					}
+
+					var array = {
+						key: data,
+						label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+						sortable: !(this.nonsortablefields && this.nonsortablefields.includes(data)),
+						visible: visible,
+						disabled: false
+					}
+				
+					// Initialize CSV export header
+					this.json_fields[data] = data
+				
+					// Initialize datatable header
+					var index = this.fields.findIndex(x => x.key==data);
+					index === -1 ? this.fields.push(array) : null
+				})
+
+				this.fields = [
+					...this.fields.filter(field => field.key === 'selected'),
+					...this.rowheader.map(name => this.fields.find(f => f.key === name)).filter(Boolean),
+					...this.fields.filter(field => field.key === 'actions'),
+				]
+			}
+
+			// local storage only carries visibility, the rest is recomputed
+			this.fields.forEach(field => {
+				if (field.key === 'selected' || field.key === 'actions') return
+				field.sortable = !(this.nonsortablefields && this.nonsortablefields.includes(field.key))
+			})
+		},
+
 		toggleFieldVisibility(field) {
 			if (field.key === "name") return
 
