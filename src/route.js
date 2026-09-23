@@ -244,6 +244,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/inventory/cve_report',
+		name: 'CveReport',
+		component: () => import('@/pages/Inventory/Tools/CveReport.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/deployment/packages',
 		name: 'Packages',
 		component: () => import('@/pages/Deployment/Package.vue'),
@@ -289,6 +297,14 @@ const routes = [
 		path: '/configurations/software_mapping',
 		name: 'SoftwareMapping',
 		component: () => import('@/pages/Configuration/SoftwareMapping/SoftwareMapping.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/configurations/cpe_matrix',
+		name: 'CpeMatrix',
+		component: () => import('@/pages/Configuration/CveIntegration/CpeMatrix.vue'),
 		meta: {
 			layout: AppLayout
 		}
