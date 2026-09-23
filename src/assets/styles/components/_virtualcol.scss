@@ -1,0 +1,36 @@
+// ===========================================
+//  VIRTUAL COLUMN COMPONENT
+// ===========================================
+
+.has-secondary-action .dropdown-toggle {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#virtualcol-modal .datatable-btn {
+  width: 36px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: -1px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+// no display utility here, its !important would beat the flex centring
+.vcol-row-btn {
+  align-items: center;
+  display: inline-flex;
+  height: 40px;
+  justify-content: center;
+  margin-top: 7px;
+  padding: 0;
+  width: 40px;
+}
+
+.virtualcol-form .vs__search::placeholder {
+  color: $gray-600;
+}
+
+.virtualcol-form hr {
+  margin-bottom: 0.5rem;
+}
