@@ -309,7 +309,7 @@ export default {
 			apoptions: [
 				{value: null, text: this.$t("generic.none")},
 				{value: "MD5", text: "MD5"},
-				{value: "SHA-1", text: "SHA-1"},
+				{value: "SHA", text: "SHA"},
 			],
 			ppoptions: [
 				{value: null, text: this.$t("generic.none")},
