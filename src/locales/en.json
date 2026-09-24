@@ -581,6 +581,7 @@
     "templateversion": "Templates - Versions",
     "user": "Users",
     "usergroupassignment": "Users - Group assignment methods",
+    "virtualcol": "Virtual columns",
     "windowsbuildmapping": "Compliance - Windows Build Mapping"
   },
   "rule": {
