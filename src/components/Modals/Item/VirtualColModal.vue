@@ -365,7 +365,9 @@ export default {
 	},
 
 	watch: {
-		createwithsuccess: function () {
+		// setting it back to false fires this watcher again, reload only once
+		createwithsuccess: function (value) {
+			if (!value) return
 			setTimeout(() => {
 				this.createwithsuccess = false
 				this.resetForm()
