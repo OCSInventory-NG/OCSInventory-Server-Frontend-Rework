@@ -323,7 +323,7 @@ export default {
 
 			row: {
 				name: null,
-				visibility: "public",
+				visibility: "private_personal",
 				groups: [],
 				allow_group_modification: false,
 			},
@@ -344,8 +344,8 @@ export default {
 	computed: {
 		visibilityopt() {
 			return [
-				{ value: "public", text: this.$t('search.public') },
 				{ value: "private_personal", text: this.$t('search.private_personal') },
+				{ value: "public", text: this.$t('search.public') },
 				{ value: "private_group", text: this.$t('search.private_group') },
 			]
 		},
@@ -399,7 +399,7 @@ export default {
 		resetForm() {
 			this.row = {
 				name: null,
-				visibility: "public",
+				visibility: "private_personal",
 				groups: [],
 				allow_group_modification: false,
 			}
@@ -416,7 +416,7 @@ export default {
 			this.editingid = col.id
 			this.row = {
 				name: col.name,
-				visibility: col.rawvisibility || "public",
+				visibility: col.rawvisibility || "private_personal",
 				groups: col.groups || [],
 				allow_group_modification: col.allow_group_modification || false,
 			}
