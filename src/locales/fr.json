@@ -581,6 +581,7 @@
     "templateversion": "Modèles - Versions",
     "user": "Utilisateurs",
     "usergroupassignment": "Utilisateurs - Méthodes d'assignation de groupes",
+    "virtualcol": "Colonnes virtuelles",
     "windowsbuildmapping": "Conformité - Mapping Windows Build"
   },
   "rule": {
@@ -916,9 +917,23 @@
       "name": "Nom du réseau",
       "nettag": "TAG du réseau"
     },
-    "template": {
+    "template":{
       "id": "ID du modèle",
       "name": "Nom du modèle"
     }
+  },
+  "virtualcol": {
+    "addrow": "Ajouter un template",
+    "edit": "Modifier",
+    "field": "Champ",
+    "help": "Pour chaque template, indiquez le champ qui porte cette information. Un template laissé vide n'affichera simplement rien dans cette colonne.",
+    "manage": "Gérer les colonnes virtuelles",
+    "name": "Nom de la colonne",
+    "nameplaceholder": "ex : BIOS VERSION",
+    "removerow": "Retirer ce template",
+    "section": "Section",
+    "template": "Template",
+    "templates": "Templates couverts",
+    "visibility": "Visibilité"
   }
 }

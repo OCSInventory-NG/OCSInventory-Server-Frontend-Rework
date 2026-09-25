@@ -24,6 +24,7 @@ import SoftwareMappingModal from '@/components/Modals/Item/SoftwareMappingModal.
 import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
+import VirtualColModal from '@/components/Modals/Item/VirtualColModal.vue'
 import UserGroupAssignmentsModal from '@/components/Modals/Item/UserGroupAssignmentsModal.vue'
 import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
@@ -70,6 +71,7 @@ const GlobalComponents = {
 		Vue.component('SnmpModal', SnmpModal)
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)
+		Vue.component('VirtualColModal', VirtualColModal)
 		Vue.component('UserGroupAssignmentsModal', UserGroupAssignmentsModal)
 		Vue.component('ExtensionModal', ExtensionModal)
 		Vue.component('ExtensionSlot', ExtensionSlot)

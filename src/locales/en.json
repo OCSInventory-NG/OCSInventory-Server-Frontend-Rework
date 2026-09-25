@@ -581,6 +581,7 @@
     "templateversion": "Templates - Versions",
     "user": "Users",
     "usergroupassignment": "Users - Group assignment methods",
+    "virtualcol": "Virtual columns",
     "windowsbuildmapping": "Compliance - Windows Build Mapping"
   },
   "rule": {
@@ -916,9 +917,23 @@
       "name": "Network name",
       "nettag": "Network TAG"
     },
-    "template": {
+    "template":{
       "id": "Template ID",
       "name": "Template name"
     }
+  },
+  "virtualcol": {
+    "addrow": "Add a template",
+    "edit": "Edit",
+    "field": "Field",
+    "help": "For each template, point at the field holding this information. A template left empty simply shows nothing in this column.",
+    "manage": "Manage virtual columns",
+    "name": "Column name",
+    "nameplaceholder": "e.g. BIOS VERSION",
+    "removerow": "Remove this template",
+    "section": "Section",
+    "template": "Template",
+    "templates": "Mapped templates",
+    "visibility": "Visibility"
   }
 }
