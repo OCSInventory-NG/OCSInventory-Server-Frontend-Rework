@@ -10,6 +10,8 @@ import {
 	BFormGroup,
 	BFormTextarea,
 	BSpinner,
+	BTabs,
+	BTab,
 } from "bootstrap-vue-next"
 
 const BOOTSTRAP_COMPONENTS = {
@@ -21,6 +23,8 @@ const BOOTSTRAP_COMPONENTS = {
 	BFormGroup,
 	BFormTextarea,
 	BSpinner,
+	BTabs,
+	BTab,
 }
 
 export function installBootstrapUi(app) {
