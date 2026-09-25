@@ -929,7 +929,7 @@
     "help": "Pour chaque template, indiquez le champ qui porte cette information. Un template laissé vide n'affichera simplement rien dans cette colonne.",
     "manage": "Gérer les colonnes virtuelles",
     "name": "Nom de la colonne",
-    "nameplaceholder": "ex : BIOS NAME",
+    "nameplaceholder": "ex : BIOS VERSION",
     "removerow": "Retirer ce template",
     "section": "Section",
     "template": "Template",

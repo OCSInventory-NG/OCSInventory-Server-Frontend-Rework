@@ -929,7 +929,7 @@
     "help": "For each template, point at the field holding this information. A template left empty simply shows nothing in this column.",
     "manage": "Manage virtual columns",
     "name": "Column name",
-    "nameplaceholder": "e.g. BIOS NAME",
+    "nameplaceholder": "e.g. BIOS VERSION",
     "removerow": "Remove this template",
     "section": "Section",
     "template": "Template",

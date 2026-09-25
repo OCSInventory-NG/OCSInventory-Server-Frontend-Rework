@@ -24,7 +24,7 @@
 			id="virtualcolmodal"
 			v-model="virtualcolmodal"
 			:title="$t('virtualcol.manage')"
-			size="lg"
+			size="xl"
 			hide-footer
 			modal-class="custom-modal"
 		>
