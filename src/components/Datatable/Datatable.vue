@@ -166,7 +166,8 @@
 							@click="toggleFieldVisibility(field)"
 						>
 							<b-col>
-								<label v-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
+								<label v-if="fieldlabels[field.key]">{{ fieldlabels[field.key] }}</label>
+								<label v-else-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
 								<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
 								<label v-else>{{ field.key }}</label>
 							</b-col>
@@ -746,6 +747,8 @@ export default {
 		compactheader: { type: Boolean, default: false },
 		// table listed here, when it accepts virtual columns
 		virtualcoltarget: { type: String, default: null },
+		// labels of the columns whose key is no translation key
+		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group
 		removefromgroup: { type: Boolean, default: false },
 		assetgroupid: { type: [String, Number], default: null },
@@ -957,6 +960,10 @@ export default {
 		rowheader() {
 			this.buildFields()
 			this.syncActionsField()
+		},
+		// a renamed virtual column keeps its key
+		fieldlabels() {
+			this.updateColumnLabels()
 		}
 	},
 	created() {
@@ -1035,9 +1042,7 @@ export default {
 						var index = this.fields.findIndex(x => x.key == visible.key);
 						if (index === -1) {
 							// Translate label
-							visible.label = (this.$te(this.translationkey+visible.key))
-								? this.$t(this.translationkey+visible.key)
-								: visible.key;
+							visible.label = this.fieldLabel(visible.key);
 							this.fields.push(arrayVisible);
 						}
 					}
@@ -1059,7 +1064,7 @@ export default {
 						}
 						var array = {
 							key: data,
-							label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+							label: this.fieldLabel(data),
 							sortable: !(this.nonsortablefields && this.nonsortablefields.includes(data)),
 							visible: visible,
 							disabled: false
@@ -1100,7 +1105,7 @@ export default {
 
 					var array = {
 						key: data,
-						label: (this.$te(this.translationkey+data)) ? this.$t(this.translationkey+data) : data,
+						label: this.fieldLabel(data),
 						sortable: !(this.nonsortablefields && this.nonsortablefields.includes(data)),
 						visible: visible,
 						disabled: false
@@ -1125,7 +1130,13 @@ export default {
 			this.fields.forEach(field => {
 				if (field.key === 'selected' || field.key === 'actions') return
 				field.sortable = !(this.nonsortablefields && this.nonsortablefields.includes(field.key))
+				field.label = this.fieldLabel(field.key)
 			})
+		},
+
+		fieldLabel(key) {
+			if (this.fieldlabels[key]) return this.fieldlabels[key]
+			return (this.$te(this.translationkey+key)) ? this.$t(this.translationkey+key) : key
 		},
 
 		toggleFieldVisibility(field) {
@@ -1506,7 +1517,7 @@ export default {
 		updateColumnLabels() {
 			this.fields.forEach(field => {
 				if (field.key !== 'selected' && field.key !== 'actions') {
-					field.label = (this.$te(this.translationkey+field.key)) ? this.$t(this.translationkey+field.key) : field.key
+					field.label = this.fieldLabel(field.key)
 				}
 			})
 		},

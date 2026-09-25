@@ -31,6 +31,7 @@
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
 								virtualcoltarget="asset"
+								:fieldlabels="virtualcollabels"
 								:canaccessdetails="true"
 								:candelete="candelete"
 								:candeploy="true"
@@ -97,8 +98,12 @@ export default {
 	},
 
 	computed: {
-		virtualcolnames() {
-			return this.virtualcols.map((col) => col.name)
+		// keyed by id, a name may be shared or match a native column
+		virtualcolkeys() {
+			return this.virtualcols.map((col) => `vc_${col.id}`)
+		},
+		virtualcollabels() {
+			return Object.fromEntries(this.virtualcols.map((col) => [`vc_${col.id}`, col.name]))
 		},
 	},
 
@@ -171,7 +176,7 @@ export default {
 			}
 
 			// header comes from the definition, a column with no value stays
-			this.rowheader = [...this.virtualcolnames, ...this.baserowheader]
+			this.rowheader = [...this.virtualcolkeys, ...this.baserowheader]
 		},
 
 		async getAssets(query) {
@@ -212,8 +217,8 @@ export default {
 				// Flatten virtual columns
 				results.forEach((item) => {
 					if (!item.virtual_cols) return
-					Object.keys(item.virtual_cols).forEach((column) => {
-						item[column] = item.virtual_cols[column]
+					Object.keys(item.virtual_cols).forEach((key) => {
+						item[key] = item.virtual_cols[key]
 					})
 				})
 
