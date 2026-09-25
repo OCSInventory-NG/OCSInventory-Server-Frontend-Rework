@@ -179,16 +179,29 @@ export default {
 			this.rowheader = [...this.virtualcolkeys, ...this.baserowheader]
 		},
 
+		virtualColParams() {
+			const params = { accountinfo: true }
+			if (this.virtualcols.length) {
+				params.virtual_cols = this.virtualcols.map((col) => col.id).join(",")
+			}
+			return params
+		},
+
+		flattenVirtualCols(results) {
+			results.forEach((item) => {
+				if (!item.virtual_cols) return
+				Object.keys(item.virtual_cols).forEach((key) => {
+					item[key] = item.virtual_cols[key]
+				})
+				delete item.virtual_cols
+			})
+		},
+
 		async getAssets(query) {
 			this.isbusy = true
 			try {
-				const extraparams = { accountinfo: true }
-				if (this.virtualcols.length) {
-					extraparams.virtual_cols = this.virtualcols.map((col) => col.id).join(",")
-				}
-
 				const [assetsData, templates] = await Promise.all([
-					this.$api.generic.get("asset/bases/", query, extraparams),
+					this.$api.generic.get("asset/bases/", query, this.virtualColParams()),
 					this.$api.generic.get("templates/"),
 				])
 
@@ -215,12 +228,7 @@ export default {
 				})
 
 				// Flatten virtual columns
-				results.forEach((item) => {
-					if (!item.virtual_cols) return
-					Object.keys(item.virtual_cols).forEach((key) => {
-						item[key] = item.virtual_cols[key]
-					})
-				})
+				this.flattenVirtualCols(results)
 
 				// Add compliance and EOL status
 				const assetIds = results.map(a => a.id).join(',')
@@ -310,7 +318,7 @@ export default {
 			if (!rows || !rows.length) return ''
 			const headers = Object.keys(rows[0])
 			const csvRows = []
-			csvRows.push(headers.join(';'))
+			csvRows.push(headers.map(h => this.virtualcollabels[h] ?? h).join(';'))
 
 			rows.forEach(row => {
 				const values = headers.map(h => {
@@ -330,9 +338,10 @@ export default {
 				search: filter,
 			}
 
-			const data = await this.$api.generic.get("asset/bases/", params, { accountinfo: true })
+			const data = await this.$api.generic.get("asset/bases/", params, this.virtualColParams())
 
 			const results = data.results || data
+			this.flattenVirtualCols(results)
 			allRows.push(...results)
 
 			this.handleExport({ scope: 'all', rows: allRows })
