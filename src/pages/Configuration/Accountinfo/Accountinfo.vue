@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Accountinfo",
 	data() {
@@ -78,21 +80,18 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("accountinfo_view_accountinfoconfig")) {
+		if (hasPermission("accountinfo_view_accountinfoconfig")) {
 			this.canview = true
-			if (permissions.includes("accountinfo_add_accountinfoconfig")) {
+			if (hasPermission("accountinfo_add_accountinfoconfig")) {
 				this.canadd = true
 			}
-			if (permissions.includes("accountinfo_change_accountinfoconfig")) {
+			if (hasPermission("accountinfo_change_accountinfoconfig")) {
 				this.canedit = true
 			}
-			if (permissions.includes("accountinfo_delete_accountinfoconfig")) {
+			if (hasPermission("accountinfo_delete_accountinfoconfig")) {
 				this.candelete = true
 			}
-			if (permissions.includes("accountinfo_add_accountinfovalue")) {
+			if (hasPermission("accountinfo_add_accountinfovalue")) {
 				this.canaddvalue = true
 			}
 		} else {

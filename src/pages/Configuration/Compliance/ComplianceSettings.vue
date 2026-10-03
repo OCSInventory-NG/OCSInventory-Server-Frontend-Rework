@@ -122,6 +122,7 @@
 
 <script>
 import WindowsBuildMapping from "@/pages/Configuration/Compliance/WindowsBuildMapping.vue"
+import { hasPermission } from "@/utils/permissions"
 
 export default {
 	name: "ComplianceSettings",
@@ -158,12 +159,9 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
+		await this.loadTypes()
 
-		await this.loadTypes(permissions)
-
-		if (!permissions.includes("compliance_view_compliancerule")) {
+		if (!hasPermission("compliance_view_compliancerule")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
@@ -171,10 +169,10 @@ export default {
 			return
 		}
 
-		this.canaddcompliance = permissions.includes("compliance_add_compliancerule")
-		this.caneditcompliance = permissions.includes("compliance_change_compliancerule")
-		this.candeletecompliance = permissions.includes("compliance_delete_compliancerule")
-		this.canviewcomplianceaction = permissions.includes("compliance_change_compliancerule")
+		this.canaddcompliance = hasPermission("compliance_add_compliancerule")
+		this.caneditcompliance = hasPermission("compliance_change_compliancerule")
+		this.candeletecompliance = hasPermission("compliance_delete_compliancerule")
+		this.canviewcomplianceaction = hasPermission("compliance_change_compliancerule")
 
 		await this.loadComplianceInitial()
 	},
@@ -222,17 +220,17 @@ export default {
 			this.complianceTableKey += 1
 		},
 
-		async loadTypes(permissions) {
-			if (!permissions.includes("compliance_view_compliancetype")) {
+		async loadTypes() {
+			if (!hasPermission("compliance_view_compliancetype")) {
 				this.types.errormsg = this.$t("message.dont_have_right_to_see")
 				this.types.errored = true
 				this.types.loading = false
 				this.types.isbusy = false
 				return
 			}
-			this.types.canadd = permissions.includes("compliance_add_compliancetype")
-			this.types.canedit = permissions.includes("compliance_change_compliancetype")
-			this.types.candelete = permissions.includes("compliance_delete_compliancetype")
+			this.types.canadd = hasPermission("compliance_add_compliancetype")
+			this.types.canedit = hasPermission("compliance_change_compliancetype")
+			this.types.candelete = hasPermission("compliance_delete_compliancetype")
 
 			this.types.loading = true
 			this.types.isbusy = true

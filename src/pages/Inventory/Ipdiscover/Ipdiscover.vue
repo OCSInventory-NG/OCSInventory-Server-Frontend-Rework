@@ -63,6 +63,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Ipdiscover",
 	data() {
@@ -84,17 +86,14 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("network_view_network")) {
-			if (permissions.includes("netdevice_view_netdevice")) {
+		if (hasPermission("network_view_network")) {
+			if (hasPermission("netdevice_view_netdevice")) {
 				this.canviewnetdevice = true
 			}
-			if (permissions.includes("network_change_network")) {
+			if (hasPermission("network_change_network")) {
 				this.canedit = true
 			}
-			if (permissions.includes("network_delete_network")) {
+			if (hasPermission("network_delete_network")) {
 				this.candelete = true
 			}
 		} else {

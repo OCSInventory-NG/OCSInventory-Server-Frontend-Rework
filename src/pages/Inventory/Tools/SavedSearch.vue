@@ -60,6 +60,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "SavedSearch",
 	data() {
@@ -81,18 +83,15 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (!permissions.includes("search_view_search")) {
+		if (!hasPermission("search_view_search")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 			this.isbusy = false
 			return
 		}
-		this.canedit = permissions.includes("search_change_search")
-		this.candelete = permissions.includes("search_delete_search")
+		this.canedit = hasPermission("search_change_search")
+		this.candelete = hasPermission("search_delete_search")
 
 		// Data init
 		await this.loadInitial()

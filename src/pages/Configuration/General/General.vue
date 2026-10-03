@@ -246,6 +246,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'General',
 	data() {
@@ -293,12 +295,9 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("config_view_config")) {
+		if (hasPermission("config_view_config")) {
 			this.canview = true
-			if (permissions.includes("config_change_config")) {
+			if (hasPermission("config_change_config")) {
 				this.canedit = true
 			}
 		} else {

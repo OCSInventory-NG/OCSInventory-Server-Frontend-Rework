@@ -303,6 +303,7 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
 const createEmptyLayout = () => ({
 	visibility: "public",
 	user: null,
@@ -369,12 +370,9 @@ export default {
 		const storedActiveLayout = localStorage.getItem('active_layout')
 		this.activeLayout = storedActiveLayout ? parseInt(storedActiveLayout, 10) : 0
 
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		this.canadd = permissions.includes("layout_add_dashboardlayout")
-		this.canedit = permissions.includes("layout_change_dashboardlayout")
-		this.candelete = permissions.includes("layout_delete_dashboardlayout")
+		this.canadd = hasPermission("layout_add_dashboardlayout")
+		this.canedit = hasPermission("layout_change_dashboardlayout")
+		this.candelete = hasPermission("layout_delete_dashboardlayout")
 
 		this.loading = true
 		this.errored = false

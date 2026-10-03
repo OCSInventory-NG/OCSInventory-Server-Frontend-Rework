@@ -5,6 +5,7 @@ import Alert from "@/components/Alert/Alert.vue"
 import Loader from "@/components/Loader/Loader.vue"
 import { addMenuItem, menuStore } from "@/menu/menuStore"
 import { registerSlot } from "@/extensions/slotRegistry"
+import { hasPermission } from "@/utils/permissions"
 
 export function createPluginApi({ router, i18n, apiClient }) {
 	const coreComponents = {
@@ -15,12 +16,8 @@ export function createPluginApi({ router, i18n, apiClient }) {
 		Loader
 	}
 
-	const hasPermissions = (required = []) => {
-		if (!required.length) return true
-		const raw = localStorage.getItem("permissions") || ""
-		const perms = raw.includes(",") ? raw.split(",") : raw.split(" ")
-		return required.every((p) => perms.includes(p))
-	}
+	// map, not every: each check is recorded for the debug mode
+	const hasPermissions = (required = []) => required.map(hasPermission).every(Boolean)
 
 	return {
 		addRoute: (routeRecord) => router.addRoute(routeRecord),

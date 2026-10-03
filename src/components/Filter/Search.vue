@@ -306,6 +306,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Search',
 	props: {
@@ -381,9 +383,7 @@ export default {
 		}
 	},
 	mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		this.cansave = permissions.includes("search_add_search")
+		this.cansave = hasPermission("search_add_search")
 
 		this.datavalues =
 			JSON.parse(localStorage.getItem("multisearch")) ?? [

@@ -104,6 +104,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Authentication',
 	data() {
@@ -131,8 +133,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			const perms = localStorage.getItem("permissions")?.split(",") || []
-			return !perms.includes("auth_method_change_authmethod")
+			return !hasPermission("auth_method_change_authmethod")
 		}
 	},
 	watch: {
@@ -143,12 +144,9 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("auth_method_view_authmethod")) {
+		if (hasPermission("auth_method_view_authmethod")) {
 			this.canview = true
-			if (permissions.includes("auth_method_change_authmethod")) {
+			if (hasPermission("auth_method_change_authmethod")) {
 				this.canedit = true
 			}
 		} else {

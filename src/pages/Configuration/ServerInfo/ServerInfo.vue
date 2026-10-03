@@ -78,6 +78,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "ServerInfo",
 	data() {
@@ -126,10 +128,7 @@ export default {
 	async mounted() {
 		this.frontendInfo = this.getBrowserInfo()
 
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (!permissions.includes("config_view_config")) {
+		if (!hasPermission("config_view_config")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false

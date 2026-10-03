@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Group",
 	data() {
@@ -80,18 +82,15 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("auth_view_group")) {
-			if (permissions.includes("auth_add_group")) {
+		if (hasPermission("auth_view_group")) {
+			if (hasPermission("auth_add_group")) {
 				this.canadd = true
 				this.duplicateitem = true
 			}
-			if (permissions.includes("auth_change_group")) {
+			if (hasPermission("auth_change_group")) {
 				this.canedit = true
 			}
-			if (permissions.includes("auth_delete_group")) {
+			if (hasPermission("auth_delete_group")) {
 				this.candelete = true
 			}
 		} else {

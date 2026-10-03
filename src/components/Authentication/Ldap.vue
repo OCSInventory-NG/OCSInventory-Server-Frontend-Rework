@@ -85,6 +85,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Ldap",
 
@@ -133,20 +135,17 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("auth_config_view_authconfig")) {
-			if (permissions.includes("auth_config_add_authconfig")) {
+		if (hasPermission("auth_config_view_authconfig")) {
+			if (hasPermission("auth_config_add_authconfig")) {
 				this.canadd = true
 			}
-			if (permissions.includes("auth_mapping_add_authmapping")) {
+			if (hasPermission("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			if (permissions.includes("auth_config_change_authconfig")) {
+			if (hasPermission("auth_config_change_authconfig")) {
 				this.canedit = true
 			}
-			if (permissions.includes("auth_config_delete_authconfig")) {
+			if (hasPermission("auth_config_delete_authconfig")) {
 				this.candelete = true
 			}
 		} else {

@@ -182,6 +182,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "TemplateHistoryModal",
 	props: {
@@ -222,13 +224,13 @@ export default {
 		// View gates access to the history, restore maps to the "change" right,
 		// deleting a revision to the "delete" right.
 		canView() {
-			return localStorage.getItem('permissions') ?.split(',').includes('template_view_templateversion')
+			return hasPermission('template_view_templateversion')
 		},
 		canRestore() {
-			return localStorage.getItem('permissions') ?.split(',').includes('template_change_templateversion')
+			return hasPermission('template_change_templateversion')
 		},
 		canDelete() {
-			return localStorage.getItem('permissions') ?.split(',').includes('template_delete_templateversion')
+			return hasPermission('template_delete_templateversion')
 		}
 	},
 	watch: {

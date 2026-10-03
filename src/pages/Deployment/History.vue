@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'History',
 	data() {
@@ -62,11 +64,8 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("history_view_history")) {
-			if (permissions.includes("result_view_result")) {
+		if (hasPermission("history_view_history")) {
+			if (hasPermission("result_view_result")) {
 				this.canviewhistory = true
 			}
 		} else {

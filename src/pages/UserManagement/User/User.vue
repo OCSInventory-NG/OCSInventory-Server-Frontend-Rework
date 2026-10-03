@@ -60,6 +60,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "User",
 	data() {
@@ -81,17 +83,14 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("auth_view_user")) {
-			if (permissions.includes("auth_add_user")) {
+		if (hasPermission("auth_view_user")) {
+			if (hasPermission("auth_add_user")) {
 				this.canadd = true
 			}
-			if (permissions.includes("auth_change_user")) {
+			if (hasPermission("auth_change_user")) {
 				this.canedit = true
 			}
-			if (permissions.includes("auth_delete_user")) {
+			if (hasPermission("auth_delete_user")) {
 				this.candelete = true
 			}
 		} else {

@@ -93,6 +93,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "EditRule",
 	props: {
@@ -123,7 +125,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			return !localStorage.getItem('permissions') ?.split(',').includes('rule_change_rule')
+			return !hasPermission('rule_change_rule')
 		}
 	},
 	watch: {

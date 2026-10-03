@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
 import ActionRuleModal from '@/components/Modals/Item/ActionRuleModal.vue'
 
 export default {
@@ -101,11 +102,8 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("rule_view_action")) {
-			if (permissions.includes("rule_change_rule")) {
+		if (hasPermission("rule_view_action")) {
+			if (hasPermission("rule_change_rule")) {
 				this.canadd = true
 				this.canedit = true
 				this.candelete = true

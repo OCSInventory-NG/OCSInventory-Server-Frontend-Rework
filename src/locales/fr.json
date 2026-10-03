@@ -296,6 +296,24 @@
     "Unique network names and their devices count": "Bar - Équipements répartis par réseaux",
     "Unique OS names and their count": "Secteur - Actifs répartis par systèmes d'exploitation"
   },
+  "debug": {
+    "mode": "Mode debug",
+    "title": "Debug",
+    "close": "Fermer le mode debug",
+    "collapse": "Réduire",
+    "expand": "Agrandir",
+    "trace": "Trace API",
+    "no_calls": "Aucun appel API enregistré sur cette page pour le moment.",
+    "method": "Méthode",
+    "path": "Chemin",
+    "status": "Statut",
+    "duration": "Durée",
+    "permissions": "Permissions",
+    "resolving": "Résolution des permissions de cette page.",
+    "permissions_undetermined": "Les permissions nécessaires à cette page n'ont pas pu être déterminées.",
+    "no_permission_needed": "Aucune permission spécifique nécessaire pour cette page.",
+    "permissions_intro": "Permissions nécessaires pour voir cette page et utiliser ses actions. Celles d'une modale sont complétées à son ouverture ou à sa validation."
+  },
   "deployment": {
     "actions": "Actions",
     "actions_list": "Actions de déploiement",
@@ -543,6 +561,7 @@
     "authmapping": "Authentification - Mappages",
     "authmethod": "Authentification - Méthodes",
     "dashboardlayout": "Tableau de bord - Disposition",
+    "debugmode": "Mode debug",
     "deploymentaction": "Déploiement - Actions",
     "category": "Inventaire - Catégories",
     "complianceresult": "Conformité - Résultats",

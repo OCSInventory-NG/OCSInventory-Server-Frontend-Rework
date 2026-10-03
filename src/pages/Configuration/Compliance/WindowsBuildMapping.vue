@@ -85,6 +85,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "WindowsBuildMapping",
 	props: {
@@ -117,27 +119,24 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
 		if (this.section === 'wbm') {
-			await this.loadWbm(permissions)
+			await this.loadWbm()
 		} else if (this.section === 'eol') {
-			await this.loadEol(permissions)
+			await this.loadEol()
 		}
 	},
 	methods: {
-		async loadWbm(permissions) {
-			if (!permissions.includes("compliance_view_windowsbuildmapping")) {
+		async loadWbm() {
+			if (!hasPermission("compliance_view_windowsbuildmapping")) {
 				this.wbm.errormsg = this.$t("message.dont_have_right_to_see")
 				this.wbm.errored = true
 				this.wbm.loading = false
 				this.wbm.isbusy = false
 				return
 			}
-			this.wbm.canadd = permissions.includes("compliance_add_windowsbuildmapping")
-			this.wbm.canedit = permissions.includes("compliance_change_windowsbuildmapping")
-			this.wbm.candelete = permissions.includes("compliance_delete_windowsbuildmapping")
+			this.wbm.canadd = hasPermission("compliance_add_windowsbuildmapping")
+			this.wbm.canedit = hasPermission("compliance_change_windowsbuildmapping")
+			this.wbm.candelete = hasPermission("compliance_delete_windowsbuildmapping")
 
 			this.wbm.loading = true
 			this.wbm.isbusy = true
@@ -172,17 +171,17 @@ export default {
 			}
 		},
 
-		async loadEol(permissions) {
-			if (!permissions.includes("compliance_view_customeolextendedsupport")) {
+		async loadEol() {
+			if (!hasPermission("compliance_view_customeolextendedsupport")) {
 				this.eol.errormsg = this.$t("message.dont_have_right_to_see")
 				this.eol.errored = true
 				this.eol.loading = false
 				this.eol.isbusy = false
 				return
 			}
-			this.eol.canadd = permissions.includes("compliance_add_customeolextendedsupport")
-			this.eol.canedit = permissions.includes("compliance_change_customeolextendedsupport")
-			this.eol.candelete = permissions.includes("compliance_delete_customeolextendedsupport")
+			this.eol.canadd = hasPermission("compliance_add_customeolextendedsupport")
+			this.eol.canedit = hasPermission("compliance_change_customeolextendedsupport")
+			this.eol.candelete = hasPermission("compliance_delete_customeolextendedsupport")
 
 			this.eol.loading = true
 			this.eol.isbusy = true

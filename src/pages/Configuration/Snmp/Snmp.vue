@@ -209,6 +209,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Snmp",
 	data() {
@@ -266,39 +268,36 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("config_view_config")) {
+		if (hasPermission("config_view_config")) {
 			this.allconfigview = true
 			this.can.config.view = true
-			this.can.config.add = permissions.includes("config_add_config")
-			this.can.config.edit = permissions.includes("config_change_config")
-			this.can.config.delete = permissions.includes("config_delete_config")
+			this.can.config.add = hasPermission("config_add_config")
+			this.can.config.edit = hasPermission("config_change_config")
+			this.can.config.delete = hasPermission("config_delete_config")
 		}
 
-		if (permissions.includes("snmp_config_view_snmpconfig")) {
+		if (hasPermission("snmp_config_view_snmpconfig")) {
 			this.allconfigview = true
 			this.can.community.view = true
-			this.can.community.add = permissions.includes("snmp_config_add_snmpconfig")
-			this.can.community.edit = permissions.includes("snmp_config_change_snmpconfig")
-			this.can.community.delete = permissions.includes("snmp_config_delete_snmpconfig")
+			this.can.community.add = hasPermission("snmp_config_add_snmpconfig")
+			this.can.community.edit = hasPermission("snmp_config_change_snmpconfig")
+			this.can.community.delete = hasPermission("snmp_config_delete_snmpconfig")
 		}
 
-		if (permissions.includes("template_view_template")) {
+		if (hasPermission("template_view_template")) {
 			this.allconfigview = true
 			this.can.template.view = true
-			this.can.template.add = permissions.includes("template_add_template")
-			this.can.template.edit = permissions.includes("template_change_template")
-			this.can.template.delete = permissions.includes("template_delete_template")
+			this.can.template.add = hasPermission("template_add_template")
+			this.can.template.edit = hasPermission("template_change_template")
+			this.can.template.delete = hasPermission("template_delete_template")
 		}
 
-		if (permissions.includes("scanner_view_snmpscanner")) {
+		if (hasPermission("scanner_view_snmpscanner")) {
 			this.allconfigview = true
 			this.can.scanner.view = true
-			this.can.scanner.add = permissions.includes("scanner_add_snmpscanner")
-			this.can.scanner.edit = permissions.includes("scanner_change_snmpscanner")
-			this.can.scanner.delete = permissions.includes("scanner_delete_snmpscanner")
+			this.can.scanner.add = hasPermission("scanner_add_snmpscanner")
+			this.can.scanner.edit = hasPermission("scanner_change_snmpscanner")
+			this.can.scanner.delete = hasPermission("scanner_delete_snmpscanner")
 		}
 
 		if (this.can.config.view) await this.getSnmpConfig()

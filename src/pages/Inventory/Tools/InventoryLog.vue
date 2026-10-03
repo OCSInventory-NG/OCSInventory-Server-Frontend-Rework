@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "InventoryLog",
 	data() {
@@ -79,10 +81,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (!permissions.includes("log_view_log")) {
+		if (!hasPermission("log_view_log")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false

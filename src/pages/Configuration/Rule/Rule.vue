@@ -70,6 +70,8 @@
 	</div>
 </template>
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Rule",
 	data() {
@@ -102,16 +104,13 @@ export default {
 		},
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		this.canview = permissions.includes("rule_view_rule")
+		this.canview = hasPermission("rule_view_rule")
 
 		if (this.canview) {
-			this.canadd = permissions.includes("rule_add_rule")
-			this.canedit = permissions.includes("rule_change_rule")
-			this.candelete = permissions.includes("rule_delete_rule")
-			this.canviewaction = permissions.includes("rule_view_action")
+			this.canadd = hasPermission("rule_add_rule")
+			this.canedit = hasPermission("rule_change_rule")
+			this.candelete = hasPermission("rule_delete_rule")
+			this.canviewaction = hasPermission("rule_view_action")
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true

@@ -135,6 +135,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "PackageResultModal",
 	props: {
@@ -161,7 +163,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			return !localStorage.getItem("permissions")?.split(',').includes('asset_group_change_assetgroup')
+			return !hasPermission('asset_group_change_assetgroup')
 		},
 		deployableItems() {
 			const list = Array.isArray(this.items) ? this.items : [this.items]

@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'AllSoftware',
 	data() {
@@ -81,10 +83,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (!permissions.includes("software_view_softwaredictionary")) {
+		if (!hasPermission("software_view_softwaredictionary")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false

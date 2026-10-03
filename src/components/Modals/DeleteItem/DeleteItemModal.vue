@@ -105,6 +105,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'DeleteItemModal',
 	props: {
@@ -143,7 +145,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			return !localStorage.getItem('permissions') ?.split(',').includes('template_change_template')
+			return !hasPermission('template_change_template')
 		}
 	},
 	watch: {

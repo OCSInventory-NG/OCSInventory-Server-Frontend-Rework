@@ -61,6 +61,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Notes',
 
@@ -85,14 +87,11 @@ export default {
 	},
 
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("asset_group_view_assetgroup")) {
-			if (permissions.includes("asset_group_change_assetgroup")) {
+		if (hasPermission("asset_group_view_assetgroup")) {
+			if (hasPermission("asset_group_change_assetgroup")) {
 				this.canedit = true
 			}
-			if (permissions.includes("asset_group_delete_assetgroup")) {
+			if (hasPermission("asset_group_delete_assetgroup")) {
 				this.candelete = true
 			}
 		} else {

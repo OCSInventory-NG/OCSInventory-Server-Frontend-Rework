@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Multisearch",
 	data() {
@@ -139,17 +141,14 @@ export default {
 		},
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (!permissions.includes("inventory_base_view_inventorybase")) {
+		if (!hasPermission("inventory_base_view_inventorybase")) {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
 			this.loading = false
 			this.isbusy = false
 			return
 		}
-		this.candelete = permissions.includes("inventory_base_delete_inventorybase")
+		this.candelete = hasPermission("inventory_base_delete_inventorybase")
 
 		// Data init
 		await this.loadInitial()

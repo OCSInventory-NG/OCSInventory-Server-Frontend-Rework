@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Packages',
 	data() {
@@ -74,21 +76,18 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("package_view_package")) {
+		if (hasPermission("package_view_package")) {
 			this.canview = true
-			if (permissions.includes("package_add_package")) {
+			if (hasPermission("package_add_package")) {
 				this.canadd = true
 			}
-			if (permissions.includes("package_change_package")) {
+			if (hasPermission("package_change_package")) {
 				this.canedit = true
 			}
-			if (permissions.includes("package_delete_package")) {
+			if (hasPermission("package_delete_package")) {
 				this.candelete = true
 			}
-			if (permissions.includes("action_view_deploymentaction")) {
+			if (hasPermission("action_view_deploymentaction")) {
 				this.canviewaction = true
 			}
 		} else {

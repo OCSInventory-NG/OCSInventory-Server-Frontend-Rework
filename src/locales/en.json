@@ -296,6 +296,24 @@
     "Unique network names and their devices count": "Bar - Equipment distributed by networks",
     "Unique OS names and their count": "Pie - Assets distributed by operating systems"
   },
+  "debug": {
+    "mode": "Debug mode",
+    "title": "Debug",
+    "close": "Close debug mode",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "trace": "API trace",
+    "no_calls": "No API call recorded on this page yet.",
+    "method": "Method",
+    "path": "Path",
+    "status": "Status",
+    "duration": "Duration",
+    "permissions": "Permissions",
+    "resolving": "Resolving the permissions of this page.",
+    "permissions_undetermined": "The permissions needed by this page could not be determined.",
+    "no_permission_needed": "No specific permission needed for this page.",
+    "permissions_intro": "Permissions needed to view this page and use its actions. Those of a modal are completed when it is opened or submitted."
+  },
   "deployment": {
     "actions": "Actions",
     "actions_list": "Deployment actions",
@@ -544,6 +562,7 @@
     "authmapping": "Authentication - Mappings",
     "authmethod": "Authentication - Methods",
     "dashboardlayout": "Dashboard - Layout",
+    "debugmode": "Debug mode",
     "deploymentaction": "Deployment - Actions",
     "category": "Inventory - Categories",
     "complianceresult": "Compliance - Results",

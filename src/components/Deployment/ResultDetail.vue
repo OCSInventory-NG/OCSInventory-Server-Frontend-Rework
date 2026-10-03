@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'ResultDetail',
 	props: {
@@ -84,9 +86,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem("permissions")
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-		this.candelete = permissions.includes("result_delete_result")
+		this.candelete = hasPermission("result_delete_result")
 
 		// Data init
 		await this.loadInitial()

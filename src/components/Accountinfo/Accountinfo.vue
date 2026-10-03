@@ -136,6 +136,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Accountinfo',
 	props: {
@@ -180,10 +182,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		this.canedit = permissions.includes("accountinfo_add_accountinfovalue")
+		this.canedit = hasPermission("accountinfo_add_accountinfovalue")
 
 		await this.getAccountinfoConfig()
 	},

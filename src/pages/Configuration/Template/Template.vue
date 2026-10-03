@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Template',
 	data() {
@@ -80,22 +82,19 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("template_view_template")) {
+		if (hasPermission("template_view_template")) {
 			this.canview = true
 			this.exporttemplate = true
 			this.canopenedit = true
-			if (permissions.includes("template_add_template")) {
+			if (hasPermission("template_add_template")) {
 				this.canadd = true
 				this.importtemplate = true
 				this.duplicateitem = true
 			}
-			if (permissions.includes("template_change_template")) {
+			if (hasPermission("template_change_template")) {
 				this.canedit = true
 			}
-			if (permissions.includes("template_delete_template")) {
+			if (hasPermission("template_delete_template")) {
 				this.candelete = true
 			}
 		} else {

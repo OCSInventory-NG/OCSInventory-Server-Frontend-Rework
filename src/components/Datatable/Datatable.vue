@@ -694,6 +694,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Datatable',
 	props: {
@@ -861,8 +863,7 @@ export default {
 			if (!this.virtualcoltarget) {
 				return false
 			}
-			const stored = localStorage.getItem("permissions")
-			return (stored ? stored.split(",") : []).includes("virtualcolumn_add_virtualcol")
+			return hasPermission("virtualcolumn_add_virtualcol")
 		},
 	},
 	watch: {

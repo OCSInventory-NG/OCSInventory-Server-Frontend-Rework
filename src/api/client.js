@@ -1,5 +1,6 @@
 import axios from "axios"
 import router from "@/route"
+import { startTrace, traceCall } from "@/debug/debugTrace"
 
 let redirecting = false
 
@@ -20,14 +21,19 @@ export function createApiClient(baseURLOrConfig) {
 		const token = localStorage.getItem("token_authentication")
 		if (token) config.headers.Authorization = `Token ${token}`
 		else delete config.headers.Authorization
+		startTrace(config)
 		return config
 	})
 
 	// Handle 401 globally
 	api.interceptors.response.use(
-		(res) => res,
+		(res) => {
+			traceCall(api, res.config, res.status)
+			return res
+		},
 		async (err) => {
 			const status = err?.response?.status
+			traceCall(api, err?.config, status ?? 0)
 
 			if (status === 401) {
 				// purge auth

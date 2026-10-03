@@ -37,7 +37,8 @@ import {
 	faMagnifyingGlass, faDownload, faPencil, faTrashCan, faTriangleExclamation,
 	faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking, faBars, faChartSimple,
 	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle,
-	faMagnifyingGlassPlus, faClockRotateLeft, faTableColumns, faToggleOn
+	faMagnifyingGlassPlus, faClockRotateLeft, faTableColumns, faToggleOn, faToggleOff,
+	faAngleDown, faAngleUp, faBug
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -53,6 +54,9 @@ import { ensureExtensionsLoaded } from "@/extensions/runtime"
 
 /***** Base path *****/
 import { withBase } from "@/utils/basePath"
+
+/***** Debug mode *****/
+import { installDebug } from "@/debug"
 
 async function loadConfig() {
 	const response = await fetch(withBase('config/config.json'))
@@ -88,7 +92,7 @@ loadConfig().then(async (config) => {
 		faTriangleExclamation, faXmark, faDesktop, faWrench, faCheck, faUpload, faBoxesPacking,
 		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles,
 		faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle, faMagnifyingGlassPlus, faClockRotateLeft,
-		faTableColumns, faToggleOn
+		faTableColumns, faToggleOn, faToggleOff, faAngleDown, faAngleUp, faBug
 	})
 
 	// Global config
@@ -98,6 +102,9 @@ loadConfig().then(async (config) => {
 	const api = createApi(config)
 	app.config.globalProperties.$api = api
 	app.provide("api", api)
+
+	// Debug mode (trace and panel sections)
+	installDebug({ router, api })
 
 	// Plugin API
 	const pluginApi = createPluginApi({

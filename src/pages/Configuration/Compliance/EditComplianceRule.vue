@@ -74,6 +74,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "EditComplianceRule",
 	props: {
@@ -96,7 +98,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			return !localStorage.getItem('permissions')?.split(',').includes('compliance_change_compliancerule')
+			return !hasPermission('compliance_change_compliancerule')
 		}
 	},
 	watch: {

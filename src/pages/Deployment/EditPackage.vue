@@ -64,6 +64,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'EditPackage',
 	props: {
@@ -97,17 +99,14 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("action_view_deploymentaction")) {
-			if (permissions.includes("action_add_deploymentaction")) {
+		if (hasPermission("action_view_deploymentaction")) {
+			if (hasPermission("action_add_deploymentaction")) {
 				this.canadd = true
 			}
-			if (permissions.includes("action_change_deploymentaction")) {
+			if (hasPermission("action_change_deploymentaction")) {
 				this.canedit = true
 			}
-			if (permissions.includes("action_delete_deploymentaction")) {
+			if (hasPermission("action_delete_deploymentaction")) {
 				this.candelete = true
 			}
 		} else {

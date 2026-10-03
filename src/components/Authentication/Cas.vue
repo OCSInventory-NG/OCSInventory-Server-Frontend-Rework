@@ -126,6 +126,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Cas",
 	data() {
@@ -163,14 +165,11 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("auth_config_view_authconfig")) {
-			if (permissions.includes("auth_mapping_add_authmapping")) {
+		if (hasPermission("auth_config_view_authconfig")) {
+			if (hasPermission("auth_mapping_add_authmapping")) {
 				this.canaddmapping = true
 			}
-			if (permissions.includes("auth_config_change_authconfig")) {
+			if (hasPermission("auth_config_change_authconfig")) {
 				this.canedit = true
 			}
 		} else {

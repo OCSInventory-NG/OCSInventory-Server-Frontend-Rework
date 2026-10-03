@@ -245,6 +245,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "AssetGroupModal",
 	props: {
@@ -303,7 +305,7 @@ export default {
 	},
 	computed: {
 		viewOnly() {
-			return !localStorage.getItem('permissions')?.split(',').includes("asset_group_change_assetgroup")
+			return !hasPermission("asset_group_change_assetgroup")
 		}
 	},
 	watch: {

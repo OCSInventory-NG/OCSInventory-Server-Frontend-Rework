@@ -96,6 +96,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "TemplateCreateVersionModal",
 	props: {
@@ -119,10 +121,10 @@ export default {
 	},
 	computed: {
 		canView() {
-			return localStorage.getItem('permissions') ?.split(',').includes('template_view_templateversion')
+			return hasPermission('template_view_templateversion')
 		},
 		viewOnly() {
-			return !localStorage.getItem('permissions') ?.split(',').includes('template_add_templateversion')
+			return !hasPermission('template_add_templateversion')
 		}
 	},
 	watch: {

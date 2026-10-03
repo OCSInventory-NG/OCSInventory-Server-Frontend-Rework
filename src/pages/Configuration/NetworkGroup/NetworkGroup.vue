@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "NetworkGroup",
 	data() {
@@ -72,18 +74,15 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("netgroup_view_netgroup")) {
+		if (hasPermission("netgroup_view_netgroup")) {
 			this.canview = true
-			if (permissions.includes("netgroup_add_netgroup")) {
+			if (hasPermission("netgroup_add_netgroup")) {
 				this.canadd = true
 			}
-			if (permissions.includes("netgroup_change_netgroup")) {
+			if (hasPermission("netgroup_change_netgroup")) {
 				this.canedit = true
 			}
-			if (permissions.includes("netgroup_delete_netgroup")) {
+			if (hasPermission("netgroup_delete_netgroup")) {
 				this.candelete = true
 			}
 		} else {

@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "SoftwareMapping",
 	data() {
@@ -73,18 +75,15 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("software_view_softwaremapping")) {
+		if (hasPermission("software_view_softwaremapping")) {
 			this.canview = true
-			if (permissions.includes("software_add_softwaremapping")) {
+			if (hasPermission("software_add_softwaremapping")) {
 				this.canadd = true
 			}
-			if (permissions.includes("software_change_softwaremapping")) {
+			if (hasPermission("software_change_softwaremapping")) {
 				this.canedit = true
 			}
-			if (permissions.includes("software_delete_softwaremapping")) {
+			if (hasPermission("software_delete_softwaremapping")) {
 				this.candelete = true
 			}
 		} else {

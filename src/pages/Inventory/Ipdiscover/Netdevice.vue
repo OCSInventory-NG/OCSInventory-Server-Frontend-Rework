@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: "Netdevice",
 	data() {
@@ -86,14 +88,11 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("netdevice_view_netdevice")) {
-			if (permissions.includes("netdevice_change_netdevice")) {
+		if (hasPermission("netdevice_view_netdevice")) {
+			if (hasPermission("netdevice_change_netdevice")) {
 				this.canedit = true
 			}
-			if (permissions.includes("netdevice_delete_netdevice")) {
+			if (hasPermission("netdevice_delete_netdevice")) {
 				this.candelete = true
 			}
 		} else {

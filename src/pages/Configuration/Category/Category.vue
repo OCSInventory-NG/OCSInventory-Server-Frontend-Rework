@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Category',
 	data() {
@@ -73,18 +75,15 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if (permissions.includes("category_view_category")) {
+		if (hasPermission("category_view_category")) {
 			this.canview = true
-			if (permissions.includes("category_add_category")) {
+			if (hasPermission("category_add_category")) {
 				this.canadd = true
 			}
-			if (permissions.includes("category_change_category")) {
+			if (hasPermission("category_change_category")) {
 				this.canedit = true
 			}
-			if (permissions.includes("category_delete_category")) {
+			if (hasPermission("category_delete_category")) {
 				this.candelete = true
 			}
 		} else {

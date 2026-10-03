@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Extensions',
 	data() {
@@ -78,11 +80,8 @@ export default {
 		}
 	},
 	async mounted() {
-		const rawPermissions = localStorage.getItem('permissions')
-		const permissions = rawPermissions ? rawPermissions.split(",") : []
-
-		if(permissions.includes("extension_view_extension")) {
-			if(permissions.includes("extension_change_extension")) {
+		if(hasPermission("extension_view_extension")) {
+			if(hasPermission("extension_change_extension")) {
 				this.canedit = true
 			}
 		} else {

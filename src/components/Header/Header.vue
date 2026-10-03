@@ -53,6 +53,16 @@
 						/>
 						<p>{{ $t('title.myaccount') }}</p>
 					</b-dropdown-item-button>
+					<b-dropdown-item-button
+						v-if="canDebug"
+						@click="toggleDebug"
+					>
+						<font-awesome-icon
+							:icon="['fas', debug.enabled ? 'toggle-on' : 'toggle-off']"
+							class="mr-3"
+						/>
+						<p>{{ $t('debug.mode') }}</p>
+					</b-dropdown-item-button>
 					<b-dropdown-divider />
 					<b-dropdown-item-button @click="logout">
 						<font-awesome-icon 
@@ -72,15 +82,21 @@
 </template>
 
 <script>
+import { debugStore, canUseDebugMode, setDebugMode } from "@/debug/debugStore"
+
 export default {
 	name: 'Header',
 	data() {
 		return {
 			showmobilemenu: false,
 			sso: false,
+			debug: debugStore,
 		}
 	},
 	computed: {
+		canDebug() {
+			return canUseDebugMode();
+		},
 		isSSO() {
 			return localStorage.getItem('auth_method') === 'sso';
 		}
@@ -101,12 +117,16 @@ export default {
 			localStorage.removeItem('token_authentication');
 			localStorage.removeItem('permissions');
 			localStorage.removeItem('auth_method');
+			localStorage.removeItem('debug_mode');
 
 			let backendLogout = `${this.$api.http.defaults.baseURL}logout/`;
 			if (authMethod === 'sso') {
 				backendLogout += "?method=sso";
 			}
 			window.location.href = backendLogout;
+		},
+		toggleDebug() {
+			setDebugMode(!this.debug.enabled);
 		},
 		account() {
 			this.$router.push('/myaccount');
