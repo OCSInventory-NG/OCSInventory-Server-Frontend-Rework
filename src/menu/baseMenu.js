@@ -231,6 +231,12 @@ export const baseMenu = [
 				column: "inventory",
 			},
 			{
+				headerKey: "title.software_identity",
+				link: "/configurations/software_identity",
+				route: "SoftwareIdentity",
+				column: "inventory",
+			},
+			{
 				headerKey: "title.compliance_settings",
 				link: "/configurations/compliance_settings",
 				route: "ComplianceSettings",

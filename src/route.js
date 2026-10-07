@@ -294,6 +294,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/configurations/software_identity',
+		name: 'SoftwareIdentity',
+		component: () => import('@/pages/Configuration/SoftwareIdentity/SoftwareIdentity.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/inventory/software_dictionary',
 		name: 'AllSoftware',
 		component: () => import('@/pages/Inventory/Asset/AllSoftware.vue'),
