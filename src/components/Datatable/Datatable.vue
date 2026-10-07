@@ -760,6 +760,8 @@ export default {
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
 		serverTotalRows: { type: Number, default: 0 },
+		// Bumped by the parent to go back to the first page
+		pageResetKey: { type: [Number, String], default: 0 },
 		isbusy: { type: Boolean, default: false },
 		// Multisearch
 		redirectToSearch: { type: Boolean, default: false },
@@ -905,6 +907,9 @@ export default {
 			if (this.serverSide) {
 				this.totalRows = val
 			}
+		},
+		pageResetKey() {
+			this.currentPage = 1
 		},
 		currentPage() {
 			if (this.serverSide) {

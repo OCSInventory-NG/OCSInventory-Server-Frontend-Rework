@@ -25,12 +25,28 @@
 						</div>
 
 						<div v-else>
+							<b-row class="mb-3">
+								<b-col
+									cols="12"
+									md="4"
+								>
+									<v-select
+										v-model="statusFilter"
+										:options="statusOptions"
+										:reduce="option => option.value"
+										:placeholder="$t('software.identity_status')"
+										label="text"
+									/>
+								</b-col>
+							</b-row>
+
 							<Datatable
 								id="all-software-datatable"
 								:rowdata="rowdata"
 								:candelete="candelete"
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
+								:nonsortablefields="['identity_status', 'identity_product', 'identity_identifier']"
 								:usecheckbox="false"
 								title="software_dictionary"
 								translationkey="software."
@@ -38,6 +54,7 @@
 								:server-side="true"
 								:server-total-rows="total"
 								:isbusy="isbusy"
+								:page-reset-key="pageResetKey"
 								:redirect-to-search="true"
 								is-sticky
 								@change-query="handleQueryChange"
@@ -69,7 +86,9 @@ export default {
 			total: 0,
 
 			candelete: false,
-			hiddenfields: ["id", "updated_at"],
+			hiddenfields: ["id", "updated_at", "platform_family", "architecture", "package_format", "source_package", "identity_product"],
+			statusFilter: null,
+			pageResetKey: 0,
 
 			query: {
 				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
@@ -81,6 +100,21 @@ export default {
 			isbusy: true,
 			loading: true,
 		}
+	},
+	computed: {
+		statusOptions() {
+			return ["matched", "validated", "review", "none", "unsupported"].map((status) => ({
+				value: status,
+				text: this.$t("software_identity.status_" + status),
+			}))
+		},
+	},
+	watch: {
+		async statusFilter(value) {
+			this.query = { ...this.query, offset: 0, identity__status: value }
+			this.pageResetKey += 1
+			await this.getSoftwares(this.query)
+		},
 	},
 	async mounted() {
 		if (!hasPermission("software_view_softwaredictionary")) {
@@ -125,7 +159,12 @@ export default {
 				const results = data.results || data
 				this.total = typeof data.count === "number" ? data.count : results.length
 
-				this.rowdata = results
+				this.rowdata = results.map((row) => ({
+					...row,
+					identity_status: row.identity_status
+						? this.$t("software_identity.status_" + row.identity_status)
+						: null,
+				}))
 
 				this.errormsg = null
 				this.errored = false
@@ -189,6 +228,7 @@ export default {
 			const params = {
 				ordering: ordering,
 				search: filter,
+				identity__status: this.statusFilter,
 			}
 
 			const data = await this.$api.generic.get("software_dictionary/", params)
