@@ -156,6 +156,14 @@ export default {
 						major_version: await this.getFieldName(sm.major_version),
 						minor_version: await this.getFieldName(sm.minor_version),
 						patch_version: await this.getFieldName(sm.patch_version),
+						architecture: await this.getFieldName(sm.architecture),
+						package_format: await this.getFieldName(sm.package_format),
+						source_package: await this.getFieldName(sm.source_package),
+						os_id: await this.getFieldName(sm.os_id),
+						os_like: await this.getFieldName(sm.os_like),
+						os_release: await this.getFieldName(sm.os_release),
+						os_codename: await this.getFieldName(sm.os_codename),
+						running_kernel: await this.getFieldName(sm.running_kernel),
 					}))
 				)
 

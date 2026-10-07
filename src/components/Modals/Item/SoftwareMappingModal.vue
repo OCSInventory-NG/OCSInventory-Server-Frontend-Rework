@@ -90,7 +90,7 @@
 								:clearable="false"
 								label="text"
 								class="mb-3"
-								@option:selected="getSections(row.template)"
+								@option:selected="onTemplateSelected(row.template)"
 							>
 								<template #search="{attributes, events}">
 									<input
@@ -161,6 +161,62 @@
 						</b-form-group>
 					</b-col>
 				</b-row>
+				<b-row
+					v-for="field in packageFields"
+					:key="field"
+				>
+					<b-col>
+						<b-form-group
+							:label="$t('software.'+field)"
+							:label-for="field"
+						>
+							<v-select
+								:id="field"
+								v-model="row[field]"
+								:options="fields"
+								:reduce="text => text.value"
+								label="text"
+								class="mb-3"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										v-bind="attributes"
+										v-on="events"
+									>
+								</template>
+							</v-select>
+						</b-form-group>
+					</b-col>
+				</b-row>
+				<b-row
+					v-for="field in machineFields"
+					:key="field"
+				>
+					<b-col>
+						<b-form-group
+							:label="$t('software.'+field)"
+							:label-for="field"
+						>
+							<v-select
+								:id="field"
+								v-model="row[field]"
+								:options="templateFields"
+								:reduce="text => text.value"
+								label="text"
+								class="mb-3"
+							>
+								<template #search="{attributes, events}">
+									<input
+										class="vs__search"
+										v-bind="attributes"
+										v-on="events"
+									>
+								</template>
+							</v-select>
+						</b-form-group>
+					</b-col>
+				</b-row>
 				<b-row>
 					<b-col align-self="start" />
 					<b-col 
@@ -188,6 +244,26 @@
 </template>
 
 <script>
+const PACKAGE_FIELDS = ["architecture", "package_format", "source_package"]
+const MACHINE_FIELDS = ["os_id", "os_like", "os_release", "os_codename", "running_kernel"]
+
+function emptyRow() {
+	const row = {
+		template: null,
+		section: null,
+		name: null,
+		publisher: null,
+		version: null,
+		major_version: null,
+		minor_version: null,
+		patch_version: null,
+	}
+	for (const field of [...PACKAGE_FIELDS, ...MACHINE_FIELDS]) {
+		row[field] = null
+	}
+	return row
+}
+
 export default {
 	name: "SoftwareMappingModal",
 	props: {
@@ -204,16 +280,7 @@ export default {
 
 			createwithsuccess: false,
 
-			row: {
-				template: null,
-				section: null,
-				name: null,
-				publisher: null,
-				version: null,
-				major_version: null,
-				minor_version: null,
-				patch_version: null
-			},
+			row: emptyRow(),
 			softwaremappingmodal: false,
 			templates: [],
 			sections: [],
@@ -226,6 +293,9 @@ export default {
 				"minor_version",
 				"patch_version"
 			],
+			packageFields: PACKAGE_FIELDS,
+			machineFields: MACHINE_FIELDS,
+			templateFields: [],
 			
 			loading: true,
 			loadingcreate: false,
@@ -236,16 +306,7 @@ export default {
 			setTimeout(() => {
 				this.softwaremappingmodal = false
 				this.createwithsuccess = false
-				this.row = {
-					template: null,
-					section: null,
-					name: null,
-					publisher: null,
-					version: null,
-					major_version: null,
-					minor_version: null,
-					patch_version: null
-				}
+				this.row = emptyRow()
 				this.$emit("reloadDatatable")
 			}, 500)
 		}
@@ -263,16 +324,7 @@ export default {
 
 		async loadData(id) {
 			this.softwaremappingmodal = true
-			this.row = {
-				template: null,
-				section: null,
-				name: null,
-				publisher: null,
-				version: null,
-				major_version: null,
-				minor_version: null,
-				patch_version: null,
-			}
+			this.row = emptyRow()
 
 			this.errormsg = null
 			this.errored = false
@@ -296,6 +348,7 @@ export default {
 
 				if (this.row.template) {
 					await this.getSections(this.row.template)
+					await this.getTemplateFields(this.row.template)
 				}
 				if (this.row.section) {
 					await this.getFields(this.row.section)
@@ -314,6 +367,25 @@ export default {
 				this.templates = (data || []).map((template) => ({
 					value: template.id,
 					text: template.name,
+				}))
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
+
+		async onTemplateSelected(templateId) {
+			await this.getSections(templateId)
+			await this.getTemplateFields(templateId)
+		},
+
+		async getTemplateFields(templateId) {
+			try {
+				const data = await this.$api.generic.get("fields/", { template: templateId })
+				const sectionNames = new Map(this.sections.map((section) => [section.value, section.text]))
+				this.templateFields = (data || []).map((field) => ({
+					value: field.id,
+					text: `${sectionNames.get(field.section) || ""} › ${field.name}`,
 				}))
 			} catch (e) {
 				this.errormsg = this._apiError(e)
