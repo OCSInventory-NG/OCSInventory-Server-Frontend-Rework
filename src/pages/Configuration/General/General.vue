@@ -34,15 +34,18 @@
 							v-else
 							@submit="onSubmit"
 						>
-							<b-tabs 
+							<b-tabs
 								v-model="activetab"
-								content-class="mt-3"
-								fill
+								content-class="col-10 sticky-tabs"
+								pills
+								card
+								vertical
 							>
 								<b-tab
 									v-for="config in configs"
 									:key="config.name"
 									:title="$t('configuration.' + config.name)"
+									title-item-class="ocs-menu-tab"
 								>
 									<b-list-group 
 										v-for="parameter in config.value"

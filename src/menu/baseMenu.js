@@ -76,6 +76,12 @@ export const baseMenu = [
 				column: "tools",
 			},
 			{
+				headerKey: "title.cve_report",
+				link: "/inventory/cve_report",
+				route: "CveReport",
+				column: "tools",
+			},
+			{
 				headerKey: "title.software_dictionary",
 				link: "/inventory/software_dictionary",
 				route: "AllSoftware",
@@ -234,6 +240,12 @@ export const baseMenu = [
 				headerKey: "title.compliance_settings",
 				link: "/configurations/compliance_settings",
 				route: "ComplianceSettings",
+				column: "inventory",
+			},
+			{
+				headerKey: "title.cpe_matrix",
+				link: "/configurations/cpe_matrix",
+				route: "CpeMatrix",
 				column: "inventory",
 			},
 			{
