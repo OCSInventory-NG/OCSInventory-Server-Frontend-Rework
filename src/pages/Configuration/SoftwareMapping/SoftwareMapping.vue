@@ -159,6 +159,7 @@ export default {
 						architecture: await this.getFieldName(sm.architecture),
 						package_format: await this.getFieldName(sm.package_format),
 						source_package: await this.getFieldName(sm.source_package),
+						package_origin: await this.getFieldName(sm.package_origin),
 						os_id: await this.getFieldName(sm.os_id),
 						os_like: await this.getFieldName(sm.os_like),
 						os_release: await this.getFieldName(sm.os_release),

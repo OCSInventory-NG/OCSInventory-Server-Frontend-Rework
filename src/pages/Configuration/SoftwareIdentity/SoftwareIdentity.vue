@@ -76,6 +76,30 @@
 									</tr>
 								</tbody>
 							</table>
+							<table
+								v-if="summary.origins.length"
+								class="table table-sm table-striped table-vcenter"
+							>
+								<thead>
+									<tr>
+										<th>{{ $t('software_identity.origin') }}</th>
+										<th>{{ $t('software_identity.distribution') }}</th>
+										<th>{{ $t('software_identity.packages') }}</th>
+										<th>{{ $t('software_identity.machines') }}</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr
+										v-for="row in summary.origins"
+										:key="row.package_origin"
+									>
+										<td>{{ row.package_origin || $t('software_identity.no_origin') }}</td>
+										<td>{{ distributionLabel(row) }}</td>
+										<td>{{ row.entries }}</td>
+										<td>{{ row.machines }}</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 
@@ -134,7 +158,7 @@ export default {
 			canviewdecisions: false,
 			cansearch: false,
 
-			summary: { index: {}, counts: [], pending: 0, machines_unknown_platform: 0 },
+			summary: { index: {}, counts: [], pending: 0, machines_unknown_platform: 0, origins: [] },
 			statuses: ["matched", "validated", "review", "none", "unsupported"],
 			decisionsKey: 0,
 			reviewKey: 0,
@@ -190,6 +214,12 @@ export default {
 		},
 		familyLabel(family) {
 			return this.$t("software_identity.family_" + (family || "unknown"))
+		},
+		distributionLabel(row) {
+			if (row.distribution) {
+				return row.distribution
+			}
+			return row.package_origin ? this.$t("software_identity.third_party") : ""
 		},
 	},
 }

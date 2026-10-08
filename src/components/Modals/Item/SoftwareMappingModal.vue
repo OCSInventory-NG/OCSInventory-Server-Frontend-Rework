@@ -244,7 +244,7 @@
 </template>
 
 <script>
-const PACKAGE_FIELDS = ["architecture", "package_format", "source_package"]
+const PACKAGE_FIELDS = ["architecture", "package_format", "source_package", "package_origin"]
 const MACHINE_FIELDS = ["os_id", "os_like", "os_release", "os_codename", "running_kernel"]
 
 function emptyRow() {
