@@ -97,6 +97,12 @@ export const baseMenu = [
 		],
 		children: [
 			{
+				headerKey: "title.vulnerabilities",
+				link: "/security/vulnerabilities",
+				route: "Vulnerabilities",
+				column: "general",
+			},
+			{
 				headerKey: "title.software_identity",
 				link: "/security/software_identity",
 				route: "SoftwareIdentity",

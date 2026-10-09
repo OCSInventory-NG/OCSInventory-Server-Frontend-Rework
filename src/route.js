@@ -294,6 +294,14 @@ const routes = [
 		}
 	},
 	{
+		path: '/security/vulnerabilities',
+		name: 'Vulnerabilities',
+		component: () => import('@/pages/Security/Vulnerabilities/Vulnerabilities.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/security/software_identity',
 		name: 'SoftwareIdentity',
 		component: () => import('@/pages/Security/SoftwareIdentity/SoftwareIdentity.vue'),

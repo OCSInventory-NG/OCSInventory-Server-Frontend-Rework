@@ -226,6 +226,15 @@
 										>
 											<ComplianceDetail :asset-id="device.id" />
 										</b-tab>
+										<b-tab
+											v-if="category.id === 1 && canviewvulnerabilities"
+											:title="$t('security.tab_title')"
+											title-item-class="ocs-menu-tab"
+											lazy
+											@click="scrollToTop()"
+										>
+											<AssetVulnerabilities :asset-id="device.id" />
+										</b-tab>
 									</template>
 								</b-tabs>
 							</div>
@@ -283,6 +292,8 @@
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+
 export default {
 	name: 'Detail',
 	data() {
@@ -298,6 +309,7 @@ export default {
 			device: {},
 			categories: [],
 			activetab: 0,
+			canviewvulnerabilities: hasPermission("security_view_vulnerability"),
 
 			loading: true,
 			complianceStatus: null,
@@ -313,41 +325,55 @@ export default {
 			return true
 		},
 	},
-	async mounted() {
-		const { type } = this.$route.params || {}
-
-		if (type === "asset") {
-			this.type = "ASSET"
-			this.slug = "inventory_base.inventorybase"
-			this.translationkey = "inventory."
-
-			// Get inventory base
-			await this.getInventoryBase()
-			this.getComplianceStatus()
-			this.getEolStatus()
-			// Get categories
-			await this.getCategories()
-
-			// Open the compliance tab directly when requested via query param.
-			// The compliance tab is rendered right after the category id 1.
-			if (this.$route.query.tab === "compliance") {
-				const idx = this.categories.findIndex((c) => c.id === 1)
-				if (idx !== -1) this.activetab = idx + 1
+	watch: {
+		// The same page instance shows another machine when only the id changes
+		async "$route.params.id"(id, previous) {
+			if (id && id !== previous) {
+				this.device = {}
+				this.categories = []
+				this.activetab = 0
+				await this.load()
 			}
-			return
-		}
-
-		if (type === "netdevice") {
-			this.type = "IPDISCOVER"
-			this.slug = "netdevice.netdevice"
-			this.translationkey = "network."
-
-			// Get netdevices
-			await this.getNetdevice()
-		}
+		},
+	},
+	async mounted() {
+		await this.load()
 	},
 
 	methods: {
+		async load() {
+			const { type } = this.$route.params || {}
+
+			if (type === "asset") {
+				this.type = "ASSET"
+				this.slug = "inventory_base.inventorybase"
+				this.translationkey = "inventory."
+
+				// Get inventory base
+				await this.getInventoryBase()
+				this.getComplianceStatus()
+				this.getEolStatus()
+				// Get categories
+				await this.getCategories()
+
+				// Open the compliance tab directly when requested via query param.
+				// The compliance tab is rendered right after the category id 1.
+				if (this.$route.query.tab === "compliance") {
+					const idx = this.categories.findIndex((c) => c.id === 1)
+					if (idx !== -1) this.activetab = idx + 1
+				}
+				return
+			}
+
+			if (type === "netdevice") {
+				this.type = "IPDISCOVER"
+				this.slug = "netdevice.netdevice"
+				this.translationkey = "network."
+
+				// Get netdevices
+				await this.getNetdevice()
+			}
+		},
 		async getNetdevice() {
 			try {
 				this.loading = true
