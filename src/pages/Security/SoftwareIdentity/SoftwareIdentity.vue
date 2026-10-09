@@ -84,7 +84,7 @@
 									<tr>
 										<th>{{ $t('software_identity.origin') }}</th>
 										<th>{{ $t('software_identity.distribution') }}</th>
-										<th>{{ $t('software_identity.packages') }}</th>
+										<th>{{ $t('software_identity.installed_packages') }}</th>
 										<th>{{ $t('software_identity.machines') }}</th>
 									</tr>
 								</thead>
@@ -95,7 +95,7 @@
 									>
 										<td>{{ row.package_origin || $t('software_identity.no_origin') }}</td>
 										<td>{{ distributionLabel(row) }}</td>
-										<td>{{ row.entries }}</td>
+										<td>{{ row.installations }}</td>
 										<td>{{ row.machines }}</td>
 									</tr>
 								</tbody>
