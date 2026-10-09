@@ -14,7 +14,7 @@
 		</div>
 		<div v-else>
 			<p v-if="!rows.length">
-				{{ $t('software_identity.review_empty') }}
+				{{ $t(status === 'matched' ? 'software_identity.matched_empty' : 'software_identity.review_empty') }}
 			</p>
 			<table
 				v-else
@@ -26,6 +26,9 @@
 						<th>{{ $t('software_identity.family') }}</th>
 						<th>{{ $t('software_identity.versions') }}</th>
 						<th>{{ $t('software_identity.machines') }}</th>
+						<th v-if="status === 'matched'">
+							{{ $t('software_identity.product') }}
+						</th>
 						<th>{{ $t('software_identity.candidates') }}</th>
 						<th v-if="candecide" />
 					</tr>
@@ -39,6 +42,9 @@
 						<td>{{ $t('software_identity.family_' + row.family) }}</td>
 						<td>{{ row.entries }}</td>
 						<td>{{ row.machines }}</td>
+						<td v-if="status === 'matched'">
+							{{ row.product }}
+						</td>
 						<td>
 							<div
 								v-for="candidate in row.candidates"
@@ -98,6 +104,8 @@ export default {
 	props: {
 		candecide: { type: Boolean, default: false },
 		cansearch: { type: Boolean, default: false },
+		// review: waiting for an admin; matched: identified automatically
+		status: { type: String, default: "review" },
 	},
 	emits: ["decided"],
 	data() {
@@ -132,6 +140,7 @@ export default {
 			this.loading = true
 			try {
 				const data = await this.$api.generic.get("software_identities/review/", {
+					status: this.status,
 					limit: this.perPage,
 					offset: (this.currentPage - 1) * this.perPage,
 				})

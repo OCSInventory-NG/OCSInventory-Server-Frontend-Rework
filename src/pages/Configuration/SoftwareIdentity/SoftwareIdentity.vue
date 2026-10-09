@@ -123,6 +123,18 @@
 									/>
 								</b-tab>
 								<b-tab
+									:title="$t('software_identity.tab_matched')"
+									title-item-class="ocs-menu-tab"
+								>
+									<SoftwareIdentityReview
+										:key="matchedKey"
+										status="matched"
+										:candecide="candecide"
+										:cansearch="cansearch"
+										@decided="onDecided"
+									/>
+								</b-tab>
+								<b-tab
 									v-if="canviewdecisions"
 									:title="$t('software_identity.tab_decisions')"
 									title-item-class="ocs-menu-tab"
@@ -162,6 +174,7 @@ export default {
 			statuses: ["matched", "validated", "review", "none", "unsupported"],
 			decisionsKey: 0,
 			reviewKey: 0,
+			matchedKey: 0,
 		}
 	},
 	computed: {
@@ -205,7 +218,9 @@ export default {
 			await this.loadSummary()
 		},
 		async onReverted() {
+			// A deleted decision sends its product back to review or to matched
 			this.reviewKey += 1
+			this.matchedKey += 1
 			await this.loadSummary()
 		},
 		count(family, status) {
