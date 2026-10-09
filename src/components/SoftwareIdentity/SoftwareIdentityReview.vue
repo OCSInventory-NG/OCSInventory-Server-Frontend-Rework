@@ -70,7 +70,7 @@
 								:options="productOptions"
 								:filterable="false"
 								:placeholder="$t('software_identity.other_product')"
-								class="mb-1"
+								class="mb-1 identity-product-search"
 								@search="searchProducts"
 								@option:selected="(option) => decide(row, option.value)"
 							/>

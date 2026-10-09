@@ -1,0 +1,12 @@
+// Product search of the software identity review: wide enough to read what
+// is typed and the CPE names offered. The list opens towards the left so it
+// stays inside the page.
+.identity-product-search {
+  min-width: 16rem;
+
+  .vs__dropdown-menu {
+    min-width: 28rem !important;
+    left: auto;
+    right: 0;
+  }
+}
