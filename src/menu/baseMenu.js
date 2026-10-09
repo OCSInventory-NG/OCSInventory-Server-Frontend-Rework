@@ -85,6 +85,27 @@ export const baseMenu = [
 	},
 	{
 		type: "group",
+		index: "security",
+		headerKey: "title.security",
+		link: "/security",
+		icon: "shield-halved",
+		columnDividers: [
+			{
+				headerKey: "title.general",
+				identifier: "general",
+			},
+		],
+		children: [
+			{
+				headerKey: "title.software_identity",
+				link: "/security/software_identity",
+				route: "SoftwareIdentity",
+				column: "general",
+			},
+		],
+	},
+	{
+		type: "group",
 		index: "deployment",
 		headerKey: "title.deployment",
 		link: "/deployment",
@@ -228,12 +249,6 @@ export const baseMenu = [
 				headerKey: "title.software_mapping",
 				link: "/configurations/software_mapping",
 				route: "SoftwareMapping",
-				column: "inventory",
-			},
-			{
-				headerKey: "title.software_identity",
-				link: "/configurations/software_identity",
-				route: "SoftwareIdentity",
 				column: "inventory",
 			},
 			{

@@ -294,9 +294,9 @@ const routes = [
 		}
 	},
 	{
-		path: '/configurations/software_identity',
+		path: '/security/software_identity',
 		name: 'SoftwareIdentity',
-		component: () => import('@/pages/Configuration/SoftwareIdentity/SoftwareIdentity.vue'),
+		component: () => import('@/pages/Security/SoftwareIdentity/SoftwareIdentity.vue'),
 		meta: {
 			layout: AppLayout
 		}
