@@ -1,7 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
-import pkg from './package.json'
 import vue from '@vitejs/plugin-vue'
 import { resolve, dirname } from 'path'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
@@ -14,7 +13,8 @@ export default defineConfig({
 	// to serve the app under a sub-path behind a reverse proxy.
 	base: process.env.VITE_BASE_PATH || '/',
 	define: {
-		__APP_VERSION__: JSON.stringify(pkg.version),
+		// Set to the release tag by .github/workflows/release.yml
+		__APP_VERSION__: JSON.stringify(process.env.APP_VERSION || 'dev'),
 	},
 	server: {
 		host: '0.0.0.0',
