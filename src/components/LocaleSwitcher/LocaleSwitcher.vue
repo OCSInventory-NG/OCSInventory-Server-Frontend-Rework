@@ -19,6 +19,7 @@ export default {
 			supportedLocales: [
 				{value: 'fr', text: 'Français'},
 				{value: 'en', text: 'English'},
+				{value: 'cs', text: 'Čeština'},
 			]
 		}
 	},
