@@ -4,10 +4,10 @@
 		class="datatable-custom"
 	>
 		<!-- Header datatable -->
-		<div class="header-table">
-			<div class="row responsive">
-				<!-- Search bar -->
-				<div class="input-icon col">
+		<div class="header-table datatable-toolbar">
+			<!-- Search and actions on the selection -->
+			<div class="toolbar-group toolbar-start">
+				<div class="input-icon toolbar-search">
 					<b-form-input 
 						id="filter-input" 
 						v-model="filter"
@@ -23,133 +23,102 @@
 				</div>
 
 				<!-- Reload datatable -->
-				<div
+				<button 
 					v-if="canrefresh"
-					class="col-1 ocs-col-datatable" 
+					:title="$t('generic.reload')"
+					class="form-control btn datatable-btn"
+					@click="reloadDatatable"
 				>
-					<b-button-group class="mr-1">
-						<button 
-							:title="$t('generic.reload')"
-							class="form-control btn datatable-btn"
-							@click="reloadDatatable"
-						>
-							<font-awesome-icon 
-								:icon="['fas', 'arrows-rotate']"
-								:class="{ 'loading': isReloading }"
-							/>
-						</button>
-					</b-button-group>
-				</div>
+					<font-awesome-icon 
+						:icon="['fas', 'arrows-rotate']"
+						:class="{ 'loading': isReloading }"
+					/>
+				</button>
 
 				<!-- Export Excel -->
-				<div
+				<ExportModal
 					v-if="canexport"
-					class="col-1 ocs-col-datatable" 
-				>
-					<b-button-group class="mr-1">
-						<ExportModal
-							:server-side="serverSide"
-							:total-rows="totalRows"
-							:page-length="pageRows.length"
-							:selection-length="selectionLength"
-							@confirm="onExportConfirm"
-						/>
-					</b-button-group>
-				</div>
+					:server-side="serverSide"
+					:total-rows="totalRows"
+					:page-length="pageRows.length"
+					:selection-length="selectionLength"
+					@confirm="onExportConfirm"
+				/>
 
 				<!-- Import template -->
-				<div
+				<ImportTemplateModal
 					v-if="importtemplate"
-					class="col-1 ocs-col-datatable"
-				>
-					<ImportTemplateModal
-						@reload-datatable="reloadDatatable"
-					/>
-				</div>
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Export template -->
-				<div
+				<ExportTemplateModal
 					v-if="exporttemplate"
-					class="col-1 ocs-col-datatable"
-				>
-					<ExportTemplateModal
-						:ids="selectedids"
-					/>
-				</div>
+					:ids="selectedids"
+				/>
 
 				<!-- Duplicate item -->
-				<div
+				<DuplicateModal
 					v-if="duplicateitem"
-					class="col-1 ocs-col-datatable"
-				>
-					<DuplicateModal
-						:route="title"
-						:title="titlevalue"
-						@reload-datatable="reloadDatatable"
-					/>
-				</div>
+					:route="title"
+					:title="titlevalue"
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Attribute package -->
-				<div
+				<PackageResultModal
 					v-if="candeploy"
-					class="col-1 ocs-col-datatable"
-				>
-					<b-button-group class="mr-1">
-						<PackageResultModal
-							:items="(multisearch && selected.length == 0) ? rowdata : selected"
-						/>
-					</b-button-group>
-				</div>
+					:items="(multisearch && selected.length == 0) ? rowdata : selected"
+				/>
 
 				<!-- Mass processing -->
-				<div
+				<MassProcessingModal
 					v-if="canmassprocessing"
-					class="col-1 ocs-col-datatable"
-				>
-					<b-button-group class="mr-1">
-						<MassProcessingModal
-							:items="(multisearch && selected.length == 0) ? rowdata : selected"
-							:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
-							@reload-datatable="reloadDatatable"
-						/>
-					</b-button-group>
-				</div>
+					:items="(multisearch && selected.length == 0) ? rowdata : selected"
+					:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Scheduler history -->
-				<div
+				<router-link 
 					v-if="viewautomationhistory"
-					class="col-1 ocs-col-datatable"
+					:to="'/configurations/automations/history'"
+					:title="$t('scheduler.see_history')"
+					class="btn datatable-btn datatable-btn-icon"
 				>
-					<router-link 
-						:to="'/configurations/automations/history'"
-						:title="$t('scheduler.see_history')"
-						class="btn datatable-btn mr-1"
-					>
-						<font-awesome-icon 
-							:icon="['far', 'file-lines']"
-						/>
-					</router-link>
-				</div>
-
-				<div
-					v-if="title == 'asset/bases' && !multisearch"
-					class="col-1"
-				>
-					<AssetGroupModal
-						:assetrow="selected"
-						:search="[]"
-						:datatable="true"
-						cssclass="datatable-btn"
+					<font-awesome-icon 
+						:icon="['far', 'file-lines']"
 					/>
-				</div>
+				</router-link>
+
+				<AssetGroupModal
+					v-if="title == 'asset/bases' && !multisearch"
+					:assetrow="selected"
+					:search="[]"
+					:datatable="true"
+					cssclass="datatable-btn"
+				/>
+			</div>
+
+			<!-- Total row number, inline when compact -->
+			<p
+				v-if="compactheader"
+				class="toolbar-count mb-0"
+			>
+				{{ totalRows }} {{ $t('generic.result') }}
+			</p>
+
+			<!-- How the table is displayed -->
+			<div class="toolbar-group toolbar-end">
+				<ColumnLayoutModal
+					v-if="canuselayout"
+					:target="layouttarget"
+					:columns="layoutColumns"
+					@apply-layout="applyLayout"
+				/>
 
 				<!-- Show/Hide columns -->
-				<div
-					v-if="canshowhide || canaddvirtualcol"
-					class="col"
-					align="right"
-				>
-					<b-button-group>
+				<b-button-group v-if="canshowhide || canaddvirtualcol">
 					<b-dropdown
 						v-if="canshowhide"
 						:text="$t('generic.show_hide')"
@@ -181,38 +150,24 @@
 						</b-dropdown-item>
 					</b-dropdown>
 
-						<VirtualColModal
-							v-if="canaddvirtualcol"
-							:target="virtualcoltarget"
-							@reload-datatable="reloadDatatable"
-						/>
-					</b-button-group>
-				</div>
-
-				<!-- Total row number, inline when compact -->
-				<div
-					v-if="compactheader"
-					class="col d-flex align-items-center justify-content-center"
-				>
-					<p class="mb-0">{{ totalRows }} {{ $t('generic.result') }}</p>
-				</div>
+					<VirtualColModal
+						v-if="canaddvirtualcol"
+						:target="virtualcoltarget"
+						@reload-datatable="reloadDatatable"
+					/>
+				</b-button-group>
 
 				<!-- Number per page-->
-				<div 
-					:class="compactheader ? 'col' : ((canshowhide) ? 'col-1' : 'col-2')" 
-					align="right"
-				>
-					<v-select
-						id="per-page-select"
-						v-model="perPage"
-						:options="pageOptions"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="datatable-btn"
-						@option:selected="updateRowPage()"
-					/>
-				</div>
+				<v-select
+					id="per-page-select"
+					v-model="perPage"
+					:options="pageOptions"
+					:reduce="text => text.value"
+					:clearable="false"
+					label="text"
+					class="datatable-btn"
+					@option:selected="updateRowPage()"
+				/>
 			</div>
 		</div>
 
@@ -749,6 +704,8 @@ export default {
 		compactheader: { type: Boolean, default: false },
 		// table listed here, when it accepts virtual columns
 		virtualcoltarget: { type: String, default: null },
+		// table listed here, when its show/hide choices can be saved as layouts
+		layouttarget: { type: String, default: null },
 		// labels of the columns whose key is no translation key
 		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group
@@ -812,6 +769,8 @@ export default {
 			],
 			// Reload parameter
 			isReloading: false,
+			// columns of the active layout, null for the user's own choices
+			layoutcolumns: null,
 			stickyHeaderActive: false,
 			stickyHeaderRaf: null,
 		};
@@ -864,6 +823,17 @@ export default {
 				return false
 			}
 			return hasPermission("virtualcolumn_add_virtualcol")
+		},
+		canuselayout() {
+			if (!this.layouttarget || !this.canshowhide) {
+				return false
+			}
+			return hasPermission("virtualcolumn_view_columnlayout")
+		},
+		layoutColumns() {
+			return this.fields
+				.filter(field => field.key !== 'selected' && field.key !== 'actions')
+				.map(field => ({ key: field.key, label: field.label, visible: field.visible }))
 		},
 	},
 	watch: {
@@ -961,6 +931,10 @@ export default {
 		rowheader() {
 			this.buildFields()
 			this.syncActionsField()
+			// a column added meanwhile is shown, unless the layout lists it
+			if (this.layoutcolumns) {
+				this.applyLayout(this.layoutcolumns)
+			}
 		},
 		// a renamed virtual column keeps its key
 		fieldlabels() {
@@ -1093,9 +1067,11 @@ export default {
 				this.fields = orderedFields
 				this.json_fields = orderedJsonFields
 
-				// Update local storage key
-				localStorage.removeItem(key)
-				localStorage.setItem(key, JSON.stringify(this.fields))
+				// Update local storage key, unless the fields carry a layout
+				if (!this.layoutcolumns) {
+					localStorage.removeItem(key)
+					localStorage.setItem(key, JSON.stringify(this.fields))
+				}
 			} else {
 				Object.values(this.rowheader).forEach( data => {
 					var visible = true
@@ -1144,10 +1120,46 @@ export default {
 			if (field.key === "name") return
 
 			field.visible = !field.visible
+			// a change made on a layout waits for its save button
+			if (this.layoutcolumns) return
 			localStorage.setItem(
 				this.title + "_" + this.templateid,
 				JSON.stringify(this.fields)
 			)
+		},
+
+		// null goes back to the show/hide choices kept in local storage, a key
+		// matching no column (removed, or a virtual column not shared) is skipped
+		applyLayout(columns) {
+			this.layoutcolumns = columns
+
+			let stored = []
+			if (!columns) {
+				const saved = localStorage.getItem(this.title + "_" + this.templateid)
+				stored = saved ? JSON.parse(saved) : []
+			}
+
+			// the layout columns first in their saved order, then the hidden ones
+			const order = columns
+				? [...columns, ...this.rowheader.filter(key => !columns.includes(key))]
+				: this.rowheader
+			this.fields = [
+				...this.fields.filter(field => field.key === 'selected'),
+				...order.map(key => this.fields.find(field => field.key === key)).filter(Boolean),
+				...this.fields.filter(field => field.key === 'actions'),
+			]
+
+			this.fields.forEach(field => {
+				if (field.disabled || field.key === 'name') return
+				if (columns) {
+					field.visible = columns.includes(field.key)
+					return
+				}
+				const previous = stored.find(item => item.key === field.key)
+				field.visible = previous
+					? previous.visible
+					: !(this.hiddenfields && this.hiddenfields.includes(field.key))
+			})
 		},
 		syncActionsField() {
 			this.fields = this.fields.filter(field => field.key !== 'actions')

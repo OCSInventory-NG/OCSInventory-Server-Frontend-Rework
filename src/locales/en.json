@@ -596,6 +596,7 @@
     "snmpscanner": "SNMP - Scanners",
     "softwaredictionary": "Softwares",
     "softwaremapping": "Softwares - Mapping",
+    "columnlayout": "Virtual columns - Layouts",
     "template": "Templates",
     "templateversion": "Templates - Versions",
     "user": "Users",
@@ -954,5 +955,18 @@
     "template": "Template",
     "templates": "Mapped templates",
     "visibility": "Visibility"
+  },
+  "columnlayout": {
+    "columnshelp": "{count} displayed columns will be saved:",
+    "delete": "Delete the layout",
+    "edit": "Edit the layout",
+    "editlayout": "Edit the layout",
+    "layout": "Layout",
+    "name": "Layout name",
+    "nameplaceholder": "e.g. Support view",
+    "none": "No layout",
+    "save": "Save the layout",
+    "saveas": "Save as new layout",
+    "savelayout": "Save the layout"
   }
 }
