@@ -956,6 +956,15 @@
     "templates": "Mapped templates",
     "visibility": "Visibility"
   },
+  "columns": {
+    "help": "Tick the columns to show, drag them by their handle to reorder.",
+    "move": "Drag to move",
+    "reset": "Reset",
+    "resetdefault": "Back to the default columns",
+    "resetlayout": "Discard the changes made to the layout",
+    "showall": "Show all",
+    "shown": "{shown} of {total} shown"
+  },
   "columnlayout": {
     "columnshelp": "{count} displayed columns will be saved:",
     "delete": "Delete the layout",

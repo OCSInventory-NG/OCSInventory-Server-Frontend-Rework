@@ -956,6 +956,15 @@
     "templates": "Templates couverts",
     "visibility": "Visibilité"
   },
+  "columns": {
+    "help": "Cochez les colonnes à afficher, faites-les glisser par leur poignée pour les réordonner.",
+    "move": "Glisser pour déplacer",
+    "reset": "Réinitialiser",
+    "resetdefault": "Revenir aux colonnes par défaut",
+    "resetlayout": "Annuler les modifications apportées au layout",
+    "showall": "Tout afficher",
+    "shown": "{shown} sur {total} affichées"
+  },
   "columnlayout": {
     "columnshelp": "{count} colonnes affichées seront enregistrées :",
     "delete": "Supprimer le layout",

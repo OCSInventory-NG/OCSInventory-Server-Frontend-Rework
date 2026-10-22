@@ -119,35 +119,77 @@
 
 				<!-- Show/Hide columns -->
 				<b-button-group v-if="canshowhide || canaddvirtualcol">
+					<!-- stays open on a click inside, several columns are often changed in a row -->
 					<b-dropdown
 						v-if="canshowhide"
-						:text="$t('generic.show_hide')"
 						variant="bg-light"
+						auto-close="outside"
+						menu-class="columns-menu"
 						:class="['datatable-btn', { 'has-secondary-action': canaddvirtualcol }]"
 					>
-						<b-dropdown-item
-							v-for="field in fields" 
-							:key="field.key"
-							v-model="field.visible"
-							:active="!field.visible"
-							:disabled="field.disabled || field.key === 'name'"
-							class="visible-select"
-							@click="toggleFieldVisibility(field)"
+						<template #button-content>
+							<font-awesome-icon
+								:icon="['fas', 'table-columns']"
+								class="me-1"
+							/>
+							{{ $t('generic.show_hide') }}
+						</template>
+
+						<div class="columns-menu-header">
+							<span class="columns-menu-count">
+								{{ $t('columns.shown', { shown: shownColumnsCount, total: orderableFields.length }) }}
+							</span>
+							<button
+								type="button"
+								class="btn btn-link btn-sm"
+								:disabled="shownColumnsCount === orderableFields.length"
+								@click="showAllFields()"
+							>
+								{{ $t('columns.showall') }}
+							</button>
+							<button
+								type="button"
+								class="btn btn-link btn-sm"
+								:title="layoutcolumns ? $t('columns.resetlayout') : $t('columns.resetdefault')"
+								@click="resetFields()"
+							>
+								{{ $t('columns.reset') }}
+							</button>
+						</div>
+						<p class="columns-menu-help">
+							{{ $t('columns.help') }}
+						</p>
+
+						<VueDraggable
+							v-model="orderableFields"
+							item-key="key"
+							tag="ul"
+							handle=".columns-menu-handle"
+							class="columns-menu-list"
+							ghost-class="columns-menu-ghost"
+							:animation="150"
 						>
-							<b-col>
-								<label v-if="fieldlabels[field.key]">{{ fieldlabels[field.key] }}</label>
-								<label v-else-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
-								<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
-								<label v-else>{{ field.key }}</label>
-							</b-col>
-							<b-col align="right">
-								<font-awesome-icon
-									v-if="!field.visible"
-									:icon="['fas', 'eye-slash']"
-									class="mr-3"
-								/>
-							</b-col>
-						</b-dropdown-item>
+							<template #item="{ element: field }">
+								<li :class="['columns-menu-item', { 'is-hidden': !field.visible }]">
+									<span
+										class="columns-menu-handle"
+										:title="$t('columns.move')"
+									>
+										<font-awesome-icon :icon="['fas', 'grip-vertical']" />
+									</span>
+									<label class="form-check mb-0">
+										<input
+											type="checkbox"
+											class="form-check-input"
+											:checked="field.visible"
+											:disabled="field.disabled || field.key === 'name'"
+											@change="toggleFieldVisibility(field)"
+										>
+										<span class="form-check-label">{{ fieldLabel(field.key) }}</span>
+									</label>
+								</li>
+							</template>
+						</VueDraggable>
 					</b-dropdown>
 
 					<VirtualColModal
@@ -650,9 +692,12 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
+// "draggable" would resolve to the rules table of components/Draggable
+import VueDraggable from "vuedraggable"
 
 export default {
 	name: 'Datatable',
+	components: { VueDraggable },
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: [Array, Object], default: () => [] },
@@ -829,6 +874,23 @@ export default {
 				return false
 			}
 			return hasPermission("virtualcolumn_view_columnlayout")
+		},
+		// the columns the user can move and hide, the checkbox and actions stay put
+		orderableFields: {
+			get() {
+				return this.fields.filter(field => field.key !== 'selected' && field.key !== 'actions')
+			},
+			set(list) {
+				this.fields = [
+					...this.fields.filter(field => field.key === 'selected'),
+					...list,
+					...this.fields.filter(field => field.key === 'actions'),
+				]
+				this.storeFields()
+			},
+		},
+		shownColumnsCount() {
+			return this.orderableFields.filter(field => field.visible).length
 		},
 		layoutColumns() {
 			return this.fields
@@ -1056,7 +1118,9 @@ export default {
 				const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
 				orderedFields.push(...specialFields)
 
-				this.rowheader.forEach(key => {
+				// the order chosen by the user, the new columns at the end
+				const stored = JSON.parse(localStorage.getItem(key)).map(field => field.key)
+				this.orderKeys(stored).forEach(key => {
 					const field = this.fields.find(f => f.key === key)
 					if (field) {
 						orderedFields.push(field)
@@ -1113,19 +1177,47 @@ export default {
 
 		fieldLabel(key) {
 			if (this.fieldlabels[key]) return this.fieldlabels[key]
-			return (this.$te(this.translationkey+key)) ? this.$t(this.translationkey+key) : key
+			if (this.$te(this.translationkey+key)) return this.$t(this.translationkey+key)
+			return (this.$te('generic.'+key)) ? this.$t('generic.'+key) : key
 		},
 
 		toggleFieldVisibility(field) {
 			if (field.key === "name") return
 
 			field.visible = !field.visible
-			// a change made on a layout waits for its save button
+			this.storeFields()
+		},
+
+		// a change made on a layout waits for its save button
+		storeFields() {
 			if (this.layoutcolumns) return
 			localStorage.setItem(
 				this.title + "_" + this.templateid,
 				JSON.stringify(this.fields)
 			)
+		},
+
+		showAllFields() {
+			this.orderableFields.forEach(field => {
+				field.visible = true
+			})
+			this.storeFields()
+		},
+
+		// on a layout, drop the unsaved changes; otherwise back to the table defaults
+		resetFields() {
+			if (this.layoutcolumns) {
+				this.applyLayout(this.layoutcolumns)
+				return
+			}
+			localStorage.removeItem(this.title + "_" + this.templateid)
+			this.applyLayout(null)
+		},
+
+		// keys still in rowheader keep their stored order, the new ones follow
+		orderKeys(stored) {
+			const kept = stored.filter(key => this.rowheader.includes(key))
+			return [...kept, ...this.rowheader.filter(key => !kept.includes(key))]
 		},
 
 		// null goes back to the show/hide choices kept in local storage, a key
@@ -1140,9 +1232,7 @@ export default {
 			}
 
 			// the layout columns first in their saved order, then the hidden ones
-			const order = columns
-				? [...columns, ...this.rowheader.filter(key => !columns.includes(key))]
-				: this.rowheader
+			const order = this.orderKeys(columns || stored.map(item => item.key))
 			this.fields = [
 				...this.fields.filter(field => field.key === 'selected'),
 				...order.map(key => this.fields.find(field => field.key === key)).filter(Boolean),
