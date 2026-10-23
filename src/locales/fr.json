@@ -596,6 +596,7 @@
     "snmpscanner": "SNMP - Scanners",
     "softwaredictionary": "Logiciels",
     "softwaremapping": "Logiciels - Mapping",
+    "columnlayout": "Colonnes virtuelles - Layouts",
     "template": "Modèles",
     "templateversion": "Modèles - Versions",
     "user": "Utilisateurs",
@@ -954,5 +955,26 @@
     "template": "Template",
     "templates": "Templates couverts",
     "visibility": "Visibilité"
+  },
+  "columns": {
+    "move": "Glisser pour déplacer",
+    "reset": "Réinitialiser",
+    "resetdefault": "Revenir aux colonnes par défaut",
+    "resetlayout": "Annuler les modifications apportées au layout",
+    "showall": "Tout afficher",
+    "shown": "{shown} sur {total} affichées"
+  },
+  "columnlayout": {
+    "columnshelp": "{count} colonnes affichées seront enregistrées :",
+    "delete": "Supprimer le layout",
+    "edit": "Modifier le layout",
+    "editlayout": "Modifier le layout",
+    "layout": "Layout",
+    "name": "Nom du layout",
+    "nameplaceholder": "ex. Vue support",
+    "none": "Aucun layout",
+    "save": "Sauvegarder le layout",
+    "saveas": "Sauvegarder en tant que nouveau layout",
+    "savelayout": "Sauvegarder le layout"
   }
 }

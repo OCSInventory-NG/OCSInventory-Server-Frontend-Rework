@@ -96,10 +96,106 @@ tbody, td, tfoot, th, thead, tr {
   }
 }
 
-.visible-select > .dropdown-item.active, .visible-select > .dropdown-item:active {
-  background-color: rgba(253, 126, 20, .2);
-  color: #fd7e14;
-  font-weight: bold;
+// Show / Hide menu: a checkbox per column, dragged by its handle
+.columns-menu {
+  max-height: 70vh;
+  min-width: 280px;
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.columns-menu-header {
+  align-items: center;
+  background-color: $white;
+  border-bottom: 1px solid $gray-200;
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .columns-menu-count {
+    color: $gray-600;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  // the navbar turns every .btn-link white on hover
+  .btn-link {
+    color: $gray-700;
+    padding: 0 4px;
+    text-decoration: none;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      color: $gray-900;
+      text-decoration: underline;
+    }
+  }
+}
+
+.columns-menu-help {
+  color: $gray-600;
+  font-size: .75rem;
+  margin: 0;
+  padding: 6px 12px 2px;
+}
+
+.columns-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.columns-menu-item {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  padding: 3px 12px 3px 6px;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  .form-check {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    padding-left: 0;
+  }
+
+  .form-check-input {
+    float: none;
+    margin: 0;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  // a hidden column stays in the list, only fainter
+  &.is-hidden .form-check-label {
+    color: $gray-500;
+  }
+}
+
+.columns-menu-handle {
+  color: $gray-400;
+  cursor: grab;
+  padding: 0 4px;
+
+  &:hover {
+    color: $gray-700;
+  }
+}
+
+.columns-menu-ghost {
+  background-color: $gray-200;
+  opacity: .6;
 }
 
 .datatable-custom .datatable-table-wrapper {
@@ -188,5 +284,118 @@ tbody, td, tfoot, th, thead, tr {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+// ===========================================
+//  DATATABLE TOOLBAR
+// ===========================================
+
+// one line, the groups only wrap when the room runs out
+.datatable-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.datatable-toolbar .toolbar-group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.datatable-toolbar .toolbar-start {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.datatable-toolbar .toolbar-end {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.datatable-toolbar .toolbar-search {
+  flex: 0 1 280px;
+  min-width: 180px;
+}
+
+.datatable-toolbar .toolbar-count {
+  color: $gray-600;
+  white-space: nowrap;
+}
+
+// the gaps space the controls, not their own margins
+.datatable-toolbar .datatable-btn,
+.datatable-toolbar .datatable-btn .dropdown-toggle {
+  height: 36px;
+  margin: 0;
+}
+
+// icon buttons are square
+.datatable-toolbar .form-control.datatable-btn,
+.datatable-toolbar .datatable-btn-icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  max-width: none;
+  padding: 0;
+  width: 36px;
+}
+
+.datatable-toolbar .btn.datatable-btn:not(.btn-teal),
+.datatable-toolbar .datatable-btn .dropdown-toggle {
+  background-color: $white;
+  color: $gray-700;
+}
+
+.datatable-toolbar .btn.datatable-btn:not(.btn-teal):hover:not(:disabled),
+.datatable-toolbar .datatable-btn .dropdown-toggle:hover {
+  background-color: $gray-100;
+  color: $gray-900;
+}
+
+.datatable-toolbar #per-page-select {
+  width: 80px;
+}
+
+// vue-select draws its own toggle, line it up on the buttons
+.datatable-toolbar .v-select .vs__dropdown-toggle {
+  align-items: center;
+  background-color: $white;
+  height: 36px;
+  padding: 0 4px 0 0;
+}
+
+.datatable-toolbar .v-select .vs__selected-options {
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0 8px;
+}
+
+.datatable-toolbar .v-select .vs__selected,
+.datatable-toolbar .v-select .vs__search {
+  margin: 0;
+  padding: 0;
+}
+
+.datatable-toolbar .v-select .vs__open-indicator {
+  transform: scale(0.7);
+}
+
+.datatable-toolbar .v-select.vs--open .vs__open-indicator {
+  transform: rotate(180deg) scale(0.7);
+}
+
+@media (max-width: 767.98px) {
+  .datatable-toolbar .toolbar-search {
+    flex-basis: 100%;
+  }
+
+  .datatable-toolbar .toolbar-end {
+    justify-content: flex-start;
+    margin-left: 0;
   }
 }

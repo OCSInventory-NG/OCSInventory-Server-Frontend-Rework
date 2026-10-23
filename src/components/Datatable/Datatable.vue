@@ -4,10 +4,10 @@
 		class="datatable-custom"
 	>
 		<!-- Header datatable -->
-		<div class="header-table">
-			<div class="row responsive">
-				<!-- Search bar -->
-				<div class="input-icon col">
+		<div class="header-table datatable-toolbar">
+			<!-- Search and actions on the selection -->
+			<div class="toolbar-group toolbar-start">
+				<div class="input-icon toolbar-search">
 					<b-form-input 
 						id="filter-input" 
 						v-model="filter"
@@ -23,196 +23,190 @@
 				</div>
 
 				<!-- Reload datatable -->
-				<div
+				<button 
 					v-if="canrefresh"
-					class="col-1 ocs-col-datatable" 
+					:title="$t('generic.reload')"
+					class="form-control btn datatable-btn"
+					@click="reloadDatatable"
 				>
-					<b-button-group class="mr-1">
-						<button 
-							:title="$t('generic.reload')"
-							class="form-control btn datatable-btn"
-							@click="reloadDatatable"
-						>
-							<font-awesome-icon 
-								:icon="['fas', 'arrows-rotate']"
-								:class="{ 'loading': isReloading }"
-							/>
-						</button>
-					</b-button-group>
-				</div>
+					<font-awesome-icon 
+						:icon="['fas', 'arrows-rotate']"
+						:class="{ 'loading': isReloading }"
+					/>
+				</button>
 
 				<!-- Export Excel -->
-				<div
+				<ExportModal
 					v-if="canexport"
-					class="col-1 ocs-col-datatable" 
-				>
-					<b-button-group class="mr-1">
-						<ExportModal
-							:server-side="serverSide"
-							:total-rows="totalRows"
-							:page-length="pageRows.length"
-							:selection-length="selectionLength"
-							@confirm="onExportConfirm"
-						/>
-					</b-button-group>
-				</div>
+					:server-side="serverSide"
+					:total-rows="totalRows"
+					:page-length="pageRows.length"
+					:selection-length="selectionLength"
+					@confirm="onExportConfirm"
+				/>
 
 				<!-- Import template -->
-				<div
+				<ImportTemplateModal
 					v-if="importtemplate"
-					class="col-1 ocs-col-datatable"
-				>
-					<ImportTemplateModal
-						@reload-datatable="reloadDatatable"
-					/>
-				</div>
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Export template -->
-				<div
+				<ExportTemplateModal
 					v-if="exporttemplate"
-					class="col-1 ocs-col-datatable"
-				>
-					<ExportTemplateModal
-						:ids="selectedids"
-					/>
-				</div>
+					:ids="selectedids"
+				/>
 
 				<!-- Duplicate item -->
-				<div
+				<DuplicateModal
 					v-if="duplicateitem"
-					class="col-1 ocs-col-datatable"
-				>
-					<DuplicateModal
-						:route="title"
-						:title="titlevalue"
-						@reload-datatable="reloadDatatable"
-					/>
-				</div>
+					:route="title"
+					:title="titlevalue"
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Attribute package -->
-				<div
+				<PackageResultModal
 					v-if="candeploy"
-					class="col-1 ocs-col-datatable"
-				>
-					<b-button-group class="mr-1">
-						<PackageResultModal
-							:items="(multisearch && selected.length == 0) ? rowdata : selected"
-						/>
-					</b-button-group>
-				</div>
+					:items="(multisearch && selected.length == 0) ? rowdata : selected"
+				/>
 
 				<!-- Mass processing -->
-				<div
+				<MassProcessingModal
 					v-if="canmassprocessing"
-					class="col-1 ocs-col-datatable"
-				>
-					<b-button-group class="mr-1">
-						<MassProcessingModal
-							:items="(multisearch && selected.length == 0) ? rowdata : selected"
-							:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
-							@reload-datatable="reloadDatatable"
-						/>
-					</b-button-group>
-				</div>
+					:items="(multisearch && selected.length == 0) ? rowdata : selected"
+					:type="(title == 'netdevice') ? 'IPDISCOVER' : 'ASSET'"
+					@reload-datatable="reloadDatatable"
+				/>
 
 				<!-- Scheduler history -->
-				<div
+				<router-link 
 					v-if="viewautomationhistory"
-					class="col-1 ocs-col-datatable"
+					:to="'/configurations/automations/history'"
+					:title="$t('scheduler.see_history')"
+					class="btn datatable-btn datatable-btn-icon"
 				>
-					<router-link 
-						:to="'/configurations/automations/history'"
-						:title="$t('scheduler.see_history')"
-						class="btn datatable-btn mr-1"
-					>
-						<font-awesome-icon 
-							:icon="['far', 'file-lines']"
-						/>
-					</router-link>
-				</div>
-
-				<div
-					v-if="title == 'asset/bases' && !multisearch"
-					class="col-1"
-				>
-					<AssetGroupModal
-						:assetrow="selected"
-						:search="[]"
-						:datatable="true"
-						cssclass="datatable-btn"
+					<font-awesome-icon 
+						:icon="['far', 'file-lines']"
 					/>
-				</div>
+				</router-link>
+
+				<AssetGroupModal
+					v-if="title == 'asset/bases' && !multisearch"
+					:assetrow="selected"
+					:search="[]"
+					:datatable="true"
+					cssclass="datatable-btn"
+				/>
+			</div>
+
+			<!-- Total row number, inline when compact -->
+			<p
+				v-if="compactheader"
+				class="toolbar-count mb-0"
+			>
+				{{ totalRows }} {{ $t('generic.result') }}
+			</p>
+
+			<!-- How the table is displayed -->
+			<div class="toolbar-group toolbar-end">
+				<ColumnLayoutModal
+					v-if="canuselayout"
+					:target="layouttarget"
+					:columns="layoutColumns"
+					@apply-layout="applyLayout"
+				/>
 
 				<!-- Show/Hide columns -->
-				<div
-					v-if="canshowhide || canaddvirtualcol"
-					class="col"
-					align="right"
-				>
-					<b-button-group>
+				<b-button-group v-if="canshowhide || canaddvirtualcol">
+					<!-- stays open on a click inside, several columns are often changed in a row -->
 					<b-dropdown
 						v-if="canshowhide"
-						:text="$t('generic.show_hide')"
 						variant="bg-light"
+						auto-close="outside"
+						menu-class="columns-menu"
 						:class="['datatable-btn', { 'has-secondary-action': canaddvirtualcol }]"
 					>
-						<b-dropdown-item
-							v-for="field in fields" 
-							:key="field.key"
-							v-model="field.visible"
-							:active="!field.visible"
-							:disabled="field.disabled || field.key === 'name'"
-							class="visible-select"
-							@click="toggleFieldVisibility(field)"
+						<template #button-content>
+							<font-awesome-icon
+								:icon="['fas', 'table-columns']"
+								class="me-1"
+							/>
+							{{ $t('generic.show_hide') }}
+						</template>
+
+						<div class="columns-menu-header">
+							<span class="columns-menu-count">
+								{{ $t('columns.shown', { shown: shownColumnsCount, total: orderableFields.length }) }}
+							</span>
+							<button
+								type="button"
+								class="btn btn-link btn-sm"
+								:disabled="shownColumnsCount === orderableFields.length"
+								@click="showAllFields()"
+							>
+								{{ $t('columns.showall') }}
+							</button>
+							<button
+								type="button"
+								class="btn btn-link btn-sm"
+								:title="layoutcolumns ? $t('columns.resetlayout') : $t('columns.resetdefault')"
+								@click="resetFields()"
+							>
+								{{ $t('columns.reset') }}
+							</button>
+						</div>
+
+						<VueDraggable
+							v-model="orderableFields"
+							item-key="key"
+							tag="ul"
+							handle=".columns-menu-handle"
+							class="columns-menu-list"
+							ghost-class="columns-menu-ghost"
+							:animation="150"
 						>
-							<b-col>
-								<label v-if="fieldlabels[field.key]">{{ fieldlabels[field.key] }}</label>
-								<label v-else-if="$te(translationkey+field.key)">{{ $t(translationkey+field.key) }}</label>
-								<label v-else-if="$te('generic.'+field.key)">{{ $t('generic.'+field.key) }}</label>
-								<label v-else>{{ field.key }}</label>
-							</b-col>
-							<b-col align="right">
-								<font-awesome-icon
-									v-if="!field.visible"
-									:icon="['fas', 'eye-slash']"
-									class="mr-3"
-								/>
-							</b-col>
-						</b-dropdown-item>
+							<template #item="{ element: field }">
+								<li :class="['columns-menu-item', { 'is-hidden': !field.visible }]">
+									<span
+										class="columns-menu-handle"
+										:title="$t('columns.move')"
+									>
+										<font-awesome-icon :icon="['fas', 'grip-vertical']" />
+									</span>
+									<label class="form-check mb-0">
+										<input
+											type="checkbox"
+											class="form-check-input"
+											:checked="field.visible"
+											:disabled="field.disabled || field.key === 'name'"
+											@change="toggleFieldVisibility(field)"
+										>
+										<span class="form-check-label">{{ fieldLabel(field.key) }}</span>
+									</label>
+								</li>
+							</template>
+						</VueDraggable>
 					</b-dropdown>
 
-						<VirtualColModal
-							v-if="canaddvirtualcol"
-							:target="virtualcoltarget"
-							@reload-datatable="reloadDatatable"
-						/>
-					</b-button-group>
-				</div>
-
-				<!-- Total row number, inline when compact -->
-				<div
-					v-if="compactheader"
-					class="col d-flex align-items-center justify-content-center"
-				>
-					<p class="mb-0">{{ totalRows }} {{ $t('generic.result') }}</p>
-				</div>
+					<VirtualColModal
+						v-if="canaddvirtualcol"
+						:target="virtualcoltarget"
+						@reload-datatable="reloadDatatable"
+					/>
+				</b-button-group>
 
 				<!-- Number per page-->
-				<div 
-					:class="compactheader ? 'col' : ((canshowhide) ? 'col-1' : 'col-2')" 
-					align="right"
-				>
-					<v-select
-						id="per-page-select"
-						v-model="perPage"
-						:options="pageOptions"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="datatable-btn"
-						@option:selected="updateRowPage()"
-					/>
-				</div>
+				<v-select
+					id="per-page-select"
+					v-model="perPage"
+					:options="pageOptions"
+					:reduce="text => text.value"
+					:clearable="false"
+					label="text"
+					class="datatable-btn"
+					@option:selected="updateRowPage()"
+				/>
 			</div>
 		</div>
 
@@ -695,9 +689,12 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
+// "draggable" would resolve to the rules table of components/Draggable
+import VueDraggable from "vuedraggable"
 
 export default {
 	name: 'Datatable',
+	components: { VueDraggable },
 	props: {
 		title: { type: String, default: '' },
 		rowdata: { type: [Array, Object], default: () => [] },
@@ -749,6 +746,8 @@ export default {
 		compactheader: { type: Boolean, default: false },
 		// table listed here, when it accepts virtual columns
 		virtualcoltarget: { type: String, default: null },
+		// table listed here, when its show/hide choices can be saved as layouts
+		layouttarget: { type: String, default: null },
 		// labels of the columns whose key is no translation key
 		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group
@@ -812,6 +811,8 @@ export default {
 			],
 			// Reload parameter
 			isReloading: false,
+			// columns of the active layout, null for the user's own choices
+			layoutcolumns: null,
 			stickyHeaderActive: false,
 			stickyHeaderRaf: null,
 		};
@@ -864,6 +865,34 @@ export default {
 				return false
 			}
 			return hasPermission("virtualcolumn_add_virtualcol")
+		},
+		canuselayout() {
+			if (!this.layouttarget || !this.canshowhide) {
+				return false
+			}
+			return hasPermission("virtualcolumn_view_columnlayout")
+		},
+		// the columns the user can move and hide, the checkbox and actions stay put
+		orderableFields: {
+			get() {
+				return this.fields.filter(field => field.key !== 'selected' && field.key !== 'actions')
+			},
+			set(list) {
+				this.fields = [
+					...this.fields.filter(field => field.key === 'selected'),
+					...list,
+					...this.fields.filter(field => field.key === 'actions'),
+				]
+				this.storeFields()
+			},
+		},
+		shownColumnsCount() {
+			return this.orderableFields.filter(field => field.visible).length
+		},
+		layoutColumns() {
+			return this.fields
+				.filter(field => field.key !== 'selected' && field.key !== 'actions')
+				.map(field => ({ key: field.key, label: field.label, visible: field.visible }))
 		},
 	},
 	watch: {
@@ -961,6 +990,10 @@ export default {
 		rowheader() {
 			this.buildFields()
 			this.syncActionsField()
+			// a column added meanwhile is shown, unless the layout lists it
+			if (this.layoutcolumns) {
+				this.applyLayout(this.layoutcolumns)
+			}
 		},
 		// a renamed virtual column keeps its key
 		fieldlabels() {
@@ -1082,7 +1115,9 @@ export default {
 				const specialFields = this.fields.filter(field => field.key === 'selected' || field.key === 'actions')
 				orderedFields.push(...specialFields)
 
-				this.rowheader.forEach(key => {
+				// the order chosen by the user, the new columns at the end
+				const stored = JSON.parse(localStorage.getItem(key)).map(field => field.key)
+				this.orderKeys(stored).forEach(key => {
 					const field = this.fields.find(f => f.key === key)
 					if (field) {
 						orderedFields.push(field)
@@ -1093,9 +1128,11 @@ export default {
 				this.fields = orderedFields
 				this.json_fields = orderedJsonFields
 
-				// Update local storage key
-				localStorage.removeItem(key)
-				localStorage.setItem(key, JSON.stringify(this.fields))
+				// Update local storage key, unless the fields carry a layout
+				if (!this.layoutcolumns) {
+					localStorage.removeItem(key)
+					localStorage.setItem(key, JSON.stringify(this.fields))
+				}
 			} else {
 				Object.values(this.rowheader).forEach( data => {
 					var visible = true
@@ -1137,17 +1174,79 @@ export default {
 
 		fieldLabel(key) {
 			if (this.fieldlabels[key]) return this.fieldlabels[key]
-			return (this.$te(this.translationkey+key)) ? this.$t(this.translationkey+key) : key
+			if (this.$te(this.translationkey+key)) return this.$t(this.translationkey+key)
+			return (this.$te('generic.'+key)) ? this.$t('generic.'+key) : key
 		},
 
 		toggleFieldVisibility(field) {
 			if (field.key === "name") return
 
 			field.visible = !field.visible
+			this.storeFields()
+		},
+
+		// a change made on a layout waits for its save button
+		storeFields() {
+			if (this.layoutcolumns) return
 			localStorage.setItem(
 				this.title + "_" + this.templateid,
 				JSON.stringify(this.fields)
 			)
+		},
+
+		showAllFields() {
+			this.orderableFields.forEach(field => {
+				field.visible = true
+			})
+			this.storeFields()
+		},
+
+		// on a layout, drop the unsaved changes; otherwise back to the table defaults
+		resetFields() {
+			if (this.layoutcolumns) {
+				this.applyLayout(this.layoutcolumns)
+				return
+			}
+			localStorage.removeItem(this.title + "_" + this.templateid)
+			this.applyLayout(null)
+		},
+
+		// keys still in rowheader keep their stored order, the new ones follow
+		orderKeys(stored) {
+			const kept = stored.filter(key => this.rowheader.includes(key))
+			return [...kept, ...this.rowheader.filter(key => !kept.includes(key))]
+		},
+
+		// null goes back to the show/hide choices kept in local storage, a key
+		// matching no column (removed, or a virtual column not shared) is skipped
+		applyLayout(columns) {
+			this.layoutcolumns = columns
+
+			let stored = []
+			if (!columns) {
+				const saved = localStorage.getItem(this.title + "_" + this.templateid)
+				stored = saved ? JSON.parse(saved) : []
+			}
+
+			// the layout columns first in their saved order, then the hidden ones
+			const order = this.orderKeys(columns || stored.map(item => item.key))
+			this.fields = [
+				...this.fields.filter(field => field.key === 'selected'),
+				...order.map(key => this.fields.find(field => field.key === key)).filter(Boolean),
+				...this.fields.filter(field => field.key === 'actions'),
+			]
+
+			this.fields.forEach(field => {
+				if (field.disabled || field.key === 'name') return
+				if (columns) {
+					field.visible = columns.includes(field.key)
+					return
+				}
+				const previous = stored.find(item => item.key === field.key)
+				field.visible = previous
+					? previous.visible
+					: !(this.hiddenfields && this.hiddenfields.includes(field.key))
+			})
 		},
 		syncActionsField() {
 			this.fields = this.fields.filter(field => field.key !== 'actions')
