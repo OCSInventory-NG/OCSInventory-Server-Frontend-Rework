@@ -957,7 +957,6 @@
     "visibility": "Visibility"
   },
   "columns": {
-    "help": "Tick the columns to show, drag them by their handle to reorder.",
     "move": "Drag to move",
     "reset": "Reset",
     "resetdefault": "Back to the default columns",

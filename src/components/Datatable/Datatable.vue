@@ -156,9 +156,6 @@
 								{{ $t('columns.reset') }}
 							</button>
 						</div>
-						<p class="columns-menu-help">
-							{{ $t('columns.help') }}
-						</p>
 
 						<VueDraggable
 							v-model="orderableFields"

@@ -957,7 +957,6 @@
     "visibility": "Visibilité"
   },
   "columns": {
-    "help": "Cochez les colonnes à afficher, faites-les glisser par leur poignée pour les réordonner.",
     "move": "Glisser pour déplacer",
     "reset": "Réinitialiser",
     "resetdefault": "Revenir aux colonnes par défaut",
