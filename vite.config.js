@@ -13,8 +13,10 @@ export default defineConfig({
 	// to serve the app under a sub-path behind a reverse proxy.
 	base: process.env.VITE_BASE_PATH || '/',
 	define: {
-		// Set to the release tag by .github/workflows/release.yml
-		__APP_VERSION__: JSON.stringify(process.env.APP_VERSION || 'dev'),
+		__APP_VERSION__: JSON.stringify(pkg.version || 'dev'),
+		// vue-i18n 9 needs this to read the messages precompiled by
+		// @intlify/unplugin-vue-i18n, which no longer sets it
+		__INTLIFY_JIT_COMPILATION__: true,
 	},
 	server: {
 		host: '0.0.0.0',
@@ -32,6 +34,8 @@ export default defineConfig({
 		}),
 		Components({
 			resolvers: [BootstrapVueNextResolver()],
+			// JS project: don't generate components.d.ts
+			dts: false,
 		}),
 	],
 	resolve: {
