@@ -88,6 +88,8 @@
 </template>
 
 <script>
+import { supportedLocales } from "@/i18n"
+
 export default {
 	name: "Login",
 	data() {
@@ -99,11 +101,7 @@ export default {
 			redirect_url: null,
 			username: null,
 			password: null,
-			langs: [
-				{ value: 'fr', text: 'Français' },
-				{ value: 'en', text: 'English' },
-				{ value: 'cs', text: 'Čeština' },
-			],
+			langs: supportedLocales,
 
 			loading: false,
 		}
