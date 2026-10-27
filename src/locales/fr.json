@@ -969,10 +969,9 @@
     "delete": "Supprimer le layout",
     "edit": "Modifier le layout",
     "editlayout": "Modifier le layout",
-    "layout": "Layout",
     "name": "Nom du layout",
     "nameplaceholder": "ex. Vue support",
-    "none": "Aucun layout",
+    "none": "Vue par défaut",
     "save": "Sauvegarder le layout",
     "saveas": "Sauvegarder en tant que nouveau layout",
     "savelayout": "Sauvegarder le layout"

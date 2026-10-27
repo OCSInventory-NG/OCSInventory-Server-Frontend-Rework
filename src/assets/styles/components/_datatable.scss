@@ -381,6 +381,18 @@ tbody, td, tfoot, th, thead, tr {
   padding: 0;
 }
 
+// same hover as the buttons, the global vue-select rules set both !important
+.datatable-toolbar .v-select:hover .vs__dropdown-toggle {
+  background: $gray-100 !important;
+  border-color: var(--tblr-border-active-color) !important;
+}
+
+// lists to pick from, not fields to type in
+.datatable-toolbar .v-select .vs__dropdown-toggle,
+.datatable-toolbar .v-select .vs__search {
+  cursor: pointer;
+}
+
 .datatable-toolbar .v-select .vs__open-indicator {
   transform: scale(0.7);
 }

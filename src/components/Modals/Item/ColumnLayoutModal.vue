@@ -1,64 +1,62 @@
 <template>
-	<div
-		id="columnlayout-modal"
-		:class="{ 'has-layout': activelayout }"
-	>
-		<span class="columnlayout-label">{{ $t('columnlayout.layout') }}</span>
-
-		<v-select
-			id="columnlayout-select"
-			v-model="activeid"
-			:options="layoutoptions"
-			:reduce="text => text.value"
-			:clearable="false"
-			label="text"
-			@option:selected="onSelect()"
-		/>
-
-		<!-- Save the displayed columns into the active layout -->
-		<button
-			v-if="cansave"
-			:title="$t('columnlayout.save')"
-			class="btn datatable-btn columnlayout-btn"
-			:disabled="!isdirty || loadingsave"
-			@click="saveColumns()"
-		>
-			<b-spinner
-				v-if="loadingsave"
-				small
+	<div id="columnlayout-modal">
+		<!-- the actions hang on the picker, they act on the layout it shows -->
+		<div class="columnlayout-group">
+			<v-select
+				id="columnlayout-select"
+				v-model="activeid"
+				:options="layoutoptions"
+				:reduce="text => text.value"
+				:clearable="false"
+				label="text"
+				@option:selected="onSelect()"
 			/>
-			<font-awesome-icon
-				v-else
-				:icon="['far', 'floppy-disk']"
-			/>
-		</button>
 
-		<button
-			v-if="cansaveas"
-			:title="$t('columnlayout.saveas')"
-			class="btn datatable-btn columnlayout-btn"
-			@click="openForm(false)"
-		>
-			<font-awesome-icon :icon="['fas', 'file-circle-plus']" />
-		</button>
+			<!-- Save the displayed columns into the active layout -->
+			<button
+				v-if="cansave"
+				:title="$t('columnlayout.save')"
+				class="btn datatable-btn columnlayout-btn"
+				:disabled="!isdirty || loadingsave"
+				@click="saveColumns()"
+			>
+				<b-spinner
+					v-if="loadingsave"
+					small
+				/>
+				<font-awesome-icon
+					v-else
+					:icon="['far', 'floppy-disk']"
+				/>
+			</button>
 
-		<button
-			v-if="canmodify"
-			:title="$t('columnlayout.edit')"
-			class="btn datatable-btn columnlayout-btn"
-			@click="openForm(true)"
-		>
-			<font-awesome-icon :icon="['fas', 'pencil']" />
-		</button>
+			<button
+				v-if="cansaveas"
+				:title="$t('columnlayout.saveas')"
+				class="btn datatable-btn columnlayout-btn"
+				@click="openForm(false)"
+			>
+				<font-awesome-icon :icon="['fas', 'file-circle-plus']" />
+			</button>
 
-		<button
-			v-if="candelete"
-			:title="$t('columnlayout.delete')"
-			class="btn datatable-btn columnlayout-btn text-danger"
-			@click="openDelete()"
-		>
-			<font-awesome-icon :icon="['fas', 'trash-can']" />
-		</button>
+			<button
+				v-if="canmodify"
+				:title="$t('columnlayout.edit')"
+				class="btn datatable-btn columnlayout-btn"
+				@click="openForm(true)"
+			>
+				<font-awesome-icon :icon="['fas', 'pencil']" />
+			</button>
+
+			<button
+				v-if="candelete"
+				:title="$t('columnlayout.delete')"
+				class="btn datatable-btn columnlayout-btn text-danger"
+				@click="openDelete()"
+			>
+				<font-awesome-icon :icon="['fas', 'trash-can']" />
+			</button>
+		</div>
 
 		<!-- Create / edit form -->
 		<b-modal

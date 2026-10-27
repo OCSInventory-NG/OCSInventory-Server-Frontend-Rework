@@ -9,14 +9,6 @@
   gap: 6px;
 }
 
-.columnlayout-label {
-  color: $gray-600;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 #columnlayout-select {
   min-width: 200px;
   text-align: left;
@@ -26,20 +18,48 @@
   white-space: nowrap;
 }
 
-// a list to pick from, not a field to type in
-#columnlayout-select .vs__dropdown-toggle,
-#columnlayout-select .vs__search {
-  cursor: pointer;
+// the picker and its buttons read as one control, like a button group
+.columnlayout-group {
+  display: flex;
 }
 
-// an active layout is told apart from the user's own choices
-#columnlayout-modal.has-layout #columnlayout-select .vs__dropdown-toggle {
-  border-color: $ocs-purple;
+.columnlayout-group > * + * {
+  margin-left: -1px;
 }
 
-#columnlayout-modal.has-layout #columnlayout-select .vs__selected {
-  color: $ocs-purple;
-  font-weight: 500;
+.columnlayout-group > :not(:last-child),
+.columnlayout-group > :not(:last-child) .vs__dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.columnlayout-group > :not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+// a translucent button lets the overlapping border of its neighbour show
+// through, which doubles it : fade the icon only
+.columnlayout-group > .btn:disabled {
+  border-color: var(--tblr-border-color);
+  opacity: 1;
+}
+
+.columnlayout-group > .btn:disabled > * {
+  opacity: 0.4;
+}
+
+// the next button covers the picker's right border, it takes the hover colour
+// in its place : a z-index would put the open menu under the table header
+.columnlayout-group > .v-select:hover + .btn {
+  border-left-color: var(--tblr-border-active-color);
+}
+
+// the hovered or focused button keeps its whole border over its neighbours
+.columnlayout-group > .btn:hover,
+.columnlayout-group > .btn:focus {
+  position: relative;
+  z-index: 1;
 }
 
 .columnlayout-btn {

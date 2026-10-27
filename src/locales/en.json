@@ -969,10 +969,9 @@
     "delete": "Delete the layout",
     "edit": "Edit the layout",
     "editlayout": "Edit the layout",
-    "layout": "Layout",
     "name": "Layout name",
     "nameplaceholder": "e.g. Support view",
-    "none": "No layout",
+    "none": "Default view",
     "save": "Save the layout",
     "saveas": "Save as new layout",
     "savelayout": "Save the layout"
