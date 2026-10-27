@@ -80,11 +80,12 @@
 										:view-only="viewOnly"
 										@reload-datatable="reloadDatatable"
 									/>
-									<DeleteItemModal 
+									<DeleteItemModal
 										v-if="candelete"
 										:id="element.id"
 										:name="element.name"
 										:parameter="apiroute"
+										:disabled="viewOnly"
 										@reload-datatable="reloadDatatable"
 									/>
 								</div>
