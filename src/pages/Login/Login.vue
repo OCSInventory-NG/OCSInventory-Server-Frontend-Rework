@@ -102,6 +102,7 @@ export default {
 			langs: [
 				{ value: 'fr', text: 'Français' },
 				{ value: 'en', text: 'English' },
+				{ value: 'cs', text: 'Čeština' },
 			],
 
 			loading: false,
