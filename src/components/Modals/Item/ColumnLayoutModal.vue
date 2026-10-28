@@ -267,7 +267,6 @@ export default {
 			activeid: NO_LAYOUT,
 
 			currentuserid: null,
-			currentusername: null,
 			currentusergroups: [],
 			groups: [],
 
@@ -298,15 +297,10 @@ export default {
 			return "columnlayout_" + this.target
 		},
 
-		// two authors may share a name, the author is only shown when they are mixed
 		layoutoptions() {
-			const mixed = new Set(this.layouts.map((layout) => layout.user)).size > 1
 			return [
 				{ value: NO_LAYOUT, text: this.$t("columnlayout.none") },
-				...this.layouts.map((layout) => ({
-					value: layout.id,
-					text: (mixed && layout.author) ? `${layout.name} (${layout.author})` : layout.name,
-				})),
+				...this.layouts.map((layout) => ({ value: layout.id, text: layout.name })),
 			]
 		},
 
@@ -407,26 +401,11 @@ export default {
 			return e?.message || String(e)
 		},
 
-		userName(user) {
-			return (user.first_name && user.first_name !== "")
-				? `${user.last_name} ${user.first_name}`
-				: user.username
-		},
-
-		// the list expands the author, a creation or an update answers with its id
-		normalizeLayout(layout, author = null) {
-			if (layout.user && typeof layout.user === "object") {
-				return { ...layout, user: layout.user.id, author: this.userName(layout.user) }
-			}
-			return { ...layout, author }
-		},
-
 		async getLayouts() {
 			try {
-				const data = await this.$api.generic.get(
-					"column_layouts/", {}, { target: this.target, ordering: "name", expand: "user" }
+				this.layouts = await this.$api.generic.get(
+					"column_layouts/", {}, { target: this.target, ordering: "name" }
 				)
-				this.layouts = data.map((layout) => this.normalizeLayout(layout))
 			} catch (e) {
 				this.layouts = []
 			}
@@ -436,11 +415,9 @@ export default {
 			try {
 				const account = await this.$api.generic.get("myaccount/")
 				this.currentuserid = account.id
-				this.currentusername = this.userName(account)
 				this.currentusergroups = account.groups || []
 			} catch (e) {
 				this.currentuserid = null
-				this.currentusername = null
 				this.currentusergroups = []
 			}
 		},
@@ -483,11 +460,10 @@ export default {
 					`column_layouts/${this.activelayout.id}/`,
 					{ columns: this.columnsToSave(this.activelayout) }
 				)
-				const layout = this.normalizeLayout(updated, this.activelayout.author)
-				this.replaceLayout(layout)
+				this.replaceLayout(updated)
 				// the table keeps the columns it was given, a reload would bring
 				// the previous ones back ; the server's list is the cleaned one
-				this.$emit("applyLayout", layout.columns || [])
+				this.$emit("applyLayout", updated.columns || [])
 			} catch (e) {
 				// reuse the form to report it, the toolbar has no room for an alert
 				this.editingid = this.activelayout.id
@@ -552,14 +528,14 @@ export default {
 					const updated = await this.$api.generic.patch(
 						`column_layouts/${this.editingid}/`, payload
 					)
-					this.replaceLayout(this.normalizeLayout(updated, this.activelayout.author))
+					this.replaceLayout(updated)
 				} else {
 					const created = await this.$api.generic.post("column_layouts/", {
 						...payload,
 						target: this.target,
 						columns: this.columnsToSave(null),
 					})
-					this.replaceLayout(this.normalizeLayout(created, this.currentusername))
+					this.replaceLayout(created)
 					this.activeid = created.id
 					this.onSelect()
 				}
