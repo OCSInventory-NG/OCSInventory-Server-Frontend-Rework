@@ -455,7 +455,7 @@ export default {
 			return this.hasdashboard
 				&& this.canedit
 				&& (
-					dashboard.user == this.userid
+					this.isOwner(dashboard)
 					|| (
 						dashboard.visibility === "private_group"
 						&& dashboard.allow_group_modification == true
@@ -467,7 +467,7 @@ export default {
 		canremove() {
 			return this.hasdashboard
 				&& this.candelete
-				&& this.activedashboard.user == this.userid
+				&& this.isOwner(this.activedashboard)
 		},
 	},
 	watch: {
@@ -757,6 +757,16 @@ export default {
 			)
 
 			this.addchartid = null
+		},
+
+		// a dashboard without author, or an account not loaded, belongs to nobody
+		isOwner(dashboard) {
+			const owner = (dashboard.user && typeof dashboard.user === "object")
+				? dashboard.user.id
+				: dashboard.user
+			return this.userid != null
+				&& owner != null
+				&& Number(owner) === Number(this.userid)
 		},
 
 		hasGroupAccess(groups = []) {

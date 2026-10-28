@@ -351,7 +351,7 @@ export default {
 		candelete() {
 			return !!this.activelayout
 				&& hasPermission("virtualcolumn_delete_columnlayout")
-				&& this.activelayout.user === this.currentuserid
+				&& this.isOwner(this.activelayout)
 		},
 	},
 
@@ -380,7 +380,7 @@ export default {
 	methods: {
 		// the author always may, a group member only when allowed to
 		canEdit(layout) {
-			if (layout.user === this.currentuserid) {
+			if (this.isOwner(layout)) {
 				return true
 			}
 			return layout.visibility === "private_group"
@@ -389,6 +389,13 @@ export default {
 		},
 
 		// a creation answers {error}, an update the DRF field errors, a refusal {detail}
+		// a layout without author, or an account not loaded, belongs to nobody
+		isOwner(layout) {
+			return this.currentuserid != null
+				&& layout.user != null
+				&& Number(layout.user) === Number(this.currentuserid)
+		},
+
 		_apiError(e) {
 			const data = e?.response?.data
 			if (data?.error) return data.error
@@ -476,7 +483,11 @@ export default {
 					`column_layouts/${this.activelayout.id}/`,
 					{ columns: this.columnsToSave(this.activelayout) }
 				)
-				this.replaceLayout(this.normalizeLayout(updated, this.activelayout.author))
+				const layout = this.normalizeLayout(updated, this.activelayout.author)
+				this.replaceLayout(layout)
+				// the table keeps the columns it was given, a reload would bring
+				// the previous ones back ; the server's list is the cleaned one
+				this.$emit("applyLayout", layout.columns || [])
 			} catch (e) {
 				// reuse the form to report it, the toolbar has no room for an alert
 				this.editingid = this.activelayout.id
