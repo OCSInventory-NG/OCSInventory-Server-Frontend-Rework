@@ -21,214 +21,128 @@
 					</div>
 
 					<div v-else>
-						<div 
-							class="col-auto ms-auto div-save-search"
-						>
-							<b-row>
-								<b-col 
-									v-if="layouts[activeLayout].id"
-									cols="2"
-								>
+						<div class="ocs-toolbar">
+							<!-- the actions hang on the picker, they act on the dashboard it shows -->
+							<div class="toolbar-group toolbar-start">
+								<div class="select-btn-group">
 									<v-select
-										v-model="activeLayout" 
-										:options="optlayouts" 
+										v-if="hasdashboard"
+										id="dashboard-select"
+										v-model="activeLayout"
+										:options="optlayouts"
 										:reduce="text => text.value"
 										:clearable="false"
-										label="text"
-										class="mb-3 ocs-select"
-									/>
-								</b-col>
-								<b-col cols="1">
-									<b-spinner 
-										v-if="loadingsave"
-										variant="success"
-									/>
-									<font-awesome-icon 
-										v-if="savewithsuccess"
-										:icon="['fas', 'check']"
-										color="green"
-									/>
-									<font-awesome-icon 
-										v-if="saveerror"
-										:icon="['fas', 'xmark']"
-										color="red"
-									/>
-									&nbsp;
-									<button 
-										v-if="canedit || canadd"
-										:title="$t('dashboard.editdashboardlayout')"
-										class="btn datatable-btn mr-1"
 										:disabled="edit"
-										@click="edit = !edit"
+										label="text"
+									/>
+
+									<!-- Save the arrangement of the charts -->
+									<button
+										v-if="cansave"
+										:title="$t('dashboard.save')"
+										class="btn datatable-btn toolbar-btn"
+										:disabled="!edit || loadingsave"
+										@click="saveDashboard()"
 									>
-										<font-awesome-icon 
-											:icon="['fas', 'pencil']"
+										<b-spinner
+											v-if="loadingsave"
+											small
+										/>
+										<font-awesome-icon
+											v-else
+											:icon="['far', 'floppy-disk']"
 										/>
 									</button>
-								</b-col>
-								<b-col v-if="edit">
+
+									<button
+										v-if="canadd"
+										:title="$t('dashboard.saveas')"
+										class="btn datatable-btn toolbar-btn"
+										@click="openForm(false)"
+									>
+										<font-awesome-icon :icon="['fas', 'file-circle-plus']" />
+									</button>
+
+									<button
+										v-if="cansave"
+										:title="$t('dashboard.edit')"
+										class="btn datatable-btn toolbar-btn"
+										:disabled="edit"
+										@click="openForm(true)"
+									>
+										<font-awesome-icon :icon="['fas', 'pencil']" />
+									</button>
+
+									<button
+										v-if="canremove"
+										:title="$t('dashboard.delete')"
+										class="btn datatable-btn toolbar-btn text-danger"
+										:disabled="edit"
+										@click="openDelete()"
+									>
+										<font-awesome-icon :icon="['fas', 'trash-can']" />
+									</button>
+								</div>
+							</div>
+
+							<!-- Rearrange the charts -->
+							<div class="toolbar-group toolbar-end">
+								<template v-if="edit">
 									<v-select
+										id="dashboard-chart-select"
 										v-model="addchartid"
 										:options="optcharts"
 										:reduce="text => text.value"
 										:clearable="false"
 										:placeholder="$t('dashboard.chartplaceholder')"
 										label="text"
-										class="mb-3 ocs-select"
 										@option:selected="addItem()"
 									/>
-								</b-col>
-								<b-col 
-									v-if="
-										layouts[activeLayout].id 
-											&& (
-												layouts[activeLayout].user == userid
-												|| (
-													hasGroupAccess(layouts[activeLayout].groups)
-													&& layouts[activeLayout].allow_group_modification == true
-												)
-											)
-									"
-									align="right"
+									<button
+										class="btn datatable-btn"
+										@click="reloadDashboard()"
+									>
+										<font-awesome-icon
+											:icon="['fas', 'xmark']"
+											class="me-1"
+										/>
+										{{ $t('generic.cancel') }}
+									</button>
+								</template>
+								<button
+									v-else-if="cansave || canadd"
+									class="btn datatable-btn"
+									@click="edit = true"
 								>
-									<b-row>
-										<b-col
-											align="right"
-										>
-											<DeleteItemModal
-												v-if="candelete"
-												:id="layouts[activeLayout].id"
-												:name="layouts[activeLayout].name"
-												customclass="datatable-btn mr-1"
-												parameter="dashboard/layout"
-												:disabled="edit"
-												@reload-dashboard="reloadDashboard"
-											/>
-										</b-col>
-									</b-row>
-								</b-col>
-							</b-row>
+									<font-awesome-icon
+										:icon="['fas', 'sliders']"
+										class="me-1"
+									/>
+									{{ $t('dashboard.customize') }}
+								</button>
+							</div>
 						</div>
+
+						<p
+							v-if="edit"
+							class="dashboard-hint"
+						>
+							<font-awesome-icon
+								:icon="['fas', 'circle-info']"
+								class="me-1"
+							/>
+							{{ $t('dashboard.customizehelp') }}
+						</p>
 
 						<div align="center">
 							<b-col cols="6">
 								<Alert 
-									v-if="!layouts[activeLayout].id && !edit"
+									v-if="!hasdashboard && !edit"
 									:message="$t('dashboard.nodashboard')"
 									:cols="true" 
 									variant="info"
 								/>
 							</b-col>
-						</div>
-
-						<div align="center">
-							<div 
-								v-if="edit"
-								class="multisearch-card col-6"
-							>
-								<b-row>
-									<b-col>
-										<b-form-group
-											:label="$t('search.name')" 
-											label-for="name"
-										>
-											<b-form-input
-												id="name"
-												v-model="emptylayout.name"
-												required
-											/>
-										</b-form-group>
-									</b-col>
-									<b-col>
-										<b-form-group
-											:label="$t('search.visibility')" 
-											label-for="visibility"
-										>
-											<v-select
-												id="visibility"
-												v-model="emptylayout.visibility" 
-												:options="optvisibility" 
-												:reduce="text => text.value"
-												:clearable="false"
-												label="text"
-												class="mb-3"
-											/>
-										</b-form-group>
-									</b-col>
-								</b-row>
-								<b-row v-if="emptylayout.visibility == 'private_group'">
-									<b-col>
-										<b-form-group
-											:label="$t('search.groups')" 
-											label-for="groups"
-										>
-											<v-select 
-												v-model="emptylayout.groups"
-												:options="groups"
-												:reduce="text => text.value"
-												label="text"
-												multiple
-											/>
-										</b-form-group>
-									</b-col>
-								</b-row>
-								<b-row v-if="emptylayout.visibility == 'private_group'">
-									<b-col>
-										<b-form-group
-											class="allow-group-modification"
-											:label="$t('search.allow_group_modification')" 
-											label-for="allow_group_modification"
-										>
-											<label class="form-check form-switch">
-												<input 
-													v-model="emptylayout.allow_group_modification"
-													class="form-check-input"
-													type="checkbox"
-												>
-											</label>
-										</b-form-group>
-									</b-col>
-								</b-row>
-								<b-row>
-									<b-col>
-										<b-button 
-											v-if="canadd"
-											type="submit"
-											variant="success"
-											@click="addDashboard()"
-										>
-											{{ $t('generic.saveas') }}
-										</b-button>
-										&nbsp;
-										<b-button
-											v-if="
-												canedit
-													&& layouts[activeLayout].id
-													&& (
-														layouts[activeLayout].user == userid
-														|| (
-															hasGroupAccess(layouts[activeLayout].groups)
-															&& layouts[activeLayout].allow_group_modification == true
-														)
-													)
-											"
-											type="submit"
-											variant="success"
-											@click="saveDashboard()"
-										>
-											{{ $t('generic.save') }}
-										</b-button>
-										&nbsp;
-										<b-button 
-											type="submit"
-											variant="danger"
-											@click="reloadDashboard()"
-										>
-											{{ $t('generic.cancel') }}
-										</b-button>
-									</b-col>
-								</b-row>
-							</div>
 						</div>
 
 						<div
@@ -295,6 +209,171 @@
 								/>
 							</GridItem>
 						</GridLayout>
+
+						<!-- Create / edit form -->
+						<b-modal
+							id="dashboardmodal"
+							v-model="formmodal"
+							hide-footer
+							modal-class="custom-modal"
+							size="lg"
+						>
+							<template #header="{ close }">
+								<h5 class="modal-title">
+									{{ editingid ? $t('dashboard.editdashboard') : $t('dashboard.savedashboard') }}
+									<b-spinner
+										v-if="loadingform"
+										variant="success"
+									/>
+								</h5>
+								<b-button
+									size="sm"
+									variant="outline-danger"
+									@click="close()"
+								>
+									<font-awesome-icon
+										:icon="['fas', 'xmark']"
+										size="1x"
+									/>
+								</b-button>
+							</template>
+
+							<div class="ocs-modal-form">
+								<Alert
+									v-if="formerror"
+									:message="formerrormsg"
+									variant="danger"
+								/>
+
+								<b-form @submit="onSubmit">
+									<b-row>
+										<b-col md="7">
+											<b-form-group
+												class="mb-2"
+												:label="$t('dashboard.name')"
+												label-for="dashboard-name"
+											>
+												<b-form-input
+													id="dashboard-name"
+													v-model="form.name"
+													:placeholder="$t('dashboard.nameplaceholder')"
+													required
+												/>
+											</b-form-group>
+										</b-col>
+										<b-col md="5">
+											<b-form-group
+												class="mb-2"
+												:label="$t('search.visibility')"
+												label-for="dashboard-visibility"
+											>
+												<v-select
+													id="dashboard-visibility"
+													v-model="form.visibility"
+													:options="optvisibility"
+													:reduce="text => text.value"
+													:clearable="false"
+													label="text"
+													class="ocs-select"
+												/>
+											</b-form-group>
+										</b-col>
+									</b-row>
+
+									<b-row v-if="form.visibility == 'private_group'">
+										<b-col md="7">
+											<b-form-group
+												class="mb-2"
+												:label="$t('search.groups')"
+												label-for="dashboard-groups"
+											>
+												<v-select
+													id="dashboard-groups"
+													v-model="form.groups"
+													:options="groups"
+													:reduce="text => text.value"
+													label="text"
+													class="ocs-select"
+													multiple
+												/>
+											</b-form-group>
+										</b-col>
+										<b-col md="5">
+											<b-form-group
+												class="mb-2"
+												:label="$t('search.allow_group_modification')"
+												label-for="dashboard-allow-group"
+											>
+												<label class="form-check form-switch">
+													<input
+														id="dashboard-allow-group"
+														v-model="form.allow_group_modification"
+														class="form-check-input"
+														type="checkbox"
+													>
+												</label>
+											</b-form-group>
+										</b-col>
+									</b-row>
+
+									<!-- an edit only renames or shares, the charts go through the save button -->
+									<p
+										v-if="!editingid"
+										class="text-muted mt-2 mb-0"
+									>
+										{{ $t('dashboard.chartshelp', { count: activedashboard.layout.length }) }}
+									</p>
+
+									<div class="text-center mt-3">
+										<b-button
+											type="submit"
+											variant="success"
+											:disabled="loadingform"
+										>
+											{{ editingid ? $t('generic.save') : $t('generic.add') }}
+										</b-button>
+										<b-button
+											variant="outline-secondary"
+											class="ms-2"
+											@click="formmodal = false"
+										>
+											{{ $t('generic.cancel') }}
+										</b-button>
+									</div>
+								</b-form>
+							</div>
+						</b-modal>
+
+						<!-- Delete confirmation -->
+						<b-modal
+							id="dashboarddeletemodal"
+							v-model="deletemodal"
+							:title="$t('dashboard.delete')"
+							hide-footer
+							size="sm"
+						>
+							<Alert
+								v-if="deleteerror"
+								:message="deleteerrormsg"
+								variant="danger"
+							/>
+							<div class="text-center">
+								<font-awesome-icon
+									:icon="['fas', 'triangle-exclamation']"
+									size="5x"
+									color="#d63939"
+								/>
+								<p><b>{{ $t('message.deletevalid') }}</b></p>
+								<p>{{ $t('message.delete_msg') }} {{ activedashboard.name }} ?</p>
+								<button
+									class="btn btn-danger"
+									:disabled="loadingdelete"
+									@click="onDelete()"
+								>
+									{{ $t('generic.delete_msg2') }}
+								</button>
+							</div>
+						</b-modal>
 					</div>
 				</div>
 			</div>
@@ -304,14 +383,6 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
-const createEmptyLayout = () => ({
-	visibility: "public",
-	user: null,
-	groups: [],
-	allow_group_modification: false,
-	name: null,
-	layout: []
-})
 
 export default {
 	name: "Dashboard",
@@ -320,17 +391,11 @@ export default {
 			errormsg: null,
 			errored: false,
 
-			savewithsuccess: false,
-			saveerror: false,
-
 			canedit: false,
 			canadd: false,
 			candelete: false,
 
 			chartsVisible: false,
-			draggable: true,
-			resizable: true,
-			emptylayout: createEmptyLayout(),
 			layouts: [
 				{
 					layout: []
@@ -344,24 +409,68 @@ export default {
 			groupids: [],
 			groups: [],
 			addchartid: null,
-			optvisibility: [
-				{ value: "public", text: this.$t("search.public") },
-				{ value: "private_personal", text: this.$t("search.private_personal") },
-				{ value: "private_group", text: this.$t("search.private_group") }
-			],
+
+			formmodal: false,
+			editingid: null,
+			form: {
+				name: null,
+				visibility: "public",
+				groups: [],
+				allow_group_modification: false,
+			},
+			loadingform: false,
+			formerror: false,
+			formerrormsg: null,
+
+			deletemodal: false,
+			loadingdelete: false,
+			deleteerror: false,
+			deleteerrormsg: null,
 
 			loadingsave: false,
 			loading: true,
 			loadingchart: false,
 		}
 	},
-	watch: {
-		savewithsuccess: function() {
-			setTimeout(() => {
-				this.edit = false
-				this.savewithsuccess = false
-			}, 500)
+	computed: {
+		optvisibility() {
+			return [
+				{ value: "public", text: this.$t("search.public") },
+				{ value: "private_personal", text: this.$t("search.private_personal") },
+				{ value: "private_group", text: this.$t("search.private_group") },
+			]
 		},
+
+		activedashboard() {
+			return this.layouts[this.activeLayout] || { layout: [] }
+		},
+
+		hasdashboard() {
+			return !!this.activedashboard.id
+		},
+
+		// the author always may, a group member only when allowed to
+		cansave() {
+			const dashboard = this.activedashboard
+			return this.hasdashboard
+				&& this.canedit
+				&& (
+					dashboard.user == this.userid
+					|| (
+						dashboard.visibility === "private_group"
+						&& dashboard.allow_group_modification == true
+						&& this.hasGroupAccess(dashboard.groups)
+					)
+				)
+		},
+
+		canremove() {
+			return this.hasdashboard
+				&& this.candelete
+				&& this.activedashboard.user == this.userid
+		},
+	},
+	watch: {
 		activeLayout() {
 			this.onActiveLayoutChanged()
 		}
@@ -400,6 +509,18 @@ export default {
 		}, 10)
 	},
 	methods: {
+		// a creation answers {error}, an update the DRF field errors, a refusal {detail}
+		_apiError(e) {
+			const data = e?.response?.data
+			if (data?.error) return data.error
+			if (data?.detail) return data.detail
+			if (data && typeof data === "object") {
+				const messages = Object.values(data).flat().filter((item) => typeof item === "string")
+				if (messages.length) return messages.join(" ")
+			}
+			return e?.message || String(e)
+		},
+
 		async getChartsList() {
 			this.optcharts = []
 			try {
@@ -414,7 +535,7 @@ export default {
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
@@ -425,15 +546,10 @@ export default {
 				this.userid = data?.id
 				this.groupids = data?.groups || []
 
-				this.ensureEmptyLayoutInitialized()
-				if (this.emptylayout.user === null || this.emptylayout.user === undefined) {
-					this.emptylayout.user = this.userid
-				}
-
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
@@ -453,8 +569,7 @@ export default {
 						const g = r.value
 						this.groups.push({ value: g.id, text: g.name })
 					} else {
-						const e = r.reason
-						this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+						this.errormsg = this._apiError(r.reason)
 						this.errored = true
 					}
 				})
@@ -466,7 +581,7 @@ export default {
 					this.errored = false
 				}
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
@@ -490,74 +605,121 @@ export default {
 
 				if (!this.layouts.length) {
 					this.layouts = [{ layout: [] }]
-				} else {
-					if (!this.layouts[this.activeLayout]) this.activeLayout = 0
-					this.syncEmptyLayoutFromActive()
+				} else if (!this.layouts[this.activeLayout]) {
+					this.activeLayout = 0
 				}
 
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 				this.errored = true
 			}
 		},
 
+		// the author is set by the server, only the charts are sent
 		async saveDashboard() {
 			this.loadingsave = true
 			try {
-				const layoutId = this.layouts?.[this.activeLayout]?.id
-				if (!layoutId) throw new Error("No active layout id")
-
-				this.emptylayout.layout = this.layouts[this.activeLayout].layout
-
-				await this.$api.generic.patch(`dashboard/layout/${layoutId}/`, this.emptylayout)
-
-				this.savewithsuccess = true
-				this.saveerror = false
+				await this.$api.generic.patch(
+					`dashboard/layout/${this.activedashboard.id}/`,
+					{ layout: this.activedashboard.layout }
+				)
+				this.edit = false
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
-				this.savewithsuccess = false
-				this.saveerror = true
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				this.errormsg = this._apiError(e)
 				this.errored = true
 			} finally {
 				this.loadingsave = false
 			}
 		},
 
-		async addDashboard() {
-			this.loadingsave = true
+		openForm(edit) {
+			const dashboard = edit ? this.activedashboard : null
+			this.editingid = edit ? dashboard.id : null
+			this.form = {
+				name: dashboard?.name || null,
+				visibility: dashboard?.visibility || "public",
+				groups: dashboard?.groups || [],
+				allow_group_modification: dashboard?.allow_group_modification || false,
+			}
+			this.formerror = false
+			this.formerrormsg = null
+			this.formmodal = true
+		},
+
+		async onSubmit(event) {
+			event.preventDefault()
+			this.loadingform = true
+			this.formerror = false
+			this.formerrormsg = null
+
+			const payload = {
+				name: this.form.name,
+				visibility: this.form.visibility,
+				groups: this.form.visibility === "private_group" ? this.form.groups : [],
+				allow_group_modification:
+					this.form.visibility === "private_group"
+					&& this.form.allow_group_modification,
+			}
+
 			try {
-				this.emptylayout.layout = this.layouts[this.activeLayout].layout
-
-				const { id: _id, ...payload } = this.emptylayout
-
-				await this.$api.generic.post("dashboard/layout/", payload)
-
-				this.savewithsuccess = true
-				this.saveerror = false
-				this.errormsg = null
-				this.errored = false
+				if (this.editingid) {
+					const updated = await this.$api.generic.patch(
+						`dashboard/layout/${this.editingid}/`, payload
+					)
+					Object.assign(this.activedashboard, updated)
+					this.optlayouts[this.activeLayout].text = updated.name
+				} else {
+					// a copy of the charts on screen, rearranged or not
+					const created = await this.$api.generic.post("dashboard/layout/", {
+						...payload,
+						layout: this.activedashboard.layout,
+					})
+					this.edit = false
+					await this.getLayouts()
+					const index = this.layouts.findIndex((layout) => layout.id === created.id)
+					if (index !== -1) this.activeLayout = index
+				}
+				this.formmodal = false
 			} catch (e) {
-				this.savewithsuccess = false
-				this.saveerror = true
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-				this.errored = true
+				this.formerrormsg = this._apiError(e)
+				this.formerror = true
 			} finally {
-				this.loadingsave = false
-				this.reloadDashboard()
+				this.loadingform = false
+			}
+		},
+
+		openDelete() {
+			this.deleteerror = false
+			this.deleteerrormsg = null
+			this.deletemodal = true
+		},
+
+		async onDelete() {
+			this.loadingdelete = true
+			try {
+				await this.$api.generic.delete(`dashboard/layout/${this.activedashboard.id}/`)
+				this.deletemodal = false
+				this.activeLayout = 0
+				await this.reloadDashboard()
+			} catch (e) {
+				this.deleteerrormsg = this._apiError(e)
+				this.deleteerror = true
+			} finally {
+				this.loadingdelete = false
 			}
 		},
 
 		onActiveLayoutChanged() {
 			this.loadingchart = true
 			localStorage.setItem('active_layout', this.activeLayout)
-			this.syncEmptyLayoutFromActive()
 			this.loadingchart = false
 		},
 
+		// also the way out of the customization, the charts come back as saved
 		async reloadDashboard() {
 			this.loading = true
 			this.edit = false
@@ -569,11 +731,11 @@ export default {
 		},
 
 		removeItem(i) {
-			let index = this.layouts[this.activeLayout].layout.findIndex(item => item.i === i)
+			let index = this.activedashboard.layout.findIndex(item => item.i === i)
 
 			if (index > -1) {
-				this.layouts[this.activeLayout].layout.splice(index, 1)
-				for (const layout of this.layouts[this.activeLayout].layout) {
+				this.activedashboard.layout.splice(index, 1)
+				for (const layout of this.activedashboard.layout) {
 					if (layout.i > index) {
 						layout.i = index
 						index = index + 1
@@ -586,9 +748,9 @@ export default {
 			if (!this.addchartid) return
 
 			const [name, type] = this.addchartid.split(";")
-			const index = this.layouts[this.activeLayout].layout.length
+			const index = this.activedashboard.layout.length
 
-			this.layouts[this.activeLayout].layout.push(
+			this.activedashboard.layout.push(
 				type === "Counter"
 					? { x: 0, y: 0, w: 2, h: 4, i: index, minw: 2, minh: 4, name, type: "Counter", resizable: true }
 					: { x: 0, y: 0, w: 6, h: 9, i: index, minw: 6, minh: 9, name, type, resizable: false }
@@ -600,23 +762,6 @@ export default {
 		hasGroupAccess(groups = []) {
 			if (!Array.isArray(groups) || !Array.isArray(this.groupids)) return false
 			return groups.some(group => this.groupids.includes(group))
-		},
-
-		ensureEmptyLayoutInitialized() {
-			if (!this.emptylayout) this.emptylayout = createEmptyLayout()
-		},
-
-		syncEmptyLayoutFromActive() {
-			const activeLayout = this.layouts[this.activeLayout]
-			if (activeLayout) {
-				this.emptylayout = activeLayout
-			} else {
-				this.ensureEmptyLayoutInitialized()
-				this.emptylayout.layout = []
-			}
-			if (this.userid && (this.emptylayout.user === null || this.emptylayout.user === undefined)) {
-				this.emptylayout.user = this.userid
-			}
 		},
 	}
 }

@@ -1,7 +1,7 @@
 <template>
 	<div id="columnlayout-modal">
 		<!-- the actions hang on the picker, they act on the layout it shows -->
-		<div class="columnlayout-group">
+		<div class="select-btn-group">
 			<v-select
 				id="columnlayout-select"
 				v-model="activeid"
@@ -16,7 +16,7 @@
 			<button
 				v-if="cansave"
 				:title="$t('columnlayout.save')"
-				class="btn datatable-btn columnlayout-btn"
+				class="btn datatable-btn toolbar-btn"
 				:disabled="!isdirty || loadingsave"
 				@click="saveColumns()"
 			>
@@ -33,7 +33,7 @@
 			<button
 				v-if="cansaveas"
 				:title="$t('columnlayout.saveas')"
-				class="btn datatable-btn columnlayout-btn"
+				class="btn datatable-btn toolbar-btn"
 				@click="openForm(false)"
 			>
 				<font-awesome-icon :icon="['fas', 'file-circle-plus']" />
@@ -42,7 +42,7 @@
 			<button
 				v-if="canmodify"
 				:title="$t('columnlayout.edit')"
-				class="btn datatable-btn columnlayout-btn"
+				class="btn datatable-btn toolbar-btn"
 				@click="openForm(true)"
 			>
 				<font-awesome-icon :icon="['fas', 'pencil']" />
@@ -51,7 +51,7 @@
 			<button
 				v-if="candelete"
 				:title="$t('columnlayout.delete')"
-				class="btn datatable-btn columnlayout-btn text-danger"
+				class="btn datatable-btn toolbar-btn text-danger"
 				@click="openDelete()"
 			>
 				<font-awesome-icon :icon="['fas', 'trash-can']" />
@@ -96,7 +96,7 @@
 				</b-button>
 			</template>
 
-			<div class="columnlayout-form">
+			<div class="ocs-modal-form">
 				<Alert
 					v-if="formerror"
 					:message="formerrormsg"
@@ -143,10 +143,10 @@
 							<b-form-group
 								class="mb-2"
 								:label="$t('search.groups')"
-								label-for="columnlayout-groups"
+								label-for="select-btn-groups"
 							>
 								<v-select
-									id="columnlayout-groups"
+									id="select-btn-groups"
 									v-model="row.groups"
 									:options="groups"
 									:reduce="text => text.value"

@@ -4,7 +4,7 @@
 		class="datatable-custom"
 	>
 		<!-- Header datatable -->
-		<div class="header-table datatable-toolbar">
+		<div class="header-table ocs-toolbar">
 			<!-- Search and actions on the selection -->
 			<div class="toolbar-group toolbar-start">
 				<div class="input-icon toolbar-search">
