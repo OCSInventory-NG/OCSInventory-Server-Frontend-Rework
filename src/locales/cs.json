@@ -552,8 +552,13 @@
   "note": {
     "addnote": "Přidat novou poznámku",
     "create": "Vytvořit novou poznámku",
+    "created_at": "Vytvořeno",
+    "creator": "Autor",
     "edit": "Upravit poznámku",
-    "text": "Poznámka"
+    "id": "ID",
+    "note": "Poznámka",
+    "text": "Poznámka",
+    "updated_at": "Upraveno"
   },
   "permission": {
     "accountinfoconfig": "Administrativní údaje – konfigurace",

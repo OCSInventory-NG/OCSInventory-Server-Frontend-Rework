@@ -552,8 +552,13 @@
   "note": {
     "addnote": "Ajouter une nouvelle note",
     "create": "Créer une nouvelle note",
+    "created_at": "Créée le",
+    "creator": "Auteur",
     "edit": "Modifier la note",
-    "text": "Note"
+    "id": "ID",
+    "note": "Note",
+    "text": "Note",
+    "updated_at": "Modifiée le"
   },
   "permission": {
     "accountinfoconfig": "Données administratives - Configuration",

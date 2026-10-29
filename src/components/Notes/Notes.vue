@@ -8,7 +8,7 @@
 				{{ $t("title.notes") }}
 			</h2>
 			<b-button
-				v-if="!loading && !errored"
+				v-if="canadd && !loading && !errored"
 				:title="$t('note.addnote')"
 				variant="primary"
 				class="btn-modal"
@@ -84,6 +84,7 @@ export default {
 			rowdata: [],
 			rowheader: [],
 			hiddenfields: ['content_type', 'object_id', 'object_slug'],
+			canadd: false,
 			candelete: false,
 			canedit: false,
 			loading: true,
@@ -92,13 +93,10 @@ export default {
 	},
 
 	async mounted() {
-		if (hasPermission("asset_group_view_assetgroup")) {
-			if (hasPermission("asset_group_change_assetgroup")) {
-				this.canedit = true
-			}
-			if (hasPermission("asset_group_delete_assetgroup")) {
-				this.candelete = true
-			}
+		if (hasPermission("notes_view_note")) {
+			this.canadd = hasPermission("notes_add_note")
+			this.canedit = hasPermission("notes_change_note")
+			this.candelete = hasPermission("notes_delete_note")
 		} else {
 			this.errormsg = this.$t("message.dont_have_right_to_see")
 			this.errored = true
