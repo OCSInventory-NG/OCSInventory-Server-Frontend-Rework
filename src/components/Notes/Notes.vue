@@ -1,5 +1,26 @@
 <template>
-	<div id="Notes">
+	<div
+		id="Notes"
+		class="detail-section"
+	>
+		<div class="detail-section-header">
+			<h2 class="detail-section-title">
+				{{ $t("title.notes") }}
+			</h2>
+			<b-button
+				v-if="!loading && !errored"
+				:title="$t('note.addnote')"
+				variant="primary"
+				class="btn-modal"
+				@click="openCreateModal"
+			>
+				<font-awesome-icon
+					:icon="['fas', 'plus']"
+				/>
+				{{ $t('note.addnote') }}
+			</b-button>
+		</div>
+
 		<section v-if="errored">
 			<Alert
 				:message="errormsg"
@@ -16,22 +37,6 @@
 			</div>
 
 			<div v-else>
-				<div class="row">
-					<div class="col-auto ms-auto">
-						<b-button
-							:title="$t('note.addnote')"
-							variant="primary"
-							class="d-sm-inline-block btn-modal"
-							@click="openCreateModal"
-						>
-							<font-awesome-icon
-								:icon="['fas', 'plus']"
-							/>
-							{{ $t('note.addnote') }}
-						</b-button>
-					</div>
-				</div>
-
 				<Datatable
 					id="notes"
 					:rowdata="rowdata"
