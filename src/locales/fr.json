@@ -9,7 +9,12 @@
     "editaccountinfo": "Modifier une donnée administrative",
     "id": "ID",
     "massprocessing": "Traitement de masse",
-    "name": "Nom"
+    "name": "Nom",
+    "edit": "Modifier",
+    "edit_mode": "Mode édition",
+    "modified": "modifié",
+    "not_set": "Non renseigné",
+    "saved": "Données administratives enregistrées"
   },
   "action": {
     "rule": "Règle",

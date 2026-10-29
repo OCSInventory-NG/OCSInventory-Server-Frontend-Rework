@@ -9,7 +9,12 @@
     "editaccountinfo": "Edit administrative data",
     "id": "ID",
     "massprocessing": "Mass processing",
-    "name": "Name"
+    "name": "Name",
+    "edit": "Edit",
+    "edit_mode": "Edit mode",
+    "modified": "modified",
+    "not_set": "Not set",
+    "saved": "Administrative data saved"
   },
   "action": {
     "rule": "Rule",

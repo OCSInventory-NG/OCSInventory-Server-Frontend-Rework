@@ -1,5 +1,32 @@
 <template>
-	<div id="Accountinfo">		
+	<div
+		id="Accountinfo"
+		:class="{ 'detail-section accountinfo-section': !massprocessing }"
+	>
+		<div
+			v-if="!massprocessing"
+			class="detail-section-header"
+		>
+			<h2 class="detail-section-title">
+				{{ $t('title.accountinfo') }}
+			</h2>
+			<button
+				v-if="canedit && !loading && !editing && rowdata.length != 0"
+				type="button"
+				class="btn"
+				@click="startEdit"
+			>
+				<font-awesome-icon :icon="['fas', 'pencil']" />
+				{{ $t('accountinfo.edit') }}
+			</button>
+			<span
+				v-if="editing"
+				class="accountinfo-edit-badge"
+			>
+				{{ $t('accountinfo.edit_mode') }}
+			</span>
+		</div>
+
 		<section v-if="errored || massprocerrored">
 			<Alert 
 				:message="(errored) ? errormsg : massprocerrormsg" 
@@ -15,7 +42,7 @@
 				<Loader />
 			</div>
 
-			<div v-else>
+			<div v-else-if="massprocessing">
 				<b-form
 					v-if="rowdata.length != 0"
 					@submit="onSubmit"
@@ -75,10 +102,7 @@
 								:disabled="!canedit"
 							/>
 						</b-col>
-						<b-col
-							v-if="massprocessing"
-							class="col-1"
-						>
+						<b-col class="col-1">
 							<label class="form-check form-switch">
 								<input 
 									v-model="value.update"
@@ -114,14 +138,9 @@
 								variant="success"
 							/>
 							<font-awesome-icon 
-								v-if="successed || massprocsuccessed"
+								v-if="massprocsuccessed"
 								:icon="['fas', 'check']"
 								color="green"
-							/>
-							<font-awesome-icon 
-								v-if="errored"
-								:icon="['fas', 'xmark']"
-								color="red"
 							/>
 						</b-col>
 						<b-col align-self="end" />
@@ -130,6 +149,159 @@
 				<p v-else>
 					{{ $t('generic.no_data') }}
 				</p>
+			</div>
+
+			<div v-else>
+				<div
+					v-if="successed"
+					role="status"
+					class="alert alert-success"
+				>
+					<font-awesome-icon :icon="['fas', 'circle-check']" />
+					{{ $t('accountinfo.saved') }}
+				</div>
+
+				<p
+					v-if="rowdata.length == 0"
+					class="text-secondary mb-0"
+				>
+					{{ $t('generic.no_data') }}
+				</p>
+
+				<dl
+					v-else-if="!editing"
+					class="datagrid accountinfo-grid"
+				>
+					<div
+						v-for="field in rowdata"
+						:key="field.id"
+						class="datagrid-item"
+						:class="{ 'accountinfo-item-wide': field.type == 'TEXTAREA' }"
+					>
+						<dt class="datagrid-title">
+							{{ field.name }}
+						</dt>
+						<dd class="datagrid-content accountinfo-value">
+							<span
+								v-if="isEmpty(field.value)"
+								class="accountinfo-empty"
+							>
+								{{ $t('accountinfo.not_set') }}
+							</span>
+							<span
+								v-else-if="field.type == 'SELECT'"
+								class="accountinfo-badge"
+							>
+								{{ selectLabel(field) }}
+							</span>
+							<template v-else-if="field.type == 'CHECKBOX'">
+								<span
+									v-for="label in checkboxLabels(field)"
+									:key="label"
+									class="accountinfo-badge"
+								>
+									<font-awesome-icon :icon="['fas', 'check']" />
+									{{ label }}
+								</span>
+							</template>
+							<span
+								v-else
+								class="accountinfo-text"
+								:class="{ 'accountinfo-text-multiline': field.type == 'TEXTAREA' }"
+							>
+								{{ field.value }}
+							</span>
+						</dd>
+					</div>
+				</dl>
+
+				<b-form
+					v-else
+					@submit="onSubmit"
+				>
+					<div class="datagrid accountinfo-grid">
+						<div
+							v-for="field in rowdata"
+							:key="field.id"
+							class="datagrid-item"
+							:class="{
+								'accountinfo-item-wide': field.type == 'TEXTAREA',
+								'accountinfo-item-dirty': isDirty(field)
+							}"
+						>
+							<label
+								:for="'field_'+field.id"
+								class="datagrid-title accountinfo-label"
+							>
+								{{ field.name }}
+								<span
+									v-if="isDirty(field)"
+									class="accountinfo-dirty"
+								>
+									{{ $t('accountinfo.modified') }}
+								</span>
+							</label>
+
+							<b-form-input
+								v-if="field.type == 'TEXT'"
+								:id="'field_'+field.id"
+								v-model="field.value"
+							/>
+
+							<b-form-textarea
+								v-if="field.type == 'TEXTAREA'"
+								:id="'field_'+field.id"
+								v-model="field.value"
+								rows="3"
+								max-rows="6"
+							/>
+
+							<v-select
+								v-if="field.type == 'SELECT'"
+								v-model="field.value"
+								:input-id="'field_'+field.id"
+								:options="field.values"
+								label="text"
+							/>
+
+							<b-form-checkbox-group
+								v-if="field.type == 'CHECKBOX'"
+								:id="'field_'+field.id"
+								v-model="field.value"
+								:options="field.values"
+								class="accountinfo-checks"
+							/>
+						</div>
+					</div>
+
+					<Alert
+						v-if="saveerrormsg"
+						:message="saveerrormsg"
+						variant="danger"
+						class="mt-3"
+					/>
+
+					<div class="accountinfo-footer">
+						<b-button
+							variant="outline-secondary"
+							:disabled="loadingcreate"
+							@click="cancelEdit"
+						>
+							{{ $t('generic.cancel') }}
+						</b-button>
+						<b-button
+							type="submit"
+							class="accountinfo-btn-primary"
+							:disabled="!hasChanges || loadingcreate"
+						>
+							<b-spinner
+								v-if="loadingcreate"
+								small
+							/>
+							{{ $t('generic.save') }}
+						</b-button>
+					</div>
+				</b-form>
 			</div>
 		</section>
 	</div>
@@ -157,22 +329,32 @@ export default {
 
 			massprocsuccessed: false,
 			successed: false,
+			saveerrormsg: null,
 
 			canedit: false,
+			editing: false,
 
 			rowdata: [],
+			original: {},
 			create: true,
 			accountid : null,
-			
+
 			loading: true,
 			loadingcreate: false,
 		}
 	},
+	computed: {
+		hasChanges() {
+			return this.rowdata.some((field) => this.isDirty(field))
+		},
+	},
 	watch: {
-		successed: function() {
-			setTimeout(() => {
+		successed: function(value) {
+			if (!value) return
+			clearTimeout(this.successTimeout)
+			this.successTimeout = setTimeout(() => {
 				this.successed = false
-			}, 500)
+			}, 3000)
 		},
 		massprocsuccessed: function() {
 			setTimeout(() => {
@@ -186,7 +368,57 @@ export default {
 
 		await this.getAccountinfoConfig()
 	},
+	beforeUnmount() {
+		clearTimeout(this.successTimeout)
+	},
 	methods: {
+		isEmpty(value) {
+			return value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)
+		},
+
+		normalize(value) {
+			if (this.isEmpty(value)) return 'null'
+			if (Array.isArray(value)) return JSON.stringify([...value].sort())
+			return JSON.stringify(value)
+		},
+
+		isDirty(field) {
+			return this.normalize(field.value) !== this.original[field.id]
+		},
+
+		snapshot() {
+			this.original = Object.fromEntries(
+				this.rowdata.map((field) => [field.id, this.normalize(field.value)])
+			)
+		},
+
+		selectLabel(field) {
+			if (typeof field.value === 'object') return field.value.text
+			const option = field.values.find((v) => v.value == field.value)
+			return option ? option.text : field.value
+		},
+
+		checkboxLabels(field) {
+			return field.values
+				.filter((v) => field.value.some((s) => s == v.value))
+				.map((v) => v.text)
+		},
+
+		startEdit() {
+			this.successed = false
+			this.saveerrormsg = null
+			this.editing = true
+		},
+
+		cancelEdit() {
+			for (const field of this.rowdata) {
+				const value = JSON.parse(this.original[field.id])
+				field.value = (value === null && field.type === 'CHECKBOX') ? [] : value
+			}
+			this.saveerrormsg = null
+			this.editing = false
+		},
+
 		async getAccountinfoConfig() {
 			try {
 				const data = await this.$api.generic.get(
@@ -254,6 +486,7 @@ export default {
 				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
 				this.errored = true
 			} finally {
+				this.snapshot()
 				this.loading = false
 			}
 		},
@@ -353,29 +586,23 @@ export default {
 
 			json.object_id = this.id
 			json.accountdata = this.buildAccountdataPayload()
+			this.saveerrormsg = null
 
-			if (this.create) {
-				try {
+			try {
+				if (this.create) {
 					await this.onPost(json)
-					this.successed = true
 					this.rowdata = []
 					await this.getAccountinfoConfig()
-				} catch (e) {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				} finally {
-					this.loadingcreate = false
-				}
-			} else {
-				try {
+				} else {
 					await this.onPatch(this.accountid, json)
-					this.successed = true
-				} catch (e) {
-					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
-					this.errored = true
-				} finally {
-					this.loadingcreate = false
+					this.snapshot()
 				}
+				this.editing = false
+				this.successed = true
+			} catch (e) {
+				this.saveerrormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+			} finally {
+				this.loadingcreate = false
 			}
 		},
 	}
