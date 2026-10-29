@@ -1,0 +1,132 @@
+// ===========================================
+//  DETAIL PAGE
+// ===========================================
+
+.detail-section {
+  margin-bottom: 2.5rem;
+}
+
+.detail-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  padding-bottom: .625rem;
+  border-bottom: 1px solid #e3e7ec;
+}
+
+.detail-section-header .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+
+  &::before {
+    content: "";
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: $ocs-purple;
+  }
+}
+
+.detail-value-empty {
+  color: var(--tblr-secondary);
+  font-style: italic;
+}
+
+.detail-toolbar {
+  display: inline-flex;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: 6px;
+  background: $white;
+  box-shadow: 0 1px 2px rgba(24, 36, 51, .05);
+  overflow: hidden;
+
+  // The deployment and options buttons come wrapped by their modal components
+  > div,
+  > div > .col-auto {
+    display: contents;
+  }
+
+  .btn {
+    width: 44px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--tblr-body-color);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--tblr-bg-surface-secondary, #f6f8fb);
+      color: $ocs-purple;
+    }
+  }
+
+  > div .btn,
+  > div + .btn {
+    border-left: 1px solid var(--tblr-border-color);
+  }
+}
+
+// b-tabs "vertical" always lays the menu beside a col-10 content, stack them on small screens
+@media (max-width: 991.98px) {
+  #detail {
+    .page-body > .card > .card-body {
+      padding: 1rem;
+    }
+
+    .tabs {
+      flex-direction: column;
+      align-items: stretch !important;
+    }
+
+    .tabs > .card-header {
+      margin: 0 0 1rem;
+      padding: .375rem;
+      overflow-x: auto;
+
+      .nav {
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        gap: .25rem;
+        margin: 0 !important;
+      }
+    }
+
+    .ocs-menu-tab {
+      flex: 0 0 auto;
+      min-width: 0;
+
+      button {
+        width: auto;
+        white-space: nowrap;
+      }
+    }
+
+    .tab-content {
+      width: 100%;
+      height: auto;
+      overflow-y: visible;
+      position: static;
+    }
+
+    .asset-btn {
+      margin-bottom: .5rem;
+    }
+  }
+}

@@ -9,7 +9,12 @@
     "editaccountinfo": "Upravit administrativní údaj",
     "id": "ID",
     "massprocessing": "Hromadné zpracování",
-    "name": "Název"
+    "name": "Název",
+    "edit": "Upravit",
+    "edit_mode": "Režim úprav",
+    "modified": "změněno",
+    "not_set": "Nevyplněno",
+    "saved": "Administrativní údaje uloženy"
   },
   "action": {
     "rule": "Pravidlo",
@@ -547,8 +552,13 @@
   "note": {
     "addnote": "Přidat novou poznámku",
     "create": "Vytvořit novou poznámku",
+    "created_at": "Vytvořeno",
+    "creator": "Autor",
     "edit": "Upravit poznámku",
-    "text": "Poznámka"
+    "id": "ID",
+    "note": "Poznámka",
+    "text": "Poznámka",
+    "updated_at": "Upraveno"
   },
   "permission": {
     "accountinfoconfig": "Administrativní údaje – konfigurace",

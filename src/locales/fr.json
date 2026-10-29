@@ -9,7 +9,12 @@
     "editaccountinfo": "Modifier une donnée administrative",
     "id": "ID",
     "massprocessing": "Traitement de masse",
-    "name": "Nom"
+    "name": "Nom",
+    "edit": "Modifier",
+    "edit_mode": "Mode édition",
+    "modified": "modifié",
+    "not_set": "Non renseigné",
+    "saved": "Données administratives enregistrées"
   },
   "action": {
     "rule": "Règle",
@@ -547,8 +552,13 @@
   "note": {
     "addnote": "Ajouter une nouvelle note",
     "create": "Créer une nouvelle note",
+    "created_at": "Créée le",
+    "creator": "Auteur",
     "edit": "Modifier la note",
-    "text": "Note"
+    "id": "ID",
+    "note": "Note",
+    "text": "Note",
+    "updated_at": "Modifiée le"
   },
   "permission": {
     "accountinfoconfig": "Données administratives - Configuration",

@@ -35,45 +35,47 @@
 						<div v-else>
 							<div v-if="type == 'ASSET'">
 								<b-row class="asset-btn responsive">
-									<div
-										class="col-1"
-										align="right"
-									>
-										<b-button-group class="mr-1">
-											<button 
+									<div class="col-auto">
+										<div
+											class="detail-toolbar"
+											role="toolbar"
+											:aria-label="$t('generic.actions')"
+										>
+											<button
 												:title="$t('generic.reload')"
-												class="form-control btn datatable-btn"
+												:aria-label="$t('generic.reload')"
+												class="btn datatable-btn"
 												@click="reloadInventory"
 											>
-												<font-awesome-icon 
+												<font-awesome-icon
 													:icon="['fas', 'arrows-rotate']"
 												/>
-											</button>&nbsp;&nbsp;
+											</button>
 
 											<PackageResultModal
 												v-if="hasAgent"
 												:items="deployment"
 												@reload-deployment="reloadDeployment"
-											/>&nbsp;
+											/>
 
 											<AssetOptionsModal
 												:item="deployment"
 												@reload-inventory="reloadInventory"
-											/>&nbsp;&nbsp;
+											/>
 
 											<router-link
 												v-if="hasAgent"
 												:to="'/inventory/inventory_logs/'+$route.params.id"
 												:title="$t('inventory.see_logs')"
-												class="btn datatable-btn mr-1"
+												:aria-label="$t('inventory.see_logs')"
+												class="btn datatable-btn"
 											>
-												<font-awesome-icon 
+												<font-awesome-icon
 													:icon="['far', 'file-lines']"
 												/>
 											</router-link>
-										</b-button-group>
+										</div>
 									</div>
-									<div class="col-1" />
 								</b-row>
 								<b-tabs
 									v-model="activetab"
@@ -94,104 +96,111 @@
 											@click="scrollToTop()"
 										>
 											<div v-if="category.id == 1">
-												<div class="datagrid">
-													<template
-														v-for="(value,key) in device"
-														:key="key"
-													>
-														<div
-															v-if="!['templateid', 'matched'].includes(key)"
-															class="datagrid-item"
+												<section class="detail-section">
+													<div class="detail-section-header">
+														<h2 class="detail-section-title">
+															{{ $t("generic.information") }}
+														</h2>
+													</div>
+													<div class="datagrid">
+														<template
+															v-for="(value,key) in device"
+															:key="key"
 														>
-															<div class="datagrid-title">
-																{{ $t(translationkey+key) }}
-															</div>
-															<div class="datagrid-content">
-																{{ formatDate(value, key) }}
-															</div>
-														</div>
-														<div
-															v-if="key === 'is_template_forced' && complianceStatus"
-															class="datagrid-item"
-														>
-															<div class="datagrid-title">
-																{{ $t('inventory.compliance') }}
-															</div>
-															<div class="datagrid-content">
-																<span
-																	:class="complianceStatus === 'compliant'
-																		? 'badge bg-success'
-																		: complianceStatus === 'non_compliant'
-																			? 'badge bg-danger'
-																			: 'badge bg-secondary'"
+															<div
+																v-if="!['templateid', 'matched'].includes(key)"
+																class="datagrid-item"
+															>
+																<div class="datagrid-title">
+																	{{ $t(translationkey+key) }}
+																</div>
+																<div
+																	class="datagrid-content"
+																	:class="valueClass(value)"
 																>
-																	{{ $t('compliance.' + complianceStatus) }}
-																</span>
+																	{{ formatDate(value, key) }}
+																</div>
 															</div>
-														</div>
-														<div
-															v-if="key === 'is_template_forced'"
-															class="datagrid-item"
-														>
-															<div class="datagrid-title">
-																{{ $t('inventory.eol') }}
+															<div
+																v-if="key === 'is_template_forced' && complianceStatus"
+																class="datagrid-item"
+															>
+																<div class="datagrid-title">
+																	{{ $t('inventory.compliance') }}
+																</div>
+																<div class="datagrid-content">
+																	<span
+																		:class="complianceStatus === 'compliant'
+																			? 'badge bg-success-lt'
+																			: complianceStatus === 'non_compliant'
+																				? 'badge bg-danger-lt'
+																				: 'badge bg-secondary-lt'"
+																	>
+																		{{ $t('compliance.' + complianceStatus) }}
+																	</span>
+																</div>
 															</div>
-															<div class="datagrid-content">
-																<span
-																	v-if="eolStatus && eolStatus.product"
-																	:class="eolStatus.is_eol
-																		? 'badge bg-danger'
-																		: 'badge bg-success'"
-																>
-																	{{ eolStatus.is_eol
-																		? $t('compliance.eol_expired')
-																		: $t('compliance.eol_active') }}
-																</span>
-																<span
-																	v-else
-																	class="badge bg-secondary"
-																>
-																	{{ $t('compliance.eol_unknown') }}
-																</span>
+															<div
+																v-if="key === 'is_template_forced'"
+																class="datagrid-item"
+															>
+																<div class="datagrid-title">
+																	{{ $t('inventory.eol') }}
+																</div>
+																<div class="datagrid-content">
+																	<span
+																		v-if="eolStatus && eolStatus.product"
+																		:class="eolStatus.is_eol
+																			? 'badge bg-danger-lt'
+																			: 'badge bg-success-lt'"
+																	>
+																		{{ eolStatus.is_eol
+																			? $t('compliance.eol_expired')
+																			: $t('compliance.eol_active') }}
+																	</span>
+																	<span
+																		v-else
+																		class="badge bg-secondary-lt"
+																	>
+																		{{ $t('compliance.eol_unknown') }}
+																	</span>
+																</div>
 															</div>
-														</div>
-													</template>
-												</div><br><br>
-												<div align="center">
-													<h2>{{ $t("title.accountinfo") }}</h2>
-												</div>
-												<fieldset class="form-fieldset">
-													<Accountinfo
-														:id="device.id"
-														:type="type"
-														:slug="slug"
-													/>
-												</fieldset><br>
+														</template>
+													</div>
+												</section>
 
-												<div align="center">
-													<h2>{{ $t("title.notes") }}</h2>
-												</div>
+												<Accountinfo
+													:id="device.id"
+													:type="type"
+													:slug="slug"
+												/>
+
 												<Notes
 													:id="device.id"
 													:type="type"
 													:slug="slug"
-												/><br>
+												/>
 
 												<ExtensionSlot
 													name="inventory.asset.detail.afterAccountInfo"
 													:context="{ assetId: device?.id }"
-												/><br>
+												/>
 											</div>
 											<div v-if="category.id == 2 && hasAgent">
-												<div align="center">
-													<h2>{{ $t("title.deployment") }}</h2>
-												</div>
+												<section class="detail-section">
+													<div class="detail-section-header">
+														<h2 class="detail-section-title">
+															{{ $t("title.deployment") }}
+														</h2>
+													</div>
 
-												<ResultDetail
-													:id="$route.params.id"
-													:reload="reload"
-													@end-reload-deployment="endReloadDeployment"
-												/>
+													<ResultDetail
+														:id="$route.params.id"
+														:reload="reload"
+														@end-reload-deployment="endReloadDeployment"
+													/>
+												</section>
 											</div>
 											<div
 												v-if="category.inventory_sections
@@ -230,49 +239,40 @@
 								</b-tabs>
 							</div>
 							<div v-else>
-								<div class="hr-text">
-									{{ $t("generic.information") }}
-								</div>
-								<b-row>
-									<b-col cols="1" />
-									<b-col>
-										<div class="datagrid">
-											<div 
-												v-for="(value,key) in device"
-												:key="key"
-												class="datagrid-item"
+								<section class="detail-section">
+									<div class="detail-section-header">
+										<h2 class="detail-section-title">
+											{{ $t("generic.information") }}
+										</h2>
+									</div>
+									<div class="datagrid">
+										<div
+											v-for="(value,key) in device"
+											:key="key"
+											class="datagrid-item"
+										>
+											<div class="datagrid-title">
+												{{ $t(translationkey+key) }}
+											</div>
+											<div
+												class="datagrid-content"
+												:class="valueClass(value)"
 											>
-												<div class="datagrid-title">
-													{{ $t(translationkey+key) }}
-												</div>
-												<div class="datagrid-content">
-													{{ formatDate(value, key) }}
-												</div>
+												{{ formatDate(value, key) }}
 											</div>
 										</div>
-									</b-col>
-									<b-col cols="1" />
-								</b-row>
-								<br><br>
-								<div align="center">
-									<h2>{{ $t("title.accountinfo") }}</h2>
-								</div>
-								<fieldset class="form-fieldset">
-									<Accountinfo
-										:id="device.id"
-										:type="type"
-										
-										:slug="slug"
-									/>
-								</fieldset><br>
-								<div align="center">
-									<h2>{{ $t("title.notes") }}</h2>
-								</div>
+									</div>
+								</section>
+								<Accountinfo
+									:id="device.id"
+									:type="type"
+									:slug="slug"
+								/>
 								<Notes
 									:id="device.id"
 									:type="type"
 									:slug="slug"
-								/><br>
+								/>
 							</div>
 						</div>
 					</div>
@@ -498,6 +498,12 @@ export default {
 				return new Date(value).toLocaleString(this.$i18n.locale)
 			}
 			return value
+		},
+
+		valueClass(value) {
+			return {
+				'detail-value-empty': value === null || value === '' || value === 'Empty',
+			}
 		},
 	}
 }
