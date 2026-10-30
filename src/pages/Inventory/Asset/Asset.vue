@@ -31,6 +31,7 @@
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
 								virtualcoltarget="asset"
+							layouttarget="asset"
 								:fieldlabels="virtualcollabels"
 								:canaccessdetails="true"
 								:candelete="candelete"

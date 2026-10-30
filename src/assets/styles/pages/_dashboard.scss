@@ -2,6 +2,20 @@
 //  DASHBOARD PAGE
 // ===========================================
 
+#dashboard-select {
+  min-width: 220px;
+}
+
+#dashboard-chart-select {
+  min-width: 340px;
+}
+
+.dashboard-hint {
+  color: $gray-600;
+  font-size: 0.85rem;
+  margin: -4px 0 8px;
+}
+
 .donut-card {
   border: 0;
   display: flex;
