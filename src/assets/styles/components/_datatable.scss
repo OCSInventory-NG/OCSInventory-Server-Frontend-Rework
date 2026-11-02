@@ -96,10 +96,106 @@ tbody, td, tfoot, th, thead, tr {
   }
 }
 
-.visible-select > .dropdown-item.active, .visible-select > .dropdown-item:active {
-  background-color: rgba(253, 126, 20, .2);
-  color: #fd7e14;
-  font-weight: bold;
+// Show / Hide menu: a checkbox per column, dragged by its handle
+.columns-menu {
+  max-height: 70vh;
+  min-width: 280px;
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.columns-menu-header {
+  align-items: center;
+  background-color: $white;
+  border-bottom: 1px solid $gray-200;
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .columns-menu-count {
+    color: $gray-600;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  // the navbar turns every .btn-link white on hover
+  .btn-link {
+    color: $gray-700;
+    padding: 0 4px;
+    text-decoration: none;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      color: $gray-900;
+      text-decoration: underline;
+    }
+  }
+}
+
+.columns-menu-help {
+  color: $gray-600;
+  font-size: .75rem;
+  margin: 0;
+  padding: 6px 12px 2px;
+}
+
+.columns-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.columns-menu-item {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  padding: 3px 12px 3px 6px;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+
+  .form-check {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    padding-left: 0;
+  }
+
+  .form-check-input {
+    float: none;
+    margin: 0;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  // a hidden column stays in the list, only fainter
+  &.is-hidden .form-check-label {
+    color: $gray-500;
+  }
+}
+
+.columns-menu-handle {
+  color: $gray-400;
+  cursor: grab;
+  padding: 0 4px;
+
+  &:hover {
+    color: $gray-700;
+  }
+}
+
+.columns-menu-ghost {
+  background-color: $gray-200;
+  opacity: .6;
 }
 
 .datatable-custom .datatable-table-wrapper {
