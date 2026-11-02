@@ -26,7 +26,7 @@
 				content-class="mt-3"
 				fill
 			>
-				<b-tab :title="$t('security.tab_open', { count: visibleOpen.length })">
+				<b-tab :title="$t('security.tab_open_label')">
 					<!-- Noise hidden by default, always counted -->
 					<div
 						v-if="noiseCount"
@@ -106,7 +106,7 @@
 					</div>
 				</b-tab>
 
-				<b-tab :title="$t('security.tab_software', { count: software.length })">
+				<b-tab :title="$t('security.tab_software_label')">
 					<Datatable
 						id="asset-software-states-datatable"
 						:rowdata="filteredSoftware"
@@ -139,7 +139,7 @@
 
 				<b-tab
 					v-if="excludedOpen.length"
-					:title="$t('security.tab_excluded', { count: excludedOpen.length })"
+					:title="$t('security.tab_excluded_label')"
 				>
 					<ExposureTable
 						name="asset_vulnerabilities_excluded"
