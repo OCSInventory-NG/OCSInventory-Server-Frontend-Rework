@@ -279,7 +279,11 @@
     "invalid_values": "Some values are refused: see the messages under the fields.",
     "order_move": "Drag to move",
     "order_up": "Move up",
-    "order_down": "Move down"
+    "order_down": "Move down",
+    "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included",
+    "Order of the vulnerability list, first criterion first": "Order of the vulnerability list, first criterion first",
+    "Windows and macOS software: name match score from which the product is identified automatically": "Windows and macOS software: name match score from which the product is identified automatically",
+    "Windows and macOS software: name match score from which the product is proposed for review": "Windows and macOS software: name match score from which the product is proposed for review"
   },
   "dashboard": {
     "chartplaceholder": "Select component to add",
@@ -1224,7 +1228,6 @@
     "compliance_settings": "Compliance settings",
     "vulnerability_coverage": "Coverage",
     "vulnerability_exclusions": "Exclusions",
-    "security_settings": "Security settings",
     "coverage": "Coverage",
     "exclusions": "Exclusions"
   },
