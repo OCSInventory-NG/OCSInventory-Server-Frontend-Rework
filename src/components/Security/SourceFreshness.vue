@@ -26,7 +26,7 @@
 						<span
 							v-if="source.error"
 							class="text-danger ms-1"
-						>— {{ source.error }}</span>
+						>({{ source.error }})</span>
 					</li>
 					<li
 						v-for="line in extra"

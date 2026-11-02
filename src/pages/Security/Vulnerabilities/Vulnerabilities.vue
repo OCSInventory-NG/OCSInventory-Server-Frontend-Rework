@@ -154,7 +154,7 @@
 										:level="row.item.level"
 										:score="row.item.cvss_score"
 									/>
-									<div class="text-muted small text-nowrap">
+									<div class="text-muted small score-detail">
 										{{ scoreDetail(row.item) }}
 									</div>
 								</template>
@@ -168,13 +168,13 @@
 									<span
 										v-else
 										class="text-muted"
-									>—</span>
+									>{{ $t('security.unknown') }}</span>
 								</template>
 								<template #cell(products)="{ row }">
 									<div
 										v-for="product in row.item.products"
 										:key="product.product + product.version"
-										class="text-nowrap"
+										class="cell-wrap"
 										:title="product.product"
 									>
 										{{ product.name || product.product }} {{ product.version }}

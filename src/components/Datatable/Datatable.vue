@@ -7,7 +7,10 @@
 		<div class="header-table ocs-toolbar">
 			<!-- Search and actions on the selection -->
 			<div class="toolbar-group toolbar-start">
-				<div class="input-icon toolbar-search">
+				<div
+					v-if="cansearch"
+					class="input-icon toolbar-search"
+				>
 					<b-form-input 
 						id="filter-input" 
 						v-model="filter"
@@ -760,6 +763,8 @@ export default {
 		virtualcoltarget: { type: String, default: null },
 		// table listed here, when its show/hide choices can be saved as layouts
 		layouttarget: { type: String, default: null },
+		// false when the route behind the table cannot search
+		cansearch: { type: Boolean, default: true },
 		// shown instead of the generic "no data" when the table is empty
 		emptytext: { type: String, default: '' },
 		// labels of the columns whose key is no translation key

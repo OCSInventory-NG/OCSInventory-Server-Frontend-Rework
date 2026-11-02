@@ -16,24 +16,27 @@
 			<SourceFreshness />
 
 			<!-- Coverage of this machine -->
-			<div class="card mb-3">
-				<div class="card-body d-flex flex-wrap gap-4">
-					<div>
-						<div class="subheader">
-							{{ $t('security.running_kernel') }}
-						</div>
-						<span :class="kernelOk ? 'text-success' : 'text-warning'">
-							<font-awesome-icon
-								:icon="['fas', kernelOk ? 'circle-check' : 'triangle-exclamation']"
-								class="me-1"
-							/>
-							{{ kernelLabel }}
-						</span>
+			<div class="datagrid mb-3">
+				<div class="datagrid-item">
+					<div class="datagrid-title">
+						{{ $t('security.running_kernel') }}
 					</div>
-					<div>
-						<div class="subheader">
-							{{ $t('security.not_checked') }}
-						</div>
+					<div
+						class="datagrid-content"
+						:class="kernelOk ? 'text-success' : 'text-warning'"
+					>
+						<font-awesome-icon
+							:icon="['fas', kernelOk ? 'circle-check' : 'triangle-exclamation']"
+							class="me-1"
+						/>
+						{{ kernelLabel }}
+					</div>
+				</div>
+				<div class="datagrid-item">
+					<div class="datagrid-title">
+						{{ $t('security.not_checked') }}
+					</div>
+					<div class="datagrid-content">
 						<a
 							v-if="coverage.unchecked"
 							href="#"
@@ -51,18 +54,23 @@
 							class="text-success"
 						>{{ $t('security.all_checked') }}</span>
 					</div>
-					<div v-if="coverage.excluded">
-						<div class="subheader">
-							{{ $t('security.state_excluded') }}
-						</div>
-						<span class="text-muted">
-							{{ $t('security.excluded_installations', { count: coverage.excluded }, coverage.excluded) }}
-						</span>
+				</div>
+				<div
+					v-if="coverage.excluded"
+					class="datagrid-item"
+				>
+					<div class="datagrid-title">
+						{{ $t('security.state_excluded') }}
 					</div>
-					<div>
-						<div class="subheader">
-							{{ $t('security.open_exposures') }}
-						</div>
+					<div class="datagrid-content text-muted">
+						{{ $t('security.excluded_installations', { count: coverage.excluded }, coverage.excluded) }}
+					</div>
+				</div>
+				<div class="datagrid-item">
+					<div class="datagrid-title">
+						{{ $t('security.open_exposures') }}
+					</div>
+					<div class="datagrid-content">
 						{{ visibleOpen.length }}
 					</div>
 				</div>
@@ -80,23 +88,22 @@
 						v-if="noiseCount"
 						class="alert alert-info"
 					>
-						<font-awesome-icon
-							:icon="['fas', 'eye-slash']"
-							class="me-2"
-						/>
-						<template v-if="!showNoise">
-							{{ $t('security.asset_noise_hidden', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
-						</template>
-						<template v-else>
-							{{ $t('security.asset_noise_shown', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
-						</template>
-						<b-button
-							size="sm"
-							variant="link"
-							@click="showNoise = !showNoise"
-						>
-							{{ showNoise ? $t('security.hide_noise') : $t('security.show_hidden') }}
-						</b-button>
+						<div class="d-flex flex-wrap align-items-center gap-2">
+							<font-awesome-icon :icon="['fas', 'eye-slash']" />
+							<span v-if="!showNoise">
+								{{ $t('security.asset_noise_hidden', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
+							</span>
+							<span v-else>
+								{{ $t('security.asset_noise_shown', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
+							</span>
+							<b-button
+								size="sm"
+								variant="outline-primary"
+								@click="showNoise = !showNoise"
+							>
+								{{ showNoise ? $t('security.hide_noise') : $t('security.show_hidden') }}
+							</b-button>
+						</div>
 					</div>
 
 					<!-- Never a bare "no vulnerability" -->
@@ -108,11 +115,12 @@
 						<div>
 							<div>{{ $t('security.asset_no_exposure') }}</div>
 							<div v-if="coverage.unchecked">
-							{{ $t('security.asset_unchecked_warning', { count: coverage.unchecked }, coverage.unchecked) }}
-							<a
-								href="#"
-								@click.prevent="showUnchecked"
-							>{{ $t('security.see_list') }}</a>
+								{{ $t('security.asset_unchecked_warning', { count: coverage.unchecked }, coverage.unchecked) }}
+								<a
+									href="#"
+									class="ocs-link"
+									@click.prevent="showUnchecked"
+								>{{ $t('security.see_list') }}</a>
 							</div>
 							<div v-if="!kernelOk && coverage.kernel !== 'not_applicable'">
 								{{ $t('security.asset_kernel_warning', { state: kernelLabel }) }}
@@ -121,22 +129,12 @@
 					</div>
 					<ExposureTable
 						v-else
+						name="asset_vulnerabilities_open"
 						:rows="visibleOpen"
 						assetview
 						:canexclude="canexclude"
 						@exclude="openExclusion"
 					/>
-
-					<template v-if="excludedOpen.length">
-						<h4 class="text-muted mt-3">
-							{{ $t('security.excluded_exposures') }} ({{ excludedOpen.length }})
-						</h4>
-						<ExposureTable
-							:rows="excludedOpen"
-							assetview
-							excluded
-						/>
-					</template>
 				</b-tab>
 
 				<b-tab
@@ -148,17 +146,13 @@
 						:message="closedError"
 						variant="danger"
 					/>
-					<p
-						v-else-if="closed && !closed.length"
-						class="text-muted"
-					>
-						{{ $t('security.closed_none') }}
-					</p>
 					<ExposureTable
 						v-else-if="closed"
+						name="asset_vulnerabilities_closed"
 						:rows="closed"
 						assetview
 						closed
+						:emptytext="$t('security.closed_none')"
 					/>
 					<div
 						v-else
@@ -169,62 +163,49 @@
 				</b-tab>
 
 				<b-tab :title="$t('security.tab_software', { count: software.length })">
-					<b-row class="mb-3 g-2">
-						<b-col md="4">
-							<b-form-select
+					<Datatable
+						id="asset-software-states-datatable"
+						:rowdata="filteredSoftware"
+						:rowheader="softwareColumns"
+						:usecheckbox="false"
+						:candeletemultiple="false"
+						title="asset_software_states"
+						translationkey="security.column_"
+						compactheader
+					>
+						<template #toolbar>
+							<v-select
 								v-model="softwareState"
 								:options="softwareStateOptions"
+								:reduce="option => option.value"
+								:placeholder="$t('security.all_states')"
+								:searchable="false"
+								label="text"
+								class="datatable-btn vuln-filter"
 							/>
-						</b-col>
-						<b-col md="4">
-							<b-form-input
-								v-model="softwareSearch"
-								type="search"
-								:placeholder="$t('generic.search')"
-							/>
-						</b-col>
-					</b-row>
-					<p
-						v-if="!filteredSoftware.length"
-						class="text-muted"
-					>
-						{{ $t('generic.no_data') }}
+						</template>
+						<template #cell(family)="{ row }">
+							{{ row.item.family ? $t('software_identity.family_' + row.item.family) : '' }}
+						</template>
+						<template #cell(state)="{ row }">
+							<InstallationState :state="row.item.state" />
+						</template>
+					</Datatable>
+				</b-tab>
+
+				<b-tab
+					v-if="excludedOpen.length"
+					:title="$t('security.tab_excluded', { count: excludedOpen.length })"
+				>
+					<p class="text-muted">
+						{{ $t('security.excluded_help') }}
 					</p>
-					<template v-else>
-						<table class="table table-sm table-striped table-vcenter">
-							<thead>
-								<tr>
-									<th>{{ $t('security.software') }}</th>
-									<th>{{ $t('security.version') }}</th>
-									<th>{{ $t('software_identity.family') }}</th>
-									<th>{{ $t('software_identity.product') }}</th>
-									<th>{{ $t('security.state') }}</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr
-									v-for="row in pagedSoftware"
-									:key="row.entry"
-								>
-									<td>{{ row.name }}</td>
-									<td>{{ row.version }}</td>
-									<td>{{ row.family ? $t('software_identity.family_' + row.family) : '' }}</td>
-									<td>{{ row.product || '—' }}</td>
-									<td>
-										<InstallationState :state="row.state" />
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<b-pagination
-							v-if="filteredSoftware.length > perPage"
-							v-model="softwarePage"
-							:total-rows="filteredSoftware.length"
-							:per-page="perPage"
-							align="right"
-							size="sm"
-						/>
-					</template>
+					<ExposureTable
+						name="asset_vulnerabilities_excluded"
+						:rows="excludedOpen"
+						assetview
+						excluded
+					/>
 				</b-tab>
 			</b-tabs>
 
@@ -266,9 +247,7 @@ export default {
 			activeTab: 0,
 
 			softwareState: null,
-			softwareSearch: "",
-			softwarePage: 1,
-			perPage: 25,
+			softwareColumns: ["software_name", "version", "family", "product", "state"],
 
 			canexclude: hasPermission("security_add_exclusion"),
 			exclusionShown: false,
@@ -311,31 +290,21 @@ export default {
 		softwareStateOptions() {
 			const states = [...new Set(this.software.map((row) => row.state))]
 			return [
-				{ value: null, text: this.$t("security.all_states") },
 				{ value: "__unchecked", text: this.$t("security.unchecked_only") },
 				...states.map((state) => ({ value: state, text: this.stateLabel(state) })),
 			]
 		},
+		// the datatable searches; the state is picked in its toolbar
 		filteredSoftware() {
-			const search = this.softwareSearch.toLowerCase()
-			return this.software.filter((row) => {
-				if (this.softwareState === "__unchecked" && FINE_STATES.includes(row.state)) return false
-				if (this.softwareState && this.softwareState !== "__unchecked" && row.state !== this.softwareState) return false
-				return !search || `${row.name} ${row.version} ${row.product || ""}`.toLowerCase().includes(search)
-			})
-		},
-		pagedSoftware() {
-			const start = (this.softwarePage - 1) * this.perPage
-			return this.filteredSoftware.slice(start, start + this.perPage)
+			return this.software
+				.filter((row) => {
+					if (this.softwareState === "__unchecked") return !FINE_STATES.includes(row.state)
+					return !this.softwareState || row.state === this.softwareState
+				})
+				.map((row) => ({ ...row, id: row.entry, software_name: row.name }))
 		},
 	},
 	watch: {
-		softwareState() {
-			this.softwarePage = 1
-		},
-		softwareSearch() {
-			this.softwarePage = 1
-		},
 		async activeTab(index) {
 			if (index === 1 && this.closed === null) {
 				await this.loadClosed()

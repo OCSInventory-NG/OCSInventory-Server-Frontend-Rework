@@ -6,60 +6,38 @@
 			:cols="true"
 			variant="danger"
 		/>
+		<Datatable
+			v-if="ready"
+			id="software-identity-decisions-datatable"
+			:rowdata="rowdata"
+			:rowheader="columns"
+			:candelete="candelete"
+			:candeletemultiple="false"
+			:usecheckbox="false"
+			:isbusy="loading"
+			:emptytext="$t('software_identity.decisions_empty')"
+			title="software_identity_decisions"
+			translationkey="software_identity.column_"
+			compactheader
+			@reload-datatable="onDeleted"
+		>
+			<template #cell(source)="{ row }">
+				{{ $t('software_identity.source_' + row.item.source_key) }}
+				<span
+					v-if="row.item.replaced"
+					class="badge bg-secondary-lt ms-1"
+					:title="$t('software_identity.replaced_help')"
+				>{{ $t('software_identity.replaced') }}</span>
+			</template>
+			<template #cell(created)="{ row }">
+				<span class="text-nowrap">{{ new Date(row.item.created).toLocaleString() }}</span>
+			</template>
+		</Datatable>
 		<div
-			v-if="loading"
+			v-else
 			class="ocs-loader"
 		>
 			<Loader />
-		</div>
-		<div v-else>
-			<p v-if="!decisions.length">
-				{{ $t('software_identity.decisions_empty') }}
-			</p>
-			<table
-				v-else
-				class="table table-sm table-striped table-vcenter"
-			>
-				<thead>
-					<tr>
-						<th>{{ $t('software_identity.family') }}</th>
-						<th>{{ $t('software_identity.match_key') }}</th>
-						<th>{{ $t('software_identity.product') }}</th>
-						<th>{{ $t('software_identity.source') }}</th>
-						<th>{{ $t('software_identity.created_at') }}</th>
-						<th v-if="candelete" />
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="decision in decisions"
-						:key="decision.id"
-					>
-						<td>{{ $t('software_identity.family_' + decision.family) }}</td>
-						<td>{{ decision.match_key }}</td>
-						<td>{{ decision.product || $t('software_identity.no_cpe') }}</td>
-						<td>
-							{{ $t('software_identity.source_' + decision.source) }}
-							<span
-								v-if="isReplaced(decision)"
-								class="badge bg-secondary-lt ms-1"
-								:title="$t('software_identity.replaced_help')"
-							>{{ $t('software_identity.replaced') }}</span>
-						</td>
-						<td>{{ new Date(decision.created_at).toLocaleString() }}</td>
-						<td v-if="candelete">
-							<button
-								v-if="decision.source === 'admin'"
-								class="btn btn-ghost-danger"
-								:title="$t('software_identity.revert')"
-								@click="revert(decision)"
-							>
-								<font-awesome-icon :icon="['fas', 'trash-can']" />
-							</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
 		</div>
 	</div>
 </template>
@@ -76,8 +54,27 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
+			ready: false,
+			columns: ["family", "match_key", "product", "source", "created"],
 			decisions: [],
 		}
+	},
+	computed: {
+		// shipped decisions cannot be deleted; created_at is drawn by the datatable itself, renamed
+		rowdata() {
+			return this.decisions.map((decision) => ({
+				id: decision.id,
+				name: decision.match_key,
+				family: this.$t("software_identity.family_" + decision.family),
+				match_key: decision.match_key,
+				product: decision.product || this.$t("software_identity.no_cpe"),
+				source: this.$t("software_identity.source_" + decision.source),
+				source_key: decision.source,
+				replaced: this.isReplaced(decision),
+				created: decision.created_at,
+				is_protected: decision.source !== "admin",
+			}))
+		},
 	},
 	async mounted() {
 		await this.load()
@@ -97,6 +94,7 @@ export default {
 				this.errored = true
 			} finally {
 				this.loading = false
+				this.ready = true
 			}
 		},
 
@@ -107,15 +105,10 @@ export default {
 			)
 		},
 
-		async revert(decision) {
-			try {
-				await this.$api.generic.delete(`software_identity_decisions/${decision.id}/`)
-				this.$emit("reverted")
-				await this.load()
-			} catch (e) {
-				this.errormsg = this._apiError(e)
-				this.errored = true
-			}
+		// the datatable deleted a decision (or asks for a reload)
+		async onDeleted() {
+			this.$emit("reverted")
+			await this.load()
 		},
 	},
 }

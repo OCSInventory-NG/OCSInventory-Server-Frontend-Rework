@@ -10,7 +10,7 @@
 	<span
 		v-else
 		class="text-muted"
-	>—</span>
+	>{{ $t('security.kev_not_listed') }}</span>
 </template>
 
 <script>

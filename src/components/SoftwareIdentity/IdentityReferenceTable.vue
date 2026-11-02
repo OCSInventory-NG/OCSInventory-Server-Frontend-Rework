@@ -1,131 +1,88 @@
 <template>
 	<div class="identity-reference">
-		<p
-			v-if="help"
-			class="text-muted"
-		>
-			{{ help }}
-		</p>
+		<div class="d-flex align-items-start gap-3 mb-3">
+			<p
+				v-if="help"
+				class="text-muted mb-0"
+			>
+				{{ help }}
+			</p>
+			<b-button
+				v-if="cancreate"
+				variant="primary"
+				class="ms-auto text-nowrap"
+				@click="openForm(null)"
+			>
+				<font-awesome-icon
+					:icon="['fas', 'plus']"
+					class="me-1"
+				/>
+				{{ $t('generic.add') }}
+			</b-button>
+		</div>
 		<Alert
 			v-if="errored"
 			:message="errormsg"
 			:cols="true"
 			variant="danger"
 		/>
+		<Datatable
+			v-if="ready"
+			:id="route + '-datatable'"
+			:rowdata="rowdata"
+			:rowheader="columnKeys"
+			:fieldlabels="columnLabels"
+			:candelete="candelete"
+			:candeletemultiple="false"
+			:usecheckbox="false"
+			:hascustomactions="canedit && editableFields.length > 0"
+			:isbusy="loading"
+			:title="route"
+			compactheader
+			@reload-datatable="load"
+		>
+			<template
+				v-for="field in columns"
+				:key="field"
+				#[cellSlot(field)]="{ row }"
+			>
+				<template v-if="fieldType(field) === 'boolean'">
+					<span
+						v-if="row.item.source[field]"
+						class="badge"
+						:class="badgefields[field] || 'bg-green-lt'"
+					>{{ booleanLabel(field) }}</span>
+				</template>
+				<template v-else-if="field === 'source' && (row.item.source[field] === 'shipped' || row.item.source[field] === 'admin')">
+					{{ $t('software_identity.source_' + row.item.source[field]) }}
+				</template>
+				<template v-else-if="fieldType(field) === 'date'">
+					{{ formatDay(row.item.source[field]) }}
+				</template>
+				<template v-else-if="fieldType(field) === 'datetime'">
+					{{ formatDateTime(row.item.source[field]) }}
+				</template>
+				<template v-else>
+					{{ display(row.item.source[field]) }}
+				</template>
+			</template>
+			<template #cell(firstActions)="{ row }">
+				<button
+					v-if="!row.item.is_protected"
+					class="btn btn-ghost-dark"
+					:title="$t('generic.update')"
+					@click="openForm(row.item.source)"
+				>
+					<font-awesome-icon :icon="['fas', 'pencil']" />
+				</button>
+			</template>
+		</Datatable>
 		<div
-			v-if="loading"
+			v-else
 			class="ocs-loader"
 		>
 			<Loader />
 		</div>
-		<template v-else>
-			<div class="d-flex mb-3 gap-2">
-				<b-form-input
-					v-model="search"
-					type="search"
-					:placeholder="$t('generic.search')"
-					class="w-auto"
-				/>
-				<b-button
-					v-if="cancreate"
-					variant="primary"
-					class="ms-auto"
-					@click="openForm(null)"
-				>
-					<font-awesome-icon
-						:icon="['fas', 'plus']"
-						class="me-1"
-					/>
-					{{ $t('generic.add') }}
-				</b-button>
-			</div>
-			<p v-if="!filteredRows.length">
-				{{ $t('generic.no_data') }}
-			</p>
-			<div
-				v-else
-				class="table-responsive"
-			>
-				<table class="table table-sm table-striped table-vcenter">
-					<thead>
-						<tr>
-							<th
-								v-for="field in columns"
-								:key="field"
-							>
-								{{ fieldLabel(field) }}
-							</th>
-							<th v-if="canedit || candelete" />
-						</tr>
-					</thead>
-					<tbody>
-						<tr
-							v-for="row in pagedRows"
-							:key="row.id"
-						>
-							<td
-								v-for="field in columns"
-								:key="field"
-							>
-								<template v-if="fieldType(field) === 'boolean'">
-									<span
-										v-if="row[field]"
-										class="badge"
-										:class="badgefields[field] || 'bg-green-lt'"
-									>{{ booleanLabel(field) }}</span>
-									<span
-										v-else
-										class="text-muted"
-									>—</span>
-								</template>
-								<template v-else-if="field === 'source' && (row[field] === 'shipped' || row[field] === 'admin')">
-									{{ $t('software_identity.source_' + row[field]) }}
-								</template>
-								<template v-else-if="fieldType(field) === 'date'">
-									{{ row[field] ? formatDay(row[field]) : '—' }}
-								</template>
-								<template v-else-if="fieldType(field) === 'datetime'">
-									{{ formatDateTime(row[field]) }}
-								</template>
-								<template v-else>
-									{{ display(row[field]) }}
-								</template>
-							</td>
-							<td
-								v-if="canedit || candelete"
-								class="text-nowrap"
-							>
-								<div class="d-flex">
-									<button
-										v-if="canedit && editableFields.length && !isprotected(row)"
-										class="btn btn-ghost-dark"
-										:title="$t('generic.update')"
-										@click="openForm(row)"
-									>
-										<font-awesome-icon :icon="['fas', 'pencil']" />
-									</button>
-									<DeleteItemModal
-										v-if="candelete && !isprotected(row)"
-										:id="row.id"
-										:name="String(row[columns[0]] ?? row.id)"
-										:parameter="route"
-										@reload-datatable="load"
-									/>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<b-pagination
-				v-if="filteredRows.length > perPage"
-				v-model="currentPage"
-				:total-rows="filteredRows.length"
-				:per-page="perPage"
-				align="right"
-				size="sm"
-			/>
-		</template>
 
 		<b-modal
 			v-model="formShown"
@@ -222,12 +179,11 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
+			// the datatable is drawn once the columns and the first rows are in
+			ready: false,
 			rows: [],
 			meta: {},
 			hasPost: false,
-			search: "",
-			currentPage: 1,
-			perPage: 25,
 
 			canadd: hasPermission(`${this.app}_add_${this.model}`),
 			canedit: hasPermission(`${this.app}_change_${this.model}`),
@@ -264,21 +220,27 @@ export default {
 		formFields() {
 			return this.editableFields
 		},
-		filteredRows() {
-			const search = this.search.toLowerCase()
-			if (!search) return this.rows
-			return this.rows.filter((row) =>
-				this.columns.some((field) => String(row[field] ?? "").toLowerCase().includes(search))
-			)
+		// every column key is prefixed: the datatable draws some keys itself (created_at, error…)
+		columnKeys() {
+			return this.columns.map((field) => "col_" + field)
 		},
-		pagedRows() {
-			const start = (this.currentPage - 1) * this.perPage
-			return this.filteredRows.slice(start, start + this.perPage)
+		columnLabels() {
+			return Object.fromEntries(this.columns.map((field) => ["col_" + field, this.fieldLabel(field)]))
 		},
-	},
-	watch: {
-		search() {
-			this.currentPage = 1
+		// plain values for the search and the sort, the row itself for the cells
+		rowdata() {
+			return this.rows.map((row) => {
+				const item = {
+					id: row.id,
+					name: String(row[this.columns[0]] ?? row.id),
+					is_protected: this.isprotected(row),
+					source: row,
+				}
+				for (const field of this.columns) {
+					item["col_" + field] = this.display(row[field])
+				}
+				return item
+			})
 		},
 	},
 	async mounted() {
@@ -305,7 +267,12 @@ export default {
 				this.errored = true
 			} finally {
 				this.loading = false
+				this.ready = true
 			}
+		},
+
+		cellSlot(field) {
+			return "cell(col_" + field + ")"
 		},
 
 		fieldType(field) {
@@ -328,7 +295,7 @@ export default {
 			return "text"
 		},
 		display(value) {
-			if (value === null || value === undefined || value === "") return "—"
+			if (value === null || value === undefined || value === "") return ""
 			if (Array.isArray(value)) return value.join(", ")
 			if (typeof value === "object") return JSON.stringify(value)
 			return value

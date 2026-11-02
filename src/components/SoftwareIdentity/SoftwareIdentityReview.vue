@@ -6,95 +6,67 @@
 			:cols="true"
 			variant="danger"
 		/>
-		<div
-			v-if="loading"
-			class="ocs-loader"
+		<Datatable
+			:id="'software-identity-' + status + '-datatable'"
+			:rowdata="rowdata"
+			:rowheader="columns"
+			:nonsortablefields="columns"
+			:usecheckbox="false"
+			:candeletemultiple="false"
+			:cansearch="false"
+			:canexport="false"
+			:server-side="true"
+			:server-total-rows="total"
+			:isbusy="loading"
+			:emptytext="$t(status === 'matched' ? 'software_identity.matched_empty' : 'software_identity.review_empty')"
+			:title="'software_identity_' + status"
+			translationkey="software_identity.column_"
+			compactheader
+			@change-query="onQueryChange"
+			@reload-datatable="load"
 		>
-			<Loader />
-		</div>
-		<div v-else>
-			<p v-if="!rows.length">
-				{{ $t(status === 'matched' ? 'software_identity.matched_empty' : 'software_identity.review_empty') }}
-			</p>
-			<table
-				v-else
-				class="table table-sm table-striped table-vcenter"
-			>
-				<thead>
-					<tr>
-						<th>{{ $t('software_identity.name') }}</th>
-						<th>{{ $t('software_identity.family') }}</th>
-						<th>{{ $t('software_identity.versions') }}</th>
-						<th>{{ $t('software_identity.machines') }}</th>
-						<th v-if="status === 'matched'">
-							{{ $t('software_identity.product') }}
-						</th>
-						<th>{{ $t('software_identity.candidates') }}</th>
-						<th v-if="candecide" />
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="row in rows"
-						:key="row.family + row.match_key"
+			<template #cell(family)="{ row }">
+				{{ $t('software_identity.family_' + row.item.family) }}
+			</template>
+			<template #cell(candidates)="{ row }">
+				<div
+					v-for="candidate in row.item.candidates"
+					:key="candidate.product"
+				>
+					<b-button
+						v-if="candecide"
+						size="sm"
+						variant="outline-primary"
+						class="mb-1 text-start"
+						:title="$t('software_identity.accept')"
+						@click="decide(row.item, candidate.product)"
 					>
-						<td>{{ row.name }}</td>
-						<td>{{ $t('software_identity.family_' + row.family) }}</td>
-						<td>{{ row.entries }}</td>
-						<td>{{ row.machines }}</td>
-						<td v-if="status === 'matched'">
-							{{ row.product }}
-						</td>
-						<td>
-							<div
-								v-for="candidate in row.candidates"
-								:key="candidate.product"
-							>
-								<b-button
-									v-if="candecide"
-									size="sm"
-									variant="outline-primary"
-									class="mb-1"
-									:title="$t('software_identity.accept')"
-									@click="decide(row, candidate.product)"
-								>
-									<font-awesome-icon :icon="['fas', 'check']" />
-									{{ candidate.product }} ({{ candidate.score.toFixed(2) }})
-								</b-button>
-								<span v-else>{{ candidate.product }} ({{ candidate.score.toFixed(2) }})</span>
-							</div>
-						</td>
-						<td v-if="candecide">
-							<v-select
-								v-if="cansearch"
-								:options="productOptions"
-								:filterable="false"
-								:placeholder="$t('software_identity.other_product')"
-								class="mb-1 identity-product-search"
-								@search="searchProducts"
-								@option:selected="(option) => decide(row, option.value)"
-							/>
-							<b-button
-								size="sm"
-								variant="outline-danger"
-								@click="decide(row, null)"
-							>
-								<font-awesome-icon :icon="['fas', 'xmark']" />
-								{{ $t('software_identity.no_cpe') }}
-							</b-button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<b-pagination
-				v-if="total > perPage"
-				v-model="currentPage"
-				:total-rows="total"
-				:per-page="perPage"
-				align="right"
-				size="sm"
-			/>
-		</div>
+						<font-awesome-icon :icon="['fas', 'check']" />
+						{{ candidate.product }} ({{ candidate.score.toFixed(2) }})
+					</b-button>
+					<span v-else>{{ candidate.product }} ({{ candidate.score.toFixed(2) }})</span>
+				</div>
+			</template>
+			<template #cell(decision)="{ row }">
+				<v-select
+					v-if="cansearch"
+					:options="productOptions"
+					:filterable="false"
+					:placeholder="$t('software_identity.other_product')"
+					class="mb-1 identity-product-search"
+					@search="searchProducts"
+					@option:selected="(option) => decide(row.item, option.value)"
+				/>
+				<b-button
+					size="sm"
+					variant="outline-danger"
+					@click="decide(row.item, null)"
+				>
+					<font-awesome-icon :icon="['fas', 'xmark']" />
+					{{ $t('software_identity.no_cpe') }}
+				</b-button>
+			</template>
+		</Datatable>
 	</div>
 </template>
 
@@ -116,45 +88,66 @@ export default {
 
 			rows: [],
 			total: 0,
-			currentPage: 1,
-			perPage: 20,
+			// page given by the datatable
+			query: { limit: Number(localStorage.getItem("perPage")) || 5, offset: 0 },
+			request: 0,
 
 			productOptions: [],
 			searchTimer: null,
 		}
 	},
-	watch: {
-		async currentPage() {
-			await this.load()
+	computed: {
+		columns() {
+			const columns = ["software", "family", "versions", "machines"]
+			if (this.status === "matched") columns.push("product")
+			columns.push("candidates")
+			if (this.candecide) columns.push("decision")
+			return columns
+		},
+		rowdata() {
+			return this.rows.map((row) => ({
+				...row,
+				id: row.family + "|" + row.match_key,
+				software: row.name,
+				versions: row.entries,
+			}))
 		},
 	},
 	async mounted() {
 		await this.load()
+	},
+	beforeUnmount() {
+		clearTimeout(this.searchTimer)
 	},
 	methods: {
 		_apiError(e) {
 			return e?.response?.data?.error || e?.response?.data?.detail || e?.response?.data?.[0] || e?.message || String(e)
 		},
 
+		async onQueryChange(query) {
+			this.query = { limit: query.limit, offset: query.offset }
+			await this.load()
+		},
+
 		async load() {
 			this.loading = true
+			const request = ++this.request
 			try {
 				const data = await this.$api.generic.get("software_identities/review/", {
 					status: this.status,
-					limit: this.perPage,
-					offset: (this.currentPage - 1) * this.perPage,
+					limit: this.query.limit,
+					offset: this.query.offset,
 				})
+				if (request !== this.request) return
 				this.rows = data.results || data
 				this.total = typeof data.count === "number" ? data.count : this.rows.length
 				this.errored = false
-				if (!this.rows.length && this.currentPage > 1) {
-					this.currentPage -= 1
-				}
 			} catch (e) {
+				if (request !== this.request) return
 				this.errormsg = this._apiError(e)
 				this.errored = true
 			} finally {
-				this.loading = false
+				if (request === this.request) this.loading = false
 			}
 		},
 
@@ -188,6 +181,10 @@ export default {
 					product,
 				})
 				this.$emit("decided")
+				// a decided row leaves the list: the last one of a page sends back one page
+				if (this.rows.length === 1 && this.query.offset > 0) {
+					this.query = { ...this.query, offset: Math.max(0, this.query.offset - this.query.limit) }
+				}
 				await this.load()
 			} catch (e) {
 				this.errormsg = this._apiError(e)

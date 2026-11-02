@@ -7,104 +7,58 @@
 			<PageHeader page-title="software_identity" />
 
 			<div class="page-body">
-				<div v-if="errored">
-					<Alert
-						:message="errormsg"
-						:cols="true"
-						variant="danger"
-					/>
-				</div>
-
-				<div
-					v-else-if="loading"
-					class="ocs-loader"
-				>
-					<Loader />
-				</div>
-
-				<template v-else>
-					<div class="card mb-3">
-						<div class="card-header">
-							<h3 class="card-title">
-								{{ $t('software_identity.summary') }}
-							</h3>
+				<div class="card">
+					<div class="card-body">
+						<Alert
+							v-if="errored"
+							:message="errormsg"
+							:cols="true"
+							variant="danger"
+						/>
+						<div
+							v-else-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
 						</div>
-						<div class="card-body">
-							<table class="table table-sm table-striped table-vcenter">
-								<tbody>
-									<tr>
-										<td>{{ $t('software_identity.index') }}</td>
-										<td>{{ indexLabel }}</td>
-									</tr>
-									<tr>
-										<td>{{ $t('software_identity.pending') }}</td>
-										<td>{{ summary.pending }}</td>
-									</tr>
-									<tr>
-										<td>{{ $t('software_identity.unknown_platform') }}</td>
-										<td>{{ summary.machines_unknown_platform }}</td>
-									</tr>
-								</tbody>
-							</table>
-							<table
-								v-if="families.length"
-								class="table table-sm table-striped table-vcenter"
-							>
-								<thead>
-									<tr>
-										<th>{{ $t('software_identity.family') }}</th>
-										<th
-											v-for="status in statuses"
-											:key="status"
-										>
-											{{ $t('software_identity.status_' + status) }}
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr
-										v-for="family in families"
-										:key="family"
-									>
-										<td>{{ familyLabel(family) }}</td>
-										<td
-											v-for="status in statuses"
-											:key="status"
-										>
-											{{ count(family, status) }}
-										</td>
-									</tr>
-								</tbody>
-							</table>
-							<table
-								v-if="summary.origins.length"
-								class="table table-sm table-striped table-vcenter"
-							>
-								<thead>
-									<tr>
-										<th>{{ $t('software_identity.origin') }}</th>
-										<th>{{ $t('software_identity.distribution') }}</th>
-										<th>{{ $t('software_identity.installed_packages') }}</th>
-										<th>{{ $t('software_identity.machines') }}</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr
-										v-for="row in summary.origins"
-										:key="row.package_origin"
-									>
-										<td>{{ row.package_origin || $t('software_identity.no_origin') }}</td>
-										<td>{{ distributionLabel(row) }}</td>
-										<td>{{ row.installations }}</td>
-										<td>{{ row.machines }}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
 
-					<div class="card">
-						<div class="card-body">
+						<template v-else>
+							<div class="datagrid mb-4">
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('software_identity.index') }}
+									</div>
+									<div
+										class="datagrid-content"
+										:class="{ 'text-warning': !summary.index.version }"
+									>
+										{{ indexLabel }}
+									</div>
+								</div>
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('software_identity.pending') }}
+									</div>
+									<div
+										class="datagrid-content"
+										:class="{ 'text-warning': summary.pending }"
+									>
+										{{ summary.pending }}
+									</div>
+								</div>
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('software_identity.unknown_platform') }}
+									</div>
+									<div
+										class="datagrid-content"
+										:class="{ 'text-warning': summary.machines_unknown_platform }"
+									>
+										{{ summary.machines_unknown_platform }}
+									</div>
+								</div>
+							</div>
+
 							<b-tabs
 								content-class="col-10 sticky-tabs"
 								pills
@@ -112,8 +66,41 @@
 								vertical
 							>
 								<b-tab
+									:title="$t('software_identity.summary')"
+									title-item-class="ocs-menu-tab"
+								>
+									<div class="hr-text mt-0">
+										{{ $t('software_identity.by_platform') }}
+									</div>
+									<Datatable
+										id="software-identity-families-datatable"
+										:rowdata="familyRows"
+										:rowheader="familyColumns"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										:cansearch="false"
+										title="software_identity_families"
+										translationkey="software_identity.column_"
+										compactheader
+									/>
+									<div class="hr-text">
+										{{ $t('software_identity.by_origin') }}
+									</div>
+									<Datatable
+										id="software-identity-origins-summary-datatable"
+										:rowdata="originRows"
+										:rowheader="['origin', 'distribution', 'installations', 'machines']"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										title="software_identity_origins_summary"
+										translationkey="software_identity.column_"
+										compactheader
+									/>
+								</b-tab>
+								<b-tab
 									:title="$t('software_identity.tab_review')"
 									title-item-class="ocs-menu-tab"
+									lazy
 								>
 									<SoftwareIdentityReview
 										:key="reviewKey"
@@ -125,6 +112,7 @@
 								<b-tab
 									:title="$t('software_identity.tab_matched')"
 									title-item-class="ocs-menu-tab"
+									lazy
 								>
 									<SoftwareIdentityReview
 										:key="matchedKey"
@@ -138,6 +126,7 @@
 									v-if="canviewdecisions"
 									:title="$t('software_identity.tab_decisions')"
 									title-item-class="ocs-menu-tab"
+									lazy
 								>
 									<SoftwareIdentityDecisions
 										:key="decisionsKey"
@@ -190,9 +179,9 @@
 									/>
 								</b-tab>
 							</b-tabs>
-						</div>
+						</template>
 					</div>
-				</template>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -227,15 +216,36 @@ export default {
 		}
 	},
 	computed: {
-		families() {
-			return [...new Set(this.summary.counts.map((row) => row.family))]
-		},
 		indexLabel() {
 			const index = this.summary.index
 			if (!index.version) {
 				return this.$t("software_identity.no_index")
 			}
-			return `${new Date(index.source_date).toLocaleString()} (${index.product_count} ${this.$t("software_identity.products")})`
+			return `${new Date(index.source_date).toLocaleString()} (${Number(index.product_count).toLocaleString()} ${this.$t("software_identity.products")})`
+		},
+		familyColumns() {
+			return ["platform", ...this.statuses.map((status) => "status_" + status)]
+		},
+		// one row per platform, one column per identity status
+		familyRows() {
+			const families = [...new Set(this.summary.counts.map((row) => row.family))]
+			return families.map((family) => {
+				const row = { id: family || "unknown", platform: this.$t("software_identity.family_" + (family || "unknown")) }
+				for (const status of this.statuses) {
+					const count = this.summary.counts.find((item) => item.family === family && item.status === status)
+					row["status_" + status] = count ? count.count : 0
+				}
+				return row
+			})
+		},
+		originRows() {
+			return (this.summary.origins || []).map((row) => ({
+				id: row.package_origin || "",
+				origin: row.package_origin || this.$t("software_identity.no_origin"),
+				distribution: row.distribution || (row.package_origin ? this.$t("software_identity.third_party") : ""),
+				installations: row.installations,
+				machines: row.machines,
+			}))
 		},
 	},
 	async mounted() {
@@ -274,19 +284,6 @@ export default {
 			this.reviewKey += 1
 			this.matchedKey += 1
 			await this.loadSummary()
-		},
-		count(family, status) {
-			const row = this.summary.counts.find((item) => item.family === family && item.status === status)
-			return row ? row.count : 0
-		},
-		familyLabel(family) {
-			return this.$t("software_identity.family_" + (family || "unknown"))
-		},
-		distributionLabel(row) {
-			if (row.distribution) {
-				return row.distribution
-			}
-			return row.package_origin ? this.$t("software_identity.third_party") : ""
 		},
 	},
 }

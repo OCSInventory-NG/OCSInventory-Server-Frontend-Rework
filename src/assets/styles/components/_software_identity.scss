@@ -4,42 +4,15 @@
 .identity-product-search {
   min-width: 16rem;
 
-  .vs__dropdown-menu {
-    min-width: 28rem !important;
-    left: auto;
-    right: 0;
-  }
-}
-
-// Vulnerability list: filters in the datatable toolbar, order and noise under it
-.vuln-filter {
-  min-width: 11.75rem;
-
   .vs__selected,
   .vs__search,
   .vs__search::placeholder {
     font-size: 0.875rem;
   }
 
-  .vs__search::placeholder {
-    color: $gray-700;
+  .vs__dropdown-menu {
+    min-width: 28rem !important;
+    left: auto;
+    right: 0;
   }
-}
-
-.vuln-status {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  border: 1px solid var(--tblr-border-color);
-  border-radius: var(--tblr-border-radius);
-  background-color: var(--tblr-bg-surface-secondary);
-}
-
-.vuln-summary-cell {
-  display: inline-block;
-  min-width: 16rem;
-  max-width: 28rem;
-  white-space: normal;
 }

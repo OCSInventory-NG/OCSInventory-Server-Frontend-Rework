@@ -7,224 +7,205 @@
 			<PageHeader page-title="vulnerability_coverage" />
 
 			<div class="page-body">
-				<div v-if="denied">
-					<Alert
-						:message="$t('message.dont_have_right_to_see')"
-						:cols="true"
-						variant="danger"
-					/>
-				</div>
-				<Alert
-					v-else-if="errored"
-					:message="errormsg"
-					:cols="true"
-					variant="danger"
-				/>
-				<div
-					v-else-if="loading"
-					class="ocs-loader"
-				>
-					<Loader />
-				</div>
-				<template v-else>
-					<SourceFreshness
-						:sources="coverage.sources || []"
-						:showlink="false"
-					/>
-
-					<!-- Scans -->
-					<div class="card mb-3">
-						<div class="card-body d-flex flex-wrap gap-4">
-							<div
-								v-for="scan in scans"
-								:key="scan"
-							>
-								<div class="subheader">
-									{{ $t('security.' + scan) }}
-								</div>
-								<span v-if="coverage[scan]">{{ formatDateTime(coverage[scan]) }}</span>
-								<span
-									v-else
-									class="text-warning"
-								>
-									<font-awesome-icon
-										:icon="['fas', 'triangle-exclamation']"
-										class="me-1"
-									/>
-									{{ $t('security.never') }}
-								</span>
-							</div>
+				<div class="card">
+					<div class="card-body">
+						<Alert
+							v-if="denied"
+							:message="$t('message.dont_have_right_to_see')"
+							:cols="true"
+							variant="danger"
+						/>
+						<Alert
+							v-else-if="errored"
+							:message="errormsg"
+							:cols="true"
+							variant="danger"
+						/>
+						<div
+							v-else-if="loading"
+							class="ocs-loader"
+						>
+							<Loader />
 						</div>
-					</div>
+						<template v-else>
+							<SourceFreshness
+								:sources="coverage.sources || []"
+								:showlink="false"
+							/>
 
-					<!-- Funnel: each test, in its order, sets aside the installations it cannot check -->
-					<div class="card mb-3">
-						<div class="card-header">
-							<h3 class="card-title">
-								{{ $t('security.funnel') }}
-							</h3>
-						</div>
-						<div class="card-body">
-							<p class="text-muted">
-								{{ $t('security.funnel_help') }}
-							</p>
-							<div
-								v-for="family in families"
-								:key="family.family"
-								class="mb-2"
-							>
-								<div class="d-flex justify-content-between">
-									<strong>{{ $t('software_identity.family_' + family.family) }}</strong>
-									<span :class="familyChecked(family) < familyTotal(family) ? 'text-warning' : 'text-success'">
-										{{ $t('security.checked_share', { checked: familyChecked(family), total: familyTotal(family) }) }}
-									</span>
+							<!-- What the scan covers, in a few numbers -->
+							<div class="datagrid mb-4">
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('security.state_checked') }}
+									</div>
+									<div class="datagrid-content">
+										{{ $t('security.checked_share', { checked: totals.checked, total: totals.all }) }}
+									</div>
 								</div>
-								<div class="progress progress-sm">
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('security.not_checked') }}
+									</div>
 									<div
-										v-for="state in states"
-										v-show="family.installations[state]"
-										:key="state"
-										class="progress-bar"
-										:class="stateBarClass(state)"
-										:style="{ width: share(family.installations[state], familyTotal(family)) + '%' }"
-										:title="`${stateLabel(state)} : ${family.installations[state] || 0}`"
-									/>
+										class="datagrid-content"
+										:class="{ 'text-warning': totals.unchecked }"
+									>
+										{{ totals.unchecked }}
+									</div>
+								</div>
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('security.state_excluded') }}
+									</div>
+									<div class="datagrid-content">
+										{{ totals.excluded }}
+									</div>
+								</div>
+								<div class="datagrid-item">
+									<div class="datagrid-title">
+										{{ $t('security.kernels_unchecked') }}
+									</div>
+									<div
+										class="datagrid-content"
+										:class="{ 'text-warning': totals.kernels }"
+									>
+										{{ totals.kernels }}
+									</div>
+								</div>
+								<div
+									v-for="scan in scans"
+									:key="scan"
+									class="datagrid-item"
+								>
+									<div class="datagrid-title">
+										{{ $t('security.' + scan) }}
+									</div>
+									<div
+										class="datagrid-content"
+										:class="{ 'text-warning': !coverage[scan] }"
+									>
+										{{ coverage[scan] ? formatDateTime(coverage[scan]) : $t('security.never') }}
+									</div>
 								</div>
 							</div>
 
-							<div class="table-responsive mt-3">
-								<table class="table table-sm table-vcenter">
-									<thead>
-										<tr>
-											<th>#</th>
-											<th>{{ $t('security.state') }}</th>
-											<th
-												v-for="family in families"
-												:key="family.family"
-												class="text-end"
-											>
-												{{ $t('software_identity.family_' + family.family) }}
-											</th>
-											<th class="text-end">
-												{{ $t('security.total') }}
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr
-											v-for="(state, index) in states"
-											:key="state"
-											:class="{ 'table-success': state === 'checked' }"
-										>
-											<td class="text-muted">
-												{{ index + 1 }}
-											</td>
-											<td>
-												<InstallationState :state="state" />
-											</td>
-											<td
-												v-for="family in families"
-												:key="family.family"
-												class="text-end"
-												:class="{ 'text-muted': !family.installations[state] }"
-											>
-												{{ family.installations[state] || 0 }}
-											</td>
-											<td class="text-end">
-												<strong>{{ stateTotal(state) }}</strong>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<p class="text-muted mb-0">
-								{{ $t('security.installations_note') }}
-							</p>
-						</div>
-					</div>
-
-					<!-- Running kernels -->
-					<div class="card mb-3">
-						<div class="card-header">
-							<h3 class="card-title">
-								{{ $t('security.running_kernels') }}
-							</h3>
-						</div>
-						<div class="card-body d-flex flex-wrap gap-4">
-							<p
-								v-if="!kernelStates.length"
-								class="text-muted mb-0"
+							<b-tabs
+								content-class="col-10 sticky-tabs"
+								pills
+								card
+								vertical
 							>
-								{{ $t('generic.no_data') }}
-							</p>
-							<div
-								v-for="state in kernelStates"
-								:key="state"
-							>
-								<div class="subheader">
-									{{ kernelLabel(state) }}
-								</div>
-								<span
-									class="h3"
-									:class="state === 'checked' ? 'text-success' : 'text-warning'"
-								>{{ coverage.kernels[state] }}</span>
-							</div>
-						</div>
-					</div>
+								<!-- Each test, in its order, sets aside the installations it cannot check -->
+								<b-tab
+									:title="$t('security.funnel')"
+									title-item-class="ocs-menu-tab"
+								>
+									<p class="text-muted">
+										{{ $t('security.funnel_help') }}
+										{{ $t('security.installations_note') }}
+										{{ $t('security.funnel_zero_hidden') }}
+									</p>
+									<div
+										v-for="family in families"
+										:key="family.family"
+										class="mb-3"
+									>
+										<div class="d-flex justify-content-between mb-1">
+											<strong>{{ $t('software_identity.family_' + family.family) }}</strong>
+											<span :class="family.checked < family.total ? 'text-warning' : 'text-success'">
+												{{ $t('security.checked_share', { checked: family.checked, total: family.total }) }}
+											</span>
+										</div>
+										<div class="progress progress-sm">
+											<div
+												class="progress-bar bg-success"
+												:style="{ width: share(family.checked, family.total) + '%' }"
+											/>
+										</div>
+									</div>
+									<Datatable
+										id="coverage-states-datatable"
+										:rowdata="stateRows"
+										:rowheader="stateColumns"
+										:fieldlabels="familyLabels"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										:cansearch="false"
+										title="coverage_states"
+										translationkey="security.column_"
+										compactheader
+									>
+										<template #cell(state)="{ row }">
+											<InstallationState :state="row.item.state" />
+										</template>
+									</Datatable>
+								</b-tab>
 
-					<!-- Sources -->
-					<div class="card">
-						<div class="card-header">
-							<h3 class="card-title">
-								{{ $t('security.sources') }}
-							</h3>
-						</div>
-						<div class="card-body">
-							<div class="table-responsive">
-								<table class="table table-sm table-striped table-vcenter">
-									<thead>
-										<tr>
-											<th>{{ $t('security.source') }}</th>
-											<th>{{ $t('security.state') }}</th>
-											<th>{{ $t('security.last_success') }}</th>
-											<th>{{ $t('security.last_attempt') }}</th>
-											<th>{{ $t('security.record_count') }}</th>
-											<th>{{ $t('security.source_scope') }}</th>
-											<th>{{ $t('security.source_error') }}</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr
-											v-for="source in coverage.sources"
-											:key="source.source"
-										>
-											<td>{{ sourceLabel(source.source) }}</td>
-											<td>
-												<span
-													class="badge"
-													:class="sourceStateClass(source.state)"
-												>{{ $t('security.source_state_' + source.state) }}</span>
-											</td>
-											<td class="text-nowrap">
-												{{ formatDateTime(source.last_success) || $t('security.never') }}
-											</td>
-											<td class="text-nowrap">
-												{{ formatDateTime(source.last_attempt) || $t('security.never') }}
-											</td>
-											<td class="text-end">
-												{{ (source.record_count || 0).toLocaleString() }}
-											</td>
-											<td>{{ sourceScope(source) }}</td>
-											<td class="text-danger">
-												{{ source.error }}
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
+								<b-tab
+									:title="$t('security.running_kernels')"
+									title-item-class="ocs-menu-tab"
+								>
+									<Datatable
+										id="coverage-kernels-datatable"
+										:rowdata="kernelRows"
+										:rowheader="['state', 'count']"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										:cansearch="false"
+										title="coverage_kernels"
+										translationkey="security.column_"
+										compactheader
+									>
+										<template #cell(state)="{ row }">
+											<span
+												class="badge"
+												:class="row.item.state === 'checked' ? 'bg-green-lt' : 'bg-yellow-lt'"
+											>{{ kernelLabel(row.item.state) }}</span>
+										</template>
+									</Datatable>
+								</b-tab>
+
+								<b-tab
+									:title="$t('security.sources')"
+									title-item-class="ocs-menu-tab"
+								>
+									<Datatable
+										id="coverage-sources-datatable"
+										:rowdata="sourceRows"
+										:rowheader="sourceColumns"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										title="coverage_sources"
+										translationkey="security.column_"
+										compactheader
+									>
+										<template #cell(source_state)="{ row }">
+											<span
+												class="badge"
+												:class="sourceStateClass(row.item.source_state)"
+											>{{ $t('security.source_state_' + row.item.source_state) }}</span>
+										</template>
+										<template #cell(last_success)="{ row }">
+											<span :class="{ 'text-warning': !row.item.last_success }">
+												{{ row.item.last_success ? formatDateTime(row.item.last_success) : $t('security.never') }}
+											</span>
+										</template>
+										<template #cell(last_attempt)="{ row }">
+											{{ row.item.last_attempt ? formatDateTime(row.item.last_attempt) : $t('security.never') }}
+										</template>
+										<template #cell(record_count)="{ row }">
+											{{ (row.item.record_count || 0).toLocaleString() }}
+										</template>
+										<template #cell(source_error)="{ row }">
+											<span class="text-danger">{{ row.item.source_error }}</span>
+										</template>
+									</Datatable>
+								</b-tab>
+							</b-tabs>
+						</template>
 					</div>
-				</template>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -246,7 +227,7 @@ function yearRanges(years) {
 			ranges.push([year, year])
 		}
 	}
-	return ranges.map(([start, end]) => (start === end ? `${start}` : `${start}–${end}`)).join(", ")
+	return ranges.map(([start, end]) => (start === end ? `${start}` : `${start}-${end}`)).join(", ")
 }
 
 export default {
@@ -259,9 +240,17 @@ export default {
 			loading: true,
 			coverage: { states: [], families: [], sources: [], kernels: {} },
 			scans: ["last_full_scan", "last_incremental_scan", "last_exposure"],
+			sourceColumns: ["source_name", "source_state", "last_success", "last_attempt", "record_count", "scope", "source_error"],
 		}
 	},
 	computed: {
+		families() {
+			return (this.coverage.families || []).map((family) => {
+				const installations = family.installations || {}
+				const total = Object.values(installations).reduce((sum, count) => sum + count, 0)
+				return { family: family.family, installations, total, checked: installations.checked || 0 }
+			})
+		},
 		// The server order is the order of the tests; states it did not list come last
 		states() {
 			const states = [...(this.coverage.states || [])]
@@ -272,11 +261,55 @@ export default {
 			}
 			return states
 		},
-		families() {
-			return (this.coverage.families || []).map((family) => ({ ...family, installations: family.installations || {} }))
+		totals() {
+			const all = this.families.reduce((sum, family) => sum + family.total, 0)
+			const checked = this.families.reduce((sum, family) => sum + family.checked, 0)
+			const kernels = Object.entries(this.coverage.kernels || {})
+				.filter(([state]) => state !== "checked")
+				.reduce((sum, [, count]) => sum + count, 0)
+			return {
+				all,
+				checked,
+				unchecked: this.coverage.unchecked || 0,
+				excluded: this.coverage.excluded || 0,
+				kernels,
+			}
 		},
-		kernelStates() {
-			return Object.keys(this.coverage.kernels || {})
+		stateColumns() {
+			return ["position", "state", ...this.families.map((family) => "family_" + family.family), "total"]
+		},
+		familyLabels() {
+			return Object.fromEntries(this.families.map((family) =>
+				["family_" + family.family, this.$t("software_identity.family_" + family.family)]))
+		},
+		// One row per state, in the order of the tests. A state no installation is in
+		// is left out, the checked row always stays
+		stateRows() {
+			return this.states.map((state, index) => {
+				const row = { id: state, position: index + 1, state, total: 0 }
+				for (const family of this.families) {
+					const count = family.installations[state] || 0
+					row["family_" + family.family] = count
+					row.total += count
+				}
+				return row
+			}).filter((row) => row.total || row.state === "checked")
+		},
+		kernelRows() {
+			return Object.entries(this.coverage.kernels || {}).map(([state, count]) => ({ id: state, state, count }))
+		},
+		// the datatable draws "error" itself: renamed
+		sourceRows() {
+			return (this.coverage.sources || []).map((source) => ({
+				id: source.source,
+				source_name: this.sourceLabel(source.source),
+				source_state: source.state,
+				last_success: source.last_success,
+				last_attempt: source.last_attempt,
+				record_count: source.record_count,
+				scope: this.sourceScope(source),
+				source_error: source.error,
+			}))
 		},
 	},
 	async mounted() {
@@ -296,26 +329,11 @@ export default {
 	methods: {
 		formatDateTime,
 
-		familyTotal(family) {
-			return Object.values(family.installations).reduce((sum, count) => sum + count, 0)
-		},
-		familyChecked(family) {
-			return family.installations.checked || 0
-		},
-		stateTotal(state) {
-			return this.families.reduce((sum, family) => sum + (family.installations[state] || 0), 0)
-		},
 		share(count, total) {
 			return total ? ((count || 0) * 100) / total : 0
 		},
 		stateLabel(state) {
 			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state
-		},
-		stateBarClass(state) {
-			if (state === "checked") return "bg-success"
-			if (state === "kernel_not_running" || state === "excluded") return "bg-secondary"
-			if (state === "pending" || state === "stale" || state === "source_never_loaded") return "bg-orange"
-			return "bg-yellow"
 		},
 		kernelLabel(state) {
 			return state === "host_kernel_unverified" || state === "not_applicable"
