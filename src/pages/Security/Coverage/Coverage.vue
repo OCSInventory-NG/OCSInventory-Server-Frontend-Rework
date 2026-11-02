@@ -108,6 +108,43 @@
 									</template>
 								</Datatable>
 
+								<template v-if="kernelRows.length || totals.kernelsChecked">
+									<div class="hr-text">
+										{{ $t('security.kernels_unchecked') }}
+									</div>
+									<Datatable
+										id="coverage-kernels-datatable"
+										:rowdata="kernelRows"
+										:rowheader="['reason', 'machines', 'action']"
+										:nonsortablefields="['action']"
+										:usecheckbox="false"
+										:candeletemultiple="false"
+										:cansearch="false"
+										:emptytext="$t('security.all_kernels_checked')"
+										title="coverage_kernel_reasons"
+										translationkey="security.column_"
+										compactheader
+									>
+										<template #cell(action)="{ row }">
+											<router-link
+												v-if="row.item.link"
+												:to="row.item.link"
+												class="ocs-link text-nowrap"
+											>
+												{{ $t('security.reason_action_' + row.item.actionKey) }}
+											</router-link>
+											<a
+												v-else-if="row.item.actionKey === 'sources'"
+												href="#"
+												class="ocs-link text-nowrap"
+												@click.prevent="activeTab = SOURCES_TAB"
+											>
+												{{ $t('security.reason_action_sources') }}
+											</a>
+										</template>
+									</Datatable>
+								</template>
+
 								<div class="hr-text">
 									{{ $t('security.by_platform') }}
 								</div>
@@ -165,30 +202,6 @@
 							</b-tab>
 
 							<b-tab
-								:title="$t('security.running_kernels')"
-								title-item-class="ocs-menu-tab"
-							>
-								<Datatable
-									id="coverage-kernels-datatable"
-									:rowdata="kernelRows"
-									:rowheader="['state', 'count']"
-									:usecheckbox="false"
-									:candeletemultiple="false"
-									:cansearch="false"
-									title="coverage_kernels"
-									translationkey="security.column_"
-									compactheader
-								>
-									<template #cell(state)="{ row }">
-										<span
-											class="badge"
-											:class="row.item.state === 'checked' ? 'bg-green-lt' : 'bg-yellow-lt'"
-										>{{ kernelLabel(row.item.state) }}</span>
-									</template>
-								</Datatable>
-							</b-tab>
-
-							<b-tab
 								:title="$t('security.sources')"
 								title-item-class="ocs-menu-tab"
 							>
@@ -237,7 +250,7 @@ import { hasPermission } from "@/utils/permissions"
 import { apiErrorMessage, formatDateTime, formatPercent } from "@/utils/security"
 
 // tab of the sources, opened by the "see the sources" action
-const SOURCES_TAB = 3
+const SOURCES_TAB = 2
 // States that are no missing check, as the coverage counts them
 const NOT_UNCHECKED = ["checked", "excluded", "kernel_not_running"]
 // Where each reason is acted on: a route, the sources tab, or the next scan
@@ -249,6 +262,7 @@ const REASON_ACTIONS = {
 	source_never_loaded: { key: "sources" },
 	stale: { key: "sources" },
 	pending: { key: "next_scan" },
+	excluded: { key: "exclusions", link: { path: "/security/exclusions" } },
 }
 
 // "2002-2026" for consecutive years
@@ -308,6 +322,7 @@ export default {
 			return {
 				all,
 				checked,
+				kernelsChecked: (this.coverage.kernels || {}).checked || 0,
 				unchecked: this.coverage.unchecked || 0,
 				excluded: this.coverage.excluded || 0,
 				kernels,
@@ -401,8 +416,22 @@ export default {
 				return row
 			}).filter((row) => row.total || row.state === "checked")
 		},
+		// running kernels not checked, by reason: the biggest first
 		kernelRows() {
-			return Object.entries(this.coverage.kernels || {}).map(([state, count]) => ({ id: state, state, count }))
+			return Object.entries(this.coverage.kernels || {})
+				.filter(([state, count]) => state !== "checked" && count)
+				.map(([state, count]) => {
+					const action = REASON_ACTIONS[state] || {}
+					return {
+						id: state,
+						state,
+						reason: this.kernelLabel(state),
+						machines: count,
+						actionKey: action.key || "",
+						link: action.link || null,
+					}
+				})
+				.sort((a, b) => b.machines - a.machines)
 		},
 		// the datatable draws "error" itself: renamed
 		sourceRows() {
