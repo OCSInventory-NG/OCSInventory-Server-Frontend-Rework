@@ -13,74 +13,18 @@
 			<Loader />
 		</div>
 		<template v-else>
-			<SourceFreshness />
+			<!-- Coverage of this machine; the unchecked tile opens their list -->
+			<StatTiles
+				:tiles="tiles"
+				clickable
+				@select="showUnchecked"
+			/>
 
-			<!-- Coverage of this machine -->
-			<div class="datagrid mb-3">
-				<div class="datagrid-item">
-					<div class="datagrid-title">
-						{{ $t('security.running_kernel') }}
-					</div>
-					<div
-						class="datagrid-content"
-						:class="kernelOk ? 'text-success' : 'text-warning'"
-					>
-						<font-awesome-icon
-							:icon="['fas', kernelOk ? 'circle-check' : 'triangle-exclamation']"
-							class="me-1"
-						/>
-						{{ kernelLabel }}
-					</div>
-				</div>
-				<div class="datagrid-item">
-					<div class="datagrid-title">
-						{{ $t('security.not_checked') }}
-					</div>
-					<div class="datagrid-content">
-						<a
-							v-if="coverage.unchecked"
-							href="#"
-							class="text-warning"
-							@click.prevent="showUnchecked"
-						>
-							<font-awesome-icon
-								:icon="['fas', 'triangle-exclamation']"
-								class="me-1"
-							/>
-							{{ $t('security.unchecked_software', { count: coverage.unchecked }, coverage.unchecked) }}
-						</a>
-						<span
-							v-else
-							class="text-success"
-						>{{ $t('security.all_checked') }}</span>
-					</div>
-				</div>
-				<div
-					v-if="coverage.excluded"
-					class="datagrid-item"
-				>
-					<div class="datagrid-title">
-						{{ $t('security.state_excluded') }}
-					</div>
-					<div class="datagrid-content text-muted">
-						{{ $t('security.excluded_installations', { count: coverage.excluded }, coverage.excluded) }}
-					</div>
-				</div>
-				<div class="datagrid-item">
-					<div class="datagrid-title">
-						{{ $t('security.open_exposures') }}
-					</div>
-					<div class="datagrid-content">
-						{{ visibleOpen.length }}
-					</div>
-				</div>
-			</div>
-
+			<!-- the horizontal tabs of the general configuration -->
 			<b-tabs
 				v-model="activeTab"
-				pills
-				small
-				nav-class="mb-3"
+				content-class="mt-3"
+				fill
 			>
 				<b-tab :title="$t('security.tab_open', { count: visibleOpen.length })">
 					<!-- Noise hidden by default, always counted -->
@@ -261,6 +205,37 @@ export default {
 				return this.$t("security.kernel_" + state)
 			}
 			return this.stateLabel(state)
+		},
+		tiles() {
+			const unchecked = this.coverage.unchecked || 0
+			const open = this.visibleOpen.length
+			return [
+				{
+					key: "kernel",
+					label: this.$t("security.running_kernel"),
+					value: this.kernelLabel,
+					color: this.kernelOk ? "#2fb344" : "#f76707",
+					small: true,
+					static: true,
+				},
+				{
+					key: "unchecked",
+					label: this.$t("security.not_checked"),
+					value: unchecked,
+					detail: this.coverage.excluded
+						? this.$t("security.tile_excluded_detail", { count: this.coverage.excluded }, this.coverage.excluded)
+						: "",
+					color: unchecked ? "#f76707" : "#2fb344",
+					static: !unchecked,
+				},
+				{
+					key: "open",
+					label: this.$t("security.open_exposures"),
+					value: open,
+					color: open ? "#d63939" : "#2fb344",
+					static: true,
+				},
+			]
 		},
 		excludedOpen() {
 			return this.open.filter((row) => row.excluded)
