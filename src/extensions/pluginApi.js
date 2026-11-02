@@ -6,6 +6,7 @@ import Loader from "@/components/Loader/Loader.vue"
 import { addMenuItem, menuStore } from "@/menu/menuStore"
 import { registerSlot } from "@/extensions/slotRegistry"
 import { hasPermission } from "@/utils/permissions"
+import { withBase } from "@/utils/basePath"
 
 export function createPluginApi({ router, i18n, apiClient }) {
 	const coreComponents = {
@@ -33,6 +34,14 @@ export function createPluginApi({ router, i18n, apiClient }) {
 		hasPermissions,
 		http: apiClient,
 		getComponent: (name) => coreComponents[name],
-		importModule: async (url) => import(/* @vite-ignore */ new URL(url, window.location.href).href),
+		// A root-relative path (e.g. "/extensions/foo/bar.js") must go through
+		// withBase so it resolves under the deployment prefix, same as the
+		// initial plugin.js load in loader.js - otherwise it 404s as soon as
+		// the app is served from a non-root base path.
+		importModule: async (url) => {
+			const resolved = url.startsWith("/") ? withBase(url) : url
+			return import(/* @vite-ignore */ new URL(resolved, window.location.href).href)
+		},
+		withBase,
 	}
 }
