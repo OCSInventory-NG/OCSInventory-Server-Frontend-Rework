@@ -17,12 +17,19 @@
 							/>
 						</div>
 						<template v-else>
-							<!-- What this list cannot show: outdated sources, installations not checked -->
 							<Alert
 								v-if="errored"
 								:message="errormsg"
 								:cols="true"
 								variant="danger"
+							/>
+
+							<!-- Counters of the list; a click filters on the tile -->
+							<StatTiles
+								:tiles="tiles"
+								clickable
+								compact
+								@select="selectTile"
 							/>
 
 							<Datatable
@@ -211,6 +218,8 @@ import {
 } from "@/utils/security"
 
 const SUMMARY_LENGTH = 140
+// same palette as the level badges
+const LEVEL_COLORS = { critical: "#d63939", high: "#f76707", medium: "#f59f00", low: "#206bc4", unknown: "#495057" }
 // The order chosen here lasts for the session, the settings give the default
 const ORDERING_KEY = "vulnerabilities_ordering"
 // A click on these headers sorts on the criterion first; the others do not sort
@@ -253,12 +262,31 @@ export default {
 			ordering: [],
 			sessionOrdering: readSessionOrdering(),
 			hidden: {},
+			// counters of the tiles, read for the platform, search and noise shown
+			counts: {},
+			countsKey: null,
 			sources: [],
 			// null while the coverage is not read
 			unchecked: null,
 		}
 	},
 	computed: {
+		tiles() {
+			const count = (key) => (this.counts[key] === undefined ? "" : this.counts[key].toLocaleString())
+			const noFilter = !this.filters.level && !this.filters.kev && !this.filters.fix
+			return [
+				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
+				...LEVELS.map((level) => ({
+					key: level,
+					label: this.$t("security.tile_level_" + level),
+					value: count(level),
+					color: LEVEL_COLORS[level],
+					active: this.filters.level === level,
+				})),
+				{ key: "kev", label: this.$t("security.tile_kev"), value: count("kev"), color: "#ae3ec9", active: this.filters.kev === "yes" },
+				{ key: "fix", label: this.$t("security.tile_fix"), value: count("fix"), color: "#2fb344", active: this.filters.fix === "yes" },
+			]
+		},
 		filterSelects() {
 			return [
 				{
@@ -411,6 +439,7 @@ export default {
 				this.ordering = data.ordering || this.sessionOrdering || []
 				this.hidden = data.hidden || {}
 				this.errored = false
+				this.loadCounts()
 			} catch (e) {
 				if (request !== this.request) {
 					return
@@ -426,6 +455,39 @@ export default {
 				if (request === this.request) {
 					this.loading = false
 				}
+			}
+		},
+
+		// One count per tile (limit=1 answers the count only). Read again only
+		// when the platform, the search or the noise shown change
+		async loadCounts() {
+			const base = { family: this.filters.family, search: this.query.search, show: this.filters.show.join(","), limit: 1 }
+			const key = JSON.stringify(base)
+			if (key === this.countsKey) return
+			this.countsKey = key
+			const queries = {
+				total: {},
+				...Object.fromEntries(LEVELS.map((level) => [level, { level }])),
+				kev: { kev: "yes" },
+				fix: { fix: "yes" },
+			}
+			const answers = await Promise.allSettled(Object.entries(queries).map(([name, filter]) =>
+				this.$api.generic.get("vulnerabilities/", { ...base, ...filter }).then((data) => [name, data.count])
+			))
+			if (key !== this.countsKey) return
+			this.counts = Object.fromEntries(answers.filter((answer) => answer.status === "fulfilled").map((answer) => answer.value))
+		},
+
+		// total clears the tile filters, the others toggle theirs
+		selectTile(key) {
+			if (key === "total") {
+				Object.assign(this.filters, { level: null, kev: null, fix: null })
+			} else if (key === "kev") {
+				this.filters.kev = this.filters.kev === "yes" ? null : "yes"
+			} else if (key === "fix") {
+				this.filters.fix = this.filters.fix === "yes" ? null : "yes"
+			} else {
+				this.filters.level = this.filters.level === key ? null : key
 			}
 		},
 

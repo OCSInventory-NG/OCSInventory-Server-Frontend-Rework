@@ -1,17 +1,31 @@
 <template>
 	<!-- Key numbers of a page, as the compliance dashboard tiles -->
-	<div class="stat-tiles mb-3">
+	<div
+		class="stat-tiles mb-3"
+		:class="{ 'stat-tiles-compact': compact }"
+	>
 		<div
 			v-for="tile in tiles"
-			:key="tile.label"
+			:key="tile.key || tile.label"
 			class="card mb-0"
+			:class="{ 'stat-tile-clickable': clickable }"
+			:style="tileStyle(tile)"
+			:role="clickable ? 'button' : null"
+			:tabindex="clickable ? 0 : null"
+			:aria-pressed="clickable ? !!tile.active : null"
+			@click="clickable && $emit('select', tile.key)"
+			@keydown.enter="clickable && $emit('select', tile.key)"
 		>
 			<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
-				<div class="subheader mb-1">
+				<div
+					class="subheader mb-1"
+					:style="tile.color ? { color: tile.color } : null"
+				>
 					{{ tile.label }}
 				</div>
 				<div
 					:class="[tile.small ? 'stat-tile-small' : 'h3 mb-0', tile.warn ? 'text-warning' : '']"
+					:style="tile.color && !tile.small ? { color: tile.color } : null"
 				>
 					{{ tile.value }}
 				</div>
@@ -24,8 +38,26 @@
 export default {
 	name: "StatTiles",
 	props: {
-		// [{ label, value, warn: true when the value calls for attention, small: for a date }]
+		// [{ key, label, value, color, active, warn: the value calls for attention, small: for a date }]
 		tiles: { type: Array, required: true },
+		// a click on a tile emits select(key), e.g. to filter a list
+		clickable: { type: Boolean, default: false },
+		// narrower tiles, for a longer row
+		compact: { type: Boolean, default: false },
+	},
+	emits: ["select"],
+	methods: {
+		// colored top border; the active tile is outlined and tinted
+		tileStyle(tile) {
+			if (!tile.color) return null
+			if (!tile.active) return { borderTop: "3px solid " + tile.color }
+			return {
+				border: "1px solid " + tile.color,
+				borderTop: "3px solid " + tile.color,
+				backgroundColor: tile.color + "14",
+				boxShadow: "0 2px 8px " + tile.color + "40",
+			}
+		},
 	},
 }
 </script>
@@ -36,6 +68,14 @@ export default {
 	display: grid;
 	gap: 8px;
 	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.stat-tiles-compact {
+	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+
+.stat-tile-clickable {
+	cursor: pointer;
 }
 
 .stat-tile-small {
