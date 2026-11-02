@@ -39,7 +39,7 @@ import {
 	faSliders, faWandMagicSparkles, faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle,
 	faMagnifyingGlassPlus, faClockRotateLeft, faTableColumns, faToggleOn, faToggleOff,
 	faAngleDown, faAngleUp, faBug, faShieldHalved, faLink, faLinkSlash, faBuilding, faLocationDot,
-    faFileCirclePlus, faGripVertical
+    faFileCirclePlus, faGripVertical, faArrowLeft
 } from '@fortawesome/free-solid-svg-icons'
 import {
 	faSquare, faSquareCheck, faFileLines, faFloppyDisk, faStar, faWindowMaximize
@@ -94,7 +94,7 @@ loadConfig().then(async (config) => {
 		faBars, faChartSimple, faFileLines, faFloppyDisk, faStar, faWindowMaximize, faSliders, faWandMagicSparkles,
 		faEyeSlash, faCopy, faTag, faArrowUp, faUserGroup, faInfoCircle, faMagnifyingGlassPlus, faClockRotateLeft,
 		faTableColumns, faToggleOn, faToggleOff, faAngleDown, faAngleUp, faBug, faShieldHalved, faLink, faLinkSlash,
-		faBuilding, faLocationDot, faFileCirclePlus, faGripVertical
+		faBuilding, faLocationDot, faFileCirclePlus, faGripVertical, faArrowLeft
 	})
 
 	// Global config
