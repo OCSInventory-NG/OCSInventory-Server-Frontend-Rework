@@ -71,7 +71,6 @@
 											<PriorityOrder
 												v-if="ordering.length"
 												:model-value="ordering"
-												inline
 											/>
 											<span
 												v-if="sessionOrdering"

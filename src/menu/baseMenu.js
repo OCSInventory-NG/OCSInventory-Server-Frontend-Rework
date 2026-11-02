@@ -122,8 +122,9 @@ export const baseMenu = [
 			},
 			{
 				headerKey: "title.security_settings",
-				link: "/security/settings",
-				route: "SecuritySettings",
+				// the settings are the security section of the general configuration
+				link: "/configurations/general?tab=security",
+				route: "General",
 				column: "general",
 			},
 		],

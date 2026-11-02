@@ -326,14 +326,6 @@ const routes = [
 		}
 	},
 	{
-		path: '/security/settings',
-		name: 'SecuritySettings',
-		component: () => import('@/pages/Security/Settings/SecuritySettings.vue'),
-		meta: {
-			layout: AppLayout
-		}
-	},
-	{
 		path: '/security/software_identity',
 		name: 'SoftwareIdentity',
 		component: () => import('@/pages/Security/SoftwareIdentity/SoftwareIdentity.vue'),
