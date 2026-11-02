@@ -91,6 +91,9 @@
 					/>
 				</router-link>
 
+				<!-- Filters of the page, next to the search -->
+				<slot name="toolbar" />
+
 				<AssetGroupModal
 					v-if="title == 'asset/bases' && !multisearch"
 					:assetrow="selected"
@@ -210,6 +213,9 @@
 			</div>
 		</div>
 
+		<!-- What the page tells about the rows, under the header -->
+		<slot name="subheader" />
+
 		<!-- Total row number -->
 		<div
 			v-if="!compactheader"
@@ -255,7 +261,7 @@
 			>
 				<!-- No data available -->
 				<template #empty="">
-					{{ $t('generic.no_data') }}
+					{{ emptytext || $t('generic.no_data') }}
 				</template>
 
 				<template #table-busy>
@@ -269,7 +275,13 @@
 				</template>
 
 				<template #cell()="row">
-					<template v-if="getCellLink(row)">
+					<!-- a page draws its own cell with a cell(<key>) slot -->
+					<slot
+						v-if="$slots['cell(' + row.field.key + ')']"
+						:name="'cell(' + row.field.key + ')'"
+						:row="row"
+					/>
+					<template v-else-if="getCellLink(row)">
 						<span>{{ getCellLink(row).prefix }}</span>
 						<a
 							:href="getCellLink(row).href"
@@ -748,6 +760,8 @@ export default {
 		virtualcoltarget: { type: String, default: null },
 		// table listed here, when its show/hide choices can be saved as layouts
 		layouttarget: { type: String, default: null },
+		// shown instead of the generic "no data" when the table is empty
+		emptytext: { type: String, default: '' },
 		// labels of the columns whose key is no translation key
 		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group

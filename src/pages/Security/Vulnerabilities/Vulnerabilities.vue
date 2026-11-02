@@ -7,140 +7,21 @@
 			<PageHeader page-title="vulnerabilities" />
 
 			<div class="page-body">
-				<div v-if="denied">
-					<Alert
-						:message="$t('message.dont_have_right_to_see')"
-						:cols="true"
-						variant="danger"
-					/>
-				</div>
-				<template v-else>
-					<SourceFreshness />
-
-					<!-- What the list cannot tell: installations that were not checked -->
-					<div
-						v-if="unchecked.installations || unchecked.kernels"
-						class="alert alert-warning mb-3"
-					>
-						<font-awesome-icon
-							:icon="['fas', 'triangle-exclamation']"
-							class="me-2"
-						/>
-						<span v-if="unchecked.installations">
-							{{ $t('security.list_unchecked', { count: unchecked.installations, total: unchecked.total }) }}
-						</span>
-						<span
-							v-if="unchecked.kernels"
-							class="ms-1"
-						>
-							{{ $t('security.list_kernels_unchecked', { count: unchecked.kernels }) }}
-						</span>
-						<router-link
-							to="/security/coverage"
-							class="ms-2"
-						>
-							{{ $t('security.see_coverage') }}
-						</router-link>
-					</div>
-
-					<div class="card">
-						<div class="card-header">
-							<h3 class="card-title">
-								{{ $t('title.vulnerabilities') }}
-							</h3>
-							<div class="card-actions">
-								<span class="text-muted">{{ $t('generic.result') }} : {{ total }}</span>
-							</div>
+				<div class="card">
+					<div class="card-body">
+						<div v-if="denied">
+							<Alert
+								:message="$t('message.dont_have_right_to_see')"
+								:cols="true"
+								variant="danger"
+							/>
 						</div>
-						<div class="card-body">
-							<b-row class="mb-3 g-2">
-								<b-col md="2">
-									<b-form-select
-										v-model="filters.level"
-										:options="levelOptions"
-									/>
-								</b-col>
-								<b-col md="2">
-									<b-form-select
-										v-model="filters.fix"
-										:options="fixOptions"
-									/>
-								</b-col>
-								<b-col md="2">
-									<b-form-select
-										v-model="filters.kev"
-										:options="kevOptions"
-									/>
-								</b-col>
-								<b-col md="2">
-									<b-form-select
-										v-model="filters.family"
-										:options="familyOptions"
-									/>
-								</b-col>
-								<b-col md="4">
-									<b-form-input
-										v-model="search"
-										type="search"
-										:placeholder="$t('security.search')"
-									/>
-								</b-col>
-							</b-row>
-
-							<!-- Active order: every criterion is a column below -->
-							<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-								<strong>{{ $t('security.sorted_by') }}</strong>
-								<PriorityOrder
-									v-if="ordering.length"
-									:model-value="ordering"
-									inline
-								/>
-								<span
-									v-if="sessionOrdering"
-									class="badge bg-yellow-lt"
-								>{{ $t('security.session_order') }}</span>
-								<b-button
-									v-if="sessionOrdering"
-									size="sm"
-									variant="link"
-									@click="setSessionOrdering(null)"
-								>
-									{{ $t('security.reset_order') }}
-								</b-button>
-								<span class="text-muted small">{{ $t('security.order_hint') }}</span>
-							</div>
-
-							<!-- Noise hidden by default, always counted -->
-							<div
-								v-if="hiddenKinds.length || filters.show.length"
-								class="alert alert-info mb-3"
-							>
-								<div v-if="hiddenKinds.length">
-									<font-awesome-icon
-										:icon="['fas', 'eye-slash']"
-										class="me-2"
-									/>
-									{{ hiddenMessage }}
-									<b-button
-										size="sm"
-										variant="outline-primary"
-										class="ms-2"
-										@click="showNoise(hiddenKinds)"
-									>
-										{{ $t('security.show_hidden') }}
-									</b-button>
-								</div>
-								<div v-if="filters.show.length">
-									{{ $t('security.noise_shown', { kinds: filters.show.map((kind) => $t('security.noise_' + kind)).join(', ') }) }}
-									<b-button
-										size="sm"
-										variant="link"
-										@click="filters.show = []"
-									>
-										{{ $t('security.hide_noise') }}
-									</b-button>
-								</div>
-							</div>
+						<template v-else>
+							<!-- What this list cannot show: outdated sources, installations not checked -->
+							<SourceFreshness
+								:extra="incompleteLines"
+								@loaded="sources = $event"
+							/>
 
 							<Alert
 								v-if="errored"
@@ -148,143 +29,174 @@
 								:cols="true"
 								variant="danger"
 							/>
-							<div
-								v-else-if="loading"
-								class="ocs-loader"
+
+							<Datatable
+								id="vulnerabilities-datatable"
+								:rowdata="rows"
+								:rowheader="columns"
+								:nonsortablefields="nonsortable"
+								:usecheckbox="false"
+								:server-side="true"
+								:server-total-rows="total"
+								:page-reset-key="pageResetKey"
+								:isbusy="loading"
+								:emptytext="emptyMessage"
+								title="vulnerabilities"
+								translationkey="security.column_"
+								is-sticky
+								@change-query="onQueryChange"
+								@reload-datatable="load"
+								@export="exportRows"
+								@export-all="exportAll"
 							>
-								<Loader />
-							</div>
-							<template v-else>
-								<p v-if="!rows.length">
-									{{ emptyMessage }}
-								</p>
-								<div
-									v-else
-									class="table-responsive"
-								>
-									<table class="table table-sm table-striped table-vcenter">
-										<thead>
-											<tr>
-												<th>{{ $t('security.vulnerability') }}</th>
-												<th>{{ $t('security.summary') }}</th>
-												<th
-													v-for="criterion in criterionColumns"
-													:key="criterion"
-													class="text-nowrap"
-												>
-													<a
-														href="#"
-														class="text-reset"
-														:title="$t('security.sort_first')"
-														@click.prevent="putFirst(criterion)"
-													>
-														{{ $t('security.column_' + criterion) }}
-													</a>
-													<span
-														v-if="rank(criterion)"
-														class="badge bg-blue-lt ms-1"
-													>{{ rank(criterion) }}</span>
-												</th>
-												<th>{{ $t('security.products') }}</th>
-												<th>{{ $t('security.fix') }}</th>
-												<th>{{ $t('security.first_seen') }}</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr
-												v-for="row in rows"
-												:key="row.vuln_id"
+								<template #toolbar>
+									<v-select
+										v-for="filter in filterSelects"
+										:key="filter.name"
+										v-model="filters[filter.name]"
+										:options="filter.options"
+										:reduce="option => option.value"
+										:placeholder="filter.placeholder"
+										:searchable="false"
+										label="text"
+										class="datatable-btn vuln-filter"
+									/>
+								</template>
+
+								<template #subheader>
+									<!-- Active order and hidden noise -->
+									<div class="vuln-status">
+										<div class="d-flex flex-wrap align-items-center gap-2">
+											<span class="text-muted">{{ $t('security.sorted_by') }}</span>
+											<PriorityOrder
+												v-if="ordering.length"
+												:model-value="ordering"
+												inline
+											/>
+											<span
+												v-if="sessionOrdering"
+												class="badge bg-yellow-lt"
+											>{{ $t('security.session_order') }}</span>
+											<b-button
+												v-if="sessionOrdering"
+												size="sm"
+												variant="link"
+												class="p-0"
+												@click="setSessionOrdering(null)"
 											>
-												<td class="text-nowrap">
-													<router-link :to="detailLink(row.vuln_id)">
-														{{ row.vuln_id }}
-													</router-link>
-													<span
-														v-if="row.uncertain"
-														class="badge bg-secondary ms-1"
-														:title="$t('security.uncertain_help')"
-													>
-														{{ $t('security.uncertain') }}
-													</span>
-												</td>
-												<td class="vuln-summary">
-													{{ shorten(row.summary) }}
-												</td>
-												<td
-													v-for="criterion in criterionColumns"
-													:key="criterion"
+												{{ $t('security.reset_order') }}
+											</b-button>
+											<span class="text-muted small">{{ $t('security.order_hint') }}</span>
+										</div>
+										<div
+											v-if="hiddenKinds.length || filters.show.length"
+											class="d-flex flex-wrap align-items-center gap-2"
+										>
+											<font-awesome-icon
+												:icon="['fas', 'eye-slash']"
+												class="text-muted"
+											/>
+											<span v-if="hiddenKinds.length">{{ hiddenMessage }}</span>
+											<b-button
+												v-if="hiddenKinds.length"
+												size="sm"
+												variant="outline-primary"
+												@click="showNoise(hiddenKinds)"
+											>
+												{{ $t('security.show_hidden') }}
+											</b-button>
+											<template v-if="filters.show.length">
+												<span>{{ $t('security.noise_shown', { kinds: filters.show.map((kind) => $t('security.noise_' + kind)).join(', ') }) }}</span>
+												<b-button
+													size="sm"
+													variant="outline-secondary"
+													@click="filters.show = []"
 												>
-													<KevBadge
-														v-if="criterion === 'kev'"
-														:kev="row.kev"
-														:date="row.kev_date_added"
-													/>
-													<template v-else-if="criterion === 'score'">
-														<VulnerabilityLevel
-															:level="row.level"
-															:score="row.cvss_score"
-														/>
-														<div class="text-muted small text-nowrap">
-															{{ scoreDetail(row) }}
-														</div>
-													</template>
-													<template v-else-if="criterion === 'epss'">
-														<template v-if="row.epss !== null && row.epss !== undefined">
-															{{ formatPercent(row.epss) }}
-															<div class="text-muted small text-nowrap">
-																{{ $t('security.percentile', { value: formatPercent(row.epss_percentile) }) }}
-															</div>
-														</template>
-														<span
-															v-else
-															class="text-muted"
-														>—</span>
-													</template>
-													<template v-else>
-														{{ row.machines }}
-													</template>
-												</td>
-												<td>
-													<div
-														v-for="product in row.products"
-														:key="product.product + product.version"
-														class="text-nowrap"
-														:title="product.product"
-													>
-														{{ product.name || product.product }} {{ product.version }}
-													</div>
-													<div
-														v-if="row.product_count > row.products.length"
-														class="text-muted"
-													>
-														{{ $t('security.more_products', { count: row.product_count - row.products.length }) }}
-													</div>
-												</td>
-												<td>
-													<VulnerabilityFix
-														:versions="row.fix_available ? row.fixed_versions : []"
-														:channels="row.fix_channels"
-													/>
-												</td>
-												<td class="text-nowrap">
-													{{ formatDay(row.first_seen) }}
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-								<b-pagination
-									v-if="total > perPage"
-									v-model="currentPage"
-									:total-rows="total"
-									:per-page="perPage"
-									align="right"
-									size="sm"
-								/>
-							</template>
-						</div>
+													{{ $t('security.hide_noise') }}
+												</b-button>
+											</template>
+										</div>
+									</div>
+								</template>
+
+								<template #cell(vuln_id)="{ row }">
+									<router-link
+										:to="detailLink(row.item.vuln_id)"
+										class="ocs-link text-nowrap"
+									>
+										{{ row.item.vuln_id }}
+									</router-link>
+									<span
+										v-if="row.item.uncertain"
+										class="badge bg-secondary ms-1"
+										:title="$t('security.uncertain_help')"
+									>
+										{{ $t('security.uncertain') }}
+									</span>
+								</template>
+								<template #cell(summary)="{ row }">
+									<span
+										class="vuln-summary"
+										:title="row.item.summary"
+									>{{ shorten(row.item.summary) }}</span>
+								</template>
+								<template #cell(kev)="{ row }">
+									<KevBadge
+										:kev="row.item.kev"
+										:date="row.item.kev_date_added"
+									/>
+								</template>
+								<template #cell(score)="{ row }">
+									<VulnerabilityLevel
+										:level="row.item.level"
+										:score="row.item.cvss_score"
+									/>
+									<div class="text-muted small text-nowrap">
+										{{ scoreDetail(row.item) }}
+									</div>
+								</template>
+								<template #cell(epss)="{ row }">
+									<template v-if="row.item.epss !== null && row.item.epss !== undefined">
+										{{ formatPercent(row.item.epss) }}
+										<div class="text-muted small text-nowrap">
+											{{ $t('security.percentile', { value: formatPercent(row.item.epss_percentile) }) }}
+										</div>
+									</template>
+									<span
+										v-else
+										class="text-muted"
+									>—</span>
+								</template>
+								<template #cell(products)="{ row }">
+									<div
+										v-for="product in row.item.products"
+										:key="product.product + product.version"
+										class="text-nowrap"
+										:title="product.product"
+									>
+										{{ product.name || product.product }} {{ product.version }}
+									</div>
+									<div
+										v-if="row.item.product_count > row.item.products.length"
+										class="text-muted small"
+									>
+										{{ $t('security.more_products', { count: row.item.product_count - row.item.products.length }) }}
+									</div>
+								</template>
+								<template #cell(fix)="{ row }">
+									<VulnerabilityFix
+										:versions="row.item.fix_available ? row.item.fixed_versions : []"
+										:channels="row.item.fix_channels"
+									/>
+								</template>
+								<template #cell(first_seen)="{ row }">
+									<span class="text-nowrap">{{ formatDay(row.item.first_seen) }}</span>
+								</template>
+							</Datatable>
+
+						</template>
 					</div>
-				</template>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -300,6 +212,8 @@ import {
 const SUMMARY_LENGTH = 140
 // The order chosen here lasts for the session, the settings give the default
 const ORDERING_KEY = "vulnerabilities_ordering"
+// A click on these headers sorts on the criterion first; the others do not sort
+const COLUMNS = ["vuln_id", "summary", "kev", "score", "epss", "machines", "products", "fix", "first_seen"]
 
 function readSessionOrdering() {
 	try {
@@ -319,52 +233,79 @@ export default {
 			errormsg: null,
 			loading: true,
 
+			columns: COLUMNS,
+			nonsortable: COLUMNS.filter((column) => !PRIORITY_CRITERIA.includes(column)),
 			rows: [],
 			total: 0,
-			currentPage: 1,
-			perPage: 25,
+			pageResetKey: 0,
+			// page and search given by the datatable
+			query: {
+				limit: Number(localStorage.getItem("perPage")) || 5,
+				offset: 0,
+				search: null,
+			},
+			headerSort: null,
 			filters: { level: null, fix: null, kev: null, family: null, show: [] },
-			search: "",
-			searchTimer: null,
 			request: 0,
 
 			// order answered by the server, the settings one when none is asked
 			ordering: [],
 			sessionOrdering: readSessionOrdering(),
 			hidden: {},
-			unchecked: { installations: 0, total: 0, kernels: 0 },
+			sources: [],
+			// null while the coverage is not read
+			unchecked: null,
 		}
 	},
 	computed: {
-		levelOptions() {
+		filterSelects() {
 			return [
-				{ value: null, text: this.$t("security.all_levels") },
-				...LEVELS.map((level) => ({ value: level, text: this.$t("security.level_" + level) })),
+				{
+					name: "level",
+					placeholder: this.$t("security.all_levels"),
+					options: LEVELS.map((level) => ({ value: level, text: this.$t("security.level_" + level) })),
+				},
+				{
+					name: "fix",
+					placeholder: this.$t("security.any_fix"),
+					options: [
+						{ value: "yes", text: this.$t("security.fix_available") },
+						{ value: "no", text: this.$t("security.fix_none") },
+					],
+				},
+				{
+					name: "kev",
+					placeholder: this.$t("security.any_kev"),
+					options: [
+						{ value: "yes", text: this.$t("security.kev_yes") },
+						{ value: "no", text: this.$t("security.kev_no") },
+					],
+				},
+				{
+					name: "family",
+					placeholder: this.$t("security.all_platforms"),
+					options: FAMILIES.map((family) => ({ value: family, text: this.$t("software_identity.family_" + family) })),
+				},
 			]
 		},
-		fixOptions() {
-			return [
-				{ value: null, text: this.$t("security.any_fix") },
-				{ value: "yes", text: this.$t("security.fix_available") },
-				{ value: "no", text: this.$t("security.fix_none") },
-			]
+		outdatedSources() {
+			return this.sources.filter((source) => source.state !== "fresh")
 		},
-		kevOptions() {
-			return [
-				{ value: null, text: this.$t("security.any_kev") },
-				{ value: "yes", text: this.$t("security.kev_yes") },
-				{ value: "no", text: this.$t("security.kev_no") },
-			]
-		},
-		familyOptions() {
-			return [
-				{ value: null, text: this.$t("security.all_platforms") },
-				...FAMILIES.map((family) => ({ value: family, text: this.$t("software_identity.family_" + family) })),
-			]
-		},
-		// Criteria columns in the active order, the others after them
-		criterionColumns() {
-			return [...this.ordering, ...PRIORITY_CRITERIA.filter((criterion) => !this.ordering.includes(criterion))]
+		// Reasons, besides the sources, why a vulnerability may be missing
+		incompleteLines() {
+			const lines = []
+			if (!this.unchecked) {
+				return lines
+			}
+			if (!this.unchecked.total) {
+				lines.push(this.$t("security.list_nothing_checked"))
+			} else if (this.unchecked.installations) {
+				lines.push(this.$t("security.list_unchecked", { count: this.unchecked.installations, total: this.unchecked.total }))
+			}
+			if (this.unchecked.kernels) {
+				lines.push(this.$t("security.list_kernels_unchecked", { count: this.unchecked.kernels }))
+			}
+			return lines
 		},
 		hiddenKinds() {
 			return NOISE_KINDS.filter((kind) => this.hidden[kind] > 0)
@@ -379,10 +320,20 @@ export default {
 			const count = this.hiddenKinds.reduce((sum, kind) => sum + this.hidden[kind], 0)
 			return this.$t("security.hidden_banner", { items }, count)
 		},
+		// An empty list only says something about what could be checked
 		emptyMessage() {
-			const filtered = this.search || Object.entries(this.filters).some(([name, value]) => name !== "show" && value)
+			const filtered = this.query.search || Object.entries(this.filters).some(([name, value]) => name !== "show" && value)
 			if (filtered) {
 				return this.$t("security.no_vulnerability_filtered")
+			}
+			if (!this.unchecked) {
+				return this.$t("security.no_vulnerability_unknown_coverage")
+			}
+			if (!this.unchecked.total) {
+				return this.$t("security.no_vulnerability_nothing_checked")
+			}
+			if (this.outdatedSources.length) {
+				return this.$t("security.no_vulnerability_outdated")
 			}
 			return this.unchecked.installations
 				? this.$t("security.no_vulnerability_checked_only", { count: this.unchecked.installations })
@@ -396,13 +347,6 @@ export default {
 				await this.reload()
 			},
 		},
-		search() {
-			clearTimeout(this.searchTimer)
-			this.searchTimer = setTimeout(() => this.reload(), 300)
-		},
-		async currentPage() {
-			await this.load()
-		},
 	},
 	async mounted() {
 		if (!hasPermission("security_view_vulnerability")) {
@@ -411,42 +355,57 @@ export default {
 		}
 		await Promise.all([this.load(), this.loadCoverage()])
 	},
-	beforeUnmount() {
-		clearTimeout(this.searchTimer)
-	},
 	methods: {
 		formatDay,
 		formatPercent,
 
 		async reload() {
-			if (this.currentPage !== 1) {
-				// the currentPage watcher loads the first page
-				this.currentPage = 1
+			this.query = { ...this.query, offset: 0 }
+			this.pageResetKey += 1
+			await this.load()
+		},
+
+		// Page, page size and search come from the datatable, a header click puts its criterion first
+		async onQueryChange(query) {
+			const criterion = query.ordering ? query.ordering.replace(/^-/, "") : null
+			const sorted = criterion && criterion !== this.headerSort && PRIORITY_CRITERIA.includes(criterion)
+			this.headerSort = criterion
+			this.query = { limit: query.limit, offset: query.offset, search: query.search }
+			if (sorted) {
+				this.putFirst(criterion)
 				return
 			}
 			await this.load()
 		},
 
-		async load() {
-			this.loading = true
-			const query = {
-				limit: this.perPage,
-				offset: (this.currentPage - 1) * this.perPage,
+		params(paginated = true) {
+			const params = {
 				ordering: this.sessionOrdering ? this.sessionOrdering.join(",") : null,
 				show: this.filters.show.join(","),
-				search: this.search,
+				search: this.query.search,
+				level: this.filters.level,
+				fix: this.filters.fix,
+				kev: this.filters.kev,
+				family: this.filters.family,
 			}
-			for (const name of ["level", "fix", "kev", "family"]) {
-				query[name] = this.filters[name]
+			if (paginated) {
+				params.limit = this.query.limit
+				params.offset = this.query.offset
 			}
+			return params
+		},
+
+		async load() {
+			this.loading = true
 			// An answer to an older filter must not replace a newer one
 			const request = ++this.request
 			try {
-				const data = await this.$api.generic.get("vulnerabilities/", query)
+				const data = await this.$api.generic.get("vulnerabilities/", this.params())
 				if (request !== this.request) {
 					return
 				}
-				this.rows = asList(data)
+				// the datatable keys its rows on id
+				this.rows = asList(data).map((row) => ({ ...row, id: row.vuln_id }))
 				this.total = typeof data.count === "number" ? data.count : this.rows.length
 				this.ordering = data.ordering || this.sessionOrdering || []
 				this.hidden = data.hidden || {}
@@ -488,12 +447,17 @@ export default {
 					.reduce((sum, [, count]) => sum + count, 0)
 				this.unchecked = { installations, total, kernels }
 			} catch {
-				// The coverage page shows the error, the list stays usable
+				// unknown coverage: the empty list says so
+				this.unchecked = null
 			}
 		},
 
 		setSessionOrdering(order) {
 			this.sessionOrdering = order
+			if (!order) {
+				// the next click on the sorted header counts again
+				this.headerSort = null
+			}
 			try {
 				if (order) {
 					sessionStorage.setItem(ORDERING_KEY, JSON.stringify(order))
@@ -511,13 +475,60 @@ export default {
 			this.setSessionOrdering([criterion, ...order.filter((item) => item !== criterion)])
 		},
 
-		rank(criterion) {
-			const index = this.ordering.indexOf(criterion)
-			return index === -1 ? null : index + 1
-		},
-
 		showNoise(kinds) {
 			this.filters.show = [...new Set([...this.filters.show, ...kinds])]
+		},
+
+		// Export: one line per vulnerability, lists joined
+		csvRows(rows) {
+			return rows.map((row) => ({
+				vuln_id: row.vuln_id,
+				summary: row.summary,
+				level: row.level,
+				cvss_score: row.cvss_score ?? "",
+				cvss_version: row.cvss_version || "",
+				distro_rating: row.distro_rating || "",
+				kev: row.kev ? "yes" : "no",
+				kev_date_added: row.kev_date_added || "",
+				epss: row.epss ?? "",
+				epss_percentile: row.epss_percentile ?? "",
+				machines: row.machines,
+				products: (row.products || []).map((product) => `${product.product} ${product.version}`).join(", "),
+				product_count: row.product_count,
+				fixed_versions: (row.fixed_versions || []).join(", "),
+				fix_channels: (row.fix_channels || []).join(", "),
+				uncertain: row.uncertain ? "yes" : "no",
+				first_seen: row.first_seen || "",
+			}))
+		},
+
+		exportRows({ scope, rows }) {
+			const lines = this.csvRows(rows)
+			if (!lines.length) return
+			const headers = Object.keys(lines[0])
+			const csv = [
+				headers.join(";"),
+				...lines.map((line) => headers.map((header) => `"${String(line[header] ?? "").replace(/"/g, '""')}"`).join(";")),
+			].join("\n")
+			const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }))
+			const link = document.createElement("a")
+			link.href = url
+			link.setAttribute("download", `vulnerabilities_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
+		},
+
+		async exportAll() {
+			try {
+				// without limit the list comes whole
+				const data = await this.$api.generic.get("vulnerabilities/", this.params(false))
+				this.exportRows({ scope: "all", rows: asList(data) })
+			} catch (e) {
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			}
 		},
 
 		scoreDetail(row) {

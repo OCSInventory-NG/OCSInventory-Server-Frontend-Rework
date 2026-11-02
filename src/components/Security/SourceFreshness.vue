@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="outdated.length"
+		v-if="outdated.length || extra.length"
 		class="alert alert-warning mb-3"
 		role="alert"
 	>
@@ -10,7 +10,7 @@
 				class="mt-1"
 			/>
 			<div>
-				<strong>{{ $t('security.freshness_title') }}</strong>
+				<strong>{{ extra.length ? $t('security.list_incomplete_title') : $t('security.freshness_title') }}</strong>
 				<ul class="mb-1 ps-3">
 					<li
 						v-for="source in outdated"
@@ -27,6 +27,12 @@
 							v-if="source.error"
 							class="text-danger ms-1"
 						>— {{ source.error }}</span>
+					</li>
+					<li
+						v-for="line in extra"
+						:key="line"
+					>
+						{{ line }}
 					</li>
 				</ul>
 				<router-link
@@ -49,7 +55,10 @@ export default {
 		// Given by a parent that already holds them (coverage); loaded otherwise
 		sources: { type: Array, default: null },
 		showlink: { type: Boolean, default: true },
+		// other reasons the page may miss vulnerabilities, one line each
+		extra: { type: Array, default: () => [] },
 	},
+	emits: ["loaded"],
 	data() {
 		return {
 			loaded: [],
@@ -66,6 +75,7 @@ export default {
 		}
 		try {
 			this.loaded = asList(await this.$api.generic.get("vulnerabilities/sources/"))
+			this.$emit("loaded", this.loaded)
 		} catch {
 			// The page shows its own error; a missing banner must not hide it
 			this.loaded = []
