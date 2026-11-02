@@ -27,117 +27,207 @@
 						>
 							<Loader />
 						</div>
-						<template v-else>
-							<b-tabs
-								content-class="col-10 sticky-tabs"
-								pills
-								card
-								vertical
+						<b-tabs
+							v-else
+							v-model="activeTab"
+							content-class="col-10 sticky-tabs"
+							pills
+							card
+							vertical
+						>
+							<!-- What is not checked, and where to act on it -->
+							<b-tab
+								:title="$t('security.coverage_summary')"
+								title-item-class="ocs-menu-tab"
 							>
-								<!-- Each test, in its order, sets aside the installations it cannot check -->
-								<b-tab
-									:title="$t('security.funnel')"
-									title-item-class="ocs-menu-tab"
-								>
-									<StatTiles :tiles="tiles" />
-									<div
-										v-for="family in families"
-										:key="family.family"
-										class="mb-3"
+								<StatTiles :tiles="tiles" />
+								<p class="coverage-scans mb-3">
+									<span
+										v-for="scan in scans"
+										:key="scan"
 									>
-										<div class="d-flex justify-content-between mb-1">
-											<strong>{{ $t('software_identity.family_' + family.family) }}</strong>
-											<span :class="family.checked < family.total ? 'text-warning' : 'text-success'">
-												{{ $t('security.checked_share', { checked: family.checked, total: family.total }) }}
-											</span>
-										</div>
-										<div class="progress progress-sm">
-											<div
-												class="progress-bar bg-success"
-												:style="{ width: share(family.checked, family.total) + '%' }"
-											/>
-										</div>
-									</div>
-									<Datatable
-										id="coverage-states-datatable"
-										:rowdata="stateRows"
-										:rowheader="stateColumns"
-										:fieldlabels="familyLabels"
-										:usecheckbox="false"
-										:candeletemultiple="false"
-										:cansearch="false"
-										title="coverage_states"
-										translationkey="security.column_"
-										compactheader
-									>
-										<template #cell(state)="{ row }">
-											<InstallationState :state="row.item.state" />
-										</template>
-									</Datatable>
-								</b-tab>
+										{{ $t('security.' + scan) }} :
+										<strong :class="{ 'text-warning': !coverage[scan] }">
+											{{ coverage[scan] ? formatDateTime(coverage[scan]) : $t('security.never') }}
+										</strong>
+									</span>
+								</p>
 
-								<b-tab
-									:title="$t('security.running_kernels')"
-									title-item-class="ocs-menu-tab"
+								<div class="hr-text">
+									{{ $t('security.unchecked_reasons') }}
+								</div>
+								<Datatable
+									id="coverage-reasons-datatable"
+									:rowdata="reasonRows"
+									:rowheader="['reason', 'installations', 'share', 'action']"
+									:nonsortablefields="['action']"
+									:usecheckbox="false"
+									:candeletemultiple="false"
+									:cansearch="false"
+									:emptytext="$t('security.all_checked')"
+									title="coverage_reasons"
+									translationkey="security.column_"
+									compactheader
 								>
-									<Datatable
-										id="coverage-kernels-datatable"
-										:rowdata="kernelRows"
-										:rowheader="['state', 'count']"
-										:usecheckbox="false"
-										:candeletemultiple="false"
-										:cansearch="false"
-										title="coverage_kernels"
-										translationkey="security.column_"
-										compactheader
-									>
-										<template #cell(state)="{ row }">
-											<span
-												class="badge"
-												:class="row.item.state === 'checked' ? 'bg-green-lt' : 'bg-yellow-lt'"
-											>{{ kernelLabel(row.item.state) }}</span>
-										</template>
-									</Datatable>
-								</b-tab>
+									<template #cell(reason)="{ row }">
+										<InstallationState :state="row.item.state" />
+									</template>
+									<template #cell(installations)="{ row }">
+										{{ row.item.installations.toLocaleString() }}
+									</template>
+									<template #cell(share)="{ row }">
+										<div class="d-flex align-items-center gap-2 coverage-share">
+											<div class="progress progress-sm flex-fill">
+												<div
+													class="progress-bar bg-warning"
+													:style="{ width: row.item.share * 100 + '%' }"
+												/>
+											</div>
+											<span class="text-muted small text-nowrap">{{ formatPercent(row.item.share) }}</span>
+										</div>
+									</template>
+									<template #cell(action)="{ row }">
+										<router-link
+											v-if="row.item.link"
+											:to="row.item.link"
+											class="ocs-link text-nowrap"
+										>
+											{{ $t('security.reason_action_' + row.item.actionKey) }}
+										</router-link>
+										<a
+											v-else-if="row.item.actionKey === 'sources'"
+											href="#"
+											class="ocs-link text-nowrap"
+											@click.prevent="activeTab = SOURCES_TAB"
+										>
+											{{ $t('security.reason_action_sources') }}
+										</a>
+										<span
+											v-else-if="row.item.actionKey"
+											class="text-muted text-nowrap"
+										>
+											{{ $t('security.reason_action_' + row.item.actionKey) }}
+										</span>
+									</template>
+								</Datatable>
 
-								<b-tab
-									:title="$t('security.sources')"
-									title-item-class="ocs-menu-tab"
+								<div class="hr-text">
+									{{ $t('security.by_platform') }}
+								</div>
+								<Datatable
+									id="coverage-platforms-datatable"
+									:rowdata="platformRows"
+									:rowheader="['platform', 'checked', 'unchecked', 'excluded', 'coverage']"
+									:usecheckbox="false"
+									:candeletemultiple="false"
+									:cansearch="false"
+									title="coverage_platforms"
+									translationkey="security.column_"
+									compactheader
 								>
-									<Datatable
-										id="coverage-sources-datatable"
-										:rowdata="sourceRows"
-										:rowheader="sourceColumns"
-										:usecheckbox="false"
-										:candeletemultiple="false"
-										title="coverage_sources"
-										translationkey="security.column_"
-										compactheader
-									>
-										<template #cell(source_state)="{ row }">
-											<span
-												class="badge"
-												:class="sourceStateClass(row.item.source_state)"
-											>{{ $t('security.source_state_' + row.item.source_state) }}</span>
-										</template>
-										<template #cell(last_success)="{ row }">
-											<span :class="{ 'text-warning': !row.item.last_success }">
-												{{ row.item.last_success ? formatDateTime(row.item.last_success) : $t('security.never') }}
-											</span>
-										</template>
-										<template #cell(last_attempt)="{ row }">
-											{{ row.item.last_attempt ? formatDateTime(row.item.last_attempt) : $t('security.never') }}
-										</template>
-										<template #cell(record_count)="{ row }">
-											{{ (row.item.record_count || 0).toLocaleString() }}
-										</template>
-										<template #cell(source_error)="{ row }">
-											<span class="text-danger">{{ row.item.source_error }}</span>
-										</template>
-									</Datatable>
-								</b-tab>
-							</b-tabs>
-						</template>
+									<template #cell(unchecked)="{ row }">
+										<span :class="{ 'text-warning': row.item.unchecked }">
+											{{ row.item.unchecked.toLocaleString() }}
+										</span>
+									</template>
+									<template #cell(coverage)="{ row }">
+										<div class="d-flex align-items-center gap-2 coverage-share">
+											<div class="progress progress-sm flex-fill">
+												<div
+													class="progress-bar bg-success"
+													:style="{ width: row.item.coverage * 100 + '%' }"
+												/>
+											</div>
+											<span class="small text-nowrap">{{ formatPercent(row.item.coverage) }}</span>
+										</div>
+									</template>
+								</Datatable>
+							</b-tab>
+
+							<!-- The tests of the scan, in their order -->
+							<b-tab
+								:title="$t('security.coverage_by_state')"
+								title-item-class="ocs-menu-tab"
+							>
+								<Datatable
+									id="coverage-states-datatable"
+									:rowdata="stateRows"
+									:rowheader="stateColumns"
+									:fieldlabels="familyLabels"
+									:usecheckbox="false"
+									:candeletemultiple="false"
+									:cansearch="false"
+									title="coverage_states"
+									translationkey="security.column_"
+									compactheader
+								>
+									<template #cell(state)="{ row }">
+										<InstallationState :state="row.item.state" />
+									</template>
+								</Datatable>
+							</b-tab>
+
+							<b-tab
+								:title="$t('security.running_kernels')"
+								title-item-class="ocs-menu-tab"
+							>
+								<Datatable
+									id="coverage-kernels-datatable"
+									:rowdata="kernelRows"
+									:rowheader="['state', 'count']"
+									:usecheckbox="false"
+									:candeletemultiple="false"
+									:cansearch="false"
+									title="coverage_kernels"
+									translationkey="security.column_"
+									compactheader
+								>
+									<template #cell(state)="{ row }">
+										<span
+											class="badge"
+											:class="row.item.state === 'checked' ? 'bg-green-lt' : 'bg-yellow-lt'"
+										>{{ kernelLabel(row.item.state) }}</span>
+									</template>
+								</Datatable>
+							</b-tab>
+
+							<b-tab
+								:title="$t('security.sources')"
+								title-item-class="ocs-menu-tab"
+							>
+								<Datatable
+									id="coverage-sources-datatable"
+									:rowdata="sourceRows"
+									:rowheader="sourceColumns"
+									:usecheckbox="false"
+									:candeletemultiple="false"
+									title="coverage_sources"
+									translationkey="security.column_"
+									compactheader
+								>
+									<template #cell(source_state)="{ row }">
+										<span
+											class="badge"
+											:class="sourceStateClass(row.item.source_state)"
+										>{{ $t('security.source_state_' + row.item.source_state) }}</span>
+									</template>
+									<template #cell(last_success)="{ row }">
+										<span :class="{ 'text-warning': !row.item.last_success }">
+											{{ row.item.last_success ? formatDateTime(row.item.last_success) : $t('security.never') }}
+										</span>
+									</template>
+									<template #cell(last_attempt)="{ row }">
+										{{ row.item.last_attempt ? formatDateTime(row.item.last_attempt) : $t('security.never') }}
+									</template>
+									<template #cell(record_count)="{ row }">
+										{{ (row.item.record_count || 0).toLocaleString() }}
+									</template>
+									<template #cell(source_error)="{ row }">
+										<span class="text-danger">{{ row.item.source_error }}</span>
+									</template>
+								</Datatable>
+							</b-tab>
+						</b-tabs>
 					</div>
 				</div>
 			</div>
@@ -147,7 +237,22 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
-import { apiErrorMessage, formatDateTime } from "@/utils/security"
+import { apiErrorMessage, formatDateTime, formatPercent } from "@/utils/security"
+
+// tab of the sources, opened by the "see the sources" action
+const SOURCES_TAB = 3
+// States that are no missing check, as the coverage counts them
+const NOT_UNCHECKED = ["checked", "excluded", "kernel_not_running"]
+// Where each reason is acted on: a route, the sources tab, or the next scan
+const REASON_ACTIONS = {
+	no_identity: { key: "identify", link: { path: "/security/software_identity", query: { tab: "review" } } },
+	third_party: { key: "origins", link: { path: "/security/software_identity", query: { tab: "origins" } } },
+	no_origin: { key: "origins", link: { path: "/security/software_identity", query: { tab: "origins" } } },
+	release_not_tracked: { key: "releases", link: { path: "/security/software_identity", query: { tab: "releases" } } },
+	source_never_loaded: { key: "sources" },
+	stale: { key: "sources" },
+	pending: { key: "next_scan" },
+}
 
 // "2002-2026" for consecutive years
 function yearRanges(years) {
@@ -172,6 +277,8 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
+			activeTab: 0,
+			SOURCES_TAB,
 			coverage: { states: [], families: [], sources: [], kernels: {} },
 			scans: ["last_full_scan", "last_incremental_scan", "last_exposure"],
 			sourceColumns: ["source_name", "source_state", "last_success", "last_attempt", "record_count", "scope", "source_error"],
@@ -210,14 +317,70 @@ export default {
 			}
 		},
 		tiles() {
-			const date = (scan) => (this.coverage[scan] ? formatDateTime(this.coverage[scan]) : this.$t("security.never"))
+			const share = this.totals.all ? this.totals.checked / this.totals.all : 0
 			return [
-				{ label: this.$t("security.state_checked"), value: this.$t("security.checked_share", { checked: this.totals.checked, total: this.totals.all }), small: true },
-				{ label: this.$t("security.not_checked"), value: this.totals.unchecked, warn: this.totals.unchecked > 0 },
-				{ label: this.$t("security.state_excluded"), value: this.totals.excluded },
-				{ label: this.$t("security.kernels_unchecked"), value: this.totals.kernels, warn: this.totals.kernels > 0 },
-				...this.scans.map((scan) => ({ label: this.$t("security." + scan), value: date(scan), warn: !this.coverage[scan], small: true })),
+				{
+					key: "coverage",
+					label: this.$t("security.tile_coverage"),
+					value: `${this.totals.checked.toLocaleString()} / ${this.totals.all.toLocaleString()}`,
+					detail: formatPercent(share),
+					color: share >= 1 ? "#2fb344" : "#f76707",
+				},
+				{
+					key: "unchecked",
+					label: this.$t("security.not_checked"),
+					value: this.totals.unchecked.toLocaleString(),
+					color: this.totals.unchecked ? "#f76707" : "#2fb344",
+				},
+				{
+					key: "excluded",
+					label: this.$t("security.state_excluded"),
+					value: this.totals.excluded.toLocaleString(),
+					color: "#adb5bd",
+				},
+				{
+					key: "kernels",
+					label: this.$t("security.kernels_unchecked"),
+					value: this.totals.kernels.toLocaleString(),
+					color: this.totals.kernels ? "#f76707" : "#2fb344",
+				},
 			]
+		},
+		// Why installations are not checked: the biggest reason first
+		reasonRows() {
+			return this.states
+				.filter((state) => !NOT_UNCHECKED.includes(state))
+				.map((state) => {
+					const installations = this.families.reduce((sum, family) => sum + (family.installations[state] || 0), 0)
+					const action = REASON_ACTIONS[state] || {}
+					return {
+						id: state,
+						state,
+						reason: this.stateLabel(state),
+						installations,
+						share: this.totals.all ? installations / this.totals.all : 0,
+						actionKey: action.key || "",
+						link: action.link || null,
+					}
+				})
+				.filter((row) => row.installations)
+				.sort((a, b) => b.installations - a.installations)
+		},
+		platformRows() {
+			return this.families.map((family) => {
+				const excluded = family.installations.excluded || 0
+				const unchecked = Object.entries(family.installations)
+					.filter(([state]) => !NOT_UNCHECKED.includes(state))
+					.reduce((sum, [, count]) => sum + count, 0)
+				return {
+					id: family.family,
+					platform: this.$t("software_identity.family_" + family.family),
+					checked: family.checked,
+					unchecked,
+					excluded,
+					coverage: family.total ? family.checked / family.total : 0,
+				}
+			})
 		},
 		stateColumns() {
 			return ["position", "state", ...this.families.map((family) => "family_" + family.family), "total"]
@@ -272,10 +435,8 @@ export default {
 	},
 	methods: {
 		formatDateTime,
+		formatPercent,
 
-		share(count, total) {
-			return total ? ((count || 0) * 100) / total : 0
-		},
 		stateLabel(state) {
 			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state
 		},

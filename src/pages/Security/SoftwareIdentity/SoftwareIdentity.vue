@@ -64,6 +64,7 @@
 								</b-tab>
 								<b-tab
 									:title="$t('software_identity.tab_review')"
+									:active="$route.query.tab === 'review'"
 									title-item-class="ocs-menu-tab"
 									lazy
 								>
@@ -117,6 +118,7 @@
 								<b-tab
 									v-if="canvieworigins"
 									:title="$t('software_identity.tab_origins')"
+									:active="$route.query.tab === 'origins'"
 									title-item-class="ocs-menu-tab"
 									lazy
 								>
@@ -130,6 +132,7 @@
 								<b-tab
 									v-if="canviewreleases"
 									:title="$t('software_identity.tab_releases')"
+									:active="$route.query.tab === 'releases'"
 									title-item-class="ocs-menu-tab"
 									lazy
 								>

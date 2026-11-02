@@ -99,3 +99,17 @@
 .datagrid-wide {
   grid-column: span 2;
 }
+
+// dates of the scans, under the coverage tiles
+.coverage-scans {
+  color: $gray-600;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 4px 24px;
+}
+
+// a share drawn as a bar with its percent
+.coverage-share {
+  min-width: 10rem;
+}

@@ -51,6 +51,8 @@ export function formatDay(value) {
 export function formatPercent(value, digits = 1) {
 	if (value === null || value === undefined) return ""
 	const percent = value * 100
+	// a small share is not nothing
+	if (percent > 0 && percent < 0.1) return "< 0.1 %"
 	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
 }
 
