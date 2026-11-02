@@ -1,0 +1,184 @@
+// ===========================================
+//  TOOLBAR
+// ===========================================
+
+// shared by the datatable header and the dashboard : 36px controls on one
+// line, the groups only wrap when the room runs out
+.ocs-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.ocs-toolbar .toolbar-group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ocs-toolbar .toolbar-start {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ocs-toolbar .toolbar-end {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.ocs-toolbar .toolbar-search {
+  flex: 0 1 280px;
+  min-width: 180px;
+}
+
+.ocs-toolbar .toolbar-count {
+  color: $gray-600;
+  white-space: nowrap;
+}
+
+// the gaps space the controls, not their own margins
+.ocs-toolbar .datatable-btn,
+.ocs-toolbar .datatable-btn .dropdown-toggle {
+  height: 36px;
+  margin: 0;
+}
+
+// icon buttons are square
+.ocs-toolbar .form-control.datatable-btn,
+.ocs-toolbar .datatable-btn-icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  max-width: none;
+  padding: 0;
+  width: 36px;
+}
+
+.ocs-toolbar .btn.datatable-btn:not(.btn-teal),
+.ocs-toolbar .datatable-btn .dropdown-toggle {
+  background-color: $white;
+  color: $gray-700;
+}
+
+.ocs-toolbar .btn.datatable-btn:not(.btn-teal):hover:not(:disabled),
+.ocs-toolbar .datatable-btn .dropdown-toggle:hover {
+  background-color: $gray-100;
+  color: $gray-900;
+}
+
+.ocs-toolbar #per-page-select {
+  width: 80px;
+}
+
+// vue-select draws its own toggle, line it up on the buttons
+.ocs-toolbar .v-select .vs__dropdown-toggle {
+  align-items: center;
+  background-color: $white;
+  height: 36px;
+  padding: 0 4px 0 0;
+}
+
+.ocs-toolbar .v-select .vs__selected-options {
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0 8px;
+}
+
+.ocs-toolbar .v-select .vs__selected,
+.ocs-toolbar .v-select .vs__search {
+  margin: 0;
+  padding: 0;
+}
+
+// same hover as the buttons, the global vue-select rules set both !important
+.ocs-toolbar .v-select:hover .vs__dropdown-toggle {
+  background: $gray-100 !important;
+  border-color: var(--tblr-border-active-color) !important;
+}
+
+// lists to pick from, not fields to type in
+.ocs-toolbar .v-select .vs__dropdown-toggle,
+.ocs-toolbar .v-select .vs__search {
+  cursor: pointer;
+}
+
+.ocs-toolbar .v-select .vs__open-indicator {
+  transform: scale(0.7);
+}
+
+.ocs-toolbar .v-select.vs--open .vs__open-indicator {
+  transform: rotate(180deg) scale(0.7);
+}
+
+@media (max-width: 767.98px) {
+  .ocs-toolbar .toolbar-search {
+    flex-basis: 100%;
+  }
+
+  .ocs-toolbar .toolbar-end {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+
+// the picker and its buttons read as one control, like a button group
+.select-btn-group {
+  display: flex;
+}
+
+.select-btn-group > * + * {
+  margin-left: -1px;
+}
+
+.select-btn-group > :not(:last-child),
+.select-btn-group > :not(:last-child) .vs__dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.select-btn-group > :not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+// a translucent button lets the overlapping border of its neighbour show
+// through, which doubles it : fade the icon only
+.select-btn-group > .btn:disabled {
+  border-color: var(--tblr-border-color);
+  opacity: 1;
+}
+
+.select-btn-group > .btn:disabled > * {
+  opacity: 0.4;
+}
+
+// the next button covers the picker's right border, it takes the hover colour
+// in its place : a z-index would put the open menu under the content below
+.select-btn-group > .v-select:hover + .btn {
+  border-left-color: var(--tblr-border-active-color);
+}
+
+// the hovered or focused button keeps its whole border over its neighbours
+.select-btn-group > .btn:hover,
+.select-btn-group > .btn:focus {
+  position: relative;
+  z-index: 1;
+}
+
+.toolbar-btn {
+  width: 36px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+// name / visibility / groups form of the layout and dashboard modals
+.ocs-modal-form .vs__dropdown-toggle {
+  height: calc(1.5em + 0.75rem + 2px);
+}
+
+.ocs-modal-form .ocs-select {
+  margin-top: 0;
+}

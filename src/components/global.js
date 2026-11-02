@@ -25,6 +25,7 @@ import SnmpModal from '@/components/Modals/Item/SnmpModal.vue'
 import SnmpScannerModal from '@/components/Modals/Item/SnmpScannerModal.vue'
 import UserModal from '@/components/Modals/Item/UserModal.vue'
 import VirtualColModal from '@/components/Modals/Item/VirtualColModal.vue'
+import ColumnLayoutModal from '@/components/Modals/Item/ColumnLayoutModal.vue'
 import UserGroupAssignmentsModal from '@/components/Modals/Item/UserGroupAssignmentsModal.vue'
 import ExtensionModal from '@/components/Modals/Item/ExtensionModal.vue'
 import ExtensionSlot from '@/extensions/ExtensionSlot.vue'
@@ -72,6 +73,7 @@ const GlobalComponents = {
 		Vue.component('SnmpScannerModal', SnmpScannerModal)
 		Vue.component('UserModal', UserModal)
 		Vue.component('VirtualColModal', VirtualColModal)
+		Vue.component('ColumnLayoutModal', ColumnLayoutModal)
 		Vue.component('UserGroupAssignmentsModal', UserGroupAssignmentsModal)
 		Vue.component('ExtensionModal', ExtensionModal)
 		Vue.component('ExtensionSlot', ExtensionSlot)
