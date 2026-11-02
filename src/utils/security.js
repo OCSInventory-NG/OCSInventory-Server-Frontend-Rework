@@ -10,6 +10,16 @@ export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
 
 export const FAMILIES = ["deb", "rpm", "windows", "macos"]
 
+// Same palette as the compliance severities. Unknown stays dark: an unrated
+// vulnerability is not a mild one
+export const LEVEL_COLORS = {
+	critical: "#d63939",
+	high: "#f76707",
+	medium: "#f59f00",
+	low: "#206bc4",
+	unknown: "#495057",
+}
+
 // Message of a failed call. A 400 answers {parameter: "message"} or {field: ["message"]}
 export function apiErrorMessage(e) {
 	const data = e?.response?.data

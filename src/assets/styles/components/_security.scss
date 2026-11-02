@@ -82,3 +82,20 @@
 .source-notice-title {
   font-weight: 600;
 }
+
+// head of a vulnerability: id, badges and summary, edged with the level colour
+.vuln-hero {
+  border-left: 4px solid $gray-500;
+  padding: 4px 0 4px 16px;
+}
+
+.vuln-hero-summary {
+  color: $gray-700;
+  font-size: 1rem;
+  max-width: 60rem;
+}
+
+// long values of a datagrid (vector, references) take two columns
+.datagrid-wide {
+  grid-column: span 2;
+}

@@ -213,13 +213,11 @@
 <script>
 import { hasPermission } from "@/utils/permissions"
 import {
-	FAMILIES, LEVELS, NOISE_KINDS, PRIORITY_CRITERIA,
+	FAMILIES, LEVELS, LEVEL_COLORS, NOISE_KINDS, PRIORITY_CRITERIA,
 	apiErrorMessage, asList, formatDay, formatPercent, ratingLabel,
 } from "@/utils/security"
 
 const SUMMARY_LENGTH = 140
-// same palette as the level badges
-const LEVEL_COLORS = { critical: "#d63939", high: "#f76707", medium: "#f59f00", low: "#206bc4", unknown: "#495057" }
 // The order chosen here lasts for the session, the settings give the default
 const ORDERING_KEY = "vulnerabilities_ordering"
 // A click on these headers sorts on the criterion first; the others do not sort

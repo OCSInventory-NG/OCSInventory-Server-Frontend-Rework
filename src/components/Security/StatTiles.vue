@@ -29,6 +29,12 @@
 				>
 					{{ tile.value }}
 				</div>
+				<div
+					v-if="tile.detail"
+					class="text-muted small"
+				>
+					{{ tile.detail }}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -38,7 +44,8 @@
 export default {
 	name: "StatTiles",
 	props: {
-		// [{ key, label, value, color, active, warn: the value calls for attention, small: for a date,
+		// [{ key, label, value, detail: a line under the value, color, active,
+		//    warn: the value calls for attention, small: for a date,
 		//    static: a counter that filters nothing }]
 		tiles: { type: Array, required: true },
 		// a click on a tile emits select(key), e.g. to filter a list
