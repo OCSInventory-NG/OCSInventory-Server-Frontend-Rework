@@ -84,7 +84,6 @@
 											>
 												{{ $t('security.reset_order') }}
 											</b-button>
-											<span class="text-muted small">{{ $t('security.order_hint') }}</span>
 										</div>
 										<div
 											v-if="hiddenKinds.length || filters.show.length"

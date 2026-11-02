@@ -1,14 +1,10 @@
 <template>
 	<div class="identity-reference">
-		<div class="d-flex align-items-start gap-3 mb-3">
-			<p
-				v-if="help"
-				class="text-muted mb-0"
-			>
-				{{ help }}
-			</p>
+		<div
+			v-if="cancreate"
+			class="d-flex mb-3"
+		>
 			<b-button
-				v-if="cancreate"
 				variant="primary"
 				class="ms-auto text-nowrap"
 				@click="openForm(null)"
@@ -102,7 +98,6 @@
 					v-for="field in formFields"
 					:key="field"
 					:label="fieldLabel(field)"
-					:description="fieldhelp[field] || meta[field]?.help_text || ''"
 					:label-for="`reference-${field}`"
 					class="mb-3"
 				>
@@ -162,13 +157,11 @@ export default {
 		// permission codename suffix, ex: software_identity / packageorigin
 		app: { type: String, default: "software_identity" },
 		model: { type: String, required: true },
-		help: { type: String, default: "" },
 		// columns shown first, in this order
 		firstfields: { type: Array, default: () => [] },
 		// labels of a true boolean, by field
 		booleanlabels: { type: Object, default: () => ({}) },
 		badgefields: { type: Object, default: () => ({}) },
-		fieldhelp: { type: Object, default: () => ({}) },
 		patterns: { type: Object, default: () => ({}) },
 		placeholders: { type: Object, default: () => ({}) },
 		// rows that cannot be changed nor deleted: {field: value}

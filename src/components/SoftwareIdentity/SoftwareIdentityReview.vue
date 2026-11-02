@@ -13,6 +13,7 @@
 			:nonsortablefields="columns"
 			:usecheckbox="false"
 			:candeletemultiple="false"
+			:hascustomactions="candecide"
 			:cansearch="false"
 			:canexport="false"
 			:server-side="true"
@@ -32,39 +33,45 @@
 				<div
 					v-for="candidate in row.item.candidates"
 					:key="candidate.product"
+					class="identity-candidate"
 				>
-					<b-button
+					<span class="identity-candidate-name">{{ candidate.product }}</span>
+					<span
+						class="badge bg-blue-lt"
+						:title="$t('software_identity.score')"
+					>{{ candidate.score.toFixed(2) }}</span>
+					<button
 						v-if="candecide"
-						size="sm"
-						variant="outline-primary"
-						class="mb-1 text-start"
+						class="btn btn-ghost-success btn-sm px-1"
 						:title="$t('software_identity.accept')"
 						@click="decide(row.item, candidate.product)"
 					>
 						<font-awesome-icon :icon="['fas', 'check']" />
-						{{ candidate.product }} ({{ candidate.score.toFixed(2) }})
-					</b-button>
-					<span v-else>{{ candidate.product }} ({{ candidate.score.toFixed(2) }})</span>
+					</button>
 				</div>
 			</template>
 			<template #cell(decision)="{ row }">
 				<v-select
-					v-if="cansearch"
 					:options="productOptions"
 					:filterable="false"
 					:placeholder="$t('software_identity.other_product')"
-					class="mb-1 identity-product-search"
+					class="identity-product-search"
 					@search="searchProducts"
 					@option:selected="(option) => decide(row.item, option.value)"
-				/>
-				<b-button
-					size="sm"
-					variant="outline-danger"
+				>
+					<template #no-options>
+						{{ $t('software_identity.type_to_search') }}
+					</template>
+				</v-select>
+			</template>
+			<template #cell(firstActions)="{ row }">
+				<button
+					class="btn btn-ghost-danger"
+					:title="$t('software_identity.no_cpe')"
 					@click="decide(row.item, null)"
 				>
 					<font-awesome-icon :icon="['fas', 'xmark']" />
-					{{ $t('software_identity.no_cpe') }}
-				</b-button>
+				</button>
 			</template>
 		</Datatable>
 	</div>
@@ -101,7 +108,8 @@ export default {
 			const columns = ["software", "family", "versions", "machines"]
 			if (this.status === "matched") columns.push("product")
 			columns.push("candidates")
-			if (this.candecide) columns.push("decision")
+			// another product from the CPE index, when the user can search it
+			if (this.candecide && this.cansearch) columns.push("decision")
 			return columns
 		},
 		rowdata() {

@@ -16,10 +16,7 @@
 							variant="danger"
 						/>
 						<template v-else>
-							<div class="d-flex align-items-start gap-3 mb-3">
-								<p class="text-muted mb-0">
-									{{ $t('security.exclusions_help') }}
-								</p>
+							<div class="d-flex mb-3">
 								<b-button
 									v-if="canadd"
 									variant="primary"

@@ -23,42 +23,6 @@
 						</div>
 
 						<template v-else>
-							<div class="datagrid mb-4">
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('software_identity.index') }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': !summary.index.version }"
-									>
-										{{ indexLabel }}
-									</div>
-								</div>
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('software_identity.pending') }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': summary.pending }"
-									>
-										{{ summary.pending }}
-									</div>
-								</div>
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('software_identity.unknown_platform') }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': summary.machines_unknown_platform }"
-									>
-										{{ summary.machines_unknown_platform }}
-									</div>
-								</div>
-							</div>
-
 							<b-tabs
 								content-class="col-10 sticky-tabs"
 								pills
@@ -69,7 +33,8 @@
 									:title="$t('software_identity.summary')"
 									title-item-class="ocs-menu-tab"
 								>
-									<div class="hr-text mt-0">
+									<StatTiles :tiles="tiles" />
+									<div class="hr-text">
 										{{ $t('software_identity.by_platform') }}
 									</div>
 									<Datatable
@@ -143,7 +108,6 @@
 									<IdentityReferenceTable
 										route="cpe_aliases"
 										model="cpealias"
-										:help="$t('software_identity.aliases_help')"
 										:firstfields="['product', 'alias', 'source']"
 										:patterns="{ product: cpeKeyPattern, alias: cpeKeyPattern }"
 										:placeholders="{ product: 'zoom:zoom', alias: 'zoom:meetings' }"
@@ -159,10 +123,8 @@
 									<IdentityReferenceTable
 										route="package_origins"
 										model="packageorigin"
-										:help="$t('software_identity.origins_help')"
 										:booleanlabels="{ extended: $t('software_identity.extended_repo') }"
 										:badgefields="{ extended: 'bg-purple-lt' }"
-										:fieldhelp="{ extended: $t('software_identity.extended_help') }"
 									/>
 								</b-tab>
 								<b-tab
@@ -174,8 +136,6 @@
 									<IdentityReferenceTable
 										route="distro_releases"
 										model="distrorelease"
-										:help="$t('software_identity.releases_help')"
-										:fieldhelp="{ standard_support_end: $t('software_identity.standard_support_end_help') }"
 									/>
 								</b-tab>
 							</b-tabs>
@@ -222,6 +182,13 @@ export default {
 				return this.$t("software_identity.no_index")
 			}
 			return `${new Date(index.source_date).toLocaleString()} (${Number(index.product_count).toLocaleString()} ${this.$t("software_identity.products")})`
+		},
+		tiles() {
+			return [
+				{ label: this.$t("software_identity.index"), value: this.indexLabel, warn: !this.summary.index.version, small: true },
+				{ label: this.$t("software_identity.pending"), value: this.summary.pending, warn: this.summary.pending > 0 },
+				{ label: this.$t("software_identity.unknown_platform"), value: this.summary.machines_unknown_platform, warn: this.summary.machines_unknown_platform > 0 },
+			]
 		},
 		familyColumns() {
 			return ["platform", ...this.statuses.map((status) => "status_" + status)]

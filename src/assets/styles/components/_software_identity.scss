@@ -1,12 +1,18 @@
-// Product search of the software identity review: wide enough to read what
-// is typed and the CPE names offered. The list opens towards the left so it
-// stays inside the page.
+// Product search of the software identity review: the size of the other
+// pickers, wide enough to read the CPE names. The list opens towards the left
+// so it stays inside the page.
 .identity-product-search {
   min-width: 16rem;
 
+  .vs__dropdown-toggle {
+    height: 36px;
+  }
+
   .vs__selected,
   .vs__search,
-  .vs__search::placeholder {
+  .vs__search::placeholder,
+  .vs__dropdown-option,
+  .vs__no-options {
     font-size: 0.875rem;
   }
 
@@ -15,4 +21,16 @@
     left: auto;
     right: 0;
   }
+}
+
+// one candidate per line: name, score, accept
+.identity-candidate {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  padding: 1px 0;
+}
+
+.identity-candidate-name {
+  overflow-wrap: anywhere;
 }

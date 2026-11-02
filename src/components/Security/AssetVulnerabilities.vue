@@ -197,9 +197,6 @@
 					v-if="excludedOpen.length"
 					:title="$t('security.tab_excluded', { count: excludedOpen.length })"
 				>
-					<p class="text-muted">
-						{{ $t('security.excluded_help') }}
-					</p>
 					<ExposureTable
 						name="asset_vulnerabilities_excluded"
 						:rows="excludedOpen"

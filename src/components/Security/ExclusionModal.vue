@@ -58,7 +58,6 @@
 			<b-form-group
 				v-else
 				:label="$t('security.group')"
-				:description="$t('security.exclusion_group_help')"
 				class="mb-3"
 			>
 				<v-select
@@ -80,7 +79,6 @@
 
 			<b-form-group
 				:label="$t('security.exclusion_vuln')"
-				:description="$t('security.exclusion_vuln_help')"
 				label-for="exclusion-vuln"
 				class="mb-3"
 			>
@@ -106,7 +104,6 @@
 
 			<b-form-group
 				:label="$t('security.exclusion_expires')"
-				:description="$t('security.exclusion_expires_help')"
 				label-for="exclusion-expires"
 				class="mb-3"
 			>
@@ -117,12 +114,6 @@
 					:min="minExpiry"
 				/>
 			</b-form-group>
-
-			<Alert
-				v-if="!row.vuln_id"
-				:message="$t('security.whole_scan_warning')"
-				variant="warning"
-			/>
 
 			<div class="text-center">
 				<b-button

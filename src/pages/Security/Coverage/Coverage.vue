@@ -28,63 +28,6 @@
 							<Loader />
 						</div>
 						<template v-else>
-							<!-- What the scan covers, in a few numbers -->
-							<div class="datagrid mb-4">
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('security.state_checked') }}
-									</div>
-									<div class="datagrid-content">
-										{{ $t('security.checked_share', { checked: totals.checked, total: totals.all }) }}
-									</div>
-								</div>
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('security.not_checked') }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': totals.unchecked }"
-									>
-										{{ totals.unchecked }}
-									</div>
-								</div>
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('security.state_excluded') }}
-									</div>
-									<div class="datagrid-content">
-										{{ totals.excluded }}
-									</div>
-								</div>
-								<div class="datagrid-item">
-									<div class="datagrid-title">
-										{{ $t('security.kernels_unchecked') }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': totals.kernels }"
-									>
-										{{ totals.kernels }}
-									</div>
-								</div>
-								<div
-									v-for="scan in scans"
-									:key="scan"
-									class="datagrid-item"
-								>
-									<div class="datagrid-title">
-										{{ $t('security.' + scan) }}
-									</div>
-									<div
-										class="datagrid-content"
-										:class="{ 'text-warning': !coverage[scan] }"
-									>
-										{{ coverage[scan] ? formatDateTime(coverage[scan]) : $t('security.never') }}
-									</div>
-								</div>
-							</div>
-
 							<b-tabs
 								content-class="col-10 sticky-tabs"
 								pills
@@ -96,11 +39,7 @@
 									:title="$t('security.funnel')"
 									title-item-class="ocs-menu-tab"
 								>
-									<p class="text-muted">
-										{{ $t('security.funnel_help') }}
-										{{ $t('security.installations_note') }}
-										{{ $t('security.funnel_zero_hidden') }}
-									</p>
+									<StatTiles :tiles="tiles" />
 									<div
 										v-for="family in families"
 										:key="family.family"
@@ -269,6 +208,16 @@ export default {
 				excluded: this.coverage.excluded || 0,
 				kernels,
 			}
+		},
+		tiles() {
+			const date = (scan) => (this.coverage[scan] ? formatDateTime(this.coverage[scan]) : this.$t("security.never"))
+			return [
+				{ label: this.$t("security.state_checked"), value: this.$t("security.checked_share", { checked: this.totals.checked, total: this.totals.all }), small: true },
+				{ label: this.$t("security.not_checked"), value: this.totals.unchecked, warn: this.totals.unchecked > 0 },
+				{ label: this.$t("security.state_excluded"), value: this.totals.excluded },
+				{ label: this.$t("security.kernels_unchecked"), value: this.totals.kernels, warn: this.totals.kernels > 0 },
+				...this.scans.map((scan) => ({ label: this.$t("security." + scan), value: date(scan), warn: !this.coverage[scan], small: true })),
+			]
 		},
 		stateColumns() {
 			return ["position", "state", ...this.families.map((family) => "family_" + family.family), "total"]
