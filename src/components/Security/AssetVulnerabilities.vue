@@ -13,169 +13,378 @@
 			<Loader />
 		</div>
 		<template v-else>
+			<SourceFreshness />
+
+			<!-- Coverage of this machine -->
 			<div class="card mb-3">
 				<div class="card-body d-flex flex-wrap gap-4">
 					<div>
 						<div class="subheader">
-							{{ $t('security.kernel') }}
+							{{ $t('security.running_kernel') }}
 						</div>
-						<div>{{ kernelLabel }}</div>
+						<span :class="kernelOk ? 'text-success' : 'text-warning'">
+							<font-awesome-icon
+								:icon="['fas', kernelOk ? 'circle-check' : 'triangle-exclamation']"
+								class="me-1"
+							/>
+							{{ kernelLabel }}
+						</span>
 					</div>
 					<div>
 						<div class="subheader">
 							{{ $t('security.not_checked') }}
 						</div>
-						<router-link to="/security/vulnerabilities">
-							{{ $t('security.unchecked_software', { count: coverage.unchecked }) }}
-						</router-link>
+						<a
+							v-if="coverage.unchecked"
+							href="#"
+							class="text-warning"
+							@click.prevent="showUnchecked"
+						>
+							<font-awesome-icon
+								:icon="['fas', 'triangle-exclamation']"
+								class="me-1"
+							/>
+							{{ $t('security.unchecked_software', { count: coverage.unchecked }, coverage.unchecked) }}
+						</a>
+						<span
+							v-else
+							class="text-success"
+						>{{ $t('security.all_checked') }}</span>
 					</div>
-					<div class="ms-auto text-muted">
-						{{ $t('security.last_check', { date: lastCheck }) }}
+					<div>
+						<div class="subheader">
+							{{ $t('security.open_exposures') }}
+						</div>
+						{{ visibleOpen.length }}
 					</div>
 				</div>
 			</div>
-			<p v-if="!rows.length">
-				{{ $t('security.no_vulnerability') }}
-			</p>
-			<table
-				v-else
-				class="table table-sm table-striped table-vcenter"
+
+			<b-tabs
+				v-model="activeTab"
+				pills
+				small
+				nav-class="mb-3"
 			>
-				<thead>
-					<tr>
-						<th>{{ $t('security.level') }}</th>
-						<th>{{ $t('security.vulnerability') }}</th>
-						<th>{{ $t('security.products') }}</th>
-						<th>{{ $t('security.fixed_version') }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="row in rows"
-						:key="row.vuln_id"
-						style="cursor: pointer;"
-						@click="selected = row.vuln_id"
+				<b-tab :title="$t('security.tab_open', { count: visibleOpen.length })">
+					<!-- Noise hidden by default, always counted -->
+					<div
+						v-if="noiseCount"
+						class="alert alert-info"
 					>
-						<td>
-							<VulnerabilityLevel
-								:level="row.level"
-								:score="row.cvss_score"
+						<font-awesome-icon
+							:icon="['fas', 'eye-slash']"
+							class="me-2"
+						/>
+						<template v-if="!showNoise">
+							{{ $t('security.asset_noise_hidden', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
+						</template>
+						<template v-else>
+							{{ $t('security.asset_noise_shown', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
+						</template>
+						<b-button
+							size="sm"
+							variant="link"
+							@click="showNoise = !showNoise"
+						>
+							{{ showNoise ? $t('security.hide_noise') : $t('security.show_hidden') }}
+						</b-button>
+					</div>
+
+					<!-- Never a bare "no vulnerability" -->
+					<div
+						v-if="!visibleOpen.length"
+						class="alert"
+						:class="emptyWarns ? 'alert-warning' : 'alert-success'"
+					>
+						<div>
+							<div>{{ $t('security.asset_no_exposure') }}</div>
+							<div v-if="coverage.unchecked">
+							{{ $t('security.asset_unchecked_warning', { count: coverage.unchecked }, coverage.unchecked) }}
+							<a
+								href="#"
+								@click.prevent="showUnchecked"
+							>{{ $t('security.see_list') }}</a>
+							</div>
+							<div v-if="!kernelOk && coverage.kernel !== 'not_applicable'">
+								{{ $t('security.asset_kernel_warning', { state: kernelLabel }) }}
+							</div>
+						</div>
+					</div>
+					<ExposureTable
+						v-else
+						:rows="visibleOpen"
+						assetview
+						:canexclude="canexclude"
+						@exclude="openExclusion"
+					/>
+
+					<template v-if="excludedOpen.length">
+						<h4 class="text-muted mt-3">
+							{{ $t('security.excluded_exposures') }} ({{ excludedOpen.length }})
+						</h4>
+						<ExposureTable
+							:rows="excludedOpen"
+							assetview
+							excluded
+						/>
+					</template>
+				</b-tab>
+
+				<b-tab
+					:title="$t('security.tab_closed')"
+					lazy
+				>
+					<Alert
+						v-if="closedError"
+						:message="closedError"
+						variant="danger"
+					/>
+					<p
+						v-else-if="closed && !closed.length"
+						class="text-muted"
+					>
+						{{ $t('security.closed_none') }}
+					</p>
+					<ExposureTable
+						v-else-if="closed"
+						:rows="closed"
+						assetview
+						closed
+					/>
+					<div
+						v-else
+						class="ocs-loader"
+					>
+						<Loader />
+					</div>
+				</b-tab>
+
+				<b-tab :title="$t('security.tab_software', { count: software.length })">
+					<b-row class="mb-3 g-2">
+						<b-col md="4">
+							<b-form-select
+								v-model="softwareState"
+								:options="softwareStateOptions"
 							/>
-						</td>
-						<td>
-							{{ row.vuln_id }}
-							<span
-								v-if="row.uncertain"
-								class="badge bg-secondary ms-1"
-								:title="$t('security.uncertain_help')"
-							>
-								{{ $t('security.uncertain') }}
-							</span>
-						</td>
-						<td>
-							<div
-								v-for="product in row.products"
-								:key="product.product + product.version"
-							>
-								{{ product.product }} {{ product.version }}
-							</div>
-							<div
-								v-if="row.product_count > row.products.length"
-								class="text-muted"
-							>
-								{{ $t('security.more_products', { count: row.product_count - row.products.length }) }}
-							</div>
-						</td>
-						<td>
-							<div
-								v-for="version in row.fixed_versions"
-								:key="version"
-							>
-								{{ version }}
-							</div>
-							<span v-if="!row.fixed_versions.length">{{ $t('security.no_fix') }}</span>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<b-pagination
-				v-if="total > perPage"
-				v-model="currentPage"
-				:total-rows="total"
-				:per-page="perPage"
-				align="right"
-				size="sm"
-			/>
-			<VulnerabilityDetailModal
-				v-if="selected"
-				:vuln-id="selected"
-				@closed="selected = null"
+						</b-col>
+						<b-col md="4">
+							<b-form-input
+								v-model="softwareSearch"
+								type="search"
+								:placeholder="$t('generic.search')"
+							/>
+						</b-col>
+					</b-row>
+					<p
+						v-if="!filteredSoftware.length"
+						class="text-muted"
+					>
+						{{ $t('generic.no_data') }}
+					</p>
+					<template v-else>
+						<table class="table table-sm table-striped table-vcenter">
+							<thead>
+								<tr>
+									<th>{{ $t('security.software') }}</th>
+									<th>{{ $t('security.version') }}</th>
+									<th>{{ $t('software_identity.family') }}</th>
+									<th>{{ $t('software_identity.product') }}</th>
+									<th>{{ $t('security.state') }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									v-for="row in pagedSoftware"
+									:key="row.entry"
+								>
+									<td>{{ row.name }}</td>
+									<td>{{ row.version }}</td>
+									<td>{{ row.family ? $t('software_identity.family_' + row.family) : '' }}</td>
+									<td>{{ row.product || '—' }}</td>
+									<td>
+										<InstallationState :state="row.state" />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<b-pagination
+							v-if="filteredSoftware.length > perPage"
+							v-model="softwarePage"
+							:total-rows="filteredSoftware.length"
+							:per-page="perPage"
+							align="right"
+							size="sm"
+						/>
+					</template>
+				</b-tab>
+			</b-tabs>
+
+			<ExclusionModal
+				v-model="exclusionShown"
+				:preset="exclusionPreset"
+				@saved="reloadOpen"
 			/>
 		</template>
 	</div>
 </template>
 
 <script>
+import { hasPermission } from "@/utils/permissions"
+import { NOISE_KINDS, apiErrorMessage, asList } from "@/utils/security"
+
+const SOFTWARE_TAB = 2
+// States that are no missing check
+const FINE_STATES = ["checked", "kernel_not_running"]
+
 export default {
 	name: "AssetVulnerabilities",
 	props: {
 		assetId: { type: Number, required: true },
+		assetName: { type: String, default: "" },
 	},
 	data() {
 		return {
 			errored: false,
 			errormsg: null,
 			loading: true,
-			rows: [],
-			total: 0,
-			currentPage: 1,
+
+			coverage: { kernel: "not_applicable", unchecked: 0 },
+			open: [],
+			closed: null,
+			closedError: null,
+			software: [],
+			showNoise: false,
+			activeTab: 0,
+
+			softwareState: null,
+			softwareSearch: "",
+			softwarePage: 1,
 			perPage: 25,
-			coverage: { kernel: "not_applicable", unchecked: 0, last_check: null },
-			selected: null,
+
+			canexclude: hasPermission("security_add_vulnerabilityexclusion"),
+			exclusionShown: false,
+			exclusionPreset: {},
 		}
 	},
 	computed: {
+		kernelOk() {
+			return ["checked", "not_applicable"].includes(this.coverage.kernel)
+		},
 		kernelLabel() {
 			const state = this.coverage.kernel
-			if (state === "host_or_custom" || state === "not_applicable") {
+			if (state === "host_kernel_unverified" || state === "not_applicable") {
 				return this.$t("security.kernel_" + state)
 			}
-			return this.$t("security.state_" + state)
+			return this.stateLabel(state)
 		},
-		lastCheck() {
-			return this.coverage.last_check
-				? new Date(this.coverage.last_check).toLocaleString()
-				: this.$t("security.never")
+		excludedOpen() {
+			return this.open.filter((row) => row.excluded)
+		},
+		noiseRows() {
+			return this.open.filter((row) => !row.excluded && row.noise)
+		},
+		noiseCount() {
+			return this.noiseRows.length
+		},
+		noiseSummary() {
+			return NOISE_KINDS
+				.map((kind) => [kind, this.noiseRows.filter((row) => row.noise === kind).length])
+				.filter(([, count]) => count)
+				.map(([kind, count]) => `${this.$t("security.noise_" + kind)} : ${count}`)
+				.join(", ")
+		},
+		visibleOpen() {
+			return this.open.filter((row) => !row.excluded && (this.showNoise || !row.noise))
+		},
+		emptyWarns() {
+			return this.coverage.unchecked > 0 || !this.kernelOk
+		},
+		softwareStateOptions() {
+			const states = [...new Set(this.software.map((row) => row.state))]
+			return [
+				{ value: null, text: this.$t("security.all_states") },
+				{ value: "__unchecked", text: this.$t("security.unchecked_only") },
+				...states.map((state) => ({ value: state, text: this.stateLabel(state) })),
+			]
+		},
+		filteredSoftware() {
+			const search = this.softwareSearch.toLowerCase()
+			return this.software.filter((row) => {
+				if (this.softwareState === "__unchecked" && FINE_STATES.includes(row.state)) return false
+				if (this.softwareState && this.softwareState !== "__unchecked" && row.state !== this.softwareState) return false
+				return !search || `${row.name} ${row.version} ${row.product || ""}`.toLowerCase().includes(search)
+			})
+		},
+		pagedSoftware() {
+			const start = (this.softwarePage - 1) * this.perPage
+			return this.filteredSoftware.slice(start, start + this.perPage)
 		},
 	},
 	watch: {
-		async currentPage() {
-			await this.loadRows()
+		softwareState() {
+			this.softwarePage = 1
+		},
+		softwareSearch() {
+			this.softwarePage = 1
+		},
+		async activeTab(index) {
+			if (index === 1 && this.closed === null) {
+				await this.loadClosed()
+			}
 		},
 	},
 	async mounted() {
 		try {
-			const [, coverage] = await Promise.all([
-				this.loadRows(),
+			const [coverage, open, software] = await Promise.all([
 				this.$api.generic.get("vulnerabilities/coverage/", { asset: this.assetId }),
+				this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "open" }),
+				this.$api.generic.get("vulnerability_exposures/software/", { asset: this.assetId }),
 			])
 			this.coverage = coverage
+			this.open = asList(open)
+			this.software = asList(software)
 		} catch (e) {
-			this.errormsg = e?.response?.data?.detail || e?.message || String(e)
+			this.errormsg = apiErrorMessage(e)
 			this.errored = true
 		} finally {
 			this.loading = false
 		}
 	},
 	methods: {
-		async loadRows() {
-			const data = await this.$api.generic.get("vulnerabilities/", {
+		stateLabel(state) {
+			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state
+		},
+
+		async loadClosed() {
+			try {
+				this.closed = asList(await this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "closed" }))
+			} catch (e) {
+				this.closedError = apiErrorMessage(e)
+			}
+		},
+
+		async reloadOpen() {
+			try {
+				this.open = asList(await this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "open" }))
+			} catch (e) {
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			}
+		},
+
+		showUnchecked() {
+			this.softwareState = "__unchecked"
+			this.activeTab = SOFTWARE_TAB
+		},
+
+		openExclusion(row) {
+			this.exclusionPreset = {
+				vuln_id: row.vuln_id,
 				asset: this.assetId,
-				limit: this.perPage,
-				offset: (this.currentPage - 1) * this.perPage,
-			})
-			this.rows = data.results || data
-			this.total = typeof data.count === "number" ? data.count : this.rows.length
+				asset_name: row.asset_name || this.assetName,
+			}
+			this.exclusionShown = true
 		},
 	},
 }

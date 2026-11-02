@@ -1,0 +1,50 @@
+// Shared helpers of the security screens (vulnerabilities, coverage, exclusions)
+
+// Criteria the vulnerabilities can be ordered on, see the security settings
+export const PRIORITY_CRITERIA = ["kev", "score", "epss", "machines"]
+
+// Noise hidden by default from the vulnerability lists
+export const NOISE_KINDS = ["minor_distro", "kernel_unfixed"]
+
+export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
+
+export const FAMILIES = ["deb", "rpm", "windows", "macos"]
+
+// Message of a failed call. A 400 answers {parameter: "message"} or {field: ["message"]}
+export function apiErrorMessage(e) {
+	const data = e?.response?.data
+	if (typeof data === "string" && data && !data.startsWith("<")) {
+		return data
+	}
+	if (data && typeof data === "object") {
+		if (data.error) return data.error
+		if (data.detail) return data.detail
+		if (Array.isArray(data)) return data.join(" ")
+		const parts = Object.entries(data).map(([field, messages]) => {
+			const text = Array.isArray(messages) ? messages.join(" ") : String(messages)
+			return field === "non_field_errors" ? text : `${field} : ${text}`
+		})
+		if (parts.length) return parts.join(" · ")
+	}
+	return e?.message || String(e)
+}
+
+export function formatDateTime(value) {
+	return value ? new Date(value).toLocaleString() : ""
+}
+
+export function formatDay(value) {
+	return value ? new Date(value).toLocaleDateString() : ""
+}
+
+// 0.91 -> "91 %"
+export function formatPercent(value, digits = 1) {
+	if (value === null || value === undefined) return ""
+	const percent = value * 100
+	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
+}
+
+// List answers come paginated only when a limit is given
+export function asList(data) {
+	return Array.isArray(data) ? data : (data?.results || [])
+}

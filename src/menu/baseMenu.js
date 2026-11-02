@@ -103,9 +103,27 @@ export const baseMenu = [
 				column: "general",
 			},
 			{
+				headerKey: "title.vulnerability_coverage",
+				link: "/security/coverage",
+				route: "VulnerabilityCoverage",
+				column: "general",
+			},
+			{
+				headerKey: "title.vulnerability_exclusions",
+				link: "/security/exclusions",
+				route: "VulnerabilityExclusions",
+				column: "general",
+			},
+			{
 				headerKey: "title.software_identity",
 				link: "/security/software_identity",
 				route: "SoftwareIdentity",
+				column: "general",
+			},
+			{
+				headerKey: "title.security_settings",
+				link: "/security/settings",
+				route: "SecuritySettings",
 				column: "general",
 			},
 		],

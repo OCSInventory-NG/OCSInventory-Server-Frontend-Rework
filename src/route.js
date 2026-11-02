@@ -302,6 +302,38 @@ const routes = [
 		}
 	},
 	{
+		path: '/security/vulnerabilities/:vulnId',
+		name: 'VulnerabilityDetail',
+		component: () => import('@/pages/Security/Vulnerabilities/VulnerabilityDetail.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/security/coverage',
+		name: 'VulnerabilityCoverage',
+		component: () => import('@/pages/Security/Coverage/Coverage.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/security/exclusions',
+		name: 'VulnerabilityExclusions',
+		component: () => import('@/pages/Security/Exclusions/Exclusions.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
+		path: '/security/settings',
+		name: 'SecuritySettings',
+		component: () => import('@/pages/Security/Settings/SecuritySettings.vue'),
+		meta: {
+			layout: AppLayout
+		}
+	},
+	{
 		path: '/security/software_identity',
 		name: 'SoftwareIdentity',
 		component: () => import('@/pages/Security/SoftwareIdentity/SoftwareIdentity.vue'),

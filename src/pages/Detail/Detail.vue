@@ -233,7 +233,10 @@
 											lazy
 											@click="scrollToTop()"
 										>
-											<AssetVulnerabilities :asset-id="device.id" />
+											<AssetVulnerabilities
+												:asset-id="device.id"
+												:asset-name="device.name"
+											/>
 										</b-tab>
 									</template>
 								</b-tabs>
