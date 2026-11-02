@@ -86,7 +86,7 @@ export default {
 			total: 0,
 
 			candelete: false,
-			hiddenfields: ["id", "updated_at", "platform_family", "architecture", "package_format", "source_package", "identity_product"],
+			hiddenfields: ["id", "updated_at", "platform_family", "architecture", "package_format", "source_package", "source_version", "identity_product"],
 			statusFilter: null,
 			pageResetKey: 0,
 
