@@ -337,17 +337,9 @@ export default {
 			if (Array.isArray(details.ecosystems) && details.ecosystems.length) {
 				parts.push(details.ecosystems.join(", "))
 			}
-			const window = details.window
-			if (Array.isArray(window) && window.length) {
-				parts.push(this.$t("security.nvd_years_loaded", { years: yearRanges(window) }))
-			} else if (window && typeof window === "object") {
-				const start = window.start ?? window.from ?? window.first
-				const end = window.end ?? window.to ?? window.last
-				if (start || end) {
-					parts.push(this.$t("security.nvd_years_loaded", { years: `${start ?? "?"}–${end ?? "?"}` }))
-				}
-			} else if (window) {
-				parts.push(this.$t("security.nvd_years_loaded", { years: String(window) }))
+			// the NVD gives the loaded years, sorted
+			if (Array.isArray(details.window) && details.window.length) {
+				parts.push(this.$t("security.nvd_years_loaded", { years: yearRanges(details.window) }))
 			}
 			return parts.join(" · ")
 		},

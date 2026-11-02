@@ -133,10 +133,14 @@
 									>
 										{{ $t('security.uncertain') }}
 									</span>
+									<span
+										v-if="row.item.noise"
+										class="badge bg-azure-lt ms-1"
+									>{{ $t('security.noise_' + row.item.noise) }}</span>
 								</template>
 								<template #cell(summary)="{ row }">
 									<span
-										class="vuln-summary"
+										class="vuln-summary-cell"
 										:title="row.item.summary"
 									>{{ shorten(row.item.summary) }}</span>
 								</template>
@@ -206,7 +210,7 @@
 import { hasPermission } from "@/utils/permissions"
 import {
 	FAMILIES, LEVELS, NOISE_KINDS, PRIORITY_CRITERIA,
-	apiErrorMessage, asList, formatDay, formatPercent,
+	apiErrorMessage, asList, formatDay, formatPercent, ratingLabel,
 } from "@/utils/security"
 
 const SUMMARY_LENGTH = 140
@@ -304,6 +308,10 @@ export default {
 			}
 			if (this.unchecked.kernels) {
 				lines.push(this.$t("security.list_kernels_unchecked", { count: this.unchecked.kernels }))
+			}
+			// a choice, not a missing check: said apart
+			if (this.unchecked.excluded) {
+				lines.push(this.$t("security.list_excluded", { count: this.unchecked.excluded }, this.unchecked.excluded))
 			}
 			return lines
 		},
@@ -431,21 +439,13 @@ export default {
 		async loadCoverage() {
 			try {
 				const coverage = await this.$api.generic.get("vulnerabilities/coverage/")
-				let installations = 0
-				let total = 0
-				for (const family of coverage.families || []) {
-					for (const [state, count] of Object.entries(family.installations || {})) {
-						total += count
-						// a kernel package that does not run is not a missing check
-						if (state !== "checked" && state !== "kernel_not_running") {
-							installations += count
-						}
-					}
-				}
+				// every installation, for the "N out of M" line
+				const total = (coverage.families || []).reduce((sum, family) =>
+					sum + Object.values(family.installations || {}).reduce((count, value) => count + value, 0), 0)
 				const kernels = Object.entries(coverage.kernels || {})
 					.filter(([state]) => state !== "checked")
 					.reduce((sum, [, count]) => sum + count, 0)
-				this.unchecked = { installations, total, kernels }
+				this.unchecked = { installations: coverage.unchecked || 0, excluded: coverage.excluded || 0, total, kernels }
 			} catch {
 				// unknown coverage: the empty list says so
 				this.unchecked = null
@@ -534,7 +534,7 @@ export default {
 		scoreDetail(row) {
 			return [
 				row.cvss_version ? `CVSS ${row.cvss_version}` : "",
-				row.distro_rating ? this.$t("security.distro_short", { rating: row.distro_rating }) : "",
+				row.distro_rating ? this.$t("security.distro_short", { rating: ratingLabel(this, row.distro_rating) }) : "",
 			].filter(Boolean).join(" · ")
 		},
 

@@ -132,7 +132,7 @@
 						</div>
 					</td>
 					<td v-if="!assetview">
-						{{ row.rating || '—' }}
+						{{ row.rating ? ratingText(row.rating) : '—' }}
 					</td>
 					<td class="text-nowrap">
 						{{ formatDay(row.first_seen) }}
@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import { formatDay, formatPercent } from "@/utils/security"
+import { formatDay, formatPercent, ratingLabel } from "@/utils/security"
 
 const SUMMARY_LENGTH = 100
 
@@ -183,6 +183,9 @@ export default {
 	methods: {
 		formatDay,
 		formatPercent,
+		ratingText(rating) {
+			return ratingLabel(this, rating)
+		},
 		methodLabel(method) {
 			return this.$te("security.method_" + method) ? this.$t("security.method_" + method) : method
 		},

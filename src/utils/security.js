@@ -44,6 +44,12 @@ export function formatPercent(value, digits = 1) {
 	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
 }
 
+// Severity given by a distribution (closed list of the back); an unknown one is shown as is
+export function ratingLabel(vm, rating) {
+	const key = "security.rating_" + String(rating).toLowerCase().replace(/[\s-]+/g, "_")
+	return vm.$te(key) ? vm.$t(key) : rating
+}
+
 // List answers come paginated only when a limit is given
 export function asList(data) {
 	return Array.isArray(data) ? data : (data?.results || [])

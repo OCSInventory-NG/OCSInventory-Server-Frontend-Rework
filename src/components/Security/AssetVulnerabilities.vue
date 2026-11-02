@@ -51,6 +51,14 @@
 							class="text-success"
 						>{{ $t('security.all_checked') }}</span>
 					</div>
+					<div v-if="coverage.excluded">
+						<div class="subheader">
+							{{ $t('security.state_excluded') }}
+						</div>
+						<span class="text-muted">
+							{{ $t('security.excluded_installations', { count: coverage.excluded }, coverage.excluded) }}
+						</span>
+					</div>
 					<div>
 						<div class="subheader">
 							{{ $t('security.open_exposures') }}
@@ -234,8 +242,8 @@ import { hasPermission } from "@/utils/permissions"
 import { NOISE_KINDS, apiErrorMessage, asList } from "@/utils/security"
 
 const SOFTWARE_TAB = 2
-// States that are no missing check
-const FINE_STATES = ["checked", "kernel_not_running"]
+// States that are no missing check, as the coverage counts them
+const FINE_STATES = ["checked", "excluded", "kernel_not_running"]
 
 export default {
 	name: "AssetVulnerabilities",
@@ -249,7 +257,7 @@ export default {
 			errormsg: null,
 			loading: true,
 
-			coverage: { kernel: "not_applicable", unchecked: 0 },
+			coverage: { kernel: "not_applicable", unchecked: 0, excluded: 0 },
 			open: [],
 			closed: null,
 			closedError: null,
@@ -262,7 +270,7 @@ export default {
 			softwarePage: 1,
 			perPage: 25,
 
-			canexclude: hasPermission("security_add_vulnerabilityexclusion"),
+			canexclude: hasPermission("security_add_exclusion"),
 			exclusionShown: false,
 			exclusionPreset: {},
 		}

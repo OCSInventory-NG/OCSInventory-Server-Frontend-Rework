@@ -87,7 +87,7 @@
 							<Loader />
 						</div>
 						<template v-else>
-							<p v-if="!filteredRows.length">
+							<p v-if="!rows.length">
 								{{ $t('security.exclusions_empty') }}
 							</p>
 							<div
@@ -132,7 +132,7 @@
 														class="me-1"
 													/>
 													<router-link :to="`/inventory/asset/${row.asset}`">
-														{{ assetNames[row.asset] || row.asset_name || '#' + row.asset }}
+														{{ row.asset_name || '#' + row.asset }}
 													</router-link>
 												</template>
 												<template v-else-if="row.group">
@@ -146,7 +146,7 @@
 											<td class="exclusion-comment">
 												{{ row.comment }}
 											</td>
-											<td>{{ userName(row) }}</td>
+											<td>{{ row.user_name }}</td>
 											<td class="text-nowrap">
 												{{ formatDateTime(row.created_at) }}
 											</td>
@@ -186,9 +186,9 @@
 								</table>
 							</div>
 							<b-pagination
-								v-if="filteredRows.length > perPage"
+								v-if="rows.length > perPage"
 								v-model="currentPage"
-								:total-rows="filteredRows.length"
+								:total-rows="rows.length"
 								:per-page="perPage"
 								align="right"
 								size="sm"
@@ -225,10 +225,8 @@ export default {
 			candelete: false,
 
 			rows: [],
+			// asset group names, for the group filter
 			groups: {},
-			assetNames: {},
-			users: {},
-			// status is filtered here, the server returns active and expired ones
 			filters: { status: null, asset: null, group: null, vuln_id: this.$route.query.vuln_id || "" },
 			search: "",
 			searchTimer: null,
@@ -256,19 +254,14 @@ export default {
 					.sort((a, b) => a.text.localeCompare(b.text)),
 			]
 		},
-		filteredRows() {
-			if (!this.filters.status) return this.rows
-			const active = this.filters.status === "active"
-			return this.rows.filter((row) => row.active === active)
-		},
 		pagedRows() {
 			const start = (this.currentPage - 1) * this.perPage
-			return this.filteredRows.slice(start, start + this.perPage)
+			return this.rows.slice(start, start + this.perPage)
 		},
 	},
 	watch: {
 		"filters.status"() {
-			this.currentPage = 1
+			this.load()
 		},
 		"filters.asset"() {
 			this.load()
@@ -284,13 +277,13 @@ export default {
 		},
 	},
 	async mounted() {
-		if (!hasPermission("security_view_vulnerabilityexclusion")) {
+		if (!hasPermission("security_view_exclusion")) {
 			this.denied = true
 			return
 		}
-		this.canadd = hasPermission("security_add_vulnerabilityexclusion")
-		this.canedit = hasPermission("security_change_vulnerabilityexclusion")
-		this.candelete = hasPermission("security_delete_vulnerabilityexclusion")
+		this.canadd = hasPermission("security_add_exclusion")
+		this.canedit = hasPermission("security_change_exclusion")
+		this.candelete = hasPermission("security_delete_exclusion")
 		await Promise.all([this.loadGroups(), this.load()])
 	},
 	beforeUnmount() {
@@ -313,12 +306,12 @@ export default {
 					asset: this.filters.asset,
 					group: this.filters.group,
 					vuln_id: this.filters.vuln_id,
+					active: this.filters.status === null ? null : String(this.filters.status === "active"),
 				})
 				if (request !== this.request) return
 				this.rows = asList(data)
 				this.currentPage = 1
 				this.errored = false
-				await this.loadNames()
 			} catch (e) {
 				if (request !== this.request) return
 				this.errormsg = apiErrorMessage(e)
@@ -337,38 +330,8 @@ export default {
 			}
 		},
 
-		// Exclusions carry ids only: names are looked up once each
-		async loadNames() {
-			const assets = [...new Set(this.rows.filter((row) => row.asset && !row.asset_name && !this.assetNames[row.asset]).map((row) => row.asset))]
-			const users = [...new Set(this.rows.map((row) => row.user).filter((id) => typeof id === "number" && !(id in this.users)))]
-			await Promise.all([
-				...assets.map(async (id) => {
-					try {
-						const asset = await this.$api.generic.get(`asset/bases/${id}/`)
-						this.assetNames = { ...this.assetNames, [id]: asset.name }
-					} catch {
-						// the machine may be gone
-					}
-				}),
-				...users.map(async (id) => {
-					try {
-						const user = await this.$api.generic.get(`users/${id}/`)
-						this.users = { ...this.users, [id]: user.username }
-					} catch {
-						this.users = { ...this.users, [id]: null }
-					}
-				}),
-			])
-		},
-
 		groupName(row) {
 			return row.group_name || this.groups[row.group] || "#" + row.group
-		},
-
-		userName(row) {
-			if (row.user === null || row.user === undefined) return ""
-			if (typeof row.user !== "number") return row.user
-			return this.users[row.user] || "#" + row.user
 		},
 
 		openModal(row) {
