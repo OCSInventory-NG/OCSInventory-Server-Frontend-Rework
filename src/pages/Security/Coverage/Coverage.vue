@@ -316,6 +316,8 @@ export default {
 				kernels,
 			}
 		},
+		// one colour per tile: the coverage blue, what is not checked orange,
+		// the exclusions grey, the unchecked kernels red; green once at 0
 		tiles() {
 			const share = this.totals.all ? this.totals.checked / this.totals.all : 0
 			return [
@@ -324,7 +326,7 @@ export default {
 					label: this.$t("security.tile_coverage"),
 					value: `${this.totals.checked.toLocaleString()} / ${this.totals.all.toLocaleString()}`,
 					detail: formatPercent(share),
-					color: share >= 1 ? "#2fb344" : "#f76707",
+					color: "#206bc4",
 				},
 				{
 					key: "unchecked",
@@ -342,7 +344,7 @@ export default {
 					key: "kernels",
 					label: this.$t("security.kernels_unchecked"),
 					value: this.totals.kernels.toLocaleString(),
-					color: this.totals.kernels ? "#f76707" : "#2fb344",
+					color: this.totals.kernels ? "#d63939" : "#2fb344",
 				},
 			]
 		},
