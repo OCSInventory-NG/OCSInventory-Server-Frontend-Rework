@@ -69,9 +69,6 @@
 									translationkey="security.column_"
 									compactheader
 								>
-									<template #cell(reason)="{ row }">
-										<InstallationState :state="row.item.state" />
-									</template>
 									<template #cell(installations)="{ row }">
 										{{ row.item.installations.toLocaleString() }}
 									</template>
