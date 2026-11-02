@@ -1,48 +1,31 @@
 <template>
+	<!-- One discreet line: what the page may miss, the details on hover -->
 	<div
 		v-if="outdated.length || extra.length"
-		class="alert alert-warning mb-3"
-		role="alert"
+		class="source-notice"
+		role="status"
 	>
-		<div class="d-flex align-items-start gap-2">
-			<font-awesome-icon
-				:icon="['fas', 'triangle-exclamation']"
-				class="mt-1"
-			/>
-			<div>
-				<strong>{{ extra.length ? $t('security.list_incomplete_title') : $t('security.freshness_title') }}</strong>
-				<ul class="mb-1 ps-3">
-					<li
-						v-for="source in outdated"
-						:key="source.source"
-					>
-						{{ sourceLabel(source.source) }} :
-						<template v-if="source.state === 'never_loaded'">
-							{{ $t('security.source_state_never_loaded') }}
-						</template>
-						<template v-else>
-							{{ $t('security.freshness_stale', { date: formatDateTime(source.last_success) || $t('security.never') }) }}
-						</template>
-						<span
-							v-if="source.error"
-							class="text-danger ms-1"
-						>({{ source.error }})</span>
-					</li>
-					<li
-						v-for="line in extra"
-						:key="line"
-					>
-						{{ line }}
-					</li>
-				</ul>
-				<router-link
-					v-if="showlink"
-					to="/security/coverage"
-				>
-					{{ $t('security.see_coverage') }}
-				</router-link>
-			</div>
-		</div>
+		<font-awesome-icon
+			:icon="['fas', 'triangle-exclamation']"
+			class="text-warning"
+		/>
+		<span class="source-notice-title">{{ extra.length ? $t('security.notice_list_incomplete') : $t('security.notice_sources') }}</span>
+		<span
+			v-for="(source, index) in outdated"
+			:key="source.source"
+			:title="sourceDetail(source)"
+		>{{ sourceLabel(source.source) }} ({{ $t('security.source_state_' + source.state).toLowerCase() }})<template v-if="index < outdated.length - 1 || extra.length">,</template></span>
+		<span
+			v-for="(line, index) in extra"
+			:key="line"
+		>{{ line }}<template v-if="index < extra.length - 1">,</template></span>
+		<router-link
+			v-if="showlink"
+			to="/security/coverage"
+			class="ocs-link ms-1"
+		>
+			{{ $t('security.see_coverage') }}
+		</router-link>
 	</div>
 </template>
 
@@ -83,6 +66,12 @@ export default {
 	},
 	methods: {
 		formatDateTime,
+		// last success and error, in the tooltip
+		sourceDetail(source) {
+			const parts = [this.$t("security.last_success") + " : " + (formatDateTime(source.last_success) || this.$t("security.never"))]
+			if (source.error) parts.push(source.error)
+			return parts.join("\n")
+		},
 		sourceLabel(source) {
 			return this.$te("security.source_" + source) ? this.$t("security.source_" + source) : source
 		},

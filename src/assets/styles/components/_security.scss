@@ -63,3 +63,22 @@
   overflow-wrap: anywhere;
   white-space: normal;
 }
+
+// what a page may miss, on one line: no banner
+.source-notice {
+  align-items: center;
+  color: $gray-700;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.vuln-status .source-notice {
+  margin-bottom: 0;
+}
+
+.source-notice-title {
+  font-weight: 600;
+}

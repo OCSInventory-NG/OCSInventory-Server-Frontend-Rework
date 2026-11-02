@@ -18,11 +18,6 @@
 						</div>
 						<template v-else>
 							<!-- What this list cannot show: outdated sources, installations not checked -->
-							<SourceFreshness
-								:extra="incompleteLines"
-								@loaded="sources = $event"
-							/>
-
 							<Alert
 								v-if="errored"
 								:message="errormsg"
@@ -66,6 +61,10 @@
 								<template #subheader>
 									<!-- Active order and hidden noise -->
 									<div class="vuln-status">
+										<SourceFreshness
+											:extra="incompleteLines"
+											@loaded="sources = $event"
+										/>
 										<div class="d-flex flex-wrap align-items-center gap-2">
 											<span class="text-muted">{{ $t('security.sorted_by') }}</span>
 											<PriorityOrder
@@ -301,16 +300,12 @@ export default {
 				return lines
 			}
 			if (!this.unchecked.total) {
-				lines.push(this.$t("security.list_nothing_checked"))
+				lines.push(this.$t("security.notice_nothing_checked"))
 			} else if (this.unchecked.installations) {
-				lines.push(this.$t("security.list_unchecked", { count: this.unchecked.installations, total: this.unchecked.total }))
+				lines.push(this.$t("security.notice_unchecked", { count: this.unchecked.installations }, this.unchecked.installations))
 			}
 			if (this.unchecked.kernels) {
-				lines.push(this.$t("security.list_kernels_unchecked", { count: this.unchecked.kernels }))
-			}
-			// a choice, not a missing check: said apart
-			if (this.unchecked.excluded) {
-				lines.push(this.$t("security.list_excluded", { count: this.unchecked.excluded }, this.unchecked.excluded))
+				lines.push(this.$t("security.notice_kernels", { count: this.unchecked.kernels }, this.unchecked.kernels))
 			}
 			return lines
 		},

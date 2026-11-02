@@ -28,11 +28,6 @@
 							<Loader />
 						</div>
 						<template v-else>
-							<SourceFreshness
-								:sources="coverage.sources || []"
-								:showlink="false"
-							/>
-
 							<!-- What the scan covers, in a few numbers -->
 							<div class="datagrid mb-4">
 								<div class="datagrid-item">
