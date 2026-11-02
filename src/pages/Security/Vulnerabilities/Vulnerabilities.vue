@@ -276,6 +276,7 @@ export default {
 			const noFilter = !this.filters.level && !this.filters.kev && !this.filters.fix
 			return [
 				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
+				{ key: "machines", label: this.$t("security.tile_machines"), value: count("machines"), color: "#1d273b", static: true },
 				...LEVELS.map((level) => ({
 					key: level,
 					label: this.$t("security.tile_level_" + level),
@@ -458,24 +459,27 @@ export default {
 			}
 		},
 
-		// One count per tile (limit=1 answers the count only). Read again only
-		// when the platform, the search or the noise shown change
+		// Counters of the whole list: the summary gets the platform, search and
+		// noise shown, never the table filters (they would zero the other tiles)
 		async loadCounts() {
-			const base = { family: this.filters.family, search: this.query.search, show: this.filters.show.join(","), limit: 1 }
+			const base = { family: this.filters.family, search: this.query.search, show: this.filters.show.join(",") }
 			const key = JSON.stringify(base)
 			if (key === this.countsKey) return
 			this.countsKey = key
-			const queries = {
-				total: {},
-				...Object.fromEntries(LEVELS.map((level) => [level, { level }])),
-				kev: { kev: "yes" },
-				fix: { fix: "yes" },
+			try {
+				const summary = await this.$api.generic.get("vulnerabilities/summary/", base)
+				if (key !== this.countsKey) return
+				this.counts = {
+					total: summary.total,
+					machines: summary.machines,
+					...(summary.levels || {}),
+					kev: summary.kev,
+					fix: summary.fix_available,
+				}
+			} catch {
+				// tiles stay empty, the list shows its own error
+				this.counts = {}
 			}
-			const answers = await Promise.allSettled(Object.entries(queries).map(([name, filter]) =>
-				this.$api.generic.get("vulnerabilities/", { ...base, ...filter }).then((data) => [name, data.count])
-			))
-			if (key !== this.countsKey) return
-			this.counts = Object.fromEntries(answers.filter((answer) => answer.status === "fulfilled").map((answer) => answer.value))
 		},
 
 		// total clears the tile filters, the others toggle theirs

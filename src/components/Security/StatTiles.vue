@@ -8,13 +8,13 @@
 			v-for="tile in tiles"
 			:key="tile.key || tile.label"
 			class="card mb-0"
-			:class="{ 'stat-tile-clickable': clickable }"
+			:class="{ 'stat-tile-clickable': isClickable(tile) }"
 			:style="tileStyle(tile)"
-			:role="clickable ? 'button' : null"
-			:tabindex="clickable ? 0 : null"
-			:aria-pressed="clickable ? !!tile.active : null"
-			@click="clickable && $emit('select', tile.key)"
-			@keydown.enter="clickable && $emit('select', tile.key)"
+			:role="isClickable(tile) ? 'button' : null"
+			:tabindex="isClickable(tile) ? 0 : null"
+			:aria-pressed="isClickable(tile) ? !!tile.active : null"
+			@click="isClickable(tile) && $emit('select', tile.key)"
+			@keydown.enter="isClickable(tile) && $emit('select', tile.key)"
 		>
 			<div class="card-body text-center p-2 d-flex flex-column justify-content-center">
 				<div
@@ -38,7 +38,8 @@
 export default {
 	name: "StatTiles",
 	props: {
-		// [{ key, label, value, color, active, warn: the value calls for attention, small: for a date }]
+		// [{ key, label, value, color, active, warn: the value calls for attention, small: for a date,
+		//    static: a counter that filters nothing }]
 		tiles: { type: Array, required: true },
 		// a click on a tile emits select(key), e.g. to filter a list
 		clickable: { type: Boolean, default: false },
@@ -47,6 +48,9 @@ export default {
 	},
 	emits: ["select"],
 	methods: {
+		isClickable(tile) {
+			return this.clickable && !tile.static
+		},
 		// colored top border; the active tile is outlined and tinted
 		tileStyle(tile) {
 			if (!tile.color) return null

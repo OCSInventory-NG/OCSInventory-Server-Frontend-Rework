@@ -1003,6 +1003,7 @@
     "tile_level_low": "Low",
     "tile_level_medium": "Medium",
     "tile_level_unknown": "Not rated",
+    "tile_machines": "Machines impacted",
     "tile_total": "Vulnerabilities",
     "total": "Total",
     "type_to_search": "Type to search",
