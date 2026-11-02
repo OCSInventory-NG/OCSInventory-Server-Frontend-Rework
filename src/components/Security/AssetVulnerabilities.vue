@@ -106,14 +106,16 @@
 					</div>
 				</b-tab>
 
-				<b-tab :title="$t('security.tab_software_label')">
+				<!-- Only what the scan could not check: the full list is the inventory one -->
+				<b-tab :title="$t('security.tab_unchecked_label')">
 					<Datatable
-						id="asset-software-states-datatable"
+						id="asset-unchecked-software-datatable"
 						:rowdata="filteredSoftware"
 						:rowheader="softwareColumns"
 						:usecheckbox="false"
 						:candeletemultiple="false"
-						title="asset_software_states"
+						:emptytext="$t('security.all_checked')"
+						title="asset_unchecked_software"
 						translationkey="security.column_"
 						compactheader
 					>
@@ -122,7 +124,7 @@
 								v-model="softwareState"
 								:options="softwareStateOptions"
 								:reduce="option => option.value"
-								:placeholder="$t('security.all_states')"
+								:placeholder="$t('security.all_reasons')"
 								:searchable="false"
 								label="text"
 								class="datatable-btn vuln-filter"
@@ -130,9 +132,6 @@
 						</template>
 						<template #cell(family)="{ row }">
 							{{ row.item.family ? $t('software_identity.family_' + row.item.family) : '' }}
-						</template>
-						<template #cell(state)="{ row }">
-							<InstallationState :state="row.item.state" />
 						</template>
 					</Datatable>
 				</b-tab>
@@ -163,7 +162,7 @@
 import { hasPermission } from "@/utils/permissions"
 import { NOISE_KINDS, apiErrorMessage, asList } from "@/utils/security"
 
-const SOFTWARE_TAB = 2
+const UNCHECKED_TAB = 2
 // States that are no missing check, as the coverage counts them
 const FINE_STATES = ["checked", "excluded", "kernel_not_running"]
 
@@ -188,7 +187,7 @@ export default {
 			activeTab: 0,
 
 			softwareState: null,
-			softwareColumns: ["software_name", "version", "family", "product", "state"],
+			softwareColumns: ["software_name", "version", "family", "product", "reason"],
 
 			canexclude: hasPermission("security_add_exclusion"),
 			exclusionShown: false,
@@ -264,21 +263,19 @@ export default {
 		emptyWarns() {
 			return this.coverage.unchecked > 0 || !this.kernelOk
 		},
-		softwareStateOptions() {
-			const states = [...new Set(this.software.map((row) => row.state))]
-			return [
-				{ value: "__unchecked", text: this.$t("security.unchecked_only") },
-				...states.map((state) => ({ value: state, text: this.stateLabel(state) })),
-			]
-		},
-		// the datatable searches; the state is picked in its toolbar
-		filteredSoftware() {
+		// installations the scan could not check, with their reason in words
+		uncheckedSoftware() {
 			return this.software
-				.filter((row) => {
-					if (this.softwareState === "__unchecked") return !FINE_STATES.includes(row.state)
-					return !this.softwareState || row.state === this.softwareState
-				})
-				.map((row) => ({ ...row, id: row.entry, software_name: row.name }))
+				.filter((row) => !FINE_STATES.includes(row.state))
+				.map((row) => ({ ...row, id: row.entry, software_name: row.name, reason: this.stateLabel(row.state) }))
+		},
+		softwareStateOptions() {
+			const states = [...new Set(this.uncheckedSoftware.map((row) => row.state))]
+			return states.map((state) => ({ value: state, text: this.stateLabel(state) }))
+		},
+		// the datatable searches; the reason is picked in its toolbar
+		filteredSoftware() {
+			return this.uncheckedSoftware.filter((row) => !this.softwareState || row.state === this.softwareState)
 		},
 	},
 	watch: {
@@ -328,8 +325,8 @@ export default {
 		},
 
 		showUnchecked() {
-			this.softwareState = "__unchecked"
-			this.activeTab = SOFTWARE_TAB
+			this.softwareState = null
+			this.activeTab = UNCHECKED_TAB
 		},
 
 		openExclusion(row) {
