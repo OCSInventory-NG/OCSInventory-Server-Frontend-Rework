@@ -38,7 +38,14 @@
 						<td>{{ $t('software_identity.family_' + decision.family) }}</td>
 						<td>{{ decision.match_key }}</td>
 						<td>{{ decision.product || $t('software_identity.no_cpe') }}</td>
-						<td>{{ $t('software_identity.source_' + decision.source) }}</td>
+						<td>
+							{{ $t('software_identity.source_' + decision.source) }}
+							<span
+								v-if="isReplaced(decision)"
+								class="badge bg-secondary-lt ms-1"
+								:title="$t('software_identity.replaced_help')"
+							>{{ $t('software_identity.replaced') }}</span>
+						</td>
 						<td>{{ new Date(decision.created_at).toLocaleString() }}</td>
 						<td v-if="candelete">
 							<button
@@ -91,6 +98,13 @@ export default {
 			} finally {
 				this.loading = false
 			}
+		},
+
+		// An admin decision on the same software replaces the shipped one
+		isReplaced(decision) {
+			return decision.source === "shipped" && this.decisions.some((other) =>
+				other.source === "admin" && other.family === decision.family && other.match_key === decision.match_key
+			)
 		},
 
 		async revert(decision) {

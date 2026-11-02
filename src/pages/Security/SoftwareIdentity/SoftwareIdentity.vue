@@ -145,6 +145,50 @@
 										@reverted="onReverted"
 									/>
 								</b-tab>
+								<b-tab
+									v-if="canviewaliases"
+									:title="$t('software_identity.tab_aliases')"
+									title-item-class="ocs-menu-tab"
+									lazy
+								>
+									<IdentityReferenceTable
+										route="cpe_aliases"
+										model="cpealias"
+										:help="$t('software_identity.aliases_help')"
+										:firstfields="['product', 'alias', 'source']"
+										:patterns="{ product: cpeKeyPattern, alias: cpeKeyPattern }"
+										:placeholders="{ product: 'zoom:zoom', alias: 'zoom:meetings' }"
+										:protectedrows="{ source: 'shipped' }"
+									/>
+								</b-tab>
+								<b-tab
+									v-if="canvieworigins"
+									:title="$t('software_identity.tab_origins')"
+									title-item-class="ocs-menu-tab"
+									lazy
+								>
+									<IdentityReferenceTable
+										route="package_origins"
+										model="packageorigin"
+										:help="$t('software_identity.origins_help')"
+										:booleanlabels="{ extended: $t('software_identity.extended_repo') }"
+										:badgefields="{ extended: 'bg-purple-lt' }"
+										:fieldhelp="{ extended: $t('software_identity.extended_help') }"
+									/>
+								</b-tab>
+								<b-tab
+									v-if="canviewreleases"
+									:title="$t('software_identity.tab_releases')"
+									title-item-class="ocs-menu-tab"
+									lazy
+								>
+									<IdentityReferenceTable
+										route="distro_releases"
+										model="distrorelease"
+										:help="$t('software_identity.releases_help')"
+										:fieldhelp="{ standard_support_end: $t('software_identity.standard_support_end_help') }"
+									/>
+								</b-tab>
 							</b-tabs>
 						</div>
 					</div>
@@ -169,6 +213,11 @@ export default {
 			candelete: false,
 			canviewdecisions: false,
 			cansearch: false,
+			canviewaliases: false,
+			canvieworigins: false,
+			canviewreleases: false,
+			// vendor:product, as in the CPE index
+			cpeKeyPattern: "[^:\\s]+:[^:\\s]+",
 
 			summary: { index: {}, counts: [], pending: 0, machines_unknown_platform: 0, origins: [] },
 			statuses: ["matched", "validated", "review", "none", "unsupported"],
@@ -200,6 +249,9 @@ export default {
 		this.candelete = hasPermission("software_identity_delete_identitydecision")
 		this.canviewdecisions = hasPermission("software_identity_view_identitydecision")
 		this.cansearch = hasPermission("software_identity_view_cpeproduct")
+		this.canviewaliases = hasPermission("software_identity_view_cpealias")
+		this.canvieworigins = hasPermission("software_identity_view_packageorigin")
+		this.canviewreleases = hasPermission("software_identity_view_distrorelease")
 
 		await this.loadSummary()
 		this.loading = false
