@@ -209,15 +209,20 @@ export default {
 		tiles() {
 			const unchecked = this.coverage.unchecked || 0
 			const open = this.visibleOpen.length
-			return [
-				{
+			const tiles = []
+			// no Linux kernel to check (Windows, macOS): no tile rather than a green one
+			if (this.coverage.kernel !== "not_applicable") {
+				tiles.push({
 					key: "kernel",
 					label: this.$t("security.running_kernel"),
 					value: this.kernelLabel,
-					color: this.kernelOk ? "#2fb344" : "#f76707",
+					color: this.coverage.kernel === "checked" ? "#2fb344" : "#f76707",
 					small: true,
 					static: true,
-				},
+				})
+			}
+			return [
+				...tiles,
 				{
 					key: "unchecked",
 					label: this.$t("security.not_checked"),
