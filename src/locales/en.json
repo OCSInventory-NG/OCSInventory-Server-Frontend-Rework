@@ -263,7 +263,7 @@
     "uuid, name": "UUID, Name",
     "uuid, srcmac": "UUID, MAC address",
     "security": "Security",
-    "nvd_years": "NVD years loaded",
+    "nvd_years": "NVD years detected",
     "years": "years",
     "priority": "Priority order of the vulnerabilities",
     "priority_kev": "Exploited (KEV)",
@@ -279,7 +279,7 @@
     "order_move": "Drag to move",
     "order_up": "Move up",
     "order_down": "Move down",
-    "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included",
+    "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "CVE years compared with Windows and macOS software, the current year included. Scores from other years stay loaded to rate Linux vulnerabilities.",
     "Order of the vulnerability list, first criterion first": "Order of the vulnerability list, first criterion first",
     "Windows and macOS software: name match score from which the product is identified automatically": "Windows and macOS software: name match score from which the product is identified automatically",
     "Windows and macOS software: name match score from which the product is proposed for review": "Windows and macOS software: name match score from which the product is proposed for review"
