@@ -1,6 +1,5 @@
-// Product search of the software identity review: the size of the other
-// pickers, wide enough to read the CPE names. The list opens towards the left
-// so it stays inside the page.
+// Product search of the identity decision modal; its list keeps the width
+// of the field
 .identity-product-search {
   min-width: 16rem;
 
@@ -16,21 +15,9 @@
     font-size: 0.875rem;
   }
 
-  .vs__dropdown-menu {
-    min-width: 28rem !important;
-    left: auto;
-    right: 0;
+  // a long CPE name wraps rather than widening the list
+  .vs__dropdown-option {
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
-}
-
-// one candidate per line: name, score, accept
-.identity-candidate {
-  align-items: center;
-  display: flex;
-  gap: 6px;
-  padding: 1px 0;
-}
-
-.identity-candidate-name {
-  overflow-wrap: anywhere;
 }
