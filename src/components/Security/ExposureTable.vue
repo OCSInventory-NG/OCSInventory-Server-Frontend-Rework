@@ -11,6 +11,7 @@
 			:emptytext="emptytext"
 			translationkey="security.column_"
 			compactheader
+			@reload-datatable="$emit('reload')"
 		>
 			<template #cell(machine)="{ row }">
 				<router-link
@@ -152,7 +153,7 @@ export default {
 		canexclude: { type: Boolean, default: false },
 		emptytext: { type: String, default: "" },
 	},
-	emits: ["exclude"],
+	emits: ["exclude", "reload"],
 	computed: {
 		columns() {
 			const columns = this.assetview

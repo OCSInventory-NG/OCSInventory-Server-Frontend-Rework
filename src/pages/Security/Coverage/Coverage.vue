@@ -68,6 +68,7 @@
 									title="coverage_reasons"
 									translationkey="security.column_"
 									compactheader
+									@reload-datatable="loadCoverage"
 								>
 									<template #cell(installations)="{ row }">
 										{{ row.item.installations.toLocaleString() }}
@@ -124,6 +125,7 @@
 										title="coverage_kernel_reasons"
 										translationkey="security.column_"
 										compactheader
+										@reload-datatable="loadCoverage"
 									>
 										<template #cell(action)="{ row }">
 											<router-link
@@ -158,6 +160,7 @@
 									title="coverage_platforms"
 									translationkey="security.column_"
 									compactheader
+									@reload-datatable="loadCoverage"
 								>
 									<template #cell(unchecked)="{ row }">
 										<span :class="{ 'text-warning': row.item.unchecked }">
@@ -194,6 +197,7 @@
 									title="coverage_states"
 									translationkey="security.column_"
 									compactheader
+									@reload-datatable="loadCoverage"
 								>
 									<template #cell(state)="{ row }">
 										<InstallationState :state="row.item.state" />
@@ -214,6 +218,7 @@
 									title="coverage_sources"
 									translationkey="security.column_"
 									compactheader
+									@reload-datatable="loadCoverage"
 								>
 									<template #cell(source_state)="{ row }">
 										<span
@@ -452,16 +457,19 @@ export default {
 			this.denied = true
 			return
 		}
-		try {
-			this.coverage = await this.$api.generic.get("vulnerabilities/coverage/")
-		} catch (e) {
-			this.errormsg = apiErrorMessage(e)
-			this.errored = true
-		} finally {
-			this.loading = false
-		}
+		await this.loadCoverage()
+		this.loading = false
 	},
 	methods: {
+		// first load and refresh buttons of the tables
+		async loadCoverage() {
+			try {
+				this.coverage = await this.$api.generic.get("vulnerabilities/coverage/")
+			} catch (e) {
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			}
+		},
 		formatDateTime,
 		formatPercent,
 

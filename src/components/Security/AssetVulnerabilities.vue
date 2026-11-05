@@ -77,6 +77,7 @@
 						:rows="visibleOpen"
 						assetview
 						:canexclude="canexclude"
+						@reload="reloadOpen"
 						@exclude="openExclusion"
 					/>
 				</b-tab>
@@ -97,6 +98,7 @@
 						assetview
 						closed
 						:emptytext="$t('security.closed_none')"
+						@reload="loadClosed"
 					/>
 					<div
 						v-else
@@ -118,6 +120,7 @@
 						title="asset_unchecked_software"
 						translationkey="security.column_"
 						compactheader
+						@reload-datatable="reloadSoftware"
 					>
 						<template #toolbar>
 							<v-select
@@ -145,6 +148,7 @@
 						:rows="excludedOpen"
 						assetview
 						excluded
+						@reload="reloadOpen"
 					/>
 				</b-tab>
 			</b-tabs>
@@ -318,6 +322,21 @@ export default {
 		async reloadOpen() {
 			try {
 				this.open = asList(await this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "open" }))
+			} catch (e) {
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			}
+		},
+
+		// the unchecked count comes with the coverage
+		async reloadSoftware() {
+			try {
+				const [coverage, software] = await Promise.all([
+					this.$api.generic.get("vulnerabilities/coverage/", { asset: this.assetId }),
+					this.$api.generic.get("vulnerability_exposures/software/", { asset: this.assetId }),
+				])
+				this.coverage = coverage
+				this.software = asList(software)
 			} catch (e) {
 				this.errormsg = apiErrorMessage(e)
 				this.errored = true

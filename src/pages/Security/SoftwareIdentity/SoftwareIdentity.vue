@@ -47,6 +47,7 @@
 										title="software_identity_families"
 										translationkey="software_identity.column_"
 										compactheader
+										@reload-datatable="loadSummary"
 									/>
 									<div class="hr-text">
 										{{ $t('software_identity.by_origin') }}
@@ -60,6 +61,7 @@
 										title="software_identity_origins_summary"
 										translationkey="software_identity.column_"
 										compactheader
+										@reload-datatable="loadSummary"
 									/>
 								</b-tab>
 								<b-tab
