@@ -1,0 +1,23 @@
+// Product search of the identity decision modal; its list keeps the width
+// of the field
+.identity-product-search {
+  min-width: 16rem;
+
+  .vs__dropdown-toggle {
+    height: 36px;
+  }
+
+  .vs__selected,
+  .vs__search,
+  .vs__search::placeholder,
+  .vs__dropdown-option,
+  .vs__no-options {
+    font-size: 0.875rem;
+  }
+
+  // a long CPE name wraps rather than widening the list
+  .vs__dropdown-option {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}

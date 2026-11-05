@@ -1,0 +1,115 @@
+// ===========================================
+//  SECURITY
+// ===========================================
+
+// filters in the datatable toolbar
+.vuln-filter {
+  min-width: 11.75rem;
+
+  .vs__selected,
+  .vs__search,
+  .vs__search::placeholder {
+    font-size: 0.875rem;
+  }
+
+  .vs__search::placeholder {
+    color: $gray-700;
+  }
+}
+
+// a filter set from a link, removed with its cross
+.filter-chip {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.875rem;
+  height: 36px;
+  padding: 0 10px;
+
+  .btn-close {
+    font-size: 0.6rem;
+  }
+}
+
+// active order and hidden noise of the vulnerability list
+.vuln-status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  background-color: var(--tblr-bg-surface-secondary);
+}
+
+.vuln-summary-cell {
+  display: inline-block;
+  min-width: 13rem;
+  max-width: 20rem;
+  white-space: normal;
+}
+
+// "CVSS 3.1 · distribution : …" under the score badge
+.score-detail {
+  max-width: 11rem;
+  white-space: normal;
+}
+
+// long values (product names, comments) wrap inside their column
+.cell-wrap {
+  display: block;
+  min-width: 12rem;
+  max-width: 22rem;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+// what a page may miss, on one line: no banner
+.source-notice {
+  align-items: center;
+  color: $gray-700;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.vuln-status .source-notice {
+  margin-bottom: 0;
+}
+
+.source-notice-title {
+  font-weight: 600;
+}
+
+// head of a vulnerability: id, badges and summary, edged with the level colour
+.vuln-hero {
+  border-left: 4px solid $gray-500;
+  padding: 4px 0 4px 16px;
+}
+
+.vuln-hero-summary {
+  color: $gray-700;
+  font-size: 1rem;
+  max-width: 60rem;
+}
+
+// long values of a datagrid (vector, references) take two columns
+.datagrid-wide {
+  grid-column: span 2;
+}
+
+// dates of the scans, under the coverage tiles
+.coverage-scans {
+  color: $gray-600;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 4px 24px;
+}
+
+// a share drawn as a bar with its percent
+.coverage-share {
+  min-width: 10rem;
+}
