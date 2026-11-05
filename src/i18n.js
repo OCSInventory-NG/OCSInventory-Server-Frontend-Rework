@@ -11,6 +11,17 @@ const i18n = createI18n({
 		fr,
 		cs
 	},
+	// Czech has three forms: 1, 2 to 4, 5 and more; two-form messages keep the default
+	pluralRules: {
+		cs: (choice, choicesLength) => {
+			if (choicesLength === 3) {
+				if (choice === 1) return 0
+				if (choice >= 2 && choice <= 4) return 1
+				return 2
+			}
+			return choice === 1 ? 0 : 1
+		},
+	},
 	globalInjection: true,
 	allowComposition: true,
 	legacy: false
