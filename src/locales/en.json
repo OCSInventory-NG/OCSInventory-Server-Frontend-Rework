@@ -1082,7 +1082,6 @@
     "source_version": "Source version"
   },
   "software_identity": {
-    "accept": "Accept this product",
     "by_origin": "By package origin",
     "by_platform": "By platform",
     "candidates": "Candidates",
@@ -1106,6 +1105,11 @@
     "column_status_validated": "Validated",
     "column_versions": "Versions",
     "created_at": "Date",
+    "decide_current": "Current product",
+    "decide_machines": "{count} machine | {count} machines",
+    "decide_ok": "Validate",
+    "decide_title": "Identify the product",
+    "decide_versions": "{count} version | {count} versions",
     "decisions_empty": "No decision yet",
     "distribution": "Distribution",
     "extended_repo": "Pro repository",
@@ -1125,6 +1129,7 @@
     "machines": "Machines",
     "match_key": "Product key",
     "matched_empty": "No product identified automatically",
+    "more_candidates": "+ {count} other candidate | + {count} other candidates",
     "name": "Name",
     "no_cpe": "No CPE",
     "no_index": "Not built yet",

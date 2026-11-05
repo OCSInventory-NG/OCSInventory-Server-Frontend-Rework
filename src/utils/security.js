@@ -62,6 +62,12 @@ export function ratingLabel(vm, rating) {
 	return vm.$te(key) ? vm.$t(key) : rating
 }
 
+// A CPE key as people read it: the dictionary escapes some characters
+// ("notepad\\+\\+:notepad\\+\\+" is notepad++:notepad++); the key itself is sent unchanged
+export function cpeLabel(key) {
+	return key ? String(key).replace(/\\(.)/g, "$1") : ""
+}
+
 // List answers come paginated only when a limit is given
 export function asList(data) {
 	return Array.isArray(data) ? data : (data?.results || [])

@@ -29,55 +29,48 @@
 			<template #cell(family)="{ row }">
 				{{ $t('software_identity.family_' + row.item.family) }}
 			</template>
-			<template #cell(candidates)="{ row }">
-				<div
-					v-for="candidate in row.item.candidates"
-					:key="candidate.product"
-					class="identity-candidate"
-				>
-					<span class="identity-candidate-name">{{ candidate.product }}</span>
-					<span
-						class="badge bg-blue-lt"
-						:title="$t('software_identity.score')"
-					>{{ candidate.score.toFixed(2) }}</span>
-					<button
-						v-if="candecide"
-						class="btn btn-ghost-success btn-sm px-1"
-						:title="$t('software_identity.accept')"
-						@click="decide(row.item, candidate.product)"
-					>
-						<font-awesome-icon :icon="['fas', 'check']" />
-					</button>
-				</div>
+			<template #cell(product)="{ row }">
+				{{ cpeLabel(row.item.product) }}
 			</template>
-			<template #cell(decision)="{ row }">
-				<v-select
-					:options="productOptions"
-					:filterable="false"
-					:placeholder="$t('software_identity.other_product')"
-					class="identity-product-search"
-					@search="searchProducts"
-					@option:selected="(option) => decide(row.item, option.value)"
-				>
-					<template #no-options>
-						{{ $t('software_identity.type_to_search') }}
-					</template>
-				</v-select>
+			<!-- the best candidate, the others counted: the choice is made in the modal -->
+			<template #cell(candidates)="{ row }">
+				<template v-if="row.item.candidates.length">
+					<span>{{ cpeLabel(row.item.candidates[0].product) }}</span>
+					<span
+						class="badge bg-blue-lt ms-1"
+						:title="$t('software_identity.score')"
+					>{{ row.item.candidates[0].score.toFixed(2) }}</span>
+					<div
+						v-if="row.item.candidates.length > 1"
+						class="text-muted small"
+					>
+						{{ $t('software_identity.more_candidates', { count: row.item.candidates.length - 1 }, row.item.candidates.length - 1) }}
+					</div>
+				</template>
 			</template>
 			<template #cell(firstActions)="{ row }">
 				<button
-					class="btn btn-ghost-danger"
-					:title="$t('software_identity.no_cpe')"
-					@click="decide(row.item, null)"
+					class="btn btn-ghost-dark"
+					:title="$t('software_identity.decide_title')"
+					@click="openDecision(row.item)"
 				>
-					<font-awesome-icon :icon="['fas', 'xmark']" />
+					<font-awesome-icon :icon="['fas', 'pencil']" />
 				</button>
 			</template>
 		</Datatable>
+
+		<IdentityDecisionModal
+			v-model="decisionShown"
+			:software="deciding"
+			:cansearch="cansearch"
+			@decided="onDecided"
+		/>
 	</div>
 </template>
 
 <script>
+import { cpeLabel } from "@/utils/security"
+
 export default {
 	name: "SoftwareIdentityReview",
 	props: {
@@ -99,8 +92,8 @@ export default {
 			query: { limit: Number(localStorage.getItem("perPage")) || 5, offset: 0 },
 			request: 0,
 
-			productOptions: [],
-			searchTimer: null,
+			decisionShown: false,
+			deciding: null,
 		}
 	},
 	computed: {
@@ -108,8 +101,6 @@ export default {
 			const columns = ["software", "family", "versions", "machines"]
 			if (this.status === "matched") columns.push("product")
 			columns.push("candidates")
-			// another product from the CPE index, when the user can search it
-			if (this.candecide && this.cansearch) columns.push("decision")
 			return columns
 		},
 		rowdata() {
@@ -124,10 +115,9 @@ export default {
 	async mounted() {
 		await this.load()
 	},
-	beforeUnmount() {
-		clearTimeout(this.searchTimer)
-	},
 	methods: {
+		cpeLabel,
+
 		_apiError(e) {
 			return e?.response?.data?.error || e?.response?.data?.detail || e?.response?.data?.[0] || e?.message || String(e)
 		},
@@ -159,45 +149,18 @@ export default {
 			}
 		},
 
-		searchProducts(text, toggleLoading) {
-			clearTimeout(this.searchTimer)
-			if (!text || text.length < 2) {
-				return
-			}
-			this.searchTimer = setTimeout(async () => {
-				toggleLoading(true)
-				try {
-					const data = await this.$api.generic.get("cpe_products/", { search: text, limit: 20 })
-					this.productOptions = (data.results || data).map((product) => ({
-						label: product.key,
-						value: product.key,
-					}))
-				} catch (e) {
-					this.errormsg = this._apiError(e)
-					this.errored = true
-				} finally {
-					toggleLoading(false)
-				}
-			}, 300)
+		openDecision(row) {
+			this.deciding = row
+			this.decisionShown = true
 		},
 
-		async decide(row, product) {
-			try {
-				await this.$api.generic.post("software_identity_decisions/", {
-					family: row.family,
-					match_key: row.match_key,
-					product,
-				})
-				this.$emit("decided")
-				// a decided row leaves the list: the last one of a page sends back one page
-				if (this.rows.length === 1 && this.query.offset > 0) {
-					this.query = { ...this.query, offset: Math.max(0, this.query.offset - this.query.limit) }
-				}
-				await this.load()
-			} catch (e) {
-				this.errormsg = this._apiError(e)
-				this.errored = true
+		async onDecided() {
+			this.$emit("decided")
+			// a decided row leaves the list: the last one of a page sends back one page
+			if (this.rows.length === 1 && this.query.offset > 0) {
+				this.query = { ...this.query, offset: Math.max(0, this.query.offset - this.query.limit) }
 			}
+			await this.load()
 		},
 	},
 }
