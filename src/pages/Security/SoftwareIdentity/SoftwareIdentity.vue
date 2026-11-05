@@ -24,7 +24,7 @@
 
 						<template v-else>
 							<b-tabs
-								content-class="col-10 sticky-tabs"
+								content-class="col-10"
 								pills
 								card
 								vertical
