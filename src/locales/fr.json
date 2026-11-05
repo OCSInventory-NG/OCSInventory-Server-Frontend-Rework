@@ -275,7 +275,7 @@
     "cpe_match_score_confirm": "Modifier les seuils CPE relance l'identification de tous les logiciels Windows et macOS sans décision du catalogue.",
     "cpe_review_score_confirm": "Modifier les seuils CPE relance l'identification de tous les logiciels Windows et macOS sans décision du catalogue.",
     "confirm_title": "Enregistrer ces réglages ?",
-    "invalid_values": "Certaines valeurs sont refusées : voir les messages sous les champs.",
+    "invalid_values": "Certaines valeurs ont été refusées : voir les messages sous les champs.",
     "order_move": "Glisser pour déplacer",
     "order_up": "Monter",
     "order_down": "Descendre",
@@ -865,7 +865,7 @@
     "exclusion_comment": "Commentaire",
     "exclusion_comment_required": "Le commentaire est obligatoire.",
     "exclusion_expires": "Expiration",
-    "exclusion_expires_past": "L'expiration doit être dans le futur.",
+    "exclusion_expires_past": "La date d'expiration doit être dans le futur.",
     "exclusion_target": "Cible",
     "exclusion_vuln": "Vulnérabilité",
     "exclusions_empty": "Aucune exclusion",
@@ -1163,7 +1163,7 @@
     "tab_review": "Vérification",
     "third_party": "Tiers",
     "type_to_search": "Tapez au moins 2 lettres",
-    "unknown_platform": "Machines à la plateforme inconnue",
+    "unknown_platform": "Machines dont la plateforme est inconnue",
     "versions": "Versions"
   },
   "template": {
