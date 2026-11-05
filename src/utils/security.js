@@ -68,6 +68,15 @@ export function cpeLabel(key) {
 	return key ? String(key).replace(/\\(.)/g, "$1") : ""
 }
 
+// A summary cut for a table cell; the full text goes in the title
+const SUMMARY_LENGTH = 140
+export function shortSummary(text) {
+	if (!text || text.length <= SUMMARY_LENGTH) {
+		return text
+	}
+	return text.slice(0, SUMMARY_LENGTH).trimEnd() + "…"
+}
+
 // List answers come paginated only when a limit is given
 export function asList(data) {
 	return Array.isArray(data) ? data : (data?.results || [])

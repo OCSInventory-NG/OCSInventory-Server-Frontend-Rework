@@ -13,12 +13,8 @@
 			<Loader />
 		</div>
 		<template v-else>
-			<!-- Coverage of this machine; the unchecked tile opens their list -->
-			<StatTiles
-				:tiles="tiles"
-				clickable
-				@select="showUnchecked"
-			/>
+			<!-- Coverage of this machine -->
+			<StatTiles :tiles="tiles" />
 
 			<!-- the horizontal tabs of the general configuration -->
 			<b-tabs
@@ -221,7 +217,6 @@ export default {
 					value: this.kernelLabel,
 					color: this.coverage.kernel === "checked" ? "#2fb344" : "#f76707",
 					small: true,
-					static: true,
 				})
 			}
 			return [
@@ -234,14 +229,12 @@ export default {
 						? this.$t("security.tile_excluded_detail", { count: this.coverage.excluded }, this.coverage.excluded)
 						: "",
 					color: unchecked ? "#f76707" : "#2fb344",
-					static: !unchecked,
 				},
 				{
 					key: "open",
 					label: this.$t("security.open_exposures"),
 					value: open,
 					color: open ? "#d63939" : "#2fb344",
-					static: true,
 				},
 			]
 		},

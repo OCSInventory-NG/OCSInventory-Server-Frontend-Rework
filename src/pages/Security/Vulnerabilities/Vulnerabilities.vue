@@ -214,10 +214,9 @@
 import { hasPermission } from "@/utils/permissions"
 import {
 	FAMILIES, LEVELS, LEVEL_COLORS, NOISE_KINDS, PRIORITY_CRITERIA,
-	apiErrorMessage, asList, formatDay, formatPercent, ratingLabel,
+	apiErrorMessage, asList, formatDay, formatPercent, ratingLabel, shortSummary,
 } from "@/utils/security"
 
-const SUMMARY_LENGTH = 140
 // The order chosen here lasts for the session, the settings give the default
 const ORDERING_KEY = "vulnerabilities_ordering"
 // A click on these headers sorts on the criterion first; the others do not sort
@@ -599,12 +598,7 @@ export default {
 			return `/security/vulnerabilities/${encodeURIComponent(vulnId)}`
 		},
 
-		shorten(text) {
-			if (!text || text.length <= SUMMARY_LENGTH) {
-				return text
-			}
-			return text.slice(0, SUMMARY_LENGTH).trimEnd() + "…"
-		},
+		shorten: shortSummary,
 	},
 }
 </script>

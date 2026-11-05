@@ -40,12 +40,12 @@
 					v-if="row.item.noise"
 					class="badge bg-azure-lt ms-1"
 				>{{ $t('security.noise_' + row.item.noise) }}</span>
-				<div
-					v-if="row.item.summary"
-					class="text-muted small exposure-wrap"
-				>
-					{{ row.item.summary }}
-				</div>
+			</template>
+			<template #cell(summary)="{ row }">
+				<span
+					class="vuln-summary-cell"
+					:title="row.item.summary"
+				>{{ shortSummary(row.item.summary) }}</span>
 			</template>
 			<template #cell(score)="{ row }">
 				<VulnerabilityLevel
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { formatDay, formatPercent, ratingLabel } from "@/utils/security"
+import { formatDay, formatPercent, ratingLabel, shortSummary } from "@/utils/security"
 
 // Exposures of a vulnerability (one row per machine) or of a machine (assetview),
 // on the common datatable
@@ -157,7 +157,7 @@ export default {
 	computed: {
 		columns() {
 			const columns = this.assetview
-				? ["vuln_id", "score", "kev", "epss", "software", "version"]
+				? ["vuln_id", "summary", "score", "kev", "epss", "software", "version"]
 				: ["machine", "software", "version"]
 			if (!this.closed) columns.push("fix")
 			columns.push("method")
@@ -189,6 +189,7 @@ export default {
 	methods: {
 		formatDay,
 		formatPercent,
+		shortSummary,
 		ratingText(rating) {
 			return ratingLabel(this, rating)
 		},
