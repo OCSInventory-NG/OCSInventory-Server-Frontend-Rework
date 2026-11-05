@@ -1040,7 +1040,9 @@
     "version": "Version",
     "vulnerability": "Vulnérabilité",
     "vulnerability_not_found": "{id} n'est ouverte sur aucune machine ou n'existe pas.",
-    "whole_scan": "Tout le scan"
+    "whole_scan": "Tout le scan",
+    "column_reference_id": "Référence",
+    "all_sources": "Toutes les sources"
   },
   "serverinfo": {
     "backend_title": "Serveur",
