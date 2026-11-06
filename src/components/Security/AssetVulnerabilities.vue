@@ -208,6 +208,8 @@ export default {
 		tiles() {
 			const unchecked = this.coverage.unchecked || 0
 			const open = this.visibleOpen.length
+			// distinct CVEs: one vulnerability can hit several packages of the machine
+			const withFix = new Set(this.visibleOpen.filter((row) => row.fixed_version).map((row) => row.vuln_id)).size
 			const tiles = []
 			// no Linux kernel to check (Windows, macOS): no tile rather than a green one
 			if (this.coverage.kernel !== "not_applicable") {
@@ -235,6 +237,12 @@ export default {
 					label: this.$t("security.open_exposures"),
 					value: open,
 					color: open ? "#d63939" : "#2fb344",
+				},
+				{
+					key: "fix",
+					label: this.$t("security.tile_fix"),
+					value: withFix,
+					color: "#2fb344",
 				},
 			]
 		},

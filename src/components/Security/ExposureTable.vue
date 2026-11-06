@@ -9,6 +9,7 @@
 			:candeletemultiple="false"
 			:hascustomactions="canexclude"
 			:emptytext="emptytext"
+			:hiddenfields="hiddencolumns"
 			translationkey="security.column_"
 			compactheader
 			@reload-datatable="$emit('reload')"
@@ -26,8 +27,10 @@
 				>{{ $t('security.excluded') }}</span>
 			</template>
 			<template #cell(vuln_id)="{ row }">
+				<!-- from a machine, the vulnerability opens beside it -->
 				<router-link
 					:to="`/security/vulnerabilities/${encodeURIComponent(row.item.vuln_id)}`"
+					:target="assetview ? '_blank' : null"
 					class="ocs-link text-nowrap"
 				>
 					{{ row.item.vuln_id }}
@@ -169,6 +172,10 @@ export default {
 				columns.push("seen")
 			}
 			return columns
+		},
+		// on a machine the summary and EPSS make the table too wide: shown on demand
+		hiddencolumns() {
+			return this.assetview ? ["summary", "epss"] : []
 		},
 		// keys the datatable draws itself (last_seen, closed_at…) are renamed;
 		// the plain values keep the client sort meaningful
