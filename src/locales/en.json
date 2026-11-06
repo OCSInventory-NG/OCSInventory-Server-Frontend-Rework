@@ -1001,7 +1001,7 @@
     "state": "State",
     "state_checked": "Checked",
     "state_excluded": "Excluded from the scan",
-    "state_kernel_not_running": "Kernel not booted (not applicable)",
+    "state_kernel_not_running": "Kernel not recognized (not applicable)",
     "state_no_identity": "No identity",
     "state_no_origin": "No origin",
     "state_not_handled": "No source handles it",

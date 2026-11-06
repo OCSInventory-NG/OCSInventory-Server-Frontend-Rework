@@ -1239,7 +1239,7 @@
     "state": "Stav",
     "state_checked": "Ověřeno",
     "state_excluded": "Vyloučeno ze skenování",
-    "state_kernel_not_running": "Jádro není spuštěno (nepoužije se)",
+    "state_kernel_not_running": "Jádro nerozpoznáno (nepoužije se)",
     "state_no_identity": "Bez identity",
     "state_no_origin": "Bez původu",
     "state_not_handled": "Žádný zdroj ji nepokrývá",

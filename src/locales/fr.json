@@ -1001,7 +1001,7 @@
     "state": "État",
     "state_checked": "Vérifiée",
     "state_excluded": "Exclue du scan",
-    "state_kernel_not_running": "Noyau non démarré (sans objet)",
+    "state_kernel_not_running": "Noyau non reconnu (sans objet)",
     "state_no_identity": "Pas d'identité",
     "state_no_origin": "Sans origine",
     "state_not_handled": "Aucune source ne la gère",
