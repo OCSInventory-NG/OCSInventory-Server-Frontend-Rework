@@ -56,6 +56,13 @@ export function formatPercent(value, digits = 1) {
 	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
 }
 
+// EPSS colour: most CVEs are below 1 %, 10 % and more is a high probability
+export function epssColor(epss) {
+	if (epss >= 0.1) return LEVEL_COLORS.critical
+	if (epss >= 0.01) return LEVEL_COLORS.high
+	return "#868e96"
+}
+
 // Severity given by a distribution (closed list of the back); an unknown one is shown as is
 export function ratingLabel(vm, rating) {
 	const key = "security.rating_" + String(rating).toLowerCase().replace(/[\s-]+/g, "_")

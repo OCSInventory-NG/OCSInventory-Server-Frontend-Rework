@@ -60,14 +60,10 @@
 				<KevBadge :kev="row.item.kev" />
 			</template>
 			<template #cell(epss)="{ row }">
-				<span
-					v-if="row.item.epss !== null && row.item.epss !== undefined"
-					class="text-nowrap"
-				>{{ formatPercent(row.item.epss) }}</span>
-				<span
-					v-else
-					class="text-muted"
-				>{{ $t('security.unknown') }}</span>
+				<EpssScore
+					:epss="row.item.epss"
+					:percentile="row.item.epss_percentile"
+				/>
 			</template>
 			<template #cell(software)="{ row }">
 				<div class="exposure-wrap">
@@ -140,7 +136,7 @@
 </template>
 
 <script>
-import { formatDay, formatPercent, ratingLabel, shortSummary } from "@/utils/security"
+import { formatDay, ratingLabel, shortSummary } from "@/utils/security"
 
 // Exposures of a vulnerability (one row per machine) or of a machine (assetview),
 // on the common datatable
@@ -195,7 +191,6 @@ export default {
 	},
 	methods: {
 		formatDay,
-		formatPercent,
 		shortSummary,
 		ratingText(rating) {
 			return ratingLabel(this, rating)

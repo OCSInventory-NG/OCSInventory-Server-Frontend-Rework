@@ -164,16 +164,10 @@
 									</div>
 								</template>
 								<template #cell(epss)="{ row }">
-									<template v-if="row.item.epss !== null && row.item.epss !== undefined">
-										{{ formatPercent(row.item.epss) }}
-										<div class="text-muted small text-nowrap">
-											{{ $t('security.percentile', { value: formatPercent(row.item.epss_percentile) }) }}
-										</div>
-									</template>
-									<span
-										v-else
-										class="text-muted"
-									>{{ $t('security.unknown') }}</span>
+									<EpssScore
+										:epss="row.item.epss"
+										:percentile="row.item.epss_percentile"
+									/>
 								</template>
 								<template #cell(products)="{ row }">
 									<div
@@ -214,7 +208,7 @@
 import { hasPermission } from "@/utils/permissions"
 import {
 	FAMILIES, LEVELS, LEVEL_COLORS, NOISE_KINDS, PRIORITY_CRITERIA,
-	apiErrorMessage, asList, formatDay, formatPercent, ratingLabel, shortSummary,
+	apiErrorMessage, asList, formatDay, ratingLabel, shortSummary,
 } from "@/utils/security"
 
 // The order chosen here lasts for the session, the settings give the default
@@ -384,7 +378,6 @@ export default {
 	},
 	methods: {
 		formatDay,
-		formatPercent,
 
 		async reload() {
 			this.query = { ...this.query, offset: 0 }
