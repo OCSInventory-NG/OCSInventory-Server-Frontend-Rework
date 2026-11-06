@@ -54,7 +54,21 @@
 								:candelete="candelete"
 								is-sticky
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell-file="{ item }">
+									<a
+										v-if="item.file?.file"
+										:href="item.file.file"
+										:download="item.file.name"
+										class="ocs-link"
+									>
+										{{ item.file.name }}
+									</a>
+									<span v-else>
+										{{ typeof item.file === 'object' ? item.file?.name : item.file }}
+									</span>
+								</template>
+							</Draggable>
 						</div>
 					</div>
 				</div>
@@ -158,12 +172,7 @@ export default {
 
 				const actions = Array.isArray(data?.actions_list) ? data.actions_list : []
 
-				this.rowactiondata = actions.map((action) => ({
-					...action,
-					file: (action?.file && typeof action.file === "object")
-						? action.file.name
-						: action?.file,
-				}))
+				this.rowactiondata = actions
 
 				this.errormsg = null
 				this.errored = false
