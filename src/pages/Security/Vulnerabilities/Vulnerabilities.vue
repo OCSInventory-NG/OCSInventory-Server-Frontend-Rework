@@ -65,64 +65,6 @@
 									/>
 								</template>
 
-								<template #subheader>
-									<!-- Active order and hidden noise -->
-									<div class="vuln-status">
-										<SourceFreshness
-											:extra="incompleteLines"
-											@loaded="sources = $event"
-										/>
-										<div class="d-flex flex-wrap align-items-center gap-2">
-											<span class="text-muted">{{ $t('security.sorted_by') }}</span>
-											<PriorityOrder
-												v-if="ordering.length"
-												:model-value="ordering"
-											/>
-											<span
-												v-if="sessionOrdering"
-												class="badge bg-yellow-lt"
-											>{{ $t('security.session_order') }}</span>
-											<b-button
-												v-if="sessionOrdering"
-												size="sm"
-												variant="link"
-												class="p-0"
-												@click="setSessionOrdering(null)"
-											>
-												{{ $t('security.reset_order') }}
-											</b-button>
-										</div>
-										<div
-											v-if="hiddenKinds.length || filters.show.length"
-											class="d-flex flex-wrap align-items-center gap-2"
-										>
-											<font-awesome-icon
-												:icon="['fas', 'eye-slash']"
-												class="text-muted"
-											/>
-											<span v-if="hiddenKinds.length">{{ hiddenMessage }}</span>
-											<b-button
-												v-if="hiddenKinds.length"
-												size="sm"
-												variant="outline-primary"
-												@click="showNoise(hiddenKinds)"
-											>
-												{{ $t('security.show_hidden') }}
-											</b-button>
-											<template v-if="filters.show.length">
-												<span>{{ $t('security.noise_shown', { kinds: filters.show.map((kind) => $t('security.noise_' + kind)).join(', ') }) }}</span>
-												<b-button
-													size="sm"
-													variant="outline-secondary"
-													@click="filters.show = []"
-												>
-													{{ $t('security.hide_noise') }}
-												</b-button>
-											</template>
-										</div>
-									</div>
-								</template>
-
 								<template #cell(vuln_id)="{ row }">
 									<router-link
 										:to="detailLink(row.item.vuln_id)"
@@ -207,7 +149,7 @@
 <script>
 import { hasPermission } from "@/utils/permissions"
 import {
-	FAMILIES, LEVELS, LEVEL_COLORS, NOISE_KINDS, PRIORITY_CRITERIA,
+	FAMILIES, LEVELS, LEVEL_COLORS, PRIORITY_CRITERIA,
 	apiErrorMessage, asList, formatDay, ratingLabel, shortSummary,
 } from "@/utils/security"
 
@@ -252,7 +194,6 @@ export default {
 			// order answered by the server, the settings one when none is asked
 			ordering: [],
 			sessionOrdering: readSessionOrdering(),
-			hidden: {},
 			// counters of the tiles, read for the platform, search and noise shown
 			counts: {},
 			countsKey: null,
@@ -311,35 +252,6 @@ export default {
 		},
 		outdatedSources() {
 			return this.sources.filter((source) => source.state !== "fresh")
-		},
-		// Reasons, besides the sources, why a vulnerability may be missing
-		incompleteLines() {
-			const lines = []
-			if (!this.unchecked) {
-				return lines
-			}
-			if (!this.unchecked.total) {
-				lines.push(this.$t("security.notice_nothing_checked"))
-			} else if (this.unchecked.installations) {
-				lines.push(this.$t("security.notice_unchecked", { count: this.unchecked.installations }, this.unchecked.installations))
-			}
-			if (this.unchecked.kernels) {
-				lines.push(this.$t("security.notice_kernels", { count: this.unchecked.kernels }, this.unchecked.kernels))
-			}
-			return lines
-		},
-		hiddenKinds() {
-			return NOISE_KINDS.filter((kind) => this.hidden[kind] > 0)
-		},
-		hiddenMessage() {
-			const parts = this.hiddenKinds.map((kind) =>
-				this.$t("security.hidden_" + kind, { count: this.hidden[kind] }, this.hidden[kind])
-			)
-			const items = parts.length > 1
-				? parts.slice(0, -1).join(", ") + " " + this.$t("security.and") + " " + parts[parts.length - 1]
-				: parts[0]
-			const count = this.hiddenKinds.reduce((sum, kind) => sum + this.hidden[kind], 0)
-			return this.$t("security.hidden_banner", { items }, count)
 		},
 		// An empty list only says something about what could be checked
 		emptyMessage() {
@@ -428,7 +340,6 @@ export default {
 				this.rows = asList(data).map((row) => ({ ...row, id: row.vuln_id }))
 				this.total = typeof data.count === "number" ? data.count : this.rows.length
 				this.ordering = data.ordering || this.sessionOrdering || []
-				this.hidden = data.hidden || {}
 				this.errored = false
 				this.loadCounts()
 			} catch (e) {
@@ -491,13 +402,16 @@ export default {
 				// every installation, for the "N out of M" line
 				const total = (coverage.families || []).reduce((sum, family) =>
 					sum + Object.values(family.installations || {}).reduce((count, value) => count + value, 0), 0)
-				const kernels = Object.entries(coverage.kernels || {})
-					.filter(([state]) => state !== "checked")
-					.reduce((sum, [, count]) => sum + count, 0)
-				this.unchecked = { installations: coverage.unchecked || 0, excluded: coverage.excluded || 0, total, kernels }
+				this.unchecked = { installations: coverage.unchecked || 0, excluded: coverage.excluded || 0, total }
 			} catch {
 				// unknown coverage: the empty list says so
 				this.unchecked = null
+			}
+			// stale sources: the empty list says so too
+			try {
+				this.sources = asList(await this.$api.generic.get("vulnerabilities/sources/"))
+			} catch {
+				this.sources = []
 			}
 		},
 
@@ -522,10 +436,6 @@ export default {
 		putFirst(criterion) {
 			const order = this.ordering.length ? this.ordering : PRIORITY_CRITERIA
 			this.setSessionOrdering([criterion, ...order.filter((item) => item !== criterion)])
-		},
-
-		showNoise(kinds) {
-			this.filters.show = [...new Set([...this.filters.show, ...kinds])]
 		},
 
 		// Export: one line per vulnerability, lists joined
