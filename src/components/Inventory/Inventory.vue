@@ -1,7 +1,12 @@
 <template>
-	<div id="inventory">
-		<div align="center">
-			<h2>{{ section.name }}</h2>
+	<section
+		id="inventory"
+		class="detail-section"
+	>
+		<div class="detail-section-header">
+			<h2 class="detail-section-title">
+				{{ section.name }}
+			</h2>
 		</div>
 
 		<section v-if="errored">
@@ -29,7 +34,7 @@
 			:isbusy="isbusy"
 			@reload-datatable="reloadDatatable"
 		/>
-	</div>
+	</section>
 </template>
 
 <script>
