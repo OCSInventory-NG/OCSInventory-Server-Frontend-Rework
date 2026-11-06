@@ -919,7 +919,6 @@
     "no_vulnerability_outdated": "Aucune vulnérabilité affichée, mais des sources ne sont pas à jour : la liste peut être incomplète.",
     "no_vulnerability_unknown_coverage": "Aucune vulnérabilité affichée, mais la couverture n'a pas pu être lue : rien ne dit que les machines sont saines.",
     "noise_kernel_unfixed": "CVE noyau sans correctif",
-    "noise_minor_distro": "Urgence Debian mineure ou non évaluée",
     "noise_shown": "Habituellement masquées, affichées : {kinds}.",
     "not_checked": "Non vérifiées",
     "not_rated": "Non évaluée",

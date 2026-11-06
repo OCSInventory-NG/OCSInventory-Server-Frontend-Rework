@@ -79,10 +79,6 @@
 									>
 										{{ $t('security.uncertain') }}
 									</span>
-									<span
-										v-if="row.item.noise"
-										class="badge bg-azure-lt ms-1"
-									>{{ $t('security.noise_' + row.item.noise) }}</span>
 								</template>
 								<template #cell(summary)="{ row }">
 									<span
@@ -188,13 +184,13 @@ export default {
 				search: null,
 			},
 			headerSort: null,
-			filters: { level: null, fix: null, kev: null, family: null, show: [] },
+			filters: { level: null, fix: null, kev: null, family: null },
 			request: 0,
 
 			// order answered by the server, the settings one when none is asked
 			ordering: [],
 			sessionOrdering: readSessionOrdering(),
-			// counters of the tiles, read for the platform, search and noise shown
+			// counters of the tiles, read for the platform and the search
 			counts: {},
 			countsKey: null,
 			sources: [],
@@ -255,7 +251,7 @@ export default {
 		},
 		// An empty list only says something about what could be checked
 		emptyMessage() {
-			const filtered = this.query.search || Object.entries(this.filters).some(([name, value]) => name !== "show" && value)
+			const filtered = this.query.search || Object.values(this.filters).some((value) => value)
 			if (filtered) {
 				return this.$t("security.no_vulnerability_filtered")
 			}
@@ -313,7 +309,6 @@ export default {
 		params(paginated = true) {
 			const params = {
 				ordering: this.sessionOrdering ? this.sessionOrdering.join(",") : null,
-				show: this.filters.show.join(","),
 				search: this.query.search,
 				level: this.filters.level,
 				fix: this.filters.fix,
@@ -360,10 +355,10 @@ export default {
 			}
 		},
 
-		// Counters of the whole list: the summary gets the platform, search and
-		// noise shown, never the table filters (they would zero the other tiles)
+		// Counters of the whole list: the summary gets the platform and the search,
+		// never the table filters (they would zero the other tiles)
 		async loadCounts() {
-			const base = { family: this.filters.family, search: this.query.search, show: this.filters.show.join(",") }
+			const base = { family: this.filters.family, search: this.query.search }
 			const key = JSON.stringify(base)
 			if (key === this.countsKey) return
 			this.countsKey = key

@@ -1157,7 +1157,6 @@
     "no_vulnerability_outdated": "Nezobrazuje se žádná zranitelnost, ale některé zdroje nejsou aktuální: seznam může být neúplný.",
     "no_vulnerability_unknown_coverage": "Nezobrazuje se žádná zranitelnost, ale pokrytí nebylo možné načíst: nic nedokazuje, že jsou zařízení bezpečná.",
     "noise_kernel_unfixed": "CVE jádra bez opravy",
-    "noise_minor_distro": "Nízká nebo nehodnocená naléhavost Debianu",
     "noise_shown": "Obvykle skryté, zobrazené: {kinds}.",
     "not_checked": "Neověřené",
     "not_rated": "Nehodnoceno",

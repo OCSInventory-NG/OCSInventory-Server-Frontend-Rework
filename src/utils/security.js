@@ -4,7 +4,7 @@
 export const PRIORITY_CRITERIA = ["kev", "score", "epss", "machines"]
 
 // Noise hidden by default from the vulnerability lists
-export const NOISE_KINDS = ["minor_distro", "kernel_unfixed"]
+export const NOISE_KINDS = ["kernel_unfixed"]
 
 export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
 

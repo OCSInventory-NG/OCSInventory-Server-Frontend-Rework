@@ -919,7 +919,6 @@
     "no_vulnerability_outdated": "No vulnerability shown, but some sources are not up to date: the list may be incomplete.",
     "no_vulnerability_unknown_coverage": "No vulnerability shown, but the coverage could not be read: there is no evidence that the machines are safe.",
     "noise_kernel_unfixed": "Kernel CVE without a fix",
-    "noise_minor_distro": "Minor or unrated Debian urgency",
     "noise_shown": "Usually hidden, shown: {kinds}.",
     "not_checked": "Not checked",
     "not_rated": "Not rated",
