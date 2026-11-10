@@ -8,12 +8,6 @@
   text-decoration: solid underline $ocs-purple .2rem;
 }
 
-.form-fieldset {
-  background-color: #f0f0f0;
-  border-color: #f2f3f4;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
-}
-
 .admin-row {
   align-items: center !important;
   margin-bottom: 10px;
@@ -29,4 +23,186 @@
 
 .form-check {
   margin-bottom: 0;
+}
+
+#Accountinfo.accountinfo-section {
+  padding: 1.125rem 1.5rem 1.375rem;
+  background: var(--tblr-bg-surface-secondary, #f6f8fb);
+  border: 1px solid var(--tblr-border-color);
+  border-radius: 8px;
+
+  .detail-section-header {
+    border-bottom-color: var(--tblr-border-color);
+  }
+}
+
+#Accountinfo {
+  .accountinfo-edit-badge {
+    font-size: .75rem;
+    font-weight: 600;
+    color: $ocs-purple;
+    background: rgba($ocs-purple, .1);
+    padding: .25rem .625rem;
+    border-radius: 1rem;
+  }
+
+  .accountinfo-grid {
+    margin: 0;
+  }
+
+  .accountinfo-item-wide {
+    grid-column: 1 / -1;
+  }
+
+  .accountinfo-label {
+    display: flex;
+    align-items: center;
+    gap: .375rem;
+  }
+
+  .accountinfo-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .375rem;
+    margin: 0;
+  }
+
+  .accountinfo-text {
+    overflow-wrap: anywhere;
+  }
+
+  .accountinfo-text-multiline {
+    white-space: pre-line;
+  }
+
+  .accountinfo-empty {
+    font-style: italic;
+    color: var(--tblr-secondary);
+  }
+
+  .accountinfo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .125rem .625rem;
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 1rem;
+    background: $white;
+    color: var(--tblr-body-color);
+    font-size: .8125rem;
+    font-weight: 500;
+
+    svg {
+      font-size: .625rem;
+    }
+  }
+
+  .accountinfo-dirty {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    color: $ocs-purple;
+    text-transform: none;
+    letter-spacing: 0;
+
+    &::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $ocs-purple;
+    }
+  }
+
+  .form-control {
+    margin: 0;
+  }
+
+  // vue-select draws its own toggle, give it the look of the Tabler .form-control next to it
+  .v-select {
+    font-size: .875rem;
+
+    .vs__dropdown-toggle {
+      height: calc(2.125rem + 2px);
+      padding: 0 .375rem 0 .75rem;
+      border: var(--tblr-border-width) solid var(--tblr-border-color) !important;
+      border-radius: var(--tblr-border-radius);
+      background: var(--tblr-bg-forms);
+      box-shadow: var(--tblr-box-shadow-input);
+      cursor: pointer;
+    }
+
+    .vs__search {
+      cursor: pointer;
+    }
+
+    .vs__selected-options {
+      padding: 0;
+    }
+
+    .vs__selected,
+    .vs__search,
+    .vs__search:focus {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      line-height: 1.4285714286;
+      color: var(--tblr-body-color);
+    }
+  }
+
+  .accountinfo-item-dirty {
+    .form-control,
+    .vs__dropdown-toggle {
+      border-color: $ocs-purple !important;
+    }
+  }
+
+  .accountinfo-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+
+    .form-check {
+      margin: 0;
+    }
+
+    .form-check-input:checked {
+      background-color: $ocs-purple;
+      border-color: $ocs-purple;
+    }
+  }
+
+  .accountinfo-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--tblr-border-color);
+  }
+
+  .accountinfo-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: $ocs-purple;
+    border-color: $ocs-purple;
+    color: $white;
+    font-weight: 600;
+
+    &:hover,
+    &:focus-visible {
+      background: #7f1b6d;
+      border-color: #7f1b6d;
+      color: $white;
+    }
+
+    &:disabled {
+      opacity: .45;
+    }
+  }
 }
