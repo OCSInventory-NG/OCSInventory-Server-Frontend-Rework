@@ -10,6 +10,9 @@ export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
 
 export const FAMILIES = ["deb", "rpm", "windows", "macos"]
 
+// Why the scan cannot check a whole machine, see /vulnerabilities/machines/
+export const MACHINE_REASONS = ["no_platform", "no_source", "end_of_support", "source_never_loaded", "release_not_tracked"]
+
 // Same palette as the compliance severities. Unknown stays dark: an unrated
 // vulnerability is not a mild one
 export const LEVEL_COLORS = {

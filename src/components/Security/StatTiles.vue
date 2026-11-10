@@ -10,6 +10,7 @@
 			class="card mb-0"
 			:class="{ 'stat-tile-clickable': isClickable(tile) }"
 			:style="tileStyle(tile)"
+			:title="tile.title || null"
 			:role="isClickable(tile) ? 'button' : null"
 			:tabindex="isClickable(tile) ? 0 : null"
 			:aria-pressed="isClickable(tile) ? !!tile.active : null"
@@ -46,7 +47,7 @@ export default {
 	props: {
 		// [{ key, label, value, detail: a line under the value, color, active,
 		//    warn: the value calls for attention, small: for a date,
-		//    static: a counter that filters nothing }]
+		//    static: a counter that filters nothing, title: shown on hover }]
 		tiles: { type: Array, required: true },
 		// a click on a tile emits select(key), e.g. to filter a list
 		clickable: { type: Boolean, default: false },
@@ -82,7 +83,7 @@ export default {
 }
 
 .stat-tiles-compact {
-	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
 }
 
 .stat-tile-clickable {

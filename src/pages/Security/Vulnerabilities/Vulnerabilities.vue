@@ -205,6 +205,7 @@ export default {
 			return [
 				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
 				{ key: "machines", label: this.$t("security.tile_machines"), value: count("machines"), color: "#1d273b", static: true },
+				this.notCoveredTile,
 				...LEVELS.map((level) => ({
 					key: level,
 					label: this.$t("security.tile_level_" + level),
@@ -215,6 +216,23 @@ export default {
 				{ key: "kev", label: this.$t("security.tile_kev"), value: count("kev"), color: "#ae3ec9", active: this.filters.kev === "yes" },
 				{ key: "fix", label: this.$t("security.tile_fix"), value: count("fix"), color: "#2fb344", active: this.filters.fix === "yes" },
 			]
+		},
+		// Machines the scan cannot check: they would show 0 vulnerability, as a safe one
+		notCoveredTile() {
+			const coverage = this.counts.coverage
+			const count = coverage ? coverage.not_covered : undefined
+			const reasons = Object.entries(coverage?.reasons || {})
+				.filter(([, value]) => value)
+				.map(([reason, value]) => `${this.$t("security.machine_reason_" + reason)} : ${value}`)
+			return {
+				key: "not_covered",
+				label: this.$t("security.tile_machines_not_covered"),
+				value: count === undefined ? "" : count.toLocaleString(),
+				color: count ? "#f76707" : "#adb5bd",
+				title: reasons.join("\n") || null,
+				// opens the machine list, nothing to open at 0
+				static: !count,
+			}
 		},
 		filterSelects() {
 			return [
@@ -371,6 +389,7 @@ export default {
 					...(summary.levels || {}),
 					kev: summary.kev,
 					fix: summary.fix_available,
+					coverage: summary.coverage,
 				}
 			} catch {
 				// tiles stay empty, the list shows its own error
@@ -380,7 +399,9 @@ export default {
 
 		// total clears the tile filters, the others toggle theirs
 		selectTile(key) {
-			if (key === "total") {
+			if (key === "not_covered") {
+				this.$router.push({ path: "/security/coverage", query: { tab: "machines", status: "not_covered" } })
+			} else if (key === "total") {
 				Object.assign(this.filters, { level: null, kev: null, fix: null })
 			} else if (key === "kev") {
 				this.filters.kev = this.filters.kev === "yes" ? null : "yes"

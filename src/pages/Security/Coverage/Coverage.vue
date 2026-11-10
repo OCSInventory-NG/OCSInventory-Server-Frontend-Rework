@@ -40,7 +40,11 @@
 								:title="$t('security.coverage_summary')"
 								title-item-class="ocs-menu-tab"
 							>
-								<StatTiles :tiles="tiles" />
+								<StatTiles
+									:tiles="tiles"
+									clickable
+									@select="selectTile"
+								/>
 								<p class="coverage-scans mb-3">
 									<span
 										v-for="scan in scans"
@@ -181,6 +185,18 @@
 								</Datatable>
 							</b-tab>
 
+							<!-- Machines the scan can or cannot check -->
+							<b-tab
+								:title="$t('security.coverage_machines')"
+								title-item-class="ocs-menu-tab"
+								lazy
+							>
+								<CoverageMachines
+									:key="machinesKey"
+									:status="machinesStatus"
+								/>
+							</b-tab>
+
 							<!-- The tests of the scan, in their order -->
 							<b-tab
 								:title="$t('security.coverage_by_state')"
@@ -255,7 +271,8 @@ import { hasPermission } from "@/utils/permissions"
 import { apiErrorMessage, formatDateTime, formatPercent } from "@/utils/security"
 
 // tab of the sources, opened by the "see the sources" action
-const SOURCES_TAB = 2
+const MACHINES_TAB = 1
+const SOURCES_TAB = 3
 // States that are no missing check, as the coverage counts them
 const NOT_UNCHECKED = ["checked", "excluded", "kernel_not_running"]
 // Where each reason is acted on: a route, the sources tab, or the next scan
@@ -293,8 +310,11 @@ export default {
 			errored: false,
 			errormsg: null,
 			loading: true,
-			activeTab: 0,
+			activeTab: { machines: MACHINES_TAB, sources: SOURCES_TAB }[this.$route.query.tab] || 0,
 			SOURCES_TAB,
+			// filter of the machine list, set by the link or the tile that opens it
+			machinesStatus: this.$route.query.status || null,
+			machinesKey: 0,
 			coverage: { states: [], families: [], sources: [], kernels: {} },
 			scans: ["last_full_scan", "last_incremental_scan", "last_exposure"],
 			sourceColumns: ["source_name", "source_state", "last_success", "last_attempt", "record_count", "scope", "source_error"],
@@ -344,26 +364,48 @@ export default {
 					value: `${this.totals.checked.toLocaleString()} / ${this.totals.all.toLocaleString()}`,
 					detail: formatPercent(share),
 					color: "#206bc4",
+					static: true,
 				},
 				{
 					key: "unchecked",
 					label: this.$t("security.not_checked"),
 					value: this.totals.unchecked.toLocaleString(),
 					color: this.totals.unchecked ? "#f76707" : "#2fb344",
+					static: true,
 				},
+				this.machinesTile,
 				{
 					key: "excluded",
 					label: this.$t("security.state_excluded"),
 					value: this.totals.excluded.toLocaleString(),
 					color: "#adb5bd",
+					static: true,
 				},
 				{
 					key: "kernels",
 					label: this.$t("security.kernels_unchecked"),
 					value: this.totals.kernels.toLocaleString(),
 					color: this.totals.kernels ? "#d63939" : "#2fb344",
+					static: true,
 				},
 			]
+		},
+		// Machines the scan cannot check at all: a click lists them
+		machinesTile() {
+			const machines = this.coverage.machines || {}
+			const count = machines.not_covered || 0
+			const total = count + (machines.covered || 0)
+			const reasons = Object.entries(machines.reasons || {})
+				.filter(([, value]) => value)
+				.map(([reason, value]) => `${this.$t("security.machine_reason_" + reason)} : ${value}`)
+			return {
+				key: "machines",
+				label: this.$t("security.tile_machines_not_covered"),
+				value: count.toLocaleString(),
+				detail: total ? `/ ${total.toLocaleString()}` : "",
+				color: count ? "#f76707" : "#2fb344",
+				title: reasons.join("\n") || null,
+			}
 		},
 		// Why installations are not checked: the biggest reason first
 		reasonRows() {
@@ -472,6 +514,14 @@ export default {
 		},
 		formatDateTime,
 		formatPercent,
+
+		// the machine tile opens the uncovered machines
+		selectTile(key) {
+			if (key !== "machines") return
+			this.machinesStatus = "not_covered"
+			this.machinesKey += 1
+			this.activeTab = MACHINES_TAB
+		},
 
 		stateLabel(state) {
 			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state

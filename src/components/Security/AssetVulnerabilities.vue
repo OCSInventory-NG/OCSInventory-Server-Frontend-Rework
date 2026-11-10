@@ -13,6 +13,36 @@
 			<Loader />
 		</div>
 		<template v-else>
+			<!-- A machine the scan cannot check would show 0 vulnerability, as a safe one -->
+			<div
+				v-if="notCovered"
+				class="alert alert-warning"
+			>
+				<div class="d-flex gap-2">
+					<font-awesome-icon
+						:icon="['fas', 'triangle-exclamation']"
+						class="mt-1"
+					/>
+					<div>
+						<strong>{{ $t('security.machine_not_covered_title') }}</strong>
+						<div>{{ machineBanner }}</div>
+						<div class="small">
+							{{ $t('security.machine_zero_hint') }}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				v-else-if="supportEndsSoon"
+				class="alert alert-info"
+			>
+				<font-awesome-icon
+					:icon="['fas', 'circle-info']"
+					class="me-2"
+				/>
+				{{ $t('security.support_until', { date: formatDay(machine.support_end) }) }}
+			</div>
+
 			<!-- Coverage of this machine -->
 			<StatTiles :tiles="tiles" />
 
@@ -160,9 +190,11 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
-import { NOISE_KINDS, apiErrorMessage, asList } from "@/utils/security"
+import { NOISE_KINDS, apiErrorMessage, asList, formatDay } from "@/utils/security"
 
 const UNCHECKED_TAB = 2
+// the end of security support is announced this many months ahead
+const SUPPORT_NOTICE_MONTHS = 6
 // States that are no missing check, as the coverage counts them
 const FINE_STATES = ["checked", "excluded", "kernel_not_running"]
 
@@ -195,6 +227,30 @@ export default {
 		}
 	},
 	computed: {
+		// coverage status of the whole machine, see /vulnerabilities/machines/
+		machine() {
+			return this.coverage.machine || null
+		},
+		notCovered() {
+			return this.machine?.status === "not_covered"
+		},
+		machineBanner() {
+			const reason = this.machine?.reason
+			if (reason === "end_of_support") {
+				return this.machine.support_end
+					? this.$t("security.machine_banner_end_of_support", { date: formatDay(this.machine.support_end) })
+					: this.$t("security.machine_banner_end_of_support_nodate")
+			}
+			const key = "security.machine_banner_" + reason
+			return this.$te(key) ? this.$t(key) : reason
+		},
+		supportEndsSoon() {
+			if (this.machine?.status !== "covered" || !this.machine.support_end) return false
+			const end = new Date(this.machine.support_end)
+			const limit = new Date()
+			limit.setMonth(limit.getMonth() + SUPPORT_NOTICE_MONTHS)
+			return end >= new Date() && end <= limit
+		},
 		kernelOk() {
 			return ["checked", "not_applicable"].includes(this.coverage.kernel)
 		},
@@ -236,7 +292,8 @@ export default {
 					key: "open",
 					label: this.$t("security.open_exposures"),
 					value: open,
-					color: open ? "#d63939" : "#2fb344",
+					// 0 is only good news on a machine the scan can check
+					color: open ? "#d63939" : (this.notCovered ? "#adb5bd" : "#2fb344"),
 				},
 				{
 					key: "fix",
@@ -266,7 +323,7 @@ export default {
 			return this.open.filter((row) => !row.excluded && (this.showNoise || !row.noise))
 		},
 		emptyWarns() {
-			return this.coverage.unchecked > 0 || !this.kernelOk
+			return this.notCovered || this.coverage.unchecked > 0 || !this.kernelOk
 		},
 		// installations the scan could not check, with their reason in words
 		uncheckedSoftware() {
@@ -308,6 +365,8 @@ export default {
 		}
 	},
 	methods: {
+		formatDay,
+
 		stateLabel(state) {
 			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state
 		},
