@@ -84,11 +84,6 @@
 			</template>
 			<template #cell(method)="{ row }">
 				{{ methodLabel(row.item.method) }}
-				<span
-					v-if="row.item.uncertain"
-					class="badge bg-secondary ms-1"
-					:title="$t('security.uncertain_help')"
-				>{{ $t('security.uncertain') }}</span>
 				<div v-if="row.item.advisory_id">
 					<a
 						v-if="row.item.advisory_url"

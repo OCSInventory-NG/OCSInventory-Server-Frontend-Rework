@@ -72,13 +72,6 @@
 									>
 										{{ row.item.vuln_id }}
 									</router-link>
-									<span
-										v-if="row.item.uncertain"
-										class="badge bg-secondary ms-1"
-										:title="$t('security.uncertain_help')"
-									>
-										{{ $t('security.uncertain') }}
-									</span>
 								</template>
 								<template #cell(summary)="{ row }">
 									<span
@@ -472,7 +465,6 @@ export default {
 				product_count: row.product_count,
 				fixed_versions: (row.fixed_versions || []).join(", "),
 				fix_channels: (row.fix_channels || []).join(", "),
-				uncertain: row.uncertain ? "yes" : "no",
 				first_seen: row.first_seen || "",
 			}))
 		},
