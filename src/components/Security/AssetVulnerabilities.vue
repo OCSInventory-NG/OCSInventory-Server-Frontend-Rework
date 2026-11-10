@@ -53,29 +53,6 @@
 				fill
 			>
 				<b-tab :title="$t('security.tab_open_label')">
-					<!-- Noise hidden by default, always counted -->
-					<div
-						v-if="noiseCount"
-						class="alert alert-info"
-					>
-						<div class="d-flex flex-wrap align-items-center gap-2">
-							<font-awesome-icon :icon="['fas', 'eye-slash']" />
-							<span v-if="!showNoise">
-								{{ $t('security.asset_noise_hidden', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
-							</span>
-							<span v-else>
-								{{ $t('security.asset_noise_shown', { count: noiseCount, kinds: noiseSummary }, noiseCount) }}
-							</span>
-							<b-button
-								size="sm"
-								variant="outline-primary"
-								@click="showNoise = !showNoise"
-							>
-								{{ showNoise ? $t('security.hide_noise') : $t('security.show_hidden') }}
-							</b-button>
-						</div>
-					</div>
-
 					<!-- Never a bare "no vulnerability" -->
 					<div
 						v-if="!visibleOpen.length"
@@ -190,7 +167,7 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
-import { NOISE_KINDS, apiErrorMessage, asList, formatDay } from "@/utils/security"
+import { apiErrorMessage, asList, formatDay } from "@/utils/security"
 
 const UNCHECKED_TAB = 2
 // the end of security support is announced this many months ahead
@@ -215,7 +192,6 @@ export default {
 			closed: null,
 			closedError: null,
 			software: [],
-			showNoise: false,
 			activeTab: 0,
 
 			softwareState: null,
@@ -306,21 +282,8 @@ export default {
 		excludedOpen() {
 			return this.open.filter((row) => row.excluded)
 		},
-		noiseRows() {
-			return this.open.filter((row) => !row.excluded && row.noise)
-		},
-		noiseCount() {
-			return this.noiseRows.length
-		},
-		noiseSummary() {
-			return NOISE_KINDS
-				.map((kind) => [kind, this.noiseRows.filter((row) => row.noise === kind).length])
-				.filter(([, count]) => count)
-				.map(([kind, count]) => `${this.$t("security.noise_" + kind)} : ${count}`)
-				.join(", ")
-		},
 		visibleOpen() {
-			return this.open.filter((row) => !row.excluded && (this.showNoise || !row.noise))
+			return this.open.filter((row) => !row.excluded)
 		},
 		emptyWarns() {
 			return this.notCovered || this.coverage.unchecked > 0 || !this.kernelOk

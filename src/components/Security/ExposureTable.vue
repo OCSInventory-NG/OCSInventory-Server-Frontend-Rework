@@ -39,10 +39,6 @@
 					v-if="excluded"
 					class="badge bg-secondary-lt ms-1"
 				>{{ $t('security.excluded') }}</span>
-				<span
-					v-if="row.item.noise"
-					class="badge bg-azure-lt ms-1"
-				>{{ $t('security.noise_' + row.item.noise) }}</span>
 			</template>
 			<template #cell(summary)="{ row }">
 				<span

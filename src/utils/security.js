@@ -3,9 +3,6 @@
 // Criteria the vulnerabilities can be ordered on, see the security settings
 export const PRIORITY_CRITERIA = ["kev", "score", "epss", "machines"]
 
-// Noise hidden by default from the vulnerability lists
-export const NOISE_KINDS = ["kernel_unfixed"]
-
 export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
 
 export const FAMILIES = ["deb", "rpm", "windows", "macos"]
