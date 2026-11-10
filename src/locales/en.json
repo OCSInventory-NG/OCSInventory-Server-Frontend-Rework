@@ -1021,7 +1021,6 @@
     "tile_level_high": "High",
     "tile_level_low": "Low",
     "tile_level_medium": "Medium",
-    "tile_level_unknown": "Not rated",
     "tile_machines": "Impacted machines",
     "tile_machines_not_covered": "Machines not covered",
     "tile_open_machines": "Open machines",

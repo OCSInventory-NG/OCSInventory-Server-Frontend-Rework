@@ -199,7 +199,8 @@ export default {
 				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
 				{ key: "machines", label: this.$t("security.tile_machines"), value: count("machines"), color: "#1d273b", static: true },
 				this.notCoveredTile,
-				...LEVELS.map((level) => ({
+				// no tile for the unrated ones: the level filter still lists them
+				...LEVELS.filter((level) => level !== "unknown").map((level) => ({
 					key: level,
 					label: this.$t("security.tile_level_" + level),
 					value: count(level),
