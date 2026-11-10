@@ -1211,6 +1211,7 @@
     "source_osv": "OSV",
     "source_osv_alma": "AlmaLinux",
     "source_osv_debian": "Debian",
+    "source_osv_redhat": "Red Hat",
     "source_osv_rocky": "Rocky Linux",
     "source_osv_ubuntu": "Ubuntu",
     "source_scope": "Pokrývá",
