@@ -13,6 +13,51 @@
   margin-right: 5px;
 }
 
+// one criterion of the multi-criteria search; the row gutter spaces the fields
+.search-criterion {
+  margin-bottom: 8px;
+
+  // stacked below md: a line between two criteria
+  @media (max-width: 767.98px) {
+    border-bottom: 1px solid $gray-300;
+    padding-bottom: 8px;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+.search-select {
+  margin-top: 0;
+}
+
+// inputs as tall as the selects
+.search-criterion-input {
+  height: 40px;
+}
+
+.search-criterion-actions {
+  display: flex;
+  gap: 8px;
+
+  .btn {
+    height: 40px;
+    width: 44px;
+  }
+}
+
+// AND / OR between two groups, centred between the cards
+.search-group-link {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  .v-select {
+    width: 8rem;
+  }
+}
+
 .multisearch-btns {
   margin-bottom: 20px;
 }

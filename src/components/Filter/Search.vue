@@ -12,25 +12,23 @@
 				v-for="(masterinput, masterindex) in datavalues"
 				:key="rowkeys[masterindex]?.[0] ?? masterindex"
 			>
-				<b-row
+				<!-- AND / OR between two groups -->
+				<div
 					v-if="masterindex > 0"
-					class="mb-2"
+					class="search-group-link"
 				>
-					<b-col cols="1">
-						<SearchSelect
-							:id="`link-${masterindex}-0`"
-							v-model="masterinput[0].link"
-							:label="$t('search.criterion_link')"
-							:options="linkopt"
-							:disabled="disableforgroup"
-						/>
-					</b-col>
-				</b-row>
-				<div class="modal-allactions multisearch-card">
+					<SearchSelect
+						:id="`link-${masterindex}-0`"
+						v-model="masterinput[0].link"
+						:label="$t('search.criterion_link')"
+						:options="linkopt"
+						:disabled="disableforgroup"
+					/>
+				</div>
+				<div class="multisearch-card">
 					<div
-						v-if="!disableforgroup"
-						v-show="datavalues.length > 1"
-						align="right"
+						v-if="!disableforgroup && datavalues.length > 1"
+						class="text-end"
 					>
 						<b-button
 							size="sm"
@@ -39,10 +37,7 @@
 							:aria-label="$t('search.removegroup')"
 							@click="removeGroup(masterindex)"
 						>
-							<font-awesome-icon
-								:icon="['fas', 'trash-can']"
-								size="1x"
-							/>
+							<font-awesome-icon :icon="['fas', 'trash-can']" />
 						</b-button>
 					</div>
 
@@ -63,45 +58,39 @@
 					/>
 				</div>
 			</template>
-			<b-row v-if="!disableforgroup">
-				<b-col align-self="start" />
-				<b-col
-					align-self="center"
-					align="center"
-					class="multisearch-btns"
-				>
-					<div class="mb-2">
-						<b-button
-							type="button"
-							variant="info"
-							class="multisearch-btn"
-							@click="addGroup"
-						>
-							{{ $t('search.addgroup') }}
-						</b-button>
-						<b-button
-							type="submit"
-							variant="success"
-						>
-							{{ $t('generic.search') }}
-						</b-button>
-					</div>
-					<b-form-checkbox
-						v-model="grouped"
-						inline
+			<div
+				v-if="!disableforgroup"
+				class="multisearch-btns text-center"
+			>
+				<div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
+					<b-button
+						type="button"
+						variant="info"
+						@click="addGroup"
 					>
-						{{ $t('search.grouped') }}
-					</b-form-checkbox>
-					<Alert
-						v-if="!grouped"
-						:message="$t('search.ungrouped_warning')"
-						:cols="false"
-						variant="warning"
-						class="mt-3 text-start"
-					/>
-				</b-col>
-				<b-col align-self="end" />
-			</b-row>
+						{{ $t('search.addgroup') }}
+					</b-button>
+					<b-button
+						type="submit"
+						variant="success"
+					>
+						{{ $t('generic.search') }}
+					</b-button>
+				</div>
+				<b-form-checkbox
+					v-model="grouped"
+					inline
+				>
+					{{ $t('search.grouped') }}
+				</b-form-checkbox>
+				<Alert
+					v-if="!grouped"
+					:message="$t('search.ungrouped_warning')"
+					:cols="false"
+					variant="warning"
+					class="mt-3 text-start"
+				/>
+			</div>
 		</b-form>
 	</div>
 </template>

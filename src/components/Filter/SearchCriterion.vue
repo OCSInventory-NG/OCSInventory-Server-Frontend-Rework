@@ -1,34 +1,39 @@
 <template>
-	<div class="modal-allactions">
-		<b-row>
-			<b-col
+	<!-- one line from md, stacked below; the columns line up from one criterion to the next -->
+	<b-row class="search-criterion g-2">
+		<b-col
+			cols="12"
+			md="1"
+			:class="{ 'd-none d-md-block': first }"
+		>
+			<SearchSelect
 				v-if="!first"
-				cols="1"
+				:id="`link-${idsuffix}`"
+				:label="$t('search.criterion_link')"
+				:model-value="criterion.link"
+				:options="linkopt"
+				:disabled="disabled"
+				@update:model-value="set({ link: $event })"
+			/>
+		</b-col>
+		<b-col
+			cols="12"
+			md
+		>
+			<SearchSelect
+				:id="`route-${idsuffix}`"
+				:label="$t('search.criterion_type')"
+				:model-value="criterion.route"
+				:options="routeopt"
+				:disabled="disabled"
+				@update:model-value="selectRoute"
+			/>
+		</b-col>
+		<template v-if="criterion.object == 'inventory_sections'">
+			<b-col
+				cols="12"
+				md
 			>
-				<b-form-group>
-					<SearchSelect
-						:id="`link-${idsuffix}`"
-						:label="$t('search.criterion_link')"
-						:model-value="criterion.link"
-						:options="linkopt"
-						:disabled="disabled"
-						@update:model-value="set({ link: $event })"
-					/>
-				</b-form-group>
-			</b-col>
-			<b-col>
-				<b-form-group>
-					<SearchSelect
-						:id="`route-${idsuffix}`"
-						:label="$t('search.criterion_type')"
-						:model-value="criterion.route"
-						:options="routeopt"
-						:disabled="disabled"
-						@update:model-value="selectRoute"
-					/>
-				</b-form-group>
-			</b-col>
-			<b-col v-if="criterion.object == 'inventory_sections'">
 				<SearchSelect
 					:id="`template-${idsuffix}`"
 					:label="$t('search.criterion_template')"
@@ -40,7 +45,10 @@
 					@update:model-value="selectTemplate"
 				/>
 			</b-col>
-			<b-col v-if="criterion.object == 'inventory_sections'">
+			<b-col
+				cols="12"
+				md
+			>
 				<SearchSelect
 					:id="`section-${idsuffix}`"
 					:label="$t('search.criterion_section')"
@@ -52,101 +60,91 @@
 					@update:model-value="selectSection"
 				/>
 			</b-col>
-			<b-col>
-				<b-form-group>
-					<SearchSelect
-						:id="`field-${idsuffix}`"
-						:label="$t('search.criterion_field')"
-						:model-value="criterion.field"
-						:options="fieldopt"
-						:loading="loadingfields"
-						:disabled="disabled"
-						required
-						@update:model-value="selectField"
-					/>
-				</b-form-group>
-			</b-col>
-			<b-col cols="2">
-				<b-form-group>
-					<SearchSelect
-						:id="`operator-${idsuffix}`"
-						:label="$t('search.criterion_operator')"
-						:model-value="criterion.operator"
-						:options="operatoropt[criterion.fieldtype]"
-						:disabled="disabled"
-						required
-						@update:model-value="set({ operator: $event })"
-					/>
-				</b-form-group>
-			</b-col>
-			<b-col cols="3">
-				<b-form-group>
-					<SearchSelect
-						v-if="SELECT_TYPES.includes(criterion.fieldtype)"
-						:id="`value-${idsuffix}`"
-						:label="$t('search.criterion_value')"
-						:model-value="criterion.value"
-						:options="valueOptions"
-						:loading="loadingvalues"
-						:disabled="disabled"
-						required
-						@update:model-value="set({ value: $event })"
-					/>
-					<b-form-input
-						v-else
-						:id="`value-${idsuffix}`"
-						:placeholder="$t('search.criterion_value')"
-						:aria-label="$t('search.criterion_value')"
-						:model-value="criterion.value"
-						:type="INPUT_TYPES[criterion.fieldtype]"
-						:step="criterion.fieldtype === 'number' ? 'any' : null"
-						class="mb-3"
-						:disabled="disabled"
-						@update:model-value="set({ value: $event })"
-					/>
-				</b-form-group>
-			</b-col>
-			<b-col
-				v-if="!disabled"
-				cols="1"
+		</template>
+		<b-col
+			cols="12"
+			md
+		>
+			<SearchSelect
+				:id="`field-${idsuffix}`"
+				:label="$t('search.criterion_field')"
+				:model-value="criterion.field"
+				:options="fieldopt"
+				:loading="loadingfields"
+				:disabled="disabled"
+				required
+				@update:model-value="selectField"
+			/>
+		</b-col>
+		<b-col
+			cols="12"
+			md="2"
+		>
+			<SearchSelect
+				:id="`operator-${idsuffix}`"
+				:label="$t('search.criterion_operator')"
+				:model-value="criterion.operator"
+				:options="operatoropt[criterion.fieldtype]"
+				:disabled="disabled"
+				required
+				@update:model-value="set({ operator: $event })"
+			/>
+		</b-col>
+		<b-col
+			cols="12"
+			md="3"
+		>
+			<SearchSelect
+				v-if="SELECT_TYPES.includes(criterion.fieldtype)"
+				:id="`value-${idsuffix}`"
+				:label="$t('search.criterion_value')"
+				:model-value="criterion.value"
+				:options="valueOptions"
+				:loading="loadingvalues"
+				:disabled="disabled"
+				required
+				@update:model-value="set({ value: $event })"
+			/>
+			<b-form-input
+				v-else
+				:id="`value-${idsuffix}`"
+				:placeholder="$t('search.criterion_value')"
+				:aria-label="$t('search.criterion_value')"
+				:model-value="criterion.value"
+				:type="INPUT_TYPES[criterion.fieldtype]"
+				:step="criterion.fieldtype === 'number' ? 'any' : null"
+				class="search-criterion-input"
+				:disabled="disabled"
+				@update:model-value="set({ value: $event })"
+			/>
+		</b-col>
+		<b-col
+			v-if="!disabled"
+			cols="12"
+			md="auto"
+			class="search-criterion-actions"
+		>
+			<b-button
+				:id="`addfield-${idsuffix}`"
+				variant="primary"
+				:title="$t('search.addquerytogroup')"
+				:aria-label="$t('search.addquerytogroup')"
+				@click="$emit('add')"
 			>
-				<b-form-group>
-					<b-button
-						:id="`addfield-${idsuffix}`"
-						variant="primary"
-						class="form-control"
-						:title="$t('search.addquerytogroup')"
-						:aria-label="$t('search.addquerytogroup')"
-						@click="$emit('add')"
-					>
-						<font-awesome-icon
-							:icon="['fas', 'plus']"
-						/>
-					</b-button>
-				</b-form-group>
-			</b-col>
-			<b-col
-				v-if="!disabled"
-				v-show="canremove"
-				cols="1"
+				<font-awesome-icon :icon="['fas', 'plus']" />
+			</b-button>
+			<b-button
+				:id="`removefield-${idsuffix}`"
+				variant="danger"
+				:class="{ invisible: !canremove }"
+				:title="$t('search.removequeryfromgroup')"
+				:aria-label="$t('search.removequeryfromgroup')"
+				@click="$emit('remove')"
 			>
-				<b-form-group>
-					<b-button
-						:id="`removefield-${idsuffix}`"
-						variant="danger"
-						class="form-control"
-						:title="$t('search.removequeryfromgroup')"
-						:aria-label="$t('search.removequeryfromgroup')"
-						@click="$emit('remove')"
-					>
-						<font-awesome-icon
-							:icon="['fas', 'trash-can']"
-						/>
-					</b-button>
-				</b-form-group>
-			</b-col>
-		</b-row>
-	</div>
+				<font-awesome-icon :icon="['fas', 'trash-can']" />
+			</b-button>
+		</b-col>
+	</b-row>
 </template>
 
 <script>
