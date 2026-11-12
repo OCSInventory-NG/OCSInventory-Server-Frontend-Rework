@@ -880,13 +880,17 @@ export default {
 		},
 		isChecked: function () {
 			if (this.isChecked) {
-				const perPage = this.perPage
-				const currentPage = this.currentPage
+				if (this.serverSide) {
+					this.selected = [...this.rowdata]
+				} else {
+					const perPage = this.perPage
+					const currentPage = this.currentPage
 
-				const start = (currentPage - 1) * perPage
-				const end   = Math.min(start + perPage, this.rowdata.length)
+					const start = (currentPage - 1) * perPage
+					const end   = Math.min(start + perPage, this.rowdata.length)
 
-				this.selected = this.rowdata.slice(start, end)
+					this.selected = this.rowdata.slice(start, end)
+				}
 				this.selectedids = this.selected.map(item => item.id)
 			} else {
 				this.selected = []
@@ -907,6 +911,7 @@ export default {
 			}
 		},
 		currentPage() {
+			this.isChecked = false
 			if (this.serverSide) {
 				this.emitQueryChange()
 			}
