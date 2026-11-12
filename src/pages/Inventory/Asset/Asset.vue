@@ -30,6 +30,7 @@
 								:rowdata="rowdata"
 								:rowheader="rowheader"
 								:hiddenfields="hiddenfields"
+								:nonsortablefields="pagecolumns"
 								virtualcoltarget="asset"
 							layouttarget="asset"
 								:fieldlabels="virtualcollabels"
@@ -49,7 +50,17 @@
 								@export="handleExport"
 								@export-all="exportAllAssets"
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(security)="{ row }">
+									<span
+										v-if="row.item.security_status"
+										class="badge"
+										:class="securityBadgeClass(row.item.security_status)"
+										:style="securityBadgeStyle(row.item.security_status)"
+										:title="row.item.security_levels"
+									>{{ row.item.security }}</span>
+								</template>
+							</Datatable>
 						</div>
 
 						<!-- To integrate a specific slot for plugin -->
@@ -68,6 +79,10 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
+import { LEVELS, LEVEL_COLORS } from "@/utils/security"
+
+// vulnerability columns, read from /vulnerabilities/asset-summary/ for the page shown
+const SECURITY_COLUMNS = ["security", "cves", "cves_fixable"]
 
 export default {
 	name: "Assets",
@@ -87,6 +102,9 @@ export default {
 
 			candelete: false,
 			hiddenfields: ["id", "uuid", "template", "agent", "is_template_forced"],
+			// computed for the page shown: the server cannot sort on them
+			pagecolumns: ["compliance", "eol"],
+			canviewsecurity: false,
 
 			query: {
 				limit: localStorage.getItem("perPage") ? Number(localStorage.getItem("perPage")) : 5,
@@ -120,6 +138,10 @@ export default {
 			return
 		}
 		this.candelete = hasPermission("inventory_base_delete_inventorybase")
+		this.canviewsecurity = hasPermission("security_view_vulnerability")
+		if (this.canviewsecurity) {
+			this.pagecolumns.push(...SECURITY_COLUMNS)
+		}
 
 		// Data init
 		await this.loadInitial()
@@ -147,6 +169,9 @@ export default {
 				// Add compliance and EOL columns at the end
 				this.rowheader.push('compliance')
 				this.rowheader.push('eol')
+				if (this.canviewsecurity) {
+					this.rowheader.push(...SECURITY_COLUMNS)
+				}
 
 				// Get virtual columns
 				this.baserowheader = [...this.rowheader]
@@ -279,6 +304,10 @@ export default {
 					})
 				}
 
+				if (this.canviewsecurity) {
+					await this.addSecurity(results)
+				}
+
 				this.rowdata = results
 			} catch (e) {
 				this.errormsg = e?.response?.data?.error || e?.message || String(e)
@@ -286,6 +315,46 @@ export default {
 			} finally {
 				this.isbusy = false
 			}
+		},
+
+		// Vulnerability status and counts of the machines of the page
+		async addSecurity(results) {
+			const map = {}
+			try {
+				// at most 500 machines per call
+				for (let i = 0; i < results.length; i += 500) {
+					const ids = results.slice(i, i + 500).map((asset) => asset.id).join(",")
+					const summaries = await this.$api.generic.get("vulnerabilities/asset-summary/", {}, { asset__in: ids })
+					summaries.forEach((summary) => { map[summary.asset] = summary })
+				}
+			} catch {
+				// the columns stay empty, the table still shows
+			}
+			results.forEach((asset) => {
+				const summary = map[asset.id]
+				asset.security_status = summary?.status || ""
+				asset.security = summary ? this.securityLabel(summary.status) : ""
+				asset.cves = summary ? summary.cves : ""
+				asset.cves_fixable = summary ? summary.cves_fixable : ""
+				asset.security_levels = summary?.levels
+					? LEVELS.map((level) => `${this.$t("security.level_" + level)} : ${summary.levels[level] || 0}`).join("\n")
+					: null
+			})
+		},
+		securityLabel(status) {
+			const key = "security.asset_status_" + status
+			return this.$te(key) ? this.$t(key) : status
+		},
+		// a vulnerable machine takes the colour of its worst CVE, as the level badges
+		securityBadgeStyle(status) {
+			return LEVELS.includes(status) ? { backgroundColor: LEVEL_COLORS[status], color: "#ffffff" } : null
+		},
+		securityBadgeClass(status) {
+			return {
+				not_vulnerable: "bg-green-lt",
+				not_scanned: "bg-orange-lt",
+				excluded: "bg-secondary-lt",
+			}[status] || ""
 		},
 
 		async reloadDatatable() {
