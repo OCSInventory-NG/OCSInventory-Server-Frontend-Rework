@@ -84,7 +84,7 @@ export function shortSummary(text) {
 	return text.slice(0, SUMMARY_LENGTH).trimEnd() + "…"
 }
 
-// Opens the multi-criteria search on the machines matching these criteria.
+// Opens the multi-criteria search, in a new tab, on the machines matching these criteria.
 // The search page runs the stored search when it opens with useSavedSearch set
 export function openMultisearch(router, criteria) {
 	const group = criteria.map((criterion, index) => ({
@@ -95,7 +95,7 @@ export function openMultisearch(router, criteria) {
 	}))
 	localStorage.setItem("multisearch", JSON.stringify([group]))
 	localStorage.setItem("useSavedSearch", "true")
-	router.push("/inventory/multisearch")
+	window.open(router.resolve("/inventory/multisearch").href, "_blank", "noopener")
 }
 
 // The machines where a vulnerability is open
