@@ -18,7 +18,7 @@
 				>
 					<b-col cols="1">
 						<v-select
-							:id="'link'+masterindex+'0'"
+							:id="`link-${masterindex}-0`"
 							v-model="datavalues[masterindex][0].link"
 							:options="linkopt"
 							:reduce="text => text.value"
@@ -60,7 +60,7 @@
 							>
 								<b-form-group>
 									<v-select
-										:id="'link'+masterindex+index"
+										:id="`link-${masterindex}-${index}`"
 										v-model="datavalues[masterindex][index].link"
 										:options="linkopt"
 										:reduce="text => text.value"
@@ -74,7 +74,7 @@
 							<b-col>
 								<b-form-group>
 									<v-select
-										:id="'route'+masterindex+index"
+										:id="`route-${masterindex}-${index}`"
 										v-model="input.route"
 										:options="routeopt"
 										:reduce="text => text.value"
@@ -88,7 +88,7 @@
 							</b-col>
 							<b-col v-if="input.object == 'inventory_sections'">
 								<v-select
-									:id="'template'+masterindex+index"
+									:id="`template-${masterindex}-${index}`"
 									v-model="input.template"
 									:options="(loadingtemplate || templateopt[masterindex] == undefined) ?
 										[] : templateopt[masterindex][index]"
@@ -112,7 +112,7 @@
 							</b-col>
 							<b-col v-if="input.object == 'inventory_sections'">
 								<v-select
-									:id="'section'+masterindex+index"
+									:id="`section-${masterindex}-${index}`"
 									v-model="input.section"
 									:options="(loadingsection || sectionopt[masterindex] == undefined) ?
 										[] : sectionopt[masterindex][index]"
@@ -137,7 +137,7 @@
 							<b-col>
 								<b-form-group>
 									<v-select
-										:id="'field'+masterindex+index"
+										:id="`field-${masterindex}-${index}`"
 										v-model="input.field"
 										:options="(fieldopt[masterindex]) ?
 											fieldopt[masterindex][index] : []"
@@ -163,7 +163,7 @@
 							<b-col cols="2">
 								<b-form-group>
 									<v-select
-										:id="'operator'+masterindex+index"
+										:id="`operator-${masterindex}-${index}`"
 										v-model="input.operator"
 										:options="operatoropt[input.fieldtype]"
 										:reduce="text => text.value"
@@ -187,7 +187,7 @@
 								<b-form-group>
 									<b-form-input
 										v-if="!selectfield.includes(input.fieldtype)"
-										:id="'value'+masterindex+index"
+										:id="`value-${masterindex}-${index}`"
 										v-model="input.value"
 										:type="inputype[input.fieldtype]"
 										:step="input.fieldtype === 'number' ? 'any' : null"
@@ -196,7 +196,7 @@
 									/>
 									<div v-else>
 										<v-select
-											:id="'value'+masterindex+index"
+											:id="`value-${masterindex}-${index}`"
 											v-model="input.value"
 											:options="valueOptions(input, masterindex, index)"
 											:reduce="text => text.value"
@@ -224,7 +224,7 @@
 							>
 								<b-form-group>
 									<b-button
-										:id="'addfield'+masterindex+index"
+										:id="`addfield-${masterindex}-${index}`"
 										variant="primary"
 										class="form-control"
 										:title="$t('search.addquerytogroup')"
@@ -243,7 +243,7 @@
 							>
 								<b-form-group>
 									<b-button
-										:id="'removefield'+masterindex+index"
+										:id="`removefield-${masterindex}-${index}`"
 										variant="danger"
 										class="form-control"
 										:title="$t('search.removequeryfromgroup')"
