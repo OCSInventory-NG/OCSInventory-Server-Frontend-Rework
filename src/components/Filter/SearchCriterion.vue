@@ -113,6 +113,7 @@
 				:model-value="criterion.value"
 				:type="INPUT_TYPES[criterion.fieldtype]"
 				:step="criterion.fieldtype === 'number' ? 'any' : null"
+				:required="criterion.fieldtype !== 'string'"
 				class="search-criterion-input"
 				:disabled="disabled"
 				@update:model-value="set({ value: $event })"
