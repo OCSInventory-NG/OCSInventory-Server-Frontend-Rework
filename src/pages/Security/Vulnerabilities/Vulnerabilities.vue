@@ -27,6 +27,7 @@
 							<!-- Counters of the list; a click filters on the tile -->
 							<StatTiles
 								:tiles="tiles"
+								:loading="countsLoading"
 								clickable
 								compact
 								@select="selectTile"
@@ -203,6 +204,7 @@ export default {
 			// counters of the tiles, read for the platform and the search
 			counts: {},
 			countsKey: null,
+			countsLoading: true,
 			sources: [],
 			// null while the coverage is not read
 			unchecked: null,
@@ -405,6 +407,7 @@ export default {
 			const key = JSON.stringify(base)
 			if (key === this.countsKey) return
 			this.countsKey = key
+			this.countsLoading = true
 			try {
 				const summary = await this.$api.generic.get("vulnerabilities/summary/", base)
 				if (key !== this.countsKey) return
@@ -419,6 +422,9 @@ export default {
 			} catch {
 				// tiles stay empty, the list shows its own error
 				this.counts = {}
+			} finally {
+				// an older answer leaves the loader to the newer one
+				if (key === this.countsKey) this.countsLoading = false
 			}
 		},
 

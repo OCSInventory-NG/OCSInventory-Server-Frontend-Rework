@@ -3,6 +3,7 @@
 	<div
 		class="stat-tiles mb-3"
 		:class="{ 'stat-tiles-compact': compact }"
+		:aria-busy="loading ? 'true' : null"
 	>
 		<div
 			v-for="tile in tiles"
@@ -24,7 +25,16 @@
 				>
 					{{ tile.label }}
 				</div>
+				<!-- counters on their way: a glowing bar where the number comes -->
 				<div
+					v-if="loading"
+					class="stat-tile-loader placeholder-glow"
+					:style="tile.color ? { color: tile.color } : null"
+				>
+					<span class="placeholder" />
+				</div>
+				<div
+					v-else
 					:class="[tile.small ? 'stat-tile-small' : 'h3 mb-0', tile.warn ? 'text-warning' : '']"
 					:style="tile.color && !tile.small ? { color: tile.color } : null"
 				>
@@ -53,6 +63,8 @@ export default {
 		clickable: { type: Boolean, default: false },
 		// narrower tiles, for a longer row
 		compact: { type: Boolean, default: false },
+		// the values are being read: a loader takes their place
+		loading: { type: Boolean, default: false },
 	},
 	emits: ["select"],
 	methods: {
@@ -92,5 +104,19 @@ export default {
 
 .stat-tile-small {
 	font-weight: 600;
+}
+
+/* as tall as an h3 value, so the tile keeps its size */
+.stat-tile-loader {
+	align-items: center;
+	display: flex;
+	height: 1.75rem;
+	justify-content: center;
+}
+
+.stat-tile-loader .placeholder {
+	border-radius: 4px;
+	height: 1rem;
+	width: 2.5rem;
 }
 </style>
