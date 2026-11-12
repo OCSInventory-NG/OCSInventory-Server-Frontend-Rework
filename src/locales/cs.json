@@ -1380,5 +1380,22 @@
     "type_to_search": "Zadejte alespoň 2 znaky",
     "unknown_platform": "Zařízení s neznámou platformou",
     "versions": "Verze"
+  },
+  "vulnerability_search": {
+    "cves": "Počet CVE",
+    "cves_fixable": "CVE s opravou",
+    "cvss_score": "Skóre CVSS",
+    "epss": "EPSS (0 až 1)",
+    "first_seen": "První zjištění",
+    "fix_available": "Oprava k dispozici",
+    "fixed_version": "Opravená verze",
+    "kev": "Zneužívaná (KEV)",
+    "level": "Závažnost",
+    "route_security": "Zabezpečení zařízení",
+    "route_vulnerabilities": "Zranitelnosti (otevřené CVE)",
+    "software_name": "Software",
+    "status": "Stav zabezpečení",
+    "version": "Verze",
+    "vuln_id": "ID zranitelnosti"
   }
 }

@@ -190,6 +190,7 @@
 										:id="'value'+masterindex+index"
 										v-model="input.value"
 										:type="inputype[input.fieldtype]"
+										:step="input.fieldtype === 'number' ? 'any' : null"
 										class="mb-3"
 										:disabled="disableforgroup"
 									/>
@@ -197,14 +198,12 @@
 										<v-select
 											:id="'value'+masterindex+index"
 											v-model="input.value"
-											:options="(input.fieldtype == 'choice') ?
-												scope : (adminopt[masterindex]) ?
-													adminopt[masterindex][index] : []"
+											:options="valueOptions(input, masterindex, index)"
 											:reduce="text => text.value"
 											:clearable="false"
 											label="text"
 											class="mb-3 ocs-select"
-											:loading="loadingadmin"
+											:loading="loadingadmin && !['enum', 'yesno'].includes(input.fieldtype)"
 											:disabled="disableforgroup"
 										>
 											<template #search="{attributes, events}">
@@ -307,6 +306,35 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
+import { LEVELS } from "@/utils/security"
+
+const SECURITY_FIELD_TYPES = ["number", "date", "enum", "yesno"]
+
+// Security criteria: no OPTIONS route describes them, the fields are listed here.
+// "vulnerabilities" = one open CVE of the machine, "security" = the machine as a whole
+const SECURITY_ROUTES = {
+	vulnerabilities: [
+		{ value: "vuln_id", fieldtype: "string" },
+		{ value: "level", fieldtype: "enum", choices: LEVELS, labelkey: "security.level_" },
+		{ value: "cvss_score", fieldtype: "number" },
+		{ value: "epss", fieldtype: "number" },
+		{ value: "kev", fieldtype: "yesno" },
+		{ value: "fix_available", fieldtype: "yesno" },
+		{ value: "software_name", fieldtype: "string" },
+		{ value: "version", fieldtype: "string" },
+		{ value: "first_seen", fieldtype: "date" },
+	],
+	security: [
+		{
+			value: "status",
+			fieldtype: "enum",
+			choices: ["critical", "high", "medium", "low", "unknown", "not_vulnerable", "not_scanned", "excluded"],
+			labelkey: "security.asset_status_",
+		},
+		{ value: "cves", fieldtype: "number" },
+		{ value: "cves_fixable", fieldtype: "number" },
+	],
+}
 
 export default {
 	name: 'Search',
@@ -349,6 +377,8 @@ export default {
 				"templates": "inventory_sections",
 				"snmp/scanner": "snmpscanner",
 				"software_dictionary": "software_dictionary_entries",
+				"vulnerabilities": "vulnerabilities",
+				"security": "security",
 			},
 			fieldopt: [],
 			operatoropt: {},
@@ -365,9 +395,11 @@ export default {
 			inputype: {
 				"string": "text",
 				"integer": "number",
-				"datetime": "datetime-local"
+				"datetime": "datetime-local",
+				"number": "number",
+				"date": "date",
 			},
-			selectfield: ["select", "checkbox", "choice"],
+			selectfield: ["select", "checkbox", "choice", "enum", "yesno"],
 			excludefield: ["id", "asset", "package", "installation_number", "identity_status", "identity_product", "identity_identifier"],
 			scope: [],
 
@@ -459,6 +491,13 @@ export default {
 				{ value: "snmp/scanner", text: this.$t("network.snmpscanner") },
 				{ value: "software_dictionary", text: this.$t("title.software_dictionary") },
 			]
+			// without this right the search answers 403
+			if (hasPermission("security_view_vulnerability")) {
+				this.routeopt.push(
+					{ value: "vulnerabilities", text: this.$t("vulnerability_search.route_vulnerabilities") },
+					{ value: "security", text: this.$t("vulnerability_search.route_security") },
+				)
+			}
 			this.routeopt.sort((a, b) => (a.text > b.text ? 1 : (b.text > a.text ? -1 : 0)))
 
 			this.operatoropt = {
@@ -490,7 +529,27 @@ export default {
 				],
 				"choice": [
 					{ value: "iexact", text: this.$t("search.iexact") },
-				]
+				],
+				// security criteria: numbers and enums compare exactly, dates by range
+				"number": [
+					{ value: "exact", text: this.$t("search.iexact") },
+					{ value: "gt", text: this.$t("search.gt") },
+					{ value: "gte", text: this.$t("search.gte") },
+					{ value: "lt", text: this.$t("search.lt") },
+					{ value: "lte", text: this.$t("search.lte") }
+				],
+				"date": [
+					{ value: "gt", text: this.$t("search.gt") },
+					{ value: "gte", text: this.$t("search.gte") },
+					{ value: "lt", text: this.$t("search.lt") },
+					{ value: "lte", text: this.$t("search.lte") }
+				],
+				"enum": [
+					{ value: "exact", text: this.$t("search.iexact") },
+				],
+				"yesno": [
+					{ value: "exact", text: this.$t("search.iexact") },
+				],
 			}
 
 			this.linkopt = [
@@ -551,6 +610,7 @@ export default {
 			if (component === "asset") component = "inventory"
 			if (component === "snmp") component = "network"
 			if (component === "software_dictionary") component = "software"
+			if (SECURITY_ROUTES[component]) component = "vulnerability_search"
 			return component
 		},
 
@@ -593,6 +653,14 @@ export default {
 
 				if (section) {
 					await this.handleSectionFields(route, masterindex, index)
+					return
+				}
+
+				if (SECURITY_ROUTES[route]) {
+					this.cleanupTemplateSection(masterindex, index)
+					this.fieldopt[masterindex][index] = SECURITY_ROUTES[route]
+						.map((field) => ({ ...field, text: this.$t(`vulnerability_search.${field.value}`) }))
+						.sort(this.sortByText)
 					return
 				}
 
@@ -782,6 +850,12 @@ export default {
 				}
 			}
 
+			// a security criterion only takes its own operators
+			const operators = SECURITY_FIELD_TYPES.includes(input.fieldtype) ? this.operatoropt[input.fieldtype] : null
+			if (operators && !operators.some((operator) => operator.value === input.operator)) {
+				input.operator = operators[0].value
+			}
+
 			if (input.fieldtype === "select" || input.fieldtype === "checkbox") {
 				try {
 					this.loadingadmin = true
@@ -806,6 +880,22 @@ export default {
 					this.loadingadmin = false
 				}
 			}
+		},
+
+		// values offered by a select: account info values, scopes, security enums
+		valueOptions(input, masterindex, index) {
+			if (input.fieldtype === "choice") return this.scope
+			if (input.fieldtype === "yesno") {
+				return [
+					{ value: "yes", text: this.$t("generic.yes") },
+					{ value: "no", text: this.$t("generic.no") },
+				]
+			}
+			if (input.fieldtype === "enum") {
+				const field = (this.fieldopt?.[masterindex]?.[index] || []).find((element) => element.value === input.field)
+				return (field?.choices || []).map((choice) => ({ value: choice, text: this.$t(field.labelkey + choice) }))
+			}
+			return this.adminopt?.[masterindex]?.[index] || []
 		},
 
 		useSaveSearch(search) {

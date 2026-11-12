@@ -1409,5 +1409,22 @@
     "save": "Sauvegarder le layout",
     "saveas": "Sauvegarder en tant que nouveau layout",
     "savelayout": "Sauvegarder le layout"
+  },
+  "vulnerability_search": {
+    "cves": "Nombre de CVE",
+    "cves_fixable": "CVE avec correctif",
+    "cvss_score": "Score CVSS",
+    "epss": "EPSS (0 à 1)",
+    "first_seen": "Première détection",
+    "fix_available": "Correctif disponible",
+    "fixed_version": "Version corrigée",
+    "kev": "Exploitée (KEV)",
+    "level": "Gravité",
+    "route_security": "Sécurité de la machine",
+    "route_vulnerabilities": "Vulnérabilités (CVE ouvertes)",
+    "software_name": "Logiciel",
+    "status": "Statut de sécurité",
+    "version": "Version",
+    "vuln_id": "Identifiant de la vulnérabilité"
   }
 }

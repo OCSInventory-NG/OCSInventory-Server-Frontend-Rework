@@ -1409,5 +1409,22 @@
     "save": "Save the layout",
     "saveas": "Save as new layout",
     "savelayout": "Save the layout"
+  },
+  "vulnerability_search": {
+    "cves": "CVE count",
+    "cves_fixable": "CVEs with a fix",
+    "cvss_score": "CVSS score",
+    "epss": "EPSS (0 to 1)",
+    "first_seen": "First seen",
+    "fix_available": "Fix available",
+    "fixed_version": "Fixed version",
+    "kev": "Exploited (KEV)",
+    "level": "Severity",
+    "route_security": "Machine security",
+    "route_vulnerabilities": "Vulnerabilities (open CVEs)",
+    "software_name": "Software",
+    "status": "Security status",
+    "version": "Version",
+    "vuln_id": "Vulnerability ID"
   }
 }
