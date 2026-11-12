@@ -6,14 +6,10 @@
 				cols="1"
 			>
 				<b-form-group>
-					<v-select
+					<SearchSelect
 						:id="`link-${idsuffix}`"
 						:model-value="criterion.link"
 						:options="linkopt"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="mb-3 ocs-select"
 						:disabled="disabled"
 						@update:model-value="set({ link: $event })"
 					/>
@@ -21,118 +17,76 @@
 			</b-col>
 			<b-col>
 				<b-form-group>
-					<v-select
+					<SearchSelect
 						:id="`route-${idsuffix}`"
 						:model-value="criterion.route"
 						:options="routeopt"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="mb-3 ocs-select"
 						:disabled="disabled"
 						@update:model-value="selectRoute"
 					/>
 				</b-form-group>
 			</b-col>
 			<b-col v-if="criterion.object == 'inventory_sections'">
-				<v-select
+				<SearchSelect
 					:id="`template-${idsuffix}`"
 					:model-value="criterion.template"
 					:options="templateopt"
-					:reduce="text => text.value"
-					:clearable="false"
-					label="text"
-					class="mb-3 ocs-select"
-					:disabled="disabled"
 					:loading="loadingtemplates"
+					:disabled="disabled"
+					required
 					@update:model-value="selectTemplate"
-				>
-					<template #search="{attributes, events}">
-						<input
-							class="vs__search"
-							:required="!criterion.template"
-							v-bind="attributes"
-							v-on="events"
-						>
-					</template>
-				</v-select>
+				/>
 			</b-col>
 			<b-col v-if="criterion.object == 'inventory_sections'">
-				<v-select
+				<SearchSelect
 					:id="`section-${idsuffix}`"
 					:model-value="criterion.section"
 					:options="sectionopt"
-					:reduce="text => text.value"
-					:clearable="false"
-					label="text"
-					class="mb-3 ocs-select"
-					:disabled="disabled"
 					:loading="loadingsections"
+					:disabled="disabled"
+					required
 					@update:model-value="selectSection"
-				>
-					<template #search="{attributes, events}">
-						<input
-							class="vs__search"
-							:required="!criterion.section"
-							v-bind="attributes"
-							v-on="events"
-						>
-					</template>
-				</v-select>
+				/>
 			</b-col>
 			<b-col>
 				<b-form-group>
-					<v-select
+					<SearchSelect
 						:id="`field-${idsuffix}`"
 						:model-value="criterion.field"
 						:options="fieldopt"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="mb-3 ocs-select"
-						:disabled="disabled"
 						:loading="loadingfields"
+						:disabled="disabled"
+						required
 						@update:model-value="selectField"
-					>
-						<template #search="{attributes, events}">
-							<input
-								class="vs__search"
-								:required="!criterion.field"
-								v-bind="attributes"
-								v-on="events"
-							>
-						</template>
-					</v-select>
+					/>
 				</b-form-group>
 			</b-col>
 			<b-col cols="2">
 				<b-form-group>
-					<v-select
+					<SearchSelect
 						:id="`operator-${idsuffix}`"
 						:model-value="criterion.operator"
 						:options="operatoropt[criterion.fieldtype]"
-						:reduce="text => text.value"
-						:clearable="false"
-						label="text"
-						class="mb-3 ocs-select"
 						:disabled="disabled"
+						required
 						@update:model-value="set({ operator: $event })"
-					>
-						<template #search="{attributes, events}">
-							<input
-								class="vs__search"
-								:required="!criterion.operator"
-								v-bind="attributes"
-								v-on="events"
-							>
-						</template>
-					</v-select>
+					/>
 				</b-form-group>
 			</b-col>
 			<b-col cols="3">
 				<b-form-group>
+					<SearchSelect
+						v-if="SELECT_TYPES.includes(criterion.fieldtype)"
+						:id="`value-${idsuffix}`"
+						:model-value="criterion.value"
+						:options="valueOptions"
+						:loading="loadingvalues"
+						:disabled="disabled"
+						required
+						@update:model-value="set({ value: $event })"
+					/>
 					<b-form-input
-						v-if="!SELECT_TYPES.includes(criterion.fieldtype)"
+						v-else
 						:id="`value-${idsuffix}`"
 						:model-value="criterion.value"
 						:type="INPUT_TYPES[criterion.fieldtype]"
@@ -141,29 +95,6 @@
 						:disabled="disabled"
 						@update:model-value="set({ value: $event })"
 					/>
-					<div v-else>
-						<v-select
-							:id="`value-${idsuffix}`"
-							:model-value="criterion.value"
-							:options="valueOptions"
-							:reduce="text => text.value"
-							:clearable="false"
-							label="text"
-							class="mb-3 ocs-select"
-							:loading="loadingvalues"
-							:disabled="disabled"
-							@update:model-value="set({ value: $event })"
-						>
-							<template #search="{attributes, events}">
-								<input
-									class="vs__search"
-									:required="!criterion.value"
-									v-bind="attributes"
-									v-on="events"
-								>
-							</template>
-						</v-select>
-					</div>
 				</b-form-group>
 			</b-col>
 			<b-col

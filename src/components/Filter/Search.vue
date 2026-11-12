@@ -17,14 +17,10 @@
 					class="mb-2"
 				>
 					<b-col cols="1">
-						<v-select
+						<SearchSelect
 							:id="`link-${masterindex}-0`"
 							v-model="masterinput[0].link"
 							:options="linkopt"
-							:reduce="text => text.value"
-							:clearable="false"
-							label="text"
-							class="mb-3 ocs-select"
 							:disabled="disableforgroup"
 						/>
 					</b-col>
