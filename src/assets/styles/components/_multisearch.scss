@@ -28,13 +28,11 @@
   }
 }
 
-.search-select {
-  margin-top: 0;
-}
-
-// inputs as tall as the selects
+// inputs as tall as the selects, which take the datatable toolbar look
 .search-criterion-input {
-  height: 40px;
+  font-size: 0.875rem;
+  height: 36px;
+  margin: 0;
 }
 
 .search-criterion-actions {
@@ -42,8 +40,9 @@
   gap: 8px;
 
   .btn {
-    height: 40px;
-    width: 44px;
+    height: 36px;
+    padding: 0;
+    width: 36px;
   }
 }
 
