@@ -20,6 +20,7 @@
 						<SearchSelect
 							:id="`link-${masterindex}-0`"
 							v-model="masterinput[0].link"
+							:label="$t('search.criterion_link')"
 							:options="linkopt"
 							:disabled="disableforgroup"
 						/>
@@ -35,10 +36,11 @@
 							size="sm"
 							variant="outline-danger"
 							:title="$t('search.removegroup')"
+							:aria-label="$t('search.removegroup')"
 							@click="removeGroup(masterindex)"
 						>
 							<font-awesome-icon
-								:icon="['fas', 'xmark']"
+								:icon="['fas', 'trash-can']"
 								size="1x"
 							/>
 						</b-button>

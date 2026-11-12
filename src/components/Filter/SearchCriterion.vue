@@ -8,6 +8,7 @@
 				<b-form-group>
 					<SearchSelect
 						:id="`link-${idsuffix}`"
+						:label="$t('search.criterion_link')"
 						:model-value="criterion.link"
 						:options="linkopt"
 						:disabled="disabled"
@@ -19,6 +20,7 @@
 				<b-form-group>
 					<SearchSelect
 						:id="`route-${idsuffix}`"
+						:label="$t('search.criterion_type')"
 						:model-value="criterion.route"
 						:options="routeopt"
 						:disabled="disabled"
@@ -29,6 +31,7 @@
 			<b-col v-if="criterion.object == 'inventory_sections'">
 				<SearchSelect
 					:id="`template-${idsuffix}`"
+					:label="$t('search.criterion_template')"
 					:model-value="criterion.template"
 					:options="templateopt"
 					:loading="loadingtemplates"
@@ -40,6 +43,7 @@
 			<b-col v-if="criterion.object == 'inventory_sections'">
 				<SearchSelect
 					:id="`section-${idsuffix}`"
+					:label="$t('search.criterion_section')"
 					:model-value="criterion.section"
 					:options="sectionopt"
 					:loading="loadingsections"
@@ -52,6 +56,7 @@
 				<b-form-group>
 					<SearchSelect
 						:id="`field-${idsuffix}`"
+						:label="$t('search.criterion_field')"
 						:model-value="criterion.field"
 						:options="fieldopt"
 						:loading="loadingfields"
@@ -65,6 +70,7 @@
 				<b-form-group>
 					<SearchSelect
 						:id="`operator-${idsuffix}`"
+						:label="$t('search.criterion_operator')"
 						:model-value="criterion.operator"
 						:options="operatoropt[criterion.fieldtype]"
 						:disabled="disabled"
@@ -78,6 +84,7 @@
 					<SearchSelect
 						v-if="SELECT_TYPES.includes(criterion.fieldtype)"
 						:id="`value-${idsuffix}`"
+						:label="$t('search.criterion_value')"
 						:model-value="criterion.value"
 						:options="valueOptions"
 						:loading="loadingvalues"
@@ -88,6 +95,8 @@
 					<b-form-input
 						v-else
 						:id="`value-${idsuffix}`"
+						:placeholder="$t('search.criterion_value')"
+						:aria-label="$t('search.criterion_value')"
 						:model-value="criterion.value"
 						:type="INPUT_TYPES[criterion.fieldtype]"
 						:step="criterion.fieldtype === 'number' ? 'any' : null"
@@ -107,6 +116,7 @@
 						variant="primary"
 						class="form-control"
 						:title="$t('search.addquerytogroup')"
+						:aria-label="$t('search.addquerytogroup')"
 						@click="$emit('add')"
 					>
 						<font-awesome-icon
@@ -126,6 +136,7 @@
 						variant="danger"
 						class="form-control"
 						:title="$t('search.removequeryfromgroup')"
+						:aria-label="$t('search.removequeryfromgroup')"
 						@click="$emit('remove')"
 					>
 						<font-awesome-icon

@@ -6,6 +6,7 @@
 		:clearable="false"
 		:loading="loading"
 		:disabled="disabled"
+		:placeholder="label"
 		label="text"
 		class="mb-3 ocs-select"
 		@update:model-value="$emit('update:modelValue', $event)"
@@ -15,6 +16,7 @@
 			<input
 				class="vs__search"
 				:required="required && isEmpty"
+				:aria-label="label"
 				v-bind="attributes"
 				v-on="events"
 			>
@@ -32,6 +34,8 @@ export default {
 		required: { type: Boolean, default: false },
 		loading: { type: Boolean, default: false },
 		disabled: { type: Boolean, default: false },
+		// what the select chooses: placeholder and name read by screen readers
+		label: { type: String, default: null },
 	},
 	emits: ["update:modelValue"],
 	computed: {
