@@ -12,15 +12,13 @@
 </template>
 
 <script>
+import { supportedLocales } from '@/i18n'
+
 export default {
 	name: 'LocaleSwitcher',
 	data() {
 		return {
-			supportedLocales: [
-				{value: 'fr', text: 'Français'},
-				{value: 'en', text: 'English'},
-				{value: 'cs', text: 'Čeština'},
-			]
+			supportedLocales
 		}
 	},
 	methods: {
