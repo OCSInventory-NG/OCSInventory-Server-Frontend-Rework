@@ -73,39 +73,6 @@
   width: 80px;
 }
 
-// rows per page: drawn as the Show / Hide button next to it
-.ocs-toolbar #per-page-select .vs__dropdown-toggle {
-  border-color: var(--tblr-border-color) !important;
-  border-radius: 6px;
-  box-shadow: 0 1px 1px 0 rgba(24, 36, 51, 0.06);
-}
-
-.ocs-toolbar #per-page-select .vs__selected-options {
-  padding: 0 4px 0 12px;
-}
-
-.ocs-toolbar #per-page-select .vs__selected {
-  color: $gray-700;
-  font-weight: 500;
-}
-
-.ocs-toolbar #per-page-select:hover .vs__dropdown-toggle {
-  border-color: var(--tblr-border-active-color) !important;
-}
-
-.ocs-toolbar #per-page-select:hover .vs__selected {
-  color: $gray-900;
-}
-
-.ocs-toolbar #per-page-select .vs__open-indicator {
-  fill: $gray-700;
-  transform: scale(0.55);
-}
-
-.ocs-toolbar #per-page-select.vs--open .vs__open-indicator {
-  transform: rotate(180deg) scale(0.55);
-}
-
 // vue-select draws its own toggle, line it up on the buttons.
 // The criteria of the multi-criteria search (.search-select) look the same
 .ocs-toolbar .v-select .vs__dropdown-toggle,
@@ -137,8 +104,9 @@
   font-size: 0.875rem;
 }
 
+// an empty criterion reads apart from a filled one
 .search-select .vs__search::placeholder {
-  color: $gray-700;
+  color: $gray-500;
 }
 
 // same hover as the buttons, the global vue-select rules set both !important
@@ -164,6 +132,47 @@
 .ocs-toolbar .v-select.vs--open .vs__open-indicator,
 .search-select.vs--open .vs__open-indicator {
   transform: rotate(180deg) scale(0.7);
+}
+
+// rows per page and the search criteria: drawn as the Show / Hide button.
+// After the rules above, which they refine
+.ocs-toolbar #per-page-select .vs__dropdown-toggle,
+.search-select .vs__dropdown-toggle {
+  border-color: var(--tblr-border-color) !important;
+  border-radius: 6px;
+  box-shadow: 0 1px 1px 0 rgba(24, 36, 51, 0.06);
+}
+
+.ocs-toolbar #per-page-select .vs__selected-options,
+.search-select .vs__selected-options {
+  padding: 0 4px 0 12px;
+}
+
+.ocs-toolbar #per-page-select .vs__selected,
+.search-select .vs__selected {
+  color: $gray-700;
+  font-weight: 500;
+}
+
+.ocs-toolbar #per-page-select:hover .vs__dropdown-toggle,
+.search-select:not(.vs--disabled):hover .vs__dropdown-toggle {
+  border-color: var(--tblr-border-active-color) !important;
+}
+
+.ocs-toolbar #per-page-select:hover .vs__selected,
+.search-select:not(.vs--disabled):hover .vs__selected {
+  color: $gray-900;
+}
+
+.ocs-toolbar #per-page-select .vs__open-indicator,
+.search-select .vs__open-indicator {
+  fill: $gray-700;
+  transform: scale(0.55);
+}
+
+.ocs-toolbar #per-page-select.vs--open .vs__open-indicator,
+.search-select.vs--open .vs__open-indicator {
+  transform: rotate(180deg) scale(0.55);
 }
 
 @media (max-width: 767.98px) {

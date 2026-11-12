@@ -30,9 +30,24 @@
 
 // inputs as tall as the selects, which take the datatable toolbar look
 .search-criterion-input {
+  border-color: var(--tblr-border-color);
+  border-radius: 6px;
+  box-shadow: 0 1px 1px 0 rgba(24, 36, 51, 0.06);
+  color: $gray-700;
   font-size: 0.875rem;
+  font-weight: 500;
   height: 36px;
   margin: 0;
+  padding-left: 12px;
+
+  &::placeholder {
+    color: $gray-500;
+    font-weight: 400;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--tblr-border-active-color);
+  }
 }
 
 .search-criterion-actions {
