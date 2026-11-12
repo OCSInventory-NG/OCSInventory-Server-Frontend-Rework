@@ -37,7 +37,7 @@
 							:aria-label="$t('search.removegroup')"
 							@click="removeGroup(masterindex)"
 						>
-							<font-awesome-icon :icon="['fas', 'trash-can']" />
+							<font-awesome-icon :icon="['fas', 'xmark']" />
 						</b-button>
 					</div>
 
