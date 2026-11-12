@@ -8,7 +8,7 @@
 		:disabled="disabled"
 		:placeholder="label"
 		label="text"
-		class="ocs-select search-select"
+		class="search-select"
 		@update:model-value="$emit('update:modelValue', $event)"
 	>
 		<!-- the browser refuses the form while a required choice is empty -->
