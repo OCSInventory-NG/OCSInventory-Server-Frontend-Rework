@@ -84,6 +84,30 @@ export function shortSummary(text) {
 	return text.slice(0, SUMMARY_LENGTH).trimEnd() + "…"
 }
 
+// Opens the multi-criteria search on the machines matching these criteria.
+// The search page runs the stored search when it opens with useSavedSearch set
+export function openMultisearch(router, criteria) {
+	const group = criteria.map((criterion, index) => ({
+		link: index ? "AND" : "",
+		value: "",
+		...criterion,
+		route: criterion.object,
+	}))
+	localStorage.setItem("multisearch", JSON.stringify([group]))
+	localStorage.setItem("useSavedSearch", "true")
+	router.push("/inventory/multisearch")
+}
+
+// The machines where a vulnerability is open
+export function vulnerabilityMachinesCriteria(vulnId) {
+	return [{ object: "vulnerabilities", field: "vuln_id", fieldtype: "string", operator: "iexact", value: vulnId }]
+}
+
+// The machines with at least one open vulnerability
+export function vulnerableMachinesCriteria() {
+	return [{ object: "security", field: "cves", fieldtype: "number", operator: "gt", value: "0" }]
+}
+
 // List answers come paginated only when a limit is given
 export function asList(data) {
 	return Array.isArray(data) ? data : (data?.results || [])

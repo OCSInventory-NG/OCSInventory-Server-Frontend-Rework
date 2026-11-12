@@ -116,6 +116,22 @@
 										{{ $t('security.more_products', { count: row.item.product_count - row.item.products.length }) }}
 									</div>
 								</template>
+								<template #cell(machines)="{ row }">
+									<a
+										v-if="canmultisearch && row.item.machines"
+										href="#"
+										class="ocs-link text-nowrap"
+										:title="$t('security.see_in_multisearch')"
+										@click.prevent="openMachines(row.item.vuln_id)"
+									>
+										{{ row.item.machines }}
+										<font-awesome-icon
+											:icon="['fas', 'magnifying-glass']"
+											class="ms-1 small"
+										/>
+									</a>
+									<span v-else>{{ row.item.machines }}</span>
+								</template>
 								<template #cell(fix)="{ row }">
 									<VulnerabilityFix
 										:versions="row.item.fix_available ? row.item.fixed_versions : []"
@@ -139,7 +155,8 @@
 import { hasPermission } from "@/utils/permissions"
 import {
 	FAMILIES, LEVELS, LEVEL_COLORS, PRIORITY_CRITERIA,
-	apiErrorMessage, asList, formatDay, ratingLabel, shortSummary,
+	apiErrorMessage, asList, formatDay, openMultisearch, ratingLabel, shortSummary,
+	vulnerabilityMachinesCriteria, vulnerableMachinesCriteria,
 } from "@/utils/security"
 
 // The order chosen here lasts for the session, the settings give the default
@@ -189,6 +206,8 @@ export default {
 			sources: [],
 			// null while the coverage is not read
 			unchecked: null,
+			// the machine counters open the multi-criteria search
+			canmultisearch: hasPermission("inventory_base_view_inventorybase"),
 		}
 	},
 	computed: {
@@ -197,7 +216,15 @@ export default {
 			const noFilter = !this.filters.level && !this.filters.kev && !this.filters.fix
 			return [
 				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
-				{ key: "machines", label: this.$t("security.tile_machines"), value: count("machines"), color: "#1d273b", static: true },
+				// the search has no platform nor text criterion: only the whole fleet opens it
+				{
+					key: "machines",
+					label: this.$t("security.tile_machines"),
+					value: count("machines"),
+					color: "#1d273b",
+					static: !this.canmultisearch || !!this.filters.family || !!this.query.search || !this.counts.machines,
+					title: this.canmultisearch ? this.$t("security.see_in_multisearch") : null,
+				},
 				this.notCoveredTile,
 				// no tile for the unrated ones: the level filter still lists them
 				...LEVELS.filter((level) => level !== "unknown").map((level) => ({
@@ -299,6 +326,10 @@ export default {
 	methods: {
 		formatDay,
 
+		openMachines(vulnId) {
+			openMultisearch(this.$router, vulnerabilityMachinesCriteria(vulnId))
+		},
+
 		async reload() {
 			this.query = { ...this.query, offset: 0 }
 			this.pageResetKey += 1
@@ -393,7 +424,9 @@ export default {
 
 		// total clears the tile filters, the others toggle theirs
 		selectTile(key) {
-			if (key === "not_covered") {
+			if (key === "machines") {
+				openMultisearch(this.$router, vulnerableMachinesCriteria())
+			} else if (key === "not_covered") {
 				this.$router.push({ path: "/security/coverage", query: { tab: "machines", status: "not_covered" } })
 			} else if (key === "total") {
 				Object.assign(this.filters, { level: null, kev: null, fix: null })
