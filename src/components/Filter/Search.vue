@@ -28,7 +28,7 @@
 				<div class="multisearch-card">
 					<div
 						v-if="!disableforgroup && datavalues.length > 1"
-						class="text-end"
+						class="text-end mb-2"
 					>
 						<b-button
 							size="sm"
