@@ -83,6 +83,16 @@ import { LEVELS, LEVEL_COLORS } from "@/utils/security"
 
 // vulnerability columns, read from /vulnerabilities/asset-summary/ for the page shown
 const SECURITY_COLUMNS = ["security", "cves", "cves_fixable"]
+// the server sorts on them under another name
+const SECURITY_ORDERING = { security: "security_status", cves: "security_cves", cves_fixable: "security_cves_fixable" }
+
+// "-cves" -> "-security_cves"
+function serverOrdering(ordering) {
+	if (!ordering) return ordering
+	const desc = ordering.startsWith("-")
+	const key = desc ? ordering.slice(1) : ordering
+	return SECURITY_ORDERING[key] ? (desc ? "-" : "") + SECURITY_ORDERING[key] : ordering
+}
 
 export default {
 	name: "Assets",
@@ -139,9 +149,6 @@ export default {
 		}
 		this.candelete = hasPermission("inventory_base_delete_inventorybase")
 		this.canviewsecurity = hasPermission("security_view_vulnerability")
-		if (this.canviewsecurity) {
-			this.pagecolumns.push(...SECURITY_COLUMNS)
-		}
 
 		// Data init
 		await this.loadInitial()
@@ -226,7 +233,7 @@ export default {
 			this.isbusy = true
 			try {
 				const [assetsData, templates] = await Promise.all([
-					this.$api.generic.get("asset/bases/", query, this.virtualColParams()),
+					this.$api.generic.get("asset/bases/", { ...query, ordering: serverOrdering(query.ordering) }, this.virtualColParams()),
 					this.$api.generic.get("templates/"),
 				])
 
@@ -403,7 +410,7 @@ export default {
 		async exportAllAssets({ filter, ordering }) {
 			const allRows = []
 			const params = {
-				ordering: ordering,
+				ordering: serverOrdering(ordering),
 				search: filter,
 			}
 
