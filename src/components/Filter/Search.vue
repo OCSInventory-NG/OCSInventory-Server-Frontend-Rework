@@ -226,7 +226,7 @@
 									<b-button
 										:id="'addfield'+masterindex+index"
 										variant="primary"
-										class="d-none d-sm-inline-block form-control"
+										class="form-control"
 										:title="$t('search.addquerytogroup')"
 										@click="addField(masterindex, index, datavalues)"
 									>
@@ -245,7 +245,7 @@
 									<b-button
 										:id="'removefield'+masterindex+index"
 										variant="danger"
-										class="d-none d-sm-inline-block form-control"
+										class="form-control"
 										:title="$t('search.removequeryfromgroup')"
 										@click="removeField(masterindex, index, datavalues)"
 									>
