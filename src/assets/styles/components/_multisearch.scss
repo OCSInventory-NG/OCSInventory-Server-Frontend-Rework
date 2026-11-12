@@ -17,6 +17,11 @@
 .search-criterion {
   margin-bottom: 8px;
 
+  // the card padding alone below the last one, as above the first
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   // stacked below md: a line between two criteria
   @media (max-width: 767.98px) {
     border-bottom: 1px solid $gray-300;
@@ -24,6 +29,7 @@
 
     &:last-child {
       border-bottom: 0;
+      padding-bottom: 0;
     }
   }
 }
@@ -50,14 +56,17 @@
   }
 }
 
+// filled buttons look taller than the light framed fields: a bit smaller, centred on them
 .search-criterion-actions {
+  align-items: center;
   display: flex;
   gap: 8px;
+  height: 36px;
 
   .btn {
-    height: 36px;
+    height: 34px;
     padding: 0;
-    width: 36px;
+    width: 34px;
   }
 }
 
