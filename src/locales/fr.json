@@ -1092,6 +1092,7 @@
   },
   "software": {
     "addsoftwaremapping": "Ajouter un mapping logiciel",
+    "all_identities": "Toutes les identités",
     "architecture": "Architecture",
     "editsoftwaremapping": "Modifier un mapping logiciel",
     "identity_identifier": "Identifiant",

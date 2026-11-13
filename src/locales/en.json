@@ -1092,6 +1092,7 @@
   },
   "software": {
     "addsoftwaremapping": "Add software mapping",
+    "all_identities": "All identities",
     "architecture": "Architecture",
     "editsoftwaremapping": "Edit software mapping",
     "identity_identifier": "Identifier",

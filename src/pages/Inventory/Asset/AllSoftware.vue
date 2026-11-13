@@ -25,21 +25,6 @@
 						</div>
 
 						<div v-else>
-							<b-row class="mb-3">
-								<b-col
-									cols="12"
-									md="4"
-								>
-									<v-select
-										v-model="statusFilter"
-										:options="statusOptions"
-										:reduce="option => option.value"
-										:placeholder="$t('software.identity_status')"
-										label="text"
-									/>
-								</b-col>
-							</b-row>
-
 							<Datatable
 								id="all-software-datatable"
 								:rowdata="rowdata"
@@ -62,7 +47,19 @@
 								@export-all="exportAllSoftwares"
 								@reload-datatable="reloadDatatable"
 								@assets-search="assetsSearch"
-							/>
+							>
+								<template #toolbar>
+									<v-select
+										v-model="statusFilter"
+										:options="statusOptions"
+										:reduce="option => option.value"
+										:placeholder="$t('software.all_identities')"
+										:searchable="false"
+										label="text"
+										class="datatable-btn vuln-filter"
+									/>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>

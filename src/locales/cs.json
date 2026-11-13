@@ -809,6 +809,7 @@
   },
   "software": {
     "addsoftwaremapping": "Přidat mapování softwaru",
+    "all_identities": "Všechny identity",
     "editsoftwaremapping": "Upravit mapování softwaru",
     "major_version": "Hlavní verze",
     "minor_version": "Vedlejší verze",
