@@ -140,6 +140,7 @@
 								>
 									<IdentityReferenceTable
 										route="distro_releases"
+										app="software"
 										model="distrorelease"
 									/>
 								</b-tab>
@@ -233,7 +234,7 @@ export default {
 		this.cansearch = hasPermission("software_identity_view_cpeproduct")
 		this.canviewaliases = hasPermission("software_identity_view_cpealias")
 		this.canvieworigins = hasPermission("software_identity_view_packageorigin")
-		this.canviewreleases = hasPermission("software_identity_view_distrorelease")
+		this.canviewreleases = hasPermission("software_view_distrorelease")
 
 		await this.loadSummary()
 		this.loading = false
