@@ -4,7 +4,7 @@
 			:title="(!multiple) ?
 				$t('generic.deleteitem') : $t('generic.deleteselection')"
 			:class="'btn ' + customclass"
-			:disabled="disabled || viewOnly"
+			:disabled="disabled"
 			@click="refreshIds()"
 		>
 			<font-awesome-icon 
@@ -105,8 +105,6 @@
 </template>
 
 <script>
-import { hasPermission } from "@/utils/permissions"
-
 export default {
 	name: 'DeleteItemModal',
 	props: {
@@ -141,11 +139,6 @@ export default {
 			text: null,
 			
 			loadingdelete: false,
-		}
-	},
-	computed: {
-		viewOnly() {
-			return !hasPermission('template_change_template')
 		}
 	},
 	watch: {

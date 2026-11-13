@@ -60,10 +60,11 @@
 											@reload-template="reloadTemplate"
 											@reload-section="reloadSection"
 										/>
-										<delete-item-modal 
+										<delete-item-modal
 											:id="rowsection.id"
 											:name="rowsection.name"
 											parameter="sections"
+											:disabled="viewOnly"
 											@reload-template="reloadTemplate"
 										/>
 									</b-button-group>

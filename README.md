@@ -7,6 +7,7 @@ Welcome to the new administration console frontend for OCS Inventory.
 - [Introduction](#introduction)
 - [Production Use](#production-use)
 - [Development Setup](#development-setup)
+- [Adding a Language](#adding-a-language)
 
 ## Introduction
 
@@ -47,3 +48,11 @@ npm run lint
 ### Customize Configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
+## Adding a Language
+
+Translations live in [`src/locales/`](src/locales/), one JSON file per language. To add a new language:
+
+1. Copy `src/locales/en.json` to `src/locales/<code>.json`, where `<code>` is a language tag such as `de`, `es` or `pt-BR`.
+2. Translate the values (keep the keys unchanged).
+
+That's it: the file is loaded automatically and the language appears in the language selectors, labelled with its own name (e.g. "Deutsch"). Missing keys fall back to English.
