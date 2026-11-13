@@ -109,6 +109,24 @@
 					>
 						{{ booleanLabel(field) }}
 					</b-form-checkbox>
+					<!-- known values offered, a new one can still be typed -->
+					<v-select
+						v-else-if="fieldoptions[field]"
+						:id="`reference-${field}`"
+						v-model="form[field]"
+						:options="suggestions(field)"
+						:placeholder="placeholders[field] || ''"
+						taggable
+					>
+						<template #search="{ attributes, events }">
+							<input
+								class="vs__search"
+								:required="meta[field]?.required && !form[field]"
+								v-bind="attributes"
+								v-on="events"
+							>
+						</template>
+					</v-select>
 					<b-form-select
 						v-else-if="meta[field]?.choices"
 						:id="`reference-${field}`"
@@ -166,6 +184,8 @@ export default {
 		placeholders: { type: Object, default: () => ({}) },
 		// rows that cannot be changed nor deleted: {field: value}
 		protectedrows: { type: Object, default: () => ({}) },
+		// values offered in a dropdown, by field: {field: [string]}
+		fieldoptions: { type: Object, default: () => ({}) },
 	},
 	data() {
 		return {
@@ -280,6 +300,10 @@ export default {
 		},
 		choiceOptions(field) {
 			return (this.meta[field].choices || []).map((choice) => ({ value: choice.value, text: choice.display_name }))
+		},
+		suggestions(field) {
+			const values = new Set(this.fieldoptions[field].filter(Boolean))
+			return [...values].sort((a, b) => a.localeCompare(b))
 		},
 		inputType(field) {
 			const type = this.fieldType(field)

@@ -129,6 +129,7 @@
 										model="packageorigin"
 										:booleanlabels="{ extended: $t('software_identity.extended_repo') }"
 										:badgefields="{ extended: 'bg-purple-lt' }"
+										:fieldoptions="originOptions"
 									/>
 								</b-tab>
 								<b-tab
@@ -155,6 +156,7 @@
 
 <script>
 import { hasPermission } from "@/utils/permissions"
+import { asList } from "@/utils/security"
 
 export default {
 	name: "SoftwareIdentity",
@@ -175,6 +177,7 @@ export default {
 			cpeKeyPattern: "[^:\\s]+:[^:\\s]+",
 
 			summary: { index: {}, counts: [], pending: 0, machines_unknown_platform: 0, origins: [] },
+			releases: [],
 			statuses: ["matched", "validated", "review", "none", "unsupported"],
 			decisionsKey: 0,
 			reviewKey: 0,
@@ -220,6 +223,16 @@ export default {
 				machines: row.machines,
 			}))
 		},
+		// the distributions already known; the origin name stays typed,
+		// a vendor repository must not be attached to a distribution by a click
+		originOptions() {
+			return {
+				distribution: [
+					...(this.summary.origins || []).map((row) => row.distribution),
+					...this.releases.map((row) => row.distribution),
+				],
+			}
+		},
 	},
 	async mounted() {
 		if (!hasPermission("software_identity_view_softwareidentity")) {
@@ -236,7 +249,7 @@ export default {
 		this.canvieworigins = hasPermission("software_identity_view_packageorigin")
 		this.canviewreleases = hasPermission("software_view_distrorelease")
 
-		await this.loadSummary()
+		await Promise.all([this.loadSummary(), this.loadReleases()])
 		this.loading = false
 	},
 	methods: {
@@ -246,6 +259,15 @@ export default {
 			} catch (e) {
 				this.errormsg = e?.response?.data?.error || e?.response?.data?.detail || e?.response?.data?.[0] || e?.message || String(e)
 				this.errored = true
+			}
+		},
+		// the distributions offered when an origin is declared
+		async loadReleases() {
+			if (!this.canvieworigins || !this.canviewreleases) return
+			try {
+				this.releases = asList(await this.$api.generic.get("distro_releases/"))
+			} catch {
+				// the origins seen on the machines are offered alone
 			}
 		},
 		async onDecided() {
