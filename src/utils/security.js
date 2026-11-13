@@ -1,0 +1,114 @@
+// Shared helpers of the security screens (vulnerabilities, coverage, exclusions)
+
+// Criteria the vulnerabilities can be ordered on, see the security settings
+export const PRIORITY_CRITERIA = ["kev", "score", "epss", "machines"]
+
+export const LEVELS = ["critical", "high", "medium", "low", "unknown"]
+
+export const FAMILIES = ["deb", "rpm", "windows", "macos"]
+
+// Why the scan cannot check a whole machine, see /vulnerabilities/machines/
+export const MACHINE_REASONS = ["no_platform", "no_source", "end_of_support", "source_never_loaded", "release_not_tracked"]
+
+// Same palette as the compliance severities. Unknown stays dark: an unrated
+// vulnerability is not a mild one
+export const LEVEL_COLORS = {
+	critical: "#d63939",
+	high: "#f76707",
+	medium: "#f59f00",
+	low: "#206bc4",
+	unknown: "#495057",
+}
+
+// Message of a failed call. A 400 answers {parameter: "message"} or {field: ["message"]}
+export function apiErrorMessage(e) {
+	const data = e?.response?.data
+	if (typeof data === "string" && data && !data.startsWith("<")) {
+		return data
+	}
+	if (data && typeof data === "object") {
+		if (data.error) return data.error
+		if (data.detail) return data.detail
+		if (Array.isArray(data)) return data.join(" ")
+		const parts = Object.entries(data).map(([field, messages]) => {
+			const text = Array.isArray(messages) ? messages.join(" ") : String(messages)
+			return field === "non_field_errors" ? text : `${field} : ${text}`
+		})
+		if (parts.length) return parts.join(" · ")
+	}
+	return e?.message || String(e)
+}
+
+export function formatDateTime(value) {
+	return value ? new Date(value).toLocaleString() : ""
+}
+
+export function formatDay(value) {
+	return value ? new Date(value).toLocaleDateString() : ""
+}
+
+// 0.91 -> "91 %"
+export function formatPercent(value, digits = 1) {
+	if (value === null || value === undefined) return ""
+	const percent = value * 100
+	// a small share is not nothing
+	if (percent > 0 && percent < 0.1) return "< 0.1 %"
+	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
+}
+
+// EPSS colour: most CVEs are below 1 %, 10 % and more is a high probability
+export function epssColor(epss) {
+	if (epss >= 0.1) return LEVEL_COLORS.critical
+	if (epss >= 0.01) return LEVEL_COLORS.high
+	return "#868e96"
+}
+
+// Severity given by a distribution (closed list of the back); an unknown one is shown as is
+export function ratingLabel(vm, rating) {
+	const key = "security.rating_" + String(rating).toLowerCase().replace(/[\s-]+/g, "_")
+	return vm.$te(key) ? vm.$t(key) : rating
+}
+
+// A CPE key as people read it: the dictionary escapes some characters
+// ("notepad\\+\\+:notepad\\+\\+" is notepad++:notepad++); the key itself is sent unchanged
+export function cpeLabel(key) {
+	return key ? String(key).replace(/\\(.)/g, "$1") : ""
+}
+
+// A summary cut for a table cell; the full text goes in the title
+const SUMMARY_LENGTH = 140
+export function shortSummary(text) {
+	if (!text || text.length <= SUMMARY_LENGTH) {
+		return text
+	}
+	return text.slice(0, SUMMARY_LENGTH).trimEnd() + "…"
+}
+
+// Opens the multi-criteria search, in a new tab, on the machines matching these criteria.
+// The search page runs the stored search when it opens with useSavedSearch set
+export function openMultisearch(router, criteria) {
+	const group = criteria.map((criterion, index) => ({
+		link: index ? "AND" : "",
+		value: "",
+		...criterion,
+		route: criterion.object,
+	}))
+	localStorage.setItem("multisearch", JSON.stringify([group]))
+	localStorage.setItem("useSavedSearch", "true")
+	window.open(router.resolve("/inventory/multisearch").href, "_blank", "noopener")
+}
+
+// The machines where a vulnerability is open
+export function vulnerabilityMachinesCriteria(vulnId) {
+	return [{ object: "vulnerabilities", field: "vuln_id", fieldtype: "string", operator: "iexact", value: vulnId }]
+}
+
+// The machines with at least one open vulnerability
+export function vulnerableMachinesCriteria() {
+	return [{ object: "security", field: "cves", fieldtype: "number", operator: "gt", value: "0" }]
+}
+
+// List answers come paginated only when a limit is given
+export function asList(data) {
+	return Array.isArray(data) ? data : (data?.results || [])
+}

@@ -113,14 +113,16 @@ export default {
 				"logs": "inventory",
 				"snmpscanner": "snmp",
 				"inventory_sections": "inventory",
-				"software_dictionary_entries": "software"
+				"software_dictionary_entries": "software",
+				"vulnerabilities": "vulnerability_search"
 			},
 			translation_title_keys: {
 				"results": "deployment",
 				"logs": "inventory_logs",
 				"snmpscanner": "snmpscanner",
 				"inventory_sections": "inventory",
-				"software_dictionary_entries": "software_dictionary"
+				"software_dictionary_entries": "software_dictionary",
+				"vulnerabilities": "vulnerabilities"
 			},
 
 			isbusy: true,
@@ -418,7 +420,7 @@ export default {
 						if (value === null || value === undefined) continue
 
 						if (!flat[col]) {
-							flat[col] = String(value)
+							flat[col] = this.formatMatchValue(type, key, value)
 							continue
 						}
 					}
@@ -426,6 +428,15 @@ export default {
 			}
 
 			return flat
+		},
+
+		// matched CVEs: severity and booleans in words, the rest as given
+		formatMatchValue(type, key, value) {
+			if (type === "vulnerabilities") {
+				if (key === "level" && this.$te("security.level_" + value)) return this.$t("security.level_" + value)
+				if (typeof value === "boolean") return value ? this.$t("generic.yes") : this.$t("generic.no")
+			}
+			return String(value)
 		},
 
 		getMatchTitle(type) {
