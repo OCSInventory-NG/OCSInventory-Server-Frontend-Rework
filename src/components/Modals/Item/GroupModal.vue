@@ -82,10 +82,18 @@
 						<h4>{{ $t('group.group_informations') }}</h4>
 					</b-col>
 				</b-row>
-				<b-row>
+				<b-row v-if="update && Array.isArray(row.asset_groups) && row.asset_groups.length === 0 && !assetscopechanged">
 					<b-col>
+						<Alert
+							:message="$t('group.asset_scope_empty')"
+							variant="warning"
+						/>
+					</b-col>
+				</b-row>
+				<b-row>
+					<b-col md="6">
 						<b-form-group
-							:label="$t('user.name')" 
+							:label="$t('user.name')"
 							label-for="name"
 						>
 							<b-form-input
@@ -93,6 +101,24 @@
 								v-model="row.name"
 								required
 							/>
+						</b-form-group>
+					</b-col>
+					<b-col md="6">
+						<b-form-group
+							:label="$t('group.asset_scope')"
+							label-for="asset_scope"
+						>
+							<v-select
+								v-model="selectedassetgroups"
+								input-id="asset_scope"
+								:options="assetgroups"
+								label="text"
+								multiple
+								@update:model-value="onAssetScopeChange"
+							/>
+							<p class="text-muted mb-1">
+								{{ $t('group.asset_scope_help') }}
+							</p>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -165,7 +191,11 @@ export default {
 			matrixKey: 0,
 			permissions: [],
 			permissionslabel: [],
-			
+
+			assetgroups: [],
+			selectedassetgroups: [],
+			assetscopechanged: false,
+
 			loading: true,
 			loadingcreate: false,
 		}
@@ -195,7 +225,20 @@ export default {
 			return e?.response?.data?.error || e?.message || String(e)
 		},
 
-		loadData(id) {
+		async loadAssetGroups() {
+			try {
+				const data = await this.$api.generic.get("asset/groups/")
+				const groups = Array.isArray(data) ? data : (data?.results || [])
+				this.assetgroups = groups
+					.filter(g => g.visibility === "public")
+					.map(g => ({ value: g.id, text: g.name }))
+			} catch (e) {
+				this.errormsg = this._apiError(e)
+				this.errored = true
+			}
+		},
+
+		async loadData(id) {
 			this.groupmodal = true
 
 			this.matrixKey += 1
@@ -215,9 +258,15 @@ export default {
 			this.createerrormsg = null
 			this.createwithsuccess = false
 
+			this.selectedassetgroups = []
+			this.assetscopechanged = false
+
 			if (id) {
 				this.loading = true
+				await this.loadAssetGroups()
 				this.getPermissions(id)
+			} else {
+				this.loadAssetGroups()
 			}
 		},
 
@@ -302,6 +351,9 @@ export default {
 			try {
 				const data = await this.$api.generic.get(`groups/${id}/`)
 				this.row = data
+				const scope = data.asset_groups || []
+				this.selectedassetgroups = this.assetgroups.filter(o => scope.includes(o.value))
+				this.assetscopechanged = false
 				this.errormsg = null
 				this.errored = false
 			} catch (e) {
@@ -312,6 +364,10 @@ export default {
 			}
 		},
 
+		onAssetScopeChange() {
+			this.assetscopechanged = true
+		},
+
 		async onSubmit(event) {
 			event.preventDefault()
 			this.loadingcreate = true
@@ -319,11 +375,19 @@ export default {
 			this.createerror = false
 			this.createerrormsg = null
 
+			const payload = { ...this.row }
+			if (this.assetscopechanged) {
+				const ids = this.selectedassetgroups.map(o => o.value)
+				payload.asset_groups = ids.length ? ids : null
+			} else {
+				delete payload.asset_groups
+			}
+
 			try {
 				if (!this.update) {
-					await this.$api.generic.post("groups/", this.row)
+					await this.$api.generic.post("groups/", payload)
 				} else {
-					await this.$api.generic.patch(`groups/${this.row.id}/`, this.row)
+					await this.$api.generic.patch(`groups/${this.row.id}/`, payload)
 				}
 
 				this.createwithsuccess = true

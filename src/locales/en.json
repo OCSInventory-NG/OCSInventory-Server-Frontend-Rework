@@ -432,6 +432,9 @@
   },
   "group": {
     "addgroup": "Add a new group",
+    "asset_scope": "Asset scope",
+    "asset_scope_empty": "The asset groups of this scope were deleted. This group sees no asset until the scope is changed.",
+    "asset_scope_help": "Leave empty so that this group does not restrict assets.",
     "editgroup": "Edit a group",
     "group_informations": "Group information",
     "id": "ID",

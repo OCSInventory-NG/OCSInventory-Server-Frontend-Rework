@@ -112,7 +112,7 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("groups/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["is_protected"].includes(f)
+					(f) => !["is_protected", "asset_groups"].includes(f)
 				)
 
 				// Get permissions
