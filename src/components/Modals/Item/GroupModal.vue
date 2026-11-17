@@ -119,6 +119,12 @@
 							<p class="text-muted mb-1">
 								{{ $t('group.asset_scope_help') }}
 							</p>
+							<b-form-checkbox
+								v-if="allassetsid && selectedassetgroups.length === 0"
+								v-model="seeallassets"
+							>
+								{{ $t('group.all_assets') }}
+							</b-form-checkbox>
 						</b-form-group>
 					</b-col>
 				</b-row>
@@ -170,6 +176,7 @@ export default {
 	props: {
 		permissionsprop: { type: [Array, Object], default: () => [] },
 		permissionslabelprop: { type: [Array, Object], default: () => [] },
+		allassetsidprop: { type: Number, default: null },
 		update: { type: Boolean, default: false },
 		id: { type: Number, default: null }
 	},
@@ -191,6 +198,8 @@ export default {
 			matrixKey: 0,
 			permissions: [],
 			permissionslabel: [],
+			allassetsid: null,
+			seeallassets: false,
 
 			assetgroups: [],
 			selectedassetgroups: [],
@@ -217,6 +226,7 @@ export default {
 		if(!this.update) {
 			this.permissions = this.permissionsprop
 			this.permissionslabel = this.permissionslabelprop
+			this.allassetsid = this.allassetsidprop
 			this.loading = false
 		}
 	},
@@ -260,6 +270,7 @@ export default {
 
 			this.selectedassetgroups = []
 			this.assetscopechanged = false
+			this.seeallassets = false
 
 			if (id) {
 				this.loading = true
@@ -285,7 +296,8 @@ export default {
 					"logentry",
 					"proxy",
 					"filemanager",
-					"groupprotection"
+					"groupprotection",
+					"groupassetscope"
 				]
 
 				this.permissions = {}
@@ -305,6 +317,11 @@ export default {
 						null
 
 					if (appLabel && djangoCoreApps.some(core => appLabel.includes(core))) {
+						continue
+					}
+
+					if (codename === "view_all_assets") {
+						this.allassetsid = p.id
 						continue
 					}
 
@@ -353,6 +370,7 @@ export default {
 				this.row = data
 				const scope = data.asset_groups || []
 				this.selectedassetgroups = this.assetgroups.filter(o => scope.includes(o.value))
+				this.seeallassets = this.allassetsid !== null && (data.permissions || []).includes(this.allassetsid)
 				this.assetscopechanged = false
 				this.errormsg = null
 				this.errored = false
@@ -364,8 +382,11 @@ export default {
 			}
 		},
 
-		onAssetScopeChange() {
+		onAssetScopeChange(selected) {
 			this.assetscopechanged = true
+			if (selected.length) {
+				this.seeallassets = false
+			}
 		},
 
 		async onSubmit(event) {
@@ -381,6 +402,12 @@ export default {
 				payload.asset_groups = ids.length ? ids : null
 			} else {
 				delete payload.asset_groups
+			}
+
+			payload.permissions = (this.row.permissions || []).filter(p => p !== this.allassetsid)
+			// a scoped group never bypasses its own scope
+			if (this.seeallassets && this.allassetsid && this.selectedassetgroups.length === 0) {
+				payload.permissions.push(this.allassetsid)
 			}
 
 			try {
