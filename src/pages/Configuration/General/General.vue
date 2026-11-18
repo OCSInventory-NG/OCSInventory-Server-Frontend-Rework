@@ -44,163 +44,30 @@
 									:key="config.name"
 									:title="$t('configuration.' + config.name)"
 								>
-									<b-list-group 
-										v-for="parameter in config.value"
-										:key="parameter.name"
-										flush
-									>
-										<div v-if="parameter.length">
-											<div
-												v-for="subparameter in parameter"
-												:key="subparameter.name"
-											>
-												<b-list-group-item 
-													class="d-flex justify-content-between align-items-center"
-												>
-													<div>
-														<h4 class="mb-1">
-															{{ $t("configuration."+subparameter.name) }}
-														</h4>
-														<p class="mb-1">
-															{{ $t("configuration."+subparameter.description) }}
-														</p>
-													</div>
-													<div 
-														v-if="subparameter.type == 'switch'"
-													>
-														<label class="form-check form-switch">
-															<input 
-																:id="subparameter.name"
-																v-model="subparameter.value"
-																class="form-check-input"
-																type="checkbox"
-																:disabled="!canedit"
-															>
-														</label>
-													</div>
-													<div 
-														v-if="subparameter.type in inputtype"
-														class="ocs-config-form"
-													>
-														<b-input-group>
-															<template 
-																v-if="subparameter.unit != ''"
-																#append
-															>
-																<b-input-group-text class="form-control">
-																	{{ $t("configuration."+subparameter.unit) }}
-																</b-input-group-text>
-															</template>
-															<b-form-input
-																:id="subparameter.name"
-																v-model="subparameter.value"
-																:type="inputtype[subparameter.type]"
-																:disabled="!canedit"
-															/>
-														</b-input-group>
-													</div>
-													<div 
-														v-if="subparameter.type == 'select'"
-														class="ocs-config-form"
-													>
-														<b-form-select 
-															v-model="subparameter.value" 
-															class="form-select mb-3"
-															:disabled="!canedit"
-														>
-															<b-form-select-option 
-																v-for="option in subparameter.options"
-																:key="option"
-																:value="option"
-															>
-																{{ $t("configuration."+option) }}
-															</b-form-select-option>
-														</b-form-select>
-													</div>
-												</b-list-group-item>
-											</div>
-										</div>
-										<b-list-group-item 
-											v-else
-											class="d-flex justify-content-between align-items-center"
-										>
-											<div>
-												<h4 class="mb-1">
-													{{ $t("configuration."+parameter.name) }}
-												</h4>
-												<p class="mb-1">
-													{{ $t("configuration."+parameter.description) }}
-												</p>
-											</div>
-											<div 
-												v-if="parameter.type == 'switch'"
-											>
-												<label class="form-check form-switch">
-													<input 
-														:id="parameter.name"
-														v-model="parameter.value"
-														class="form-check-input"
-														type="checkbox"
-														:disabled="!canedit"
-													>
-												</label>
-											</div>
-											<div 
-												v-if="parameter.type in inputtype"
-												class="ocs-config-form"
-											>
-												<b-input-group>
-													<template 
-														v-if="parameter.unit != ''"
-														#append
-													>
-														<b-input-group-text class="form-control">
-															{{ $t("configuration."+parameter.unit) }}
-														</b-input-group-text>
-													</template>
-													<b-form-input
-														:id="parameter.name"
-														v-model="parameter.value"
-														:type="inputtype[parameter.type]"
-														:disabled="!canedit"
-													/>
-												</b-input-group>
-											</div>
-											<div
-												v-if="parameter.type == 'select'"
-												class="ocs-config-form"
-											>
-												<b-form-select
-													v-model="parameter.value"
-													class="form-select mb-3"
-													:disabled="!canedit"
-												>
-													<b-form-select-option
-														v-for="option in parameter.options"
-														:key="option"
-														:value="option"
-													>
-														{{ $te("configuration."+option) ?
-															$t("configuration."+option) : option }}
-													</b-form-select-option>
-												</b-form-select>
-											</div>
-											<div
-												v-if="parameter.type == 'multiselect'"
-												class="ocs-config-form"
-											>
-												<v-select
-													v-model="parameter.value"
-													:options="parameter.options"
-													:get-option-label="(option) => $te('configuration.'+option) ?
-														$t('configuration.'+option) : option"
-													multiple
-													:disabled="!canedit"
-												/>
-											</div>
-										</b-list-group-item>
-									</b-list-group>
-								</b-tab>
+								<b-list-group
+									v-for="parameter in config.value"
+									:key="parameter.name"
+									flush
+								>
+									<template v-if="parameter.length">
+										<ConfigItem
+											v-for="subparameter in parameter"
+											:key="subparameter.name"
+											v-model="subparameter.value"
+											:item="subparameter"
+											:error="itemErrors[subparameter.name] || ''"
+											:disabled="!canedit"
+										/>
+									</template>
+									<ConfigItem
+										v-else
+										v-model="parameter.value"
+										:item="parameter"
+										:error="itemErrors[parameter.name] || ''"
+										:disabled="!canedit"
+									/>
+								</b-list-group>
+							</b-tab>
 							</b-tabs>
 							<b-row>
 								<b-col align-self="start" />
@@ -238,6 +105,22 @@
 								<b-col align-self="end" />
 							</b-row>
 						</b-form>
+
+						<!-- Some changes start work on the server: asked first -->
+						<b-modal
+							v-model="confirmShown"
+							:title="$t('configuration.confirm_title')"
+							:ok-title="$t('generic.save')"
+							:cancel-title="$t('generic.cancel')"
+							@ok="save"
+						>
+							<p
+								v-for="message in confirmMessages"
+								:key="message"
+							>
+								{{ message }}
+							</p>
+						</b-modal>
 					</div>
 				</div>
 			</div>
@@ -268,10 +151,12 @@ export default {
 			canview: false,
 
 			activetab: 0,
-			inputtype: {
-				"number input": "number",
-				"text input": "text"
-			},
+			// values as loaded, by section then item, to see what changed
+			saved: {},
+			// messages of a refused save, by item name
+			itemErrors: {},
+			confirmShown: false,
+			confirmMessages: [],
 
 			loading: true,
 		}
@@ -317,6 +202,11 @@ export default {
 				const configs = Array.isArray(data) ? data : (data?.results || [])
 
 				this.configs = configs.filter((c) => !["snmp", "ipdiscover"].includes(c.name))
+				this.saved = Object.fromEntries(this.configs.map((config) => [config.name, this.itemValues(config)]))
+
+				// ?tab=<section> opens that section, e.g. from the security menu
+				const index = this.configs.findIndex((config) => config.name === this.$route.query.tab)
+				if (index !== -1) this.activetab = index
 
 				this.errormsg = null
 				this.errored = false
@@ -328,12 +218,42 @@ export default {
 			}
 		},
 
-		async onSubmit(event) {
+		// item name -> value, nested items included. A number field gives text:
+		// "0.6" and 0.6 are the same value
+		itemValues(config) {
+			const items = (config.value || []).flatMap((item) => (Array.isArray(item) ? item : [item]))
+			return Object.fromEntries(items.map((item) => {
+				const number = item.type === "number input" && item.value !== "" ? Number(item.value) : NaN
+				return [item.name, JSON.stringify(Number.isNaN(number) ? item.value : number)]
+			}))
+		},
+
+		onSubmit(event) {
 			event.preventDefault()
 			if(!this.canedit) return
+			const config = this.configs?.[this.activetab]
+			if (!config) return
+
+			// a changed item with a configuration.<name>_confirm text starts work on the server
+			const before = this.saved[config.name] || {}
+			const now = this.itemValues(config)
+			const messages = Object.keys(now)
+				.filter((name) => now[name] !== before[name] && this.$te(`configuration.${name}_confirm`))
+				.map((name) => this.$t(`configuration.${name}_confirm`))
+			// both CPE scores share their text
+			this.confirmMessages = [...new Set(messages)]
+			if (this.confirmMessages.length) {
+				this.confirmShown = true
+				return
+			}
+			this.save()
+		},
+
+		async save() {
 			this.loadingcreate = true
 			this.createwithsuccess = false
 			this.createerror = false
+			this.itemErrors = {}
 
 			try {
 				const activeConfig = this.configs?.[this.activetab]
@@ -341,20 +261,21 @@ export default {
 
 				const configToUpdate = activeConfig.name
 
+				// a number field gives text; decimals are kept (0.9 stays 0.9)
+				const toNumber = (item) => {
+					if (item?.type !== "number input" || item.value === "" || item.value === null) return item
+					const n = Number(item.value)
+					return { ...item, value: Number.isNaN(n) ? item.value : n }
+				}
 				const payload = {
 					...activeConfig,
 					value: Array.isArray(activeConfig.value)
-						? activeConfig.value.map((item) => {
-							if (item?.type === "number input") {
-								const n = parseInt(item.value, 10)
-								return { ...item, value: Number.isNaN(n) ? item.value : n }
-							}
-							return item
-						})
+						? activeConfig.value.map((item) => (Array.isArray(item) ? item.map(toNumber) : toNumber(item)))
 						: activeConfig.value,
 				}
 
 				await this.$api.generic.patch(`config/${configToUpdate}/`, payload)
+				this.saved = { ...this.saved, [configToUpdate]: this.itemValues(payload) }
 
 				this.successmsg = "success"
 				this.successed = true
@@ -363,7 +284,15 @@ export default {
 
 				this.createwithsuccess = true
 			} catch (e) {
-				this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				// a refused value comes as {"value": {"<item>": "message"}}, shown under its item
+				const itemErrors = e.response?.data?.value
+				if (itemErrors && typeof itemErrors === "object" && !Array.isArray(itemErrors)) {
+					this.itemErrors = Object.fromEntries(Object.entries(itemErrors).map(([name, message]) =>
+						[name, Array.isArray(message) ? message.join(" ") : String(message)]))
+					this.errormsg = this.$t("configuration.invalid_values")
+				} else {
+					this.errormsg = (e.response?.data?.error) ? e.response.data.error : e.message
+				}
 				this.errored = true
 				this.successmsg = null
 				this.successed = false

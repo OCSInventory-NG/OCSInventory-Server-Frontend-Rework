@@ -1,0 +1,555 @@
+<template>
+	<div
+		id="vulnerabilities"
+		class="container-xl"
+	>
+		<div>
+			<PageHeader page-title="vulnerabilities" />
+
+			<div class="page-body">
+				<div class="card">
+					<div class="card-body">
+						<div v-if="denied">
+							<Alert
+								:message="$t('message.dont_have_right_to_see')"
+								:cols="true"
+								variant="danger"
+							/>
+						</div>
+						<template v-else>
+							<Alert
+								v-if="errored"
+								:message="errormsg"
+								:cols="true"
+								variant="danger"
+							/>
+
+							<!-- Counters of the list; a click filters on the tile -->
+							<StatTiles
+								:tiles="tiles"
+								:loading="countsLoading"
+								clickable
+								compact
+								@select="selectTile"
+							/>
+
+							<Datatable
+								id="vulnerabilities-datatable"
+								:rowdata="rows"
+								:rowheader="columns"
+								:nonsortablefields="nonsortable"
+								:usecheckbox="false"
+								:server-side="true"
+								:server-total-rows="total"
+								:page-reset-key="pageResetKey"
+								:isbusy="loading"
+								:emptytext="emptyMessage"
+								title="vulnerabilities"
+								translationkey="security.column_"
+								is-sticky
+								@change-query="onQueryChange"
+								@reload-datatable="load"
+								@export="exportRows"
+								@export-all="exportAll"
+							>
+								<template #toolbar>
+									<v-select
+										v-for="filter in filterSelects"
+										:key="filter.name"
+										v-model="filters[filter.name]"
+										:options="filter.options"
+										:reduce="option => option.value"
+										:placeholder="filter.placeholder"
+										:searchable="false"
+										label="text"
+										class="datatable-btn vuln-filter"
+									/>
+								</template>
+
+								<template #cell(vuln_id)="{ row }">
+									<router-link
+										:to="detailLink(row.item.vuln_id)"
+										class="ocs-link text-nowrap"
+									>
+										{{ row.item.vuln_id }}
+									</router-link>
+								</template>
+								<template #cell(summary)="{ row }">
+									<span
+										class="vuln-summary-cell"
+										:title="row.item.summary"
+									>{{ shorten(row.item.summary) }}</span>
+								</template>
+								<template #cell(kev)="{ row }">
+									<KevBadge
+										:kev="row.item.kev"
+										:date="row.item.kev_date_added"
+									/>
+								</template>
+								<template #cell(score)="{ row }">
+									<VulnerabilityLevel
+										:level="row.item.level"
+										:score="row.item.cvss_score"
+									/>
+									<div class="text-muted small score-detail">
+										{{ scoreDetail(row.item) }}
+									</div>
+								</template>
+								<template #cell(epss)="{ row }">
+									<EpssScore
+										:epss="row.item.epss"
+										:percentile="row.item.epss_percentile"
+									/>
+								</template>
+								<template #cell(products)="{ row }">
+									<div
+										v-for="product in row.item.products"
+										:key="product.product + product.version"
+										class="cell-wrap"
+										:title="product.product"
+									>
+										{{ product.name || product.product }} {{ product.version }}
+									</div>
+									<div
+										v-if="row.item.product_count > row.item.products.length"
+										class="text-muted small"
+									>
+										{{ $t('security.more_products', { count: row.item.product_count - row.item.products.length }) }}
+									</div>
+								</template>
+								<template #cell(machines)="{ row }">
+									<a
+										v-if="canmultisearch && row.item.machines"
+										href="#"
+										class="ocs-link text-nowrap"
+										:title="$t('security.see_in_multisearch')"
+										@click.prevent="openMachines(row.item.vuln_id)"
+									>
+										{{ row.item.machines }}
+										<font-awesome-icon
+											:icon="['fas', 'magnifying-glass']"
+											class="ms-1 small"
+										/>
+									</a>
+									<span v-else>{{ row.item.machines }}</span>
+								</template>
+								<template #cell(fix)="{ row }">
+									<VulnerabilityFix
+										:versions="row.item.fix_available ? row.item.fixed_versions : []"
+										:channels="row.item.fix_channels"
+									/>
+								</template>
+								<template #cell(first_seen)="{ row }">
+									<span class="text-nowrap">{{ formatDay(row.item.first_seen) }}</span>
+								</template>
+							</Datatable>
+
+						</template>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+import { hasPermission } from "@/utils/permissions"
+import {
+	FAMILIES, LEVELS, LEVEL_COLORS, PRIORITY_CRITERIA,
+	apiErrorMessage, asList, formatDay, openMultisearch, ratingLabel, shortSummary,
+	vulnerabilityMachinesCriteria, vulnerableMachinesCriteria,
+} from "@/utils/security"
+
+// The order chosen here lasts for the session, the settings give the default
+const ORDERING_KEY = "vulnerabilities_ordering"
+// A click on these headers sorts on the criterion first; the others do not sort
+const COLUMNS = ["vuln_id", "summary", "kev", "score", "epss", "machines", "products", "fix", "first_seen"]
+
+function readSessionOrdering() {
+	try {
+		const value = JSON.parse(sessionStorage.getItem(ORDERING_KEY))
+		return Array.isArray(value) && value.length ? value : null
+	} catch {
+		return null
+	}
+}
+
+export default {
+	name: "Vulnerabilities",
+	data() {
+		return {
+			denied: false,
+			errored: false,
+			errormsg: null,
+			loading: true,
+
+			columns: COLUMNS,
+			nonsortable: COLUMNS.filter((column) => !PRIORITY_CRITERIA.includes(column)),
+			rows: [],
+			total: 0,
+			pageResetKey: 0,
+			// page and search given by the datatable
+			query: {
+				limit: Number(localStorage.getItem("perPage")) || 5,
+				offset: 0,
+				search: null,
+			},
+			headerSort: null,
+			filters: { level: null, fix: null, kev: null, family: null },
+			request: 0,
+
+			// order answered by the server, the settings one when none is asked
+			ordering: [],
+			sessionOrdering: readSessionOrdering(),
+			// counters of the tiles, read for the platform and the search
+			counts: {},
+			countsKey: null,
+			countsLoading: true,
+			sources: [],
+			// null while the coverage is not read
+			unchecked: null,
+			// the machine counters open the multi-criteria search
+			canmultisearch: hasPermission("inventory_base_view_inventorybase"),
+		}
+	},
+	computed: {
+		tiles() {
+			const count = (key) => (this.counts[key] === undefined ? "" : this.counts[key].toLocaleString())
+			const noFilter = !this.filters.level && !this.filters.kev && !this.filters.fix
+			return [
+				{ key: "total", label: this.$t("security.tile_total"), value: count("total"), color: "#1d273b", active: noFilter },
+				// the search has no platform nor text criterion: only the whole fleet opens it
+				{
+					key: "machines",
+					label: this.$t("security.tile_machines"),
+					value: count("machines"),
+					color: "#1d273b",
+					static: !this.canmultisearch || !!this.filters.family || !!this.query.search || !this.counts.machines,
+					title: this.canmultisearch ? this.$t("security.see_in_multisearch") : null,
+				},
+				this.notCoveredTile,
+				// no tile for the unrated ones: the level filter still lists them
+				...LEVELS.filter((level) => level !== "unknown").map((level) => ({
+					key: level,
+					label: this.$t("security.tile_level_" + level),
+					value: count(level),
+					color: LEVEL_COLORS[level],
+					active: this.filters.level === level,
+				})),
+				{ key: "kev", label: this.$t("security.tile_kev"), value: count("kev"), color: "#ae3ec9", active: this.filters.kev === "yes" },
+				{ key: "fix", label: this.$t("security.tile_fix"), value: count("fix"), color: "#2fb344", active: this.filters.fix === "yes" },
+			]
+		},
+		// Machines the scan cannot check: they would show 0 vulnerability, as a safe one
+		notCoveredTile() {
+			const coverage = this.counts.coverage
+			const count = coverage ? coverage.not_covered : undefined
+			const reasons = Object.entries(coverage?.reasons || {})
+				.filter(([, value]) => value)
+				.map(([reason, value]) => `${this.$t("security.machine_reason_" + reason)} : ${value}`)
+			return {
+				key: "not_covered",
+				label: this.$t("security.tile_machines_not_covered"),
+				value: count === undefined ? "" : count.toLocaleString(),
+				color: count ? "#f76707" : "#adb5bd",
+				title: reasons.join("\n") || null,
+				// opens the machine list, nothing to open at 0
+				static: !count,
+			}
+		},
+		filterSelects() {
+			return [
+				{
+					name: "level",
+					placeholder: this.$t("security.all_levels"),
+					options: LEVELS.map((level) => ({ value: level, text: this.$t("security.level_" + level) })),
+				},
+				{
+					name: "fix",
+					placeholder: this.$t("security.any_fix"),
+					options: [
+						{ value: "yes", text: this.$t("security.fix_available") },
+						{ value: "no", text: this.$t("security.fix_none") },
+					],
+				},
+				{
+					name: "kev",
+					placeholder: this.$t("security.any_kev"),
+					options: [
+						{ value: "yes", text: this.$t("security.kev_yes") },
+						{ value: "no", text: this.$t("security.kev_no") },
+					],
+				},
+				{
+					name: "family",
+					placeholder: this.$t("security.all_platforms"),
+					options: FAMILIES.map((family) => ({ value: family, text: this.$t("software_identity.family_" + family) })),
+				},
+			]
+		},
+		outdatedSources() {
+			return this.sources.filter((source) => source.state !== "fresh")
+		},
+		// An empty list only says something about what could be checked
+		emptyMessage() {
+			const filtered = this.query.search || Object.values(this.filters).some((value) => value)
+			if (filtered) {
+				return this.$t("security.no_vulnerability_filtered")
+			}
+			if (!this.unchecked) {
+				return this.$t("security.no_vulnerability_unknown_coverage")
+			}
+			if (!this.unchecked.total) {
+				return this.$t("security.no_vulnerability_nothing_checked")
+			}
+			if (this.outdatedSources.length) {
+				return this.$t("security.no_vulnerability_outdated")
+			}
+			return this.unchecked.installations
+				? this.$t("security.no_vulnerability_checked_only", { count: this.unchecked.installations })
+				: this.$t("security.no_vulnerability_checked")
+		},
+	},
+	watch: {
+		filters: {
+			deep: true,
+			async handler() {
+				await this.reload()
+			},
+		},
+	},
+	async mounted() {
+		if (!hasPermission("security_view_vulnerability")) {
+			this.denied = true
+			return
+		}
+		await Promise.all([this.load(), this.loadCoverage()])
+	},
+	methods: {
+		formatDay,
+
+		openMachines(vulnId) {
+			openMultisearch(this.$router, vulnerabilityMachinesCriteria(vulnId))
+		},
+
+		async reload() {
+			this.query = { ...this.query, offset: 0 }
+			this.pageResetKey += 1
+			await this.load()
+		},
+
+		// Page, page size and search come from the datatable, a header click puts its criterion first
+		async onQueryChange(query) {
+			const criterion = query.ordering ? query.ordering.replace(/^-/, "") : null
+			const sorted = criterion && criterion !== this.headerSort && PRIORITY_CRITERIA.includes(criterion)
+			this.headerSort = criterion
+			this.query = { limit: query.limit, offset: query.offset, search: query.search }
+			if (sorted) {
+				this.putFirst(criterion)
+				return
+			}
+			await this.load()
+		},
+
+		params(paginated = true) {
+			const params = {
+				ordering: this.sessionOrdering ? this.sessionOrdering.join(",") : null,
+				search: this.query.search,
+				level: this.filters.level,
+				fix: this.filters.fix,
+				kev: this.filters.kev,
+				family: this.filters.family,
+			}
+			if (paginated) {
+				params.limit = this.query.limit
+				params.offset = this.query.offset
+			}
+			return params
+		},
+
+		async load() {
+			this.loading = true
+			// An answer to an older filter must not replace a newer one
+			const request = ++this.request
+			try {
+				const data = await this.$api.generic.get("vulnerabilities/", this.params())
+				if (request !== this.request) {
+					return
+				}
+				// the datatable keys its rows on id
+				this.rows = asList(data).map((row) => ({ ...row, id: row.vuln_id }))
+				this.total = typeof data.count === "number" ? data.count : this.rows.length
+				this.ordering = data.ordering || this.sessionOrdering || []
+				this.errored = false
+				this.loadCounts()
+			} catch (e) {
+				if (request !== this.request) {
+					return
+				}
+				// An order saved before a settings change can be refused, the default one is used then
+				if (e?.response?.status === 400 && e.response.data?.ordering && this.sessionOrdering) {
+					this.setSessionOrdering(null)
+					return
+				}
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			} finally {
+				if (request === this.request) {
+					this.loading = false
+				}
+			}
+		},
+
+		// Counters of the whole list: the summary gets the platform and the search,
+		// never the table filters (they would zero the other tiles)
+		async loadCounts() {
+			const base = { family: this.filters.family, search: this.query.search }
+			const key = JSON.stringify(base)
+			if (key === this.countsKey) return
+			this.countsKey = key
+			this.countsLoading = true
+			try {
+				const summary = await this.$api.generic.get("vulnerabilities/summary/", base)
+				if (key !== this.countsKey) return
+				this.counts = {
+					total: summary.total,
+					machines: summary.machines,
+					...(summary.levels || {}),
+					kev: summary.kev,
+					fix: summary.fix_available,
+					coverage: summary.coverage,
+				}
+			} catch {
+				// tiles stay empty, the list shows its own error
+				this.counts = {}
+			} finally {
+				// an older answer leaves the loader to the newer one
+				if (key === this.countsKey) this.countsLoading = false
+			}
+		},
+
+		// total clears the tile filters, the others toggle theirs
+		selectTile(key) {
+			if (key === "machines") {
+				openMultisearch(this.$router, vulnerableMachinesCriteria())
+			} else if (key === "not_covered") {
+				this.$router.push({ path: "/security/coverage", query: { tab: "machines", status: "not_covered" } })
+			} else if (key === "total") {
+				Object.assign(this.filters, { level: null, kev: null, fix: null })
+			} else if (key === "kev") {
+				this.filters.kev = this.filters.kev === "yes" ? null : "yes"
+			} else if (key === "fix") {
+				this.filters.fix = this.filters.fix === "yes" ? null : "yes"
+			} else {
+				this.filters.level = this.filters.level === key ? null : key
+			}
+		},
+
+		async loadCoverage() {
+			try {
+				const coverage = await this.$api.generic.get("vulnerabilities/coverage/")
+				// every installation, for the "N out of M" line
+				const total = (coverage.families || []).reduce((sum, family) =>
+					sum + Object.values(family.installations || {}).reduce((count, value) => count + value, 0), 0)
+				this.unchecked = { installations: coverage.unchecked || 0, excluded: coverage.excluded || 0, total }
+			} catch {
+				// unknown coverage: the empty list says so
+				this.unchecked = null
+			}
+			// stale sources: the empty list says so too
+			try {
+				this.sources = asList(await this.$api.generic.get("vulnerabilities/sources/"))
+			} catch {
+				this.sources = []
+			}
+		},
+
+		setSessionOrdering(order) {
+			this.sessionOrdering = order
+			if (!order) {
+				// the next click on the sorted header counts again
+				this.headerSort = null
+			}
+			try {
+				if (order) {
+					sessionStorage.setItem(ORDERING_KEY, JSON.stringify(order))
+				} else {
+					sessionStorage.removeItem(ORDERING_KEY)
+				}
+			} catch {
+				// storage refused: the order lasts for this page only
+			}
+			this.reload()
+		},
+
+		putFirst(criterion) {
+			const order = this.ordering.length ? this.ordering : PRIORITY_CRITERIA
+			this.setSessionOrdering([criterion, ...order.filter((item) => item !== criterion)])
+		},
+
+		// Export: one line per vulnerability, lists joined
+		csvRows(rows) {
+			return rows.map((row) => ({
+				vuln_id: row.vuln_id,
+				summary: row.summary,
+				level: row.level,
+				cvss_score: row.cvss_score ?? "",
+				cvss_version: row.cvss_version || "",
+				distro_rating: row.distro_rating || "",
+				kev: row.kev ? "yes" : "no",
+				kev_date_added: row.kev_date_added || "",
+				epss: row.epss ?? "",
+				epss_percentile: row.epss_percentile ?? "",
+				machines: row.machines,
+				products: (row.products || []).map((product) => `${product.product} ${product.version}`).join(", "),
+				product_count: row.product_count,
+				fixed_versions: (row.fixed_versions || []).join(", "),
+				fix_channels: (row.fix_channels || []).join(", "),
+				first_seen: row.first_seen || "",
+			}))
+		},
+
+		exportRows({ scope, rows }) {
+			const lines = this.csvRows(rows)
+			if (!lines.length) return
+			const headers = Object.keys(lines[0])
+			const csv = [
+				headers.join(";"),
+				...lines.map((line) => headers.map((header) => `"${String(line[header] ?? "").replace(/"/g, '""')}"`).join(";")),
+			].join("\n")
+			const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }))
+			const link = document.createElement("a")
+			link.href = url
+			link.setAttribute("download", `vulnerabilities_${scope}.csv`)
+			document.body.appendChild(link)
+			link.click()
+			link.remove()
+			URL.revokeObjectURL(url)
+		},
+
+		async exportAll() {
+			try {
+				// without limit the list comes whole
+				const data = await this.$api.generic.get("vulnerabilities/", this.params(false))
+				this.exportRows({ scope: "all", rows: asList(data) })
+			} catch (e) {
+				this.errormsg = apiErrorMessage(e)
+				this.errored = true
+			}
+		},
+
+		scoreDetail(row) {
+			return [
+				row.cvss_version ? `CVSS ${row.cvss_version}` : "",
+				row.distro_rating ? this.$t("security.distro_short", { rating: ratingLabel(this, row.distro_rating) }) : "",
+			].filter(Boolean).join(" · ")
+		},
+
+		detailLink(vulnId) {
+			return `/security/vulnerabilities/${encodeURIComponent(vulnId)}`
+		},
+
+		shorten: shortSummary,
+	},
+}
+</script>

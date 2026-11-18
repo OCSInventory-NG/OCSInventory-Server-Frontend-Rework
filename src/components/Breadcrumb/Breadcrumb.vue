@@ -75,7 +75,11 @@ export default {
 					.map(param => String(param))
 
 				if(params.includes(lastSegment)) {
-					breadcrumb[breadcrumb.length - 1].text = this.currentLabel + " (" + lastSegment + ")"
+					// the id is only added when it says more than the label
+					const id = decodeURIComponent(lastSegment)
+					breadcrumb[breadcrumb.length - 1].text = this.currentLabel === id
+						? this.currentLabel
+						: this.currentLabel + " (" + lastSegment + ")"
 				}
 			}
 

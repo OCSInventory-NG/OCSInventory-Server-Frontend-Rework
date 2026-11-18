@@ -13,6 +13,74 @@
   margin-right: 5px;
 }
 
+// one criterion of the multi-criteria search; the row gutter spaces the fields
+.search-criterion {
+  margin-bottom: 8px;
+
+  // the card padding alone below the last one, as above the first
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // stacked below md: a line between two criteria
+  @media (max-width: 767.98px) {
+    border-bottom: 1px solid $gray-300;
+    padding-bottom: 8px;
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
+// inputs as tall as the selects, which take the datatable toolbar look
+.search-criterion-input {
+  border-color: var(--tblr-border-color);
+  border-radius: 6px;
+  box-shadow: 0 1px 1px 0 rgba(24, 36, 51, 0.06);
+  color: $gray-700;
+  font-size: 0.875rem;
+  font-weight: 500;
+  height: 36px;
+  margin: 0;
+  padding-left: 12px;
+
+  &::placeholder {
+    color: $gray-500;
+    font-weight: 400;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--tblr-border-active-color);
+  }
+}
+
+// filled buttons look taller than the light framed fields: a bit smaller, centred on them
+.search-criterion-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  height: 36px;
+
+  .btn {
+    height: 34px;
+    padding: 0;
+    width: 34px;
+  }
+}
+
+// AND / OR between two groups, centred between the cards
+.search-group-link {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  .v-select {
+    width: 8rem;
+  }
+}
+
 .multisearch-btns {
   margin-bottom: 20px;
 }
