@@ -31,6 +31,7 @@
 								v-if="canadd"
 								:permissionsprop="permissions"
 								:permissionslabelprop="permissionslabel"
+								:allassetsidprop="allassetsid"
 								@reload-datatable="reloadDatatable"
 							/>
 
@@ -76,6 +77,7 @@ export default {
 			rowheader: [],
 			permissions: [],
 			permissionslabel: [],
+			allassetsid: null,
 
 			isbusy: true,
 			loading: true,
@@ -112,7 +114,7 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("groups/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["is_protected"].includes(f)
+					(f) => !["is_protected", "asset_groups"].includes(f)
 				)
 
 				// Get permissions
@@ -145,7 +147,8 @@ export default {
 					"logentry",
 					"proxy",
 					"filemanager",
-					"groupprotection"
+					"groupprotection",
+					"groupassetscope"
 				]
 
 				this.permissions = {}
@@ -165,6 +168,11 @@ export default {
 						null
 
 					if (appLabel && djangoCoreApps.some(core => appLabel.includes(core))) {
+						continue
+					}
+
+					if (codename === "view_all_assets") {
+						this.allassetsid = p.id
 						continue
 					}
 
