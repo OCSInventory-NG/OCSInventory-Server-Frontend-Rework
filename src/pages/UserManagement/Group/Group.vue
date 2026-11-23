@@ -50,6 +50,28 @@
 								translationkey="group."
 								@reload-datatable="reloadDatatable"
 							>
+								<template #cell(asset_groups)="{ row }">
+									<template v-if="row.item.__asset_groups?.mode === 'list'">
+										<div
+											v-for="assetGroup in row.item.__asset_groups.groups"
+											:key="assetGroup.id"
+										>
+											<router-link
+												:to="'/inventory/assetgroups/' + assetGroup.id"
+												class="ocs-link"
+											>
+												{{ assetGroup.name }}
+											</router-link>
+										</div>
+									</template>
+									<span
+										v-else
+										class="text-secondary"
+									>
+										{{ row.item.__asset_groups?.text }}
+									</span>
+								</template>
+
 								<template #cell(permissions)="{ row }">
 									<dl class="permissions-list">
 										<template
@@ -126,7 +148,7 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("groups/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["is_protected", "asset_groups"].includes(f)
+					(f) => f !== "is_protected"
 				)
 
 				// Get permissions
@@ -232,9 +254,11 @@ export default {
 			this.isbusy = true
 
 			try {
-				const data = await this.$api.generic.get("groups/")
+				const data = await this.$api.generic.get("groups/", {}, { expand: "asset_groups" })
 				this.rowdata = Array.isArray(data) ? data : (data?.results || [])
 
+				// Must run before permissionsTreatment, which replaces the permission ids
+				this.assetGroupsTreatment()
 				this.permissionsTreatment()
 
 				this.errormsg = null
@@ -244,6 +268,26 @@ export default {
 				this.errored = true
 			} finally {
 				this.isbusy = false
+			}
+		},
+
+		assetGroupsTreatment() {
+			for (const row of this.rowdata || []) {
+				let scope
+				if (this.allassetsid && (row.permissions || []).includes(this.allassetsid)) {
+					scope = { mode: "all", text: this.$t("group.scope_all_assets") }
+				} else if (row.asset_groups == null) {
+					scope = { mode: "unrestricted", text: this.$t("group.scope_unrestricted") }
+				} else if (!row.asset_groups.length) {
+					scope = { mode: "empty", text: this.$t("group.scope_empty") }
+				} else {
+					scope = { mode: "list", groups: row.asset_groups }
+					scope.text = row.asset_groups.map((g) => g.name).join("\n")
+				}
+
+				// Structured scope for the display, plain text kept for the datatable search
+				row.__asset_groups = scope
+				row.asset_groups = scope.text
 			}
 		},
 

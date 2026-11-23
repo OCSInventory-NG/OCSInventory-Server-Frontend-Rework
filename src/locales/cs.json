@@ -424,12 +424,16 @@
   },
   "group": {
     "addgroup": "Přidat novou skupinu",
+    "asset_groups": "Rozsah zařízení",
     "editgroup": "Upravit skupinu",
     "group_informations": "Informace o skupině",
     "id": "ID",
     "name": "Název",
     "permission": "Oprávnění",
-    "permissions": "Oprávnění"
+    "permissions": "Oprávnění",
+    "scope_all_assets": "Všechna zařízení",
+    "scope_empty": "Žádné zařízení",
+    "scope_unrestricted": "Bez omezení"
   },
   "inventory": {
     "0": "Úspěch",
