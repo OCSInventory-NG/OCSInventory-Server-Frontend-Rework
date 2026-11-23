@@ -424,7 +424,11 @@
   },
   "group": {
     "addgroup": "Přidat novou skupinu",
+    "all_assets": "Zobrazit všechna zařízení bez ohledu na jakákoli omezení",
     "asset_groups": "Rozsah zařízení",
+    "asset_scope": "Rozsah zařízení",
+    "asset_scope_empty": "Skupiny zařízení v tomto rozsahu byly smazány. Dokud nebude rozsah změněn, tato skupina nevidí žádné zařízení.",
+    "asset_scope_help": "Ponechte prázdné, pokud tato skupina nemá omezovat zařízení.",
     "editgroup": "Upravit skupinu",
     "group_informations": "Informace o skupině",
     "id": "ID",
