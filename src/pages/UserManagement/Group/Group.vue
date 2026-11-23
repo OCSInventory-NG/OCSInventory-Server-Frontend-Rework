@@ -49,7 +49,19 @@
 								titlevalue="group"
 								translationkey="group."
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(permissions)="{ row }">
+									<dl class="permissions-list">
+										<template
+											v-for="line in row.item.__permissions"
+											:key="line.label"
+										>
+											<dt>{{ line.label }}</dt>
+											<dd>{{ line.rights }}</dd>
+										</template>
+									</dl>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>
@@ -260,10 +272,12 @@ export default {
 				}
 
 				const lines = Array.from(grouped.entries())
-					.map(([labelTrad, setTypes]) => `${labelTrad} : ${Array.from(setTypes).join(", ")}`)
-					.sort((a, b) => a.localeCompare(b))
+					.map(([label, setTypes]) => ({ label, rights: Array.from(setTypes).join(", ") }))
+					.sort((a, b) => a.label.localeCompare(b.label))
 
-				row.permissions = lines.join("\n")
+				// Structured lines for the aligned display, plain text kept for the datatable search
+				row.__permissions = lines
+				row.permissions = lines.map((l) => `${l.label} : ${l.rights}`).join("\n")
 			}
 		},
 
