@@ -264,7 +264,7 @@
 			>
 				<!-- No data available -->
 				<template #empty="">
-					{{ emptytext || $t('generic.no_data') }}
+					{{ $t('generic.no_data') }}
 				</template>
 
 				<template #table-busy>
@@ -765,8 +765,6 @@ export default {
 		layouttarget: { type: String, default: null },
 		// false when the route behind the table cannot search
 		cansearch: { type: Boolean, default: true },
-		// shown instead of the generic "no data" when the table is empty
-		emptytext: { type: String, default: '' },
 		// labels of the columns whose key is no translation key
 		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group

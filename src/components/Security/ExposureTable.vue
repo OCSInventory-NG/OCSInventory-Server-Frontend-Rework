@@ -8,7 +8,6 @@
 			:usecheckbox="false"
 			:candeletemultiple="false"
 			:hascustomactions="canexclude"
-			:emptytext="emptytext"
 			:hiddenfields="hiddencolumns"
 			translationkey="security.column_"
 			compactheader
@@ -141,7 +140,6 @@ export default {
 		closed: { type: Boolean, default: false },
 		excluded: { type: Boolean, default: false },
 		canexclude: { type: Boolean, default: false },
-		emptytext: { type: String, default: "" },
 	},
 	emits: ["exclude", "reload"],
 	computed: {

@@ -48,7 +48,6 @@
 								:usecheckbox="false"
 								:hascustomactions="canedit"
 								:isbusy="loading"
-								:emptytext="$t('security.exclusions_empty')"
 								title="vulnerability_exclusions"
 								translationkey="security.column_"
 								is-sticky

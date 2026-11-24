@@ -100,7 +100,6 @@
 						:rows="closed"
 						assetview
 						closed
-						:emptytext="$t('security.closed_none')"
 						@reload="loadClosed"
 					/>
 					<div
@@ -119,7 +118,6 @@
 						:rowheader="softwareColumns"
 						:usecheckbox="false"
 						:candeletemultiple="false"
-						:emptytext="$t('security.all_checked')"
 						title="asset_unchecked_software"
 						translationkey="security.column_"
 						compactheader

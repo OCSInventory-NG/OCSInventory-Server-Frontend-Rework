@@ -19,7 +19,6 @@
 			:server-side="true"
 			:server-total-rows="total"
 			:isbusy="loading"
-			:emptytext="$t(status === 'matched' ? 'software_identity.matched_empty' : 'software_identity.review_empty')"
 			:title="'software_identity_' + status"
 			translationkey="software_identity.column_"
 			compactheader

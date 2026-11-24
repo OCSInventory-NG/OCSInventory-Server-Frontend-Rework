@@ -43,7 +43,6 @@
 								:server-total-rows="total"
 								:page-reset-key="pageResetKey"
 								:isbusy="loading"
-								:emptytext="emptyMessage"
 								title="vulnerabilities"
 								translationkey="security.column_"
 								is-sticky
@@ -205,9 +204,6 @@ export default {
 			counts: {},
 			countsKey: null,
 			countsLoading: true,
-			sources: [],
-			// null while the coverage is not read
-			unchecked: null,
 			// the machine counters open the multi-criteria search
 			canmultisearch: hasPermission("inventory_base_view_inventorybase"),
 		}
@@ -287,28 +283,6 @@ export default {
 				},
 			]
 		},
-		outdatedSources() {
-			return this.sources.filter((source) => source.state !== "fresh")
-		},
-		// An empty list only says something about what could be checked
-		emptyMessage() {
-			const filtered = this.query.search || Object.values(this.filters).some((value) => value)
-			if (filtered) {
-				return this.$t("security.no_vulnerability_filtered")
-			}
-			if (!this.unchecked) {
-				return this.$t("security.no_vulnerability_unknown_coverage")
-			}
-			if (!this.unchecked.total) {
-				return this.$t("security.no_vulnerability_nothing_checked")
-			}
-			if (this.outdatedSources.length) {
-				return this.$t("security.no_vulnerability_outdated")
-			}
-			return this.unchecked.installations
-				? this.$t("security.no_vulnerability_checked_only", { count: this.unchecked.installations })
-				: this.$t("security.no_vulnerability_checked")
-		},
 	},
 	watch: {
 		filters: {
@@ -323,7 +297,7 @@ export default {
 			this.denied = true
 			return
 		}
-		await Promise.all([this.load(), this.loadCoverage()])
+		await this.load()
 	},
 	methods: {
 		formatDay,
@@ -442,25 +416,6 @@ export default {
 				this.filters.fix = this.filters.fix === "yes" ? null : "yes"
 			} else {
 				this.filters.level = this.filters.level === key ? null : key
-			}
-		},
-
-		async loadCoverage() {
-			try {
-				const coverage = await this.$api.generic.get("vulnerabilities/coverage/")
-				// every installation, for the "N out of M" line
-				const total = (coverage.families || []).reduce((sum, family) =>
-					sum + Object.values(family.installations || {}).reduce((count, value) => count + value, 0), 0)
-				this.unchecked = { installations: coverage.unchecked || 0, excluded: coverage.excluded || 0, total }
-			} catch {
-				// unknown coverage: the empty list says so
-				this.unchecked = null
-			}
-			// stale sources: the empty list says so too
-			try {
-				this.sources = asList(await this.$api.generic.get("vulnerabilities/sources/"))
-			} catch {
-				this.sources = []
 			}
 		},
 

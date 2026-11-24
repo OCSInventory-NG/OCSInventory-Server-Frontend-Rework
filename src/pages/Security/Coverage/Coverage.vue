@@ -68,7 +68,6 @@
 									:usecheckbox="false"
 									:candeletemultiple="false"
 									:cansearch="false"
-									:emptytext="$t('security.all_checked')"
 									title="coverage_reasons"
 									translationkey="security.column_"
 									compactheader
@@ -125,7 +124,6 @@
 										:usecheckbox="false"
 										:candeletemultiple="false"
 										:cansearch="false"
-										:emptytext="$t('security.all_kernels_checked')"
 										title="coverage_kernel_reasons"
 										translationkey="security.column_"
 										compactheader

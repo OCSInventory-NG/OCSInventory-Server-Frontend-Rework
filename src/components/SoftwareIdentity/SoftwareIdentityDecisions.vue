@@ -15,7 +15,6 @@
 			:candeletemultiple="false"
 			:usecheckbox="false"
 			:isbusy="loading"
-			:emptytext="$t('software_identity.decisions_empty')"
 			title="software_identity_decisions"
 			translationkey="software_identity.column_"
 			compactheader

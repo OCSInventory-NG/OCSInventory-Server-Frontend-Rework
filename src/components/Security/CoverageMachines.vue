@@ -18,7 +18,6 @@
 			:server-total-rows="total"
 			:page-reset-key="pageResetKey"
 			:isbusy="loading"
-			:emptytext="$t('security.machines_empty')"
 			title="coverage_machines"
 			translationkey="security.column_"
 			compactheader
