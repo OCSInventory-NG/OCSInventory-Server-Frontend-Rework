@@ -1285,6 +1285,7 @@
     "tab_title": "Zranitelnosti",
     "tab_unchecked_label": "Neověřené",
     "tile_coverage": "Pokrytí",
+    "tile_excluded_assets_detail": "+ {count} vyloučeno",
     "tile_excluded_detail": "+ {count} vyloučeno",
     "tile_fix": "S opravou",
     "tile_kev": "Zneužívané (KEV)",
