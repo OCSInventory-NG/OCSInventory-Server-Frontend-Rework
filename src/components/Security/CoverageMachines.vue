@@ -10,7 +10,6 @@
 			id="coverage-machines-datatable"
 			:rowdata="rows"
 			:rowheader="columns"
-			:nonsortablefields="columns"
 			:usecheckbox="false"
 			:candeletemultiple="false"
 			:cansearch="false"
@@ -157,7 +156,9 @@ export default {
 		},
 
 		async onQueryChange(query) {
-			this.query = { limit: query.limit, offset: query.offset }
+			// the server sorts the machine column on the asset name
+			const ordering = query.ordering ? query.ordering.replace("machine", "name") : null
+			this.query = { limit: query.limit, offset: query.offset, ordering }
 			await this.load()
 		},
 
