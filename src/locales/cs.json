@@ -275,8 +275,8 @@
     "priority_score": "Použité skóre (CVSS)",
     "priority_epss": "Pravděpodobnost zneužití (EPSS)",
     "priority_machines": "Počet zařízení",
-    "cpe_match_score": "Skóre automatického párování CPE",
-    "cpe_review_score": "Skóre kontroly CPE",
+    "cpe_match_score": "Skóre automatické identifikace",
+    "cpe_review_score": "Skóre kontroly",
     "cpe_match_score_confirm": "Změna prahů CPE znovu spustí identifikaci veškerého softwaru pro Windows a macOS, který nemá rozhodnutí v katalogu.",
     "cpe_review_score_confirm": "Změna prahů CPE znovu spustí identifikaci veškerého softwaru pro Windows a macOS, který nemá rozhodnutí v katalogu.",
     "confirm_title": "Uložit tato nastavení?",
@@ -285,9 +285,9 @@
     "order_up": "Posunout nahoru",
     "order_down": "Posunout dolů",
     "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "Roky CVE porovnávané se softwarem pro Windows a macOS, včetně aktuálního roku. Skóre z ostatních let zůstávají načtená pro hodnocení zranitelností v Linuxu.",
-    "Order of the vulnerability list, first criterion first": "Řazení seznamu zranitelností, první kritérium má přednost",
-    "Windows and macOS software: name match score from which the product is identified automatically": "Software pro Windows a macOS: skóre shody názvu, od kterého je produkt identifikován automaticky",
-    "Windows and macOS software: name match score from which the product is proposed for review": "Software pro Windows a macOS: skóre shody názvu, od kterého je produkt navržen ke kontrole"
+    "Default order of Security > Vulnerabilities: sorted on criterion 1, then on criterion 2 when equal, and so on": "Výchozí řazení seznamu Zabezpečení > Zranitelnosti: podle kritéria 1, při shodě podle kritéria 2 a tak dále.",
+    "Windows and macOS software is identified by comparing its name with the product names of the NVD: from this similarity score, the closest product is assigned automatically, unless another product comes close": "Software pro Windows a macOS se identifikuje porovnáním jeho názvu s názvy produktů v NVD. Od tohoto skóre podobnosti se nejbližší produkt přiřadí automaticky, pokud se mu jiný produkt nepřibližuje.",
+    "Windows and macOS software whose similarity score is between this score and the automatic identification score is listed in Security > Software identity > Review, where an administrator chooses the product; below this score, the software is not identified": "Software pro Windows a macOS, jehož skóre podobnosti je mezi tímto skóre a skóre automatické identifikace, se zobrazí v Zabezpečení > Identita softwaru > Kontrola, kde správce vybere produkt. Pod tímto skóre software není identifikován."
   },
   "dashboard": {
     "adddashboardlayout": "Přidat nový přehled",

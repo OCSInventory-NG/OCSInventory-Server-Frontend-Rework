@@ -275,8 +275,8 @@
     "priority_score": "Score retenu (CVSS)",
     "priority_epss": "Probabilité d'exploitation (EPSS)",
     "priority_machines": "Nombre d'actifs",
-    "cpe_match_score": "Score de rapprochement CPE automatique",
-    "cpe_review_score": "Score de revue CPE",
+    "cpe_match_score": "Score d'identification automatique",
+    "cpe_review_score": "Score de vérification",
     "cpe_match_score_confirm": "Modifier les seuils CPE relance l'identification de tous les logiciels Windows et macOS sans décision du catalogue.",
     "cpe_review_score_confirm": "Modifier les seuils CPE relance l'identification de tous les logiciels Windows et macOS sans décision du catalogue.",
     "confirm_title": "Enregistrer ces réglages ?",
@@ -285,9 +285,9 @@
     "order_up": "Monter",
     "order_down": "Descendre",
     "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "Années de CVE comparées aux logiciels Windows et macOS, l'année en cours comprise. Les scores des autres années restent chargés pour noter les vulnérabilités Linux.",
-    "Order of the vulnerability list, first criterion first": "Ordre de la liste des vulnérabilités, premier critère en premier",
-    "Windows and macOS software: name match score from which the product is identified automatically": "Logiciels Windows et macOS : score de correspondance du nom à partir duquel le produit est identifié automatiquement",
-    "Windows and macOS software: name match score from which the product is proposed for review": "Logiciels Windows et macOS : score de correspondance du nom à partir duquel le produit est proposé en revue"
+    "Default order of Security > Vulnerabilities: sorted on criterion 1, then on criterion 2 when equal, and so on": "Ordre par défaut de Sécurité > Vulnérabilités : tri sur le critère 1, puis sur le critère 2 en cas d'égalité, et ainsi de suite.",
+    "Windows and macOS software is identified by comparing its name with the product names of the NVD: from this similarity score, the closest product is assigned automatically, unless another product comes close": "Les logiciels Windows et macOS sont identifiés en comparant leur nom aux noms de produits de la NVD. À partir de ce score de ressemblance, le produit le plus proche est attribué automatiquement, sauf si un autre produit s'en approche.",
+    "Windows and macOS software whose similarity score is between this score and the automatic identification score is listed in Security > Software identity > Review, where an administrator chooses the product; below this score, the software is not identified": "Les logiciels Windows et macOS dont le score de ressemblance est compris entre ce score et le score d'identification automatique sont listés dans Sécurité > Identité logicielle > Vérification, où un administrateur choisit le produit. En dessous de ce score, le logiciel n'est pas identifié."
   },
   "dashboard": {
     "chartplaceholder": "Sélectionner un composant à ajouter",

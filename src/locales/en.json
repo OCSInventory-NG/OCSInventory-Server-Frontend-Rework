@@ -275,8 +275,8 @@
     "priority_score": "Selected score (CVSS)",
     "priority_epss": "Exploit probability (EPSS)",
     "priority_machines": "Number of assets",
-    "cpe_match_score": "Automatic CPE match score",
-    "cpe_review_score": "CPE review score",
+    "cpe_match_score": "Automatic identification score",
+    "cpe_review_score": "Review score",
     "cpe_match_score_confirm": "Changing the CPE thresholds restarts the identification of all Windows and macOS software without a catalog decision.",
     "cpe_review_score_confirm": "Changing the CPE thresholds restarts the identification of all Windows and macOS software without a catalog decision.",
     "confirm_title": "Save these settings?",
@@ -285,9 +285,9 @@
     "order_up": "Move up",
     "order_down": "Move down",
     "Years of NVD vulnerabilities loaded for Windows and macOS software, the current one included": "CVE years compared with Windows and macOS software, the current year included. Scores from other years stay loaded to rate Linux vulnerabilities.",
-    "Order of the vulnerability list, first criterion first": "Order of the vulnerability list, first criterion first",
-    "Windows and macOS software: name match score from which the product is identified automatically": "Windows and macOS software: name match score from which the product is automatically identified",
-    "Windows and macOS software: name match score from which the product is proposed for review": "Windows and macOS software: name match score from which the product is proposed for review"
+    "Default order of Security > Vulnerabilities: sorted on criterion 1, then on criterion 2 when equal, and so on": "Default order of Security > Vulnerabilities: sorted on criterion 1, then on criterion 2 when equal, and so on.",
+    "Windows and macOS software is identified by comparing its name with the product names of the NVD: from this similarity score, the closest product is assigned automatically, unless another product comes close": "Windows and macOS software is identified by comparing its name with the product names of the NVD. From this similarity score, the closest product is assigned automatically, unless another product comes close.",
+    "Windows and macOS software whose similarity score is between this score and the automatic identification score is listed in Security > Software identity > Review, where an administrator chooses the product; below this score, the software is not identified": "Windows and macOS software whose similarity score is between this score and the automatic identification score is listed in Security > Software identity > Review, where an administrator chooses the product. Below this score, the software is not identified."
   },
   "dashboard": {
     "chartplaceholder": "Select component to add",
