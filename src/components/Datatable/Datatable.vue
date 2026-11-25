@@ -269,7 +269,13 @@
 				</template>
 
 				<template #cell()="row">
-					<template v-if="getCellLink(row)">
+					<template v-if="$slots['cell(' + row.field.key + ')']">
+						<slot
+							:name="'cell(' + row.field.key + ')'"
+							:row="row"
+						/>
+					</template>
+					<template v-else-if="getCellLink(row)">
 						<span>{{ getCellLink(row).prefix }}</span>
 						<a
 							:href="getCellLink(row).href"

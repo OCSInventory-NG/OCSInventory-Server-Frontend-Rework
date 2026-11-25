@@ -31,6 +31,7 @@
 								v-if="canadd"
 								:permissionsprop="permissions"
 								:permissionslabelprop="permissionslabel"
+								:allassetsidprop="allassetsid"
 								@reload-datatable="reloadDatatable"
 							/>
 
@@ -48,7 +49,41 @@
 								titlevalue="group"
 								translationkey="group."
 								@reload-datatable="reloadDatatable"
-							/>
+							>
+								<template #cell(asset_groups)="{ row }">
+									<template v-if="row.item.__asset_groups?.mode === 'list'">
+										<div
+											v-for="assetGroup in row.item.__asset_groups.groups"
+											:key="assetGroup.id"
+										>
+											<router-link
+												:to="'/inventory/assetgroups/' + assetGroup.id"
+												class="ocs-link"
+											>
+												{{ assetGroup.name }}
+											</router-link>
+										</div>
+									</template>
+									<span
+										v-else
+										class="text-secondary"
+									>
+										{{ row.item.__asset_groups?.text }}
+									</span>
+								</template>
+
+								<template #cell(permissions)="{ row }">
+									<dl class="permissions-list">
+										<template
+											v-for="line in row.item.__permissions"
+											:key="line.label"
+										>
+											<dt>{{ line.label }}</dt>
+											<dd>{{ line.rights }}</dd>
+										</template>
+									</dl>
+								</template>
+							</Datatable>
 						</div>
 					</div>
 				</div>
@@ -76,6 +111,7 @@ export default {
 			rowheader: [],
 			permissions: [],
 			permissionslabel: [],
+			allassetsid: null,
 
 			isbusy: true,
 			loading: true,
@@ -112,7 +148,7 @@ export default {
 				// Get header
 				const header = await this.$api.generic.options("groups/")
 				this.rowheader = Object.keys(header.actions.POST).filter(
-					(f) => !["is_protected"].includes(f)
+					(f) => f !== "is_protected"
 				)
 
 				// Get permissions
@@ -145,7 +181,8 @@ export default {
 					"logentry",
 					"proxy",
 					"filemanager",
-					"groupprotection"
+					"groupprotection",
+					"groupassetscope"
 				]
 
 				this.permissions = {}
@@ -165,6 +202,11 @@ export default {
 						null
 
 					if (appLabel && djangoCoreApps.some(core => appLabel.includes(core))) {
+						continue
+					}
+
+					if (codename === "view_all_assets") {
+						this.allassetsid = p.id
 						continue
 					}
 
@@ -212,9 +254,11 @@ export default {
 			this.isbusy = true
 
 			try {
-				const data = await this.$api.generic.get("groups/")
+				const data = await this.$api.generic.get("groups/", {}, { expand: "asset_groups" })
 				this.rowdata = Array.isArray(data) ? data : (data?.results || [])
 
+				// Must run before permissionsTreatment, which replaces the permission ids
+				this.assetGroupsTreatment()
 				this.permissionsTreatment()
 
 				this.errormsg = null
@@ -224,6 +268,26 @@ export default {
 				this.errored = true
 			} finally {
 				this.isbusy = false
+			}
+		},
+
+		assetGroupsTreatment() {
+			for (const row of this.rowdata || []) {
+				let scope
+				if (this.allassetsid && (row.permissions || []).includes(this.allassetsid)) {
+					scope = { mode: "all", text: this.$t("group.scope_all_assets") }
+				} else if (row.asset_groups == null) {
+					scope = { mode: "unrestricted", text: this.$t("group.scope_unrestricted") }
+				} else if (!row.asset_groups.length) {
+					scope = { mode: "empty", text: this.$t("group.scope_empty") }
+				} else {
+					scope = { mode: "list", groups: row.asset_groups }
+					scope.text = row.asset_groups.map((g) => g.name).join("\n")
+				}
+
+				// Structured scope for the display, plain text kept for the datatable search
+				row.__asset_groups = scope
+				row.asset_groups = scope.text
 			}
 		},
 
@@ -252,10 +316,12 @@ export default {
 				}
 
 				const lines = Array.from(grouped.entries())
-					.map(([labelTrad, setTypes]) => `${labelTrad} : ${Array.from(setTypes).join(", ")}`)
-					.sort((a, b) => a.localeCompare(b))
+					.map(([label, setTypes]) => ({ label, rights: Array.from(setTypes).join(", ") }))
+					.sort((a, b) => a.label.localeCompare(b.label))
 
-				row.permissions = lines.join("\n")
+				// Structured lines for the aligned display, plain text kept for the datatable search
+				row.__permissions = lines
+				row.permissions = lines.map((l) => `${l.label} : ${l.rights}`).join("\n")
 			}
 		},
 
