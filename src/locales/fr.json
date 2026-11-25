@@ -894,7 +894,6 @@
     "cvss_vector": "Vecteur CVSS {version}",
     "details": "Détails",
     "distro_rating_label": "Gravité de la distribution",
-    "distro_short": "distribution : {rating}",
     "dynamic_group": "dynamique",
     "edit_exclusion": "Modifier l'exclusion",
     "epss_help": "Probabilité d'exploitation dans les 30 jours",

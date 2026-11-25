@@ -90,9 +90,6 @@
 										:level="row.item.level"
 										:score="row.item.cvss_score"
 									/>
-									<div class="text-muted small score-detail">
-										{{ scoreDetail(row.item) }}
-									</div>
 								</template>
 								<template #cell(epss)="{ row }">
 									<EpssScore
@@ -155,7 +152,7 @@
 import { hasPermission } from "@/utils/permissions"
 import {
 	FAMILIES, LEVELS, LEVEL_COLORS, PRIORITY_CRITERIA,
-	apiErrorMessage, asList, formatDay, openMultisearch, ratingLabel, shortSummary,
+	apiErrorMessage, asList, formatDay, openMultisearch, shortSummary,
 	vulnerabilityMachinesCriteria, vulnerableMachinesCriteria,
 } from "@/utils/security"
 
@@ -491,13 +488,6 @@ export default {
 				this.errormsg = apiErrorMessage(e)
 				this.errored = true
 			}
-		},
-
-		scoreDetail(row) {
-			return [
-				row.cvss_version ? `CVSS ${row.cvss_version}` : "",
-				row.distro_rating ? this.$t("security.distro_short", { rating: ratingLabel(this, row.distro_rating) }) : "",
-			].filter(Boolean).join(" · ")
 		},
 
 		detailLink(vulnId) {

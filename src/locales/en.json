@@ -894,7 +894,6 @@
     "cvss_vector": "CVSS {version} vector",
     "details": "Details",
     "distro_rating_label": "Distribution severity",
-    "distro_short": "distribution: {rating}",
     "dynamic_group": "dynamic",
     "edit_exclusion": "Edit the exclusion",
     "epss_help": "Probability of exploitation in the next 30 days",

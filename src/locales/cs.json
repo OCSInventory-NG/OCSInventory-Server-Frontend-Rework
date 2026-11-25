@@ -1134,7 +1134,6 @@
     "cvss_vector": "Vektor CVSS {version}",
     "details": "Podrobnosti",
     "distro_rating_label": "Závažnost podle distribuce",
-    "distro_short": "distribuce: {rating}",
     "dynamic_group": "dynamická",
     "edit_exclusion": "Upravit výjimku",
     "epss_help": "Pravděpodobnost zneužití v příštích 30 dnech",
