@@ -106,9 +106,7 @@
 						:id="`reference-${field}`"
 						v-model="form[field]"
 						switch
-					>
-						{{ booleanLabel(field) }}
-					</b-form-checkbox>
+					/>
 					<!-- known values offered, a new one can still be typed -->
 					<v-select
 						v-else-if="fieldoptions[field]"
