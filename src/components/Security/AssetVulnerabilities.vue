@@ -55,7 +55,7 @@
 				<b-tab :title="$t('security.tab_open_label')">
 					<!-- Never a bare "no vulnerability" -->
 					<div
-						v-if="!visibleOpen.length"
+						v-if="!counts.open"
 						class="alert"
 						:class="emptyWarns ? 'alert-warning' : 'alert-success'"
 					>
@@ -74,13 +74,13 @@
 							</div>
 						</div>
 					</div>
-					<ExposureTable
+					<AssetExposureTable
 						v-else
+						ref="openTable"
+						:asset-id="assetId"
 						name="asset_vulnerabilities_open"
-						:rows="visibleOpen"
-						assetview
 						:canexclude="canexclude"
-						@reload="reloadOpen"
+						@reload="loadCounts"
 						@exclude="openExclusion"
 					/>
 				</b-tab>
@@ -89,25 +89,11 @@
 					:title="$t('security.tab_closed')"
 					lazy
 				>
-					<Alert
-						v-if="closedError"
-						:message="closedError"
-						variant="danger"
-					/>
-					<ExposureTable
-						v-else-if="closed"
+					<AssetExposureTable
+						:asset-id="assetId"
 						name="asset_vulnerabilities_closed"
-						:rows="closed"
-						assetview
-						closed
-						@reload="loadClosed"
+						status="closed"
 					/>
-					<div
-						v-else
-						class="ocs-loader"
-					>
-						<Loader />
-					</div>
 				</b-tab>
 
 				<!-- Only what the scan could not check: the full list is the inventory one -->
@@ -141,15 +127,15 @@
 				</b-tab>
 
 				<b-tab
-					v-if="excludedOpen.length"
+					v-if="counts.excluded"
 					:title="$t('security.tab_excluded_label')"
 				>
-					<ExposureTable
+					<AssetExposureTable
+						ref="excludedTable"
+						:asset-id="assetId"
 						name="asset_vulnerabilities_excluded"
-						:rows="excludedOpen"
-						assetview
 						excluded
-						@reload="reloadOpen"
+						@reload="loadCounts"
 					/>
 				</b-tab>
 			</b-tabs>
@@ -157,7 +143,7 @@
 			<ExclusionModal
 				v-model="exclusionShown"
 				:preset="exclusionPreset"
-				@saved="reloadOpen"
+				@saved="exclusionSaved"
 			/>
 		</template>
 	</div>
@@ -186,9 +172,8 @@ export default {
 			loading: true,
 
 			coverage: { kernel: "not_applicable", unchecked: 0, excluded: 0 },
-			open: [],
-			closed: null,
-			closedError: null,
+			// open exposures, those excluded, vulnerabilities with a fix
+			counts: { open: 0, excluded: 0, fix: 0 },
 			software: [],
 			activeTab: 0,
 
@@ -237,9 +222,7 @@ export default {
 		},
 		tiles() {
 			const unchecked = this.coverage.unchecked || 0
-			const open = this.visibleOpen.length
-			// distinct CVEs: one vulnerability can hit several packages of the machine
-			const withFix = new Set(this.visibleOpen.filter((row) => row.fixed_version).map((row) => row.vuln_id)).size
+			const open = this.counts.open
 			const tiles = []
 			// no Linux kernel to check (Windows, macOS): no tile rather than a green one
 			if (this.coverage.kernel !== "not_applicable") {
@@ -272,16 +255,10 @@ export default {
 				{
 					key: "fix",
 					label: this.$t("security.tile_fix"),
-					value: withFix,
+					value: this.counts.fix,
 					color: "#2fb344",
 				},
 			]
-		},
-		excludedOpen() {
-			return this.open.filter((row) => row.excluded)
-		},
-		visibleOpen() {
-			return this.open.filter((row) => !row.excluded)
 		},
 		emptyWarns() {
 			return this.notCovered || this.coverage.unchecked > 0 || !this.kernelOk
@@ -301,22 +278,15 @@ export default {
 			return this.uncheckedSoftware.filter((row) => !this.softwareState || row.state === this.softwareState)
 		},
 	},
-	watch: {
-		async activeTab(index) {
-			if (index === 1 && this.closed === null) {
-				await this.loadClosed()
-			}
-		},
-	},
 	async mounted() {
 		try {
-			const [coverage, open, software] = await Promise.all([
+			const [coverage, counts, software] = await Promise.all([
 				this.$api.generic.get("vulnerabilities/coverage/", { asset: this.assetId }),
-				this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "open" }),
+				this.$api.generic.get("vulnerability_exposures/summary/", { asset: this.assetId }),
 				this.$api.generic.get("vulnerability_exposures/software/", { asset: this.assetId }),
 			])
 			this.coverage = coverage
-			this.open = asList(open)
+			this.counts = counts
 			this.software = asList(software)
 		} catch (e) {
 			this.errormsg = apiErrorMessage(e)
@@ -332,21 +302,20 @@ export default {
 			return this.$te("security.state_" + state) ? this.$t("security.state_" + state) : state
 		},
 
-		async loadClosed() {
+		async loadCounts() {
 			try {
-				this.closed = asList(await this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "closed" }))
-			} catch (e) {
-				this.closedError = apiErrorMessage(e)
-			}
-		},
-
-		async reloadOpen() {
-			try {
-				this.open = asList(await this.$api.generic.get("vulnerability_exposures/", { asset: this.assetId, status: "open" }))
+				this.counts = await this.$api.generic.get("vulnerability_exposures/summary/", { asset: this.assetId })
 			} catch (e) {
 				this.errormsg = apiErrorMessage(e)
 				this.errored = true
 			}
+		},
+
+		// an exposure moves between the open and the excluded tabs
+		async exclusionSaved() {
+			await this.loadCounts()
+			this.$refs.openTable?.load()
+			this.$refs.excludedTable?.load()
 		},
 
 		// the unchecked count comes with the coverage

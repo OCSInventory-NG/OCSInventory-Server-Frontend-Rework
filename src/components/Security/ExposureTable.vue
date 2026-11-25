@@ -2,6 +2,7 @@
 	<div :class="{ 'exposure-excluded': excluded }">
 		<Datatable
 			:id="name + '-datatable'"
+			ref="datatable"
 			:rowdata="rowdata"
 			:rowheader="columns"
 			:title="name"
@@ -9,9 +10,15 @@
 			:candeletemultiple="false"
 			:hascustomactions="canexclude"
 			:hiddenfields="hiddencolumns"
+			:server-side="serverside"
+			:server-total-rows="total"
+			:isbusy="busy"
 			translationkey="security.column_"
 			compactheader
 			@reload-datatable="$emit('reload')"
+			@change-query="$emit('change-query', $event)"
+			@export="exportRows"
+			@export-all="$emit('export-all')"
 		>
 			<template #cell(machine)="{ row }">
 				<router-link
@@ -140,8 +147,12 @@ export default {
 		closed: { type: Boolean, default: false },
 		excluded: { type: Boolean, default: false },
 		canexclude: { type: Boolean, default: false },
+		// rows paged, sorted and searched by the server, see AssetExposureTable
+		serverside: { type: Boolean, default: false },
+		total: { type: Number, default: 0 },
+		busy: { type: Boolean, default: false },
 	},
-	emits: ["exclude", "reload"],
+	emits: ["exclude", "reload", "change-query", "export-all"],
 	computed: {
 		columns() {
 			const columns = this.assetview
@@ -165,7 +176,14 @@ export default {
 		// keys the datatable draws itself (last_seen, closed_at…) are renamed;
 		// the plain values keep the client sort meaningful
 		rowdata() {
-			return this.rows.map((row) => ({
+			return this.rows.map(this.toItem)
+		},
+	},
+	methods: {
+		formatDay,
+		shortSummary,
+		toItem(row) {
+			return {
 				...row,
 				id: [row.vuln_id, row.asset, row.product, row.version, row.closed_at].join("|"),
 				machine: row.asset_name,
@@ -175,12 +193,15 @@ export default {
 				seen: row.last_seen,
 				closed_on: row.closed_at,
 				source: row,
-			}))
+			}
 		},
-	},
-	methods: {
-		formatDay,
-		shortSummary,
+		// the server side datatable leaves its exports to the page
+		exportRows({ scope, rows }) {
+			this.$refs.datatable.exportRowsLocal(rows, scope)
+		},
+		exportAll(rows) {
+			this.$refs.datatable.exportRowsLocal(rows.map(this.toItem), "all")
+		},
 		ratingText(rating) {
 			return ratingLabel(this, rating)
 		},
