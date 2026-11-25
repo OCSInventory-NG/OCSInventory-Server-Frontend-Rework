@@ -51,9 +51,12 @@ export function formatDay(value) {
 export function formatPercent(value, digits = 1) {
 	if (value === null || value === undefined) return ""
 	const percent = value * 100
-	// a small share is not nothing
+	// a small share is not nothing, a large one is not all
 	if (percent > 0 && percent < 0.1) return "< 0.1 %"
-	return `${percent.toFixed(percent >= 10 || percent === 0 ? 0 : digits)} %`
+	if (percent > 99.9 && percent < 100) return "> 99.9 %"
+	// from 99.5 %, a whole number would round to 100 %
+	const whole = percent === 0 || percent === 100 || (percent >= 10 && percent < 99.5)
+	return `${percent.toFixed(whole ? 0 : digits)} %`
 }
 
 // EPSS colour: most CVEs are below 1 %, 10 % and more is a high probability
