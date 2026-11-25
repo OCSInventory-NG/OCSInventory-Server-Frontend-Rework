@@ -111,10 +111,9 @@
 									<IdentityReferenceTable
 										route="cpe_aliases"
 										model="cpealias"
-										:firstfields="['product', 'alias', 'source']"
+										:firstfields="['product', 'alias']"
 										:patterns="{ product: cpeKeyPattern, alias: cpeKeyPattern }"
 										:placeholders="{ product: 'zoom:zoom', alias: 'zoom:meetings' }"
-										:protectedrows="{ source: 'shipped' }"
 									/>
 								</b-tab>
 								<b-tab

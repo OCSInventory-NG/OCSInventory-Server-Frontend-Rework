@@ -49,9 +49,6 @@
 						:class="badgefields[field] || 'bg-green-lt'"
 					>{{ booleanLabel(field) }}</span>
 				</template>
-				<template v-else-if="field === 'source' && (row.item.source[field] === 'shipped' || row.item.source[field] === 'admin')">
-					{{ $t('software_identity.source_' + row.item.source[field]) }}
-				</template>
 				<template v-else-if="fieldType(field) === 'date'">
 					{{ formatDay(row.item.source[field]) }}
 				</template>
@@ -64,7 +61,6 @@
 			</template>
 			<template #cell(firstActions)="{ row }">
 				<button
-					v-if="!row.item.is_protected"
 					class="btn btn-ghost-dark"
 					:title="$t('generic.update')"
 					@click="openForm(row.item.source)"
@@ -180,8 +176,6 @@ export default {
 		badgefields: { type: Object, default: () => ({}) },
 		patterns: { type: Object, default: () => ({}) },
 		placeholders: { type: Object, default: () => ({}) },
-		// rows that cannot be changed nor deleted: {field: value}
-		protectedrows: { type: Object, default: () => ({}) },
 		// values offered in a dropdown, by field: {field: [string]}
 		fieldoptions: { type: Object, default: () => ({}) },
 	},
@@ -244,7 +238,6 @@ export default {
 				const item = {
 					id: row.id,
 					name: String(row[this.columns[0]] ?? row.id),
-					is_protected: this.isprotected(row),
 					source: row,
 				}
 				for (const field of this.columns) {
@@ -314,9 +307,6 @@ export default {
 			if (Array.isArray(value)) return value.join(", ")
 			if (typeof value === "object") return JSON.stringify(value)
 			return value
-		},
-		isprotected(row) {
-			return Object.entries(this.protectedrows).some(([field, value]) => row[field] === value)
 		},
 
 		openForm(row) {
