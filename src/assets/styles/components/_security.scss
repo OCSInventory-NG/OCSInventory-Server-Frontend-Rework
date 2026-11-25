@@ -15,6 +15,12 @@
   .vs__search::placeholder {
     color: $gray-700;
   }
+
+  // the cross centred and sized as the arrow next to it
+  .vs__clear {
+    display: inline-flex;
+    transform: scale(0.7);
+  }
 }
 
 // a filter set from a link, removed with its cross
