@@ -286,3 +286,20 @@ tbody, td, tfoot, th, thead, tr {
     transform: rotate(360deg);
   }
 }
+
+// Permissions cell (user groups): label and rights in two aligned columns
+.permissions-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 1rem;
+  margin: 0;
+  white-space: normal;
+
+  dt {
+    font-weight: normal;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
