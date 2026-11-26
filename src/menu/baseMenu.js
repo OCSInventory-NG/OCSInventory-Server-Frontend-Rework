@@ -85,6 +85,45 @@ export const baseMenu = [
 	},
 	{
 		type: "group",
+		index: "security",
+		headerKey: "title.security",
+		link: "/security",
+		icon: "shield-halved",
+		columnDividers: [
+			{
+				headerKey: "title.general",
+				identifier: "general",
+			},
+		],
+		children: [
+			{
+				headerKey: "title.vulnerabilities",
+				link: "/security/vulnerabilities",
+				route: "Vulnerabilities",
+				column: "general",
+			},
+			{
+				headerKey: "title.vulnerability_coverage",
+				link: "/security/coverage",
+				route: "VulnerabilityCoverage",
+				column: "general",
+			},
+			{
+				headerKey: "title.vulnerability_exclusions",
+				link: "/security/exclusions",
+				route: "VulnerabilityExclusions",
+				column: "general",
+			},
+			{
+				headerKey: "title.software_identity",
+				link: "/security/software_identity",
+				route: "SoftwareIdentity",
+				column: "general",
+			},
+		],
+	},
+	{
+		type: "group",
 		index: "deployment",
 		headerKey: "title.deployment",
 		link: "/deployment",

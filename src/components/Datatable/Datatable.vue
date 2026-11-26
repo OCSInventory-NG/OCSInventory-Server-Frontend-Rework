@@ -7,7 +7,10 @@
 		<div class="header-table ocs-toolbar">
 			<!-- Search and actions on the selection -->
 			<div class="toolbar-group toolbar-start">
-				<div class="input-icon toolbar-search">
+				<div
+					v-if="cansearch"
+					class="input-icon toolbar-search"
+				>
 					<b-form-input 
 						id="filter-input" 
 						v-model="filter"
@@ -90,6 +93,9 @@
 						:icon="['far', 'file-lines']"
 					/>
 				</router-link>
+
+				<!-- Filters of the page, next to the search -->
+				<slot name="toolbar" />
 
 				<AssetGroupModal
 					v-if="title == 'asset/bases' && !multisearch"
@@ -209,6 +215,9 @@
 				/>
 			</div>
 		</div>
+
+		<!-- What the page tells about the rows, under the header -->
+		<slot name="subheader" />
 
 		<!-- Total row number -->
 		<div
@@ -754,6 +763,8 @@ export default {
 		virtualcoltarget: { type: String, default: null },
 		// table listed here, when its show/hide choices can be saved as layouts
 		layouttarget: { type: String, default: null },
+		// false when the route behind the table cannot search
+		cansearch: { type: Boolean, default: true },
 		// labels of the columns whose key is no translation key
 		fieldlabels: { type: Object, default: () => ({}) },
 		// Remove assets from group
@@ -765,6 +776,8 @@ export default {
 		// Server side pagination
 		serverSide: { type: Boolean, default: false },
 		serverTotalRows: { type: Number, default: 0 },
+		// Bumped by the parent to go back to the first page
+		pageResetKey: { type: [Number, String], default: 0 },
 		isbusy: { type: Boolean, default: false },
 		// Multisearch
 		redirectToSearch: { type: Boolean, default: false },
@@ -944,6 +957,9 @@ export default {
 			if (this.serverSide) {
 				this.totalRows = val
 			}
+		},
+		pageResetKey() {
+			this.currentPage = 1
 		},
 		currentPage() {
 			this.isChecked = false
